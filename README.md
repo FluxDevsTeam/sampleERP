@@ -1,50 +1,70 @@
-# React + TypeScript + Vite
+# How to Clone and Start the Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This guide will walk you through the steps to clone this project from a repository and start it on your local machine.
 
-Currently, two official plugins are available:
+### Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Before you begin, ensure you have the following installed:
 
-## Expanding the ESLint configuration
+- [Node.js](https://nodejs.org/)
+- [Git](https://git-scm.com/)
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Steps to Clone and Start the Project
 
-- Configure the top-level `parserOptions` property like this:
+#### 1. Clone the Repository
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+1. Open your terminal or command prompt.
+2. Navigate to the directory where you want to clone the project.
+3. Run the following command to clone the repository:
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+   ```bash
+   git clone https://github.com/FluxDevsTeam/KidsDesignCompanyFrontend.git
+   ```
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+4. Navigate to the cloned project directory:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+   ```bash
+   cd KidsDesignCompanyFrontend
+   ```
+
+#### 2. Install Dependencies
+
+1. Ensure you are in the project directory.
+2. Install the project dependencies by running:
+
+   ```bash
+   npm install
+   ```
+
+#### 3. Start the Project
+
+1. Once the dependencies are installed, start the project by running:
+
+   ```bash
+   npm run dev
+   ```
+
+2. Open your browser and go to the specified URL (e.g., `http://localhost:5173`).
+
+### Troubleshooting
+
+- **Missing Dependencies:** If you encounter missing dependencies, re-run `npm install`.
+- **Unknown Start Command:** Double-check the `scripts` section of the `package.json` file.
+
+### Additional Commands
+
+- **Build the Project:**
+
+  ```bash
+  npm run build
+  ```
+
+- **Install a Specific Dependency:**
+
+  ```bash
+  npm install <package-name>
+  ```
+
+### Conclusion
+
+You have now successfully cloned and started the project!.
