@@ -27,6 +27,18 @@ Before you begin, ensure you have the following installed:
    cd KidsDesignCompanyFrontend
    ```
 
+5. Checkout to the master branch:
+
+   ```bash
+   git checkout master
+   ```
+
+6. Create a new branch for development:
+
+   ```bash
+   git checkout -b <branch-name>
+   ```
+
 #### 2. Install Dependencies
 
 1. Ensure you are in the project directory.
