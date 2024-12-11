@@ -1,7 +1,11 @@
-import React from "react";
+import UserTable from "../allProjects/projectComponents/UserTable";
 
 const Archives = () => {
-  return <div>Archives</div>;
-};
+  return (
+
+    <div className="w-full  bg-gray-100 ">
+      <UserTable  title="Archives" />
+    </div>
+  )};
 
 export default Archives;
