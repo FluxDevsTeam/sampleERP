@@ -2,11 +2,21 @@ import { projectSummary} from "../projectUtils/header-json";
 import { MdArrowOutward } from "react-icons/md";
 import Frame180 from "../../../../assets/images/Frame180.png";
 
-const ProjectsHeader = () => {
+interface HeaderProps {
+  title?: string; 
+}
+
+
+
+
+const ProjectsHeader :  React.FC<HeaderProps> = ({ title = "Manage Projects" }) =>  {
+
+
+  
     return (
       <div className="p-6 ">
-        <p className="text-3xl text-black font-bold py-6">Manage Projects</p>
-        <div className="flex justify-center items-center space-x-4">
+        <p className="text-3xl text-black font-bold py-6 ">{title}</p>
+        <div className="lg:grid lg:grid-cols-4 lg:space-x-4 space-x-0 grid grid-cols-1 lg:space-y-0 space-y-4">
           {projectSummary.map((project, index) => (
             <div className="bg-white border rounded-lg space-y-4 p-4" key={index}>
               <div className="flex justify-between items-center text-2xl">
@@ -17,7 +27,7 @@ const ProjectsHeader = () => {
               </div>
               <p className="text-black text-3xl font-bold">{project.number}</p>
               <div className="flex space-x-2 text-sm">
-                <MdArrowOutward />
+               <span className='text-green-200'><MdArrowOutward /> </span> 
                 <span>{project.description}</span>
               </div>
             </div>

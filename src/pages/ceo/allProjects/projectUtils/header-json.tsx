@@ -103,3 +103,23 @@ export const users: Task[] = [
   },
  
 ];
+
+export const transactions = [
+{
+  text: "Groceries",
+  date: new Date("2024-12-12"),
+  price: 50.75
+},
+
+ {
+  text: "Movie Ticket",
+  date: new Date("2024-11-15"),
+  price: 12.99
+},
+
+{
+  text: "Book Purchase",
+  date: new Date("2024-10-25"),
+  price: 19.49
+}
+]
