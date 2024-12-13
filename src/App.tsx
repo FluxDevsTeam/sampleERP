@@ -11,6 +11,10 @@ import {
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Settings from "./pages/ceo/settingss/settings";
+import Logout from "./pages/ceo/logout/logout";
+import Staffs from "./pages/ceo/staffs/staffs";
+
 
 const router = createBrowserRouter([
   // {
@@ -49,6 +53,18 @@ const router = createBrowserRouter([
       {
         path: "archives",
         element: <Archives />,
+      },
+      {
+        path: "staffs",
+        element: <Staffs />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
+      },
+      {
+        path: "logout",
+        element: <Logout />,
       },
     ],
   },
