@@ -1,6 +1,6 @@
+
 import ProjectsHeader from "./projectComponents/ProjectsHeader";
 import UserTable from "./projectComponents/UserTable";
-
 
 
 const AllProjects = () => {

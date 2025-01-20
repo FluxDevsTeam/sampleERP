@@ -1,6 +1,6 @@
 import { sidebarLink } from "../utils/data-json";
 import clsx from "clsx";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import Logo from "./Logo";
 import { LogoutIcon, SettingsIcon } from "../utils/SvgIcons";
 // import Logo from "../navbar/Logo";
@@ -73,14 +73,16 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
               !isSidebarOpen && "justify-normal md:justify-center"
             )}
           >
-            <SettingsIcon className="currentColor" />
+            <Link to={"settings"}>
+              <SettingsIcon className="currentColor" />
+            </Link>
             <p
               className={clsx(
                 "currentColor",
                 isSidebarOpen ? "block" : "block md:hidden"
               )}
             >
-              Settings
+              <Link to={"settings"}>Settings</Link>
             </p>
           </button>
           <button
@@ -91,14 +93,16 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
               !isSidebarOpen && "justify-normal md:justify-center"
             )}
           >
-            <LogoutIcon className="currentColor" />
+            <Link to={"logout"}>
+              <LogoutIcon className="currentColor" />
+            </Link>
             <p
               className={clsx(
                 "currentColor",
                 isSidebarOpen ? "block" : "block md:hidden"
               )}
             >
-              Sign out
+              <Link to={"logout"}>Sign out</Link>
             </p>
           </button>
         </div>
