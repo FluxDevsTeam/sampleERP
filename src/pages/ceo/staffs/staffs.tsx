@@ -1,7 +1,5 @@
 const Staffs = () => {
-    return ( <div>
-        staff
-    </div>  );
-}
- 
+  return <div>staff</div>;
+};
+
 export default Staffs;
