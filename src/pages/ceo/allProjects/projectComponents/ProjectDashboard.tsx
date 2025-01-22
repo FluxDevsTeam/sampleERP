@@ -5,6 +5,7 @@ import Areachart from "./Areachart";
 import Piechart from "./Piechart";
 import Barchart from "./Barchart";
 import Transactions from "./Transactions";
+import ProjectTable from "./ProjectTable";
 
 function ProjectDashboard() {
   return (
@@ -12,6 +13,7 @@ function ProjectDashboard() {
       <ProjectsHeader />
       <Header  />
       <ProjectCard />
+      <ProjectTable />
       <div className="w-full lg:grid lg:grid-cols-3 grid grid-cols-1 space-x-4  p-6">  
       <Piechart  />
       <Transactions  />

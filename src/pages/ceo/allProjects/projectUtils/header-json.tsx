@@ -9,6 +9,15 @@ export interface Task {
   startDate: string; 
 
 }
+
+export interface Project {
+  name: string;
+  email: string;
+  order:string
+  id:number; 
+  orderNo: string;
+
+}
 export interface Ptask {
   name: string;
   desc: string;
@@ -69,6 +78,56 @@ export const projectSummary: ProjectSummary[] = [
   },
 ];
 
+export const project: Project[] = [
+  {
+    name: "John Doe",
+    email: "john.doe@example.com",
+    id:52443,
+    orderNo:"tw6w76w",
+    order:"Ann"
+    
+  },
+  {
+    name: "Jane Smith",
+    email: "jane.smith@example.com",
+    id: 64649,
+    orderNo:"tw6w7te6w",
+    order:"Acdon"
+   
+  },
+  {
+    name: "Michael Ebo Andorful",
+    email: "michael.andorful@example.com",
+    id: 74744,
+    orderNo:"wds6w76w",
+    order:"Bye"
+   
+  },
+  {
+    name: "Sarah Connor",
+    email: "sarah.connor@example.com",
+    id: 74536,
+    orderNo:"ttew6w76w",
+    order:"Mike"
+   
+  },
+  {
+    name: "Tom Hanks",
+    email: "tom.hanks@example.com",
+    id: 84747,
+    orderNo:"tytew6w76w",
+    order:"sike"
+   
+  },
+  {
+    name: "Bruce Wayne",
+    email: "brucewaynes@example.com",
+    id: 64647,
+    orderNo:"ters6w76w",
+    order:"Grinch"
+   
+  },
+]
 
 export const users: Task[] = [
   {
