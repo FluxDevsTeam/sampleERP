@@ -63,10 +63,10 @@ const Product: React.FC<UserTableProps> = ({ title = "Active Projects" }) => {
                 </td>
                 <td className="border px-4 py-2 text-sm text-center">{user.startDate} - {user.endDate} </td>
                 <td className="px-4 py-2 flex items-center justify-center space-x-2">
-                  <p className="text-sm mb-4">{user.cost}</p> 
+                  <p className="text-sm mb-4">${user.cost}</p> 
                 </td>
-                <td className="border px-4 py-2 text-sm text-center">{user.expense}</td>
-                <td className="border px-4 py-2 text-sm text-center">{user.selling}</td>
+                <td className="border px-4 py-2 text-sm text-center">${user.expense}</td>
+                <td className="border px-4 py-2 text-sm text-center">${user.selling}</td>
               </tr>
             ))}
           </tbody>

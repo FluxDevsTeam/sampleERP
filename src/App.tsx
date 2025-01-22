@@ -15,6 +15,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ActivePage from "./pages/ceo/allProjects/projectComponents/ActivePage";
 import Product from "./pages/ceo/allProjects/projectComponents/Product";
+import ProjectDashboard from "./pages/ceo/allProjects/projectComponents/ProjectDashboard";
 
 const router = createBrowserRouter([
   // {
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
       {
         path: "/dashboard/product",
         element: <Product />,
+      },
+      {
+        path: "/dashboard/project-dashboard",
+        element: <ProjectDashboard />,
       },
     ],
   },
