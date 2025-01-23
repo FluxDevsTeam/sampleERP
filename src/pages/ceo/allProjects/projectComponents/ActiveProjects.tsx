@@ -71,23 +71,36 @@ const ActiveProjects: React.FC<UserTableProps> = ({ title = "Active Projects" })
                   </button>
                 </td>
                 <td className="px-4 py-2 flex items-center justify-center space-x-2">
-                  <p className="text-sm mb-4">{user.status}</p>
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mb-4">
-                    {/* Progress bar with conditional width */}
-                    <div
-                      className={`bg-lime-600 h-2.5 rounded-full`}
-                      style={{
-                        width: user.status === "Completed" ? "100%" : user.status === "Active" ? "50%" : "0%",
-                      }}
-                    ></div>
-                  </div>
-                  {user.status !== "Active" && (
-                    <div className="text-red-500 flex space-x-1 mb-4">
-                      <MdCancel />
-                      <MdCancel />
-                      <MdCancel />
-                    </div>
-                  )}
+                <div className="flex items-center space-x-2">
+    {user.status === "Completed" || user.status === "Active" ? (
+      <span className="w-3 h-3 bg-lime-600 border rounded-full"></span>
+    ) : (
+      <span className="w-3 h-3 bg-red-500 border rounded-full"></span>
+    )}
+    <p className="text-sm">{user.status}</p>
+  </div>
+
+  {/* Progress Bar with Conditional Width */}
+  <div
+    className={`bg-lime-600 h-2.5 rounded-full`}
+    style={{
+      width:
+        user.status === "Completed"
+          ? "100%"
+          : user.status === "Active"
+          ? "50%"
+          : "0%",
+    }}
+  ></div>
+
+  {/* Canceled Icons for Non-Active Status */}
+  {user.status !== "Active" && user.status !== "Completed" && (
+    <div className="text-red-500 flex space-x-1">
+      <MdCancel />
+      <MdCancel />
+      <MdCancel />
+    </div>
+  )}
                 </td>
                 <td className="border px-4 py-2 text-sm text-center">{user.startDate}</td>
                 <td className="border px-4 py-2 text-center relative">

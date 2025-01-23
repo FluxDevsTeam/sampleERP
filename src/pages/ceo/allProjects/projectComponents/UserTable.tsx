@@ -64,18 +64,30 @@ const UserTable: React.FC<UserTableProps> = ({ title = "Activities" }) => {
             </button>
 
           </td>
-          <td className="px-4 py-2  flex items-center justify-center space-x-2">
-  {user.status === "Active" ? (
-    <span className="w-3 h-3 bg-lime-600 border rounded-full mb-4"></span>
-  ) : (
-    <span className="w-3 h-3 bg-red-500 border rounded-full mb-4"></span>
-  )}
-  <p className="text-sm mb-4">{user.status}</p>
+         
+          <td className="px-4 py-2 flex items-center justify-center space-x-2">
+  {/* Status Indicator */}
+  <div className="flex items-center space-x-2">
+    {user.status === "Completed" || user.status === "Active" ? (
+      <span className="w-3 h-3 bg-lime-600 border rounded-full"></span>
+    ) : (
+      <span className="w-3 h-3 bg-red-500 border rounded-full"></span>
+    )}
+    <p className="text-sm">{user.status}</p>
+  </div>
 
-  {user.status === "Active" ? (
-    <span className="w-10 h-2 bg-lime-600 border rounded-full mb-4"></span>
+  {/* Additional Status Representation */}
+  {user.status === "Completed" ? (
+    <span className="w-10 h-2 bg-lime-600 border rounded-full"></span>
+  ) : user.status === "Active" ? (
+    <div
+      className={`bg-lime-600 h-2.5 rounded-full`}
+      style={{
+        width: user.status === "Active" ? "50%" : "0%",
+      }}
+    ></div>
   ) : (
-    <div className="text-red-500 flex space-x-1 mb-4">
+    <div className="text-red-500 flex space-x-1">
       <MdCancel />
       <MdCancel />
       <MdCancel />
