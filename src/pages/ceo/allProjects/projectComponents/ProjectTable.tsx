@@ -43,7 +43,7 @@ const ProjectTable: React.FC= () => {
                   </div>
                 </td>
                 <td className="border px-4 py-2 text-sm text-center">{user.order}</td>
-                <td className="border px-4 py-2 text-sm text-center">{user.orderNo}</td>
+                <td className="border px-4 py-2 text-sm text-center "><p className='bg-blue-100 border rounded-sm'>{user.orderNo}</p></td>
                 <td className="px-4 py-2 flex items-center justify-center space-x-2">
                   <p className="text-sm mb-4">${user.id}</p> 
                 </td>

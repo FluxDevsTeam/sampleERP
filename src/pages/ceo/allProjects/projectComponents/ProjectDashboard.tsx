@@ -9,7 +9,7 @@ import ProjectTable from "./ProjectTable";
 
 function ProjectDashboard() {
   return (
-    <div className="p-6 bg-gray-300">
+    <div className="p-6 bg-[#F0F4F8]">
       <ProjectsHeader />
       <Header  />
       <ProjectCard />

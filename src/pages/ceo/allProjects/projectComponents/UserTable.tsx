@@ -56,7 +56,7 @@ const UserTable: React.FC<UserTableProps> = ({ title = "Activities" }) => {
               <p className="text-sm">{user.email}</p>
             </div>
           </td>
-          <td className="border px-4 py-2 text-sm text-center">{user.id}</td>
+          <td className="border px-4 py-2 text-sm text-center"><p className='bg-blue-100'>{user.id}</p></td>
           <td className="border px-4 py-2 text-sm text-center">{user.quantity}</td>
           <td className="border px-4 py-2 text-sm text-center">
           <button className="border rounded-full border-black  p-2 px-5">

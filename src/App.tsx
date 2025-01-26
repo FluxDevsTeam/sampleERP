@@ -16,6 +16,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ActivePage from "./pages/ceo/allProjects/projectComponents/ActivePage";
 import Product from "./pages/ceo/allProjects/projectComponents/Product";
 import ProjectDashboard from "./pages/ceo/allProjects/projectComponents/ProjectDashboard";
+import ProductDetails from "./pages/ceo/allProjects/projectComponents/ProductDetails";
 
 const router = createBrowserRouter([
   // {
@@ -78,6 +79,10 @@ const router = createBrowserRouter([
       {
         path: "/dashboard/project-dashboard",
         element: <ProjectDashboard />,
+      },
+      {
+        path: "/dashboard/details",
+        element: <ProductDetails />,
       },
     ],
   },

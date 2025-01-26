@@ -1,7 +1,7 @@
 import { products } from "../projectUtils/header-json";
 import userpic from "../../../../assets/images/16.png";
 import { FiFilter } from "react-icons/fi";
-
+import { useNavigate } from "react-router-dom";
 
 import ProjectsHeader from "./ProjectsHeader";
 
@@ -9,16 +9,26 @@ interface UserTableProps {
   title?: string;
 }
 
-const Product: React.FC<UserTableProps> = ({ title = "Active Projects" }) => {
+const Product: React.FC<UserTableProps> = ({ title = "Manage Products" }) => {
 
 
-  
+  const navigate = useNavigate()
 
   // Filter users to only include those with "In Progress" status
 
 
   return (
     <div className="w-full pb-10 bg-gray-100">
+    <div className="p-6 w-full">
+  <h1 className="text-3xl font-bold py-3">New Product</h1>
+  <p
+        className="text-2xl text-blue-200 bg-white p-2 w-fit cursor-pointer"
+        onClick={() => navigate('/dashboard/details')}
+      >
+        + Add Product
+      </p>
+</div>
+
       <ProjectsHeader />
       <div className="flex justify-between items-center p-6  px-6">
         <h1 className="text-3xl font-bold py-3">{title}</h1>

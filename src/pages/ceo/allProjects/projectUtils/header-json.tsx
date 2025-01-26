@@ -44,9 +44,11 @@ export interface ProjectSummary {
   type: string;
   number: number;
   description: string;
-  path?: string; // Optional path property
+  path?: string; 
 }
 
+
+{/*Data for the main dashbooard header*/}
 export const projectSummary: ProjectSummary[] = [
   {
     id: nanoid(),
@@ -78,6 +80,7 @@ export const projectSummary: ProjectSummary[] = [
   },
 ];
 
+{/*Data for projects table dashboard*/}
 export const project: Project[] = [
   {
     name: "John Doe",
@@ -129,6 +132,7 @@ export const project: Project[] = [
   },
 ]
 
+{/* Data for total number of users on the dashboard table*/}
 export const users: Task[] = [
   {
     name: "John Doe",
@@ -223,6 +227,7 @@ export const users: Task[] = [
  
 ];
 
+{/* Data for transactions on the min dashboard */}
 export const transactions = [
 {
   text: "Groceries",
@@ -243,6 +248,8 @@ export const transactions = [
 }
 ]
 
+
+{/* Data for list of active projects */}
 export const projects: Ptask[] = [
   {
     name: "John Doe",
@@ -281,6 +288,7 @@ export const projects: Ptask[] = [
    
   },]
 
+  {/* Data for list of projects */}
   export const products: Product[] = [
     {
       name: "John Doe",
