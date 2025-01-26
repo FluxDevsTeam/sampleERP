@@ -66,7 +66,7 @@ const CancelledProjects: React.FC<UserTableProps> = ({ title = "Cancelled Projec
                 <td className="border px-4 py-2 text-sm text-center">{user.id}</td>
                 <td className="border px-4 py-2 text-sm text-center">{user.quantity}</td>
                 <td className="border px-4 py-2 text-sm text-center">
-                  <button className="border rounded-full border-black p-2 px-5">
+                  <button className=" rounded-full border-neutral-900 border-2 p-2 px-5">
                     View
                   </button>
                 </td>

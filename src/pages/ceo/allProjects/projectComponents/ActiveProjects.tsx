@@ -66,14 +66,22 @@ const ActiveProjects: React.FC<UserTableProps> = ({ title = "Active Projects" })
                 <td className="border px-4 py-2 text-sm text-center">{user.id}</td>
                 <td className="border px-4 py-2 text-sm text-center">{user.quantity}</td>
                 <td className="border px-4 py-2 text-sm text-center">
-                  <button className="border rounded-full border-black p-2 px-5">
+                  <button className=" rounded-full border-neutral-900 border-2 p-2 px-5">
                     View
                   </button>
                 </td>
                 <td className="px-4 py-2 flex items-center justify-center space-x-2">
-                <div className="flex items-center space-x-2">
+  <div className="flex items-center space-x-2">
+    {/* Status Indicator */}
     {user.status === "Completed" || user.status === "Active" ? (
-      <span className="w-3 h-3 bg-lime-600 border rounded-full"></span>
+      <div className="w-3 h-3 bg-gray-300 border rounded-full flex items-center justify-start overflow-hidden">
+        <div
+          className="bg-lime-600 h-full rounded-full"
+          style={{
+            width: user.status === "Completed" ? "100%" : "50%",
+          }}
+        ></div>
+      </div>
     ) : (
       <span className="w-3 h-3 bg-red-500 border rounded-full"></span>
     )}
@@ -81,17 +89,19 @@ const ActiveProjects: React.FC<UserTableProps> = ({ title = "Active Projects" })
   </div>
 
   {/* Progress Bar with Conditional Width */}
-  <div
-    className={`bg-lime-600 h-2.5 rounded-full`}
-    style={{
-      width:
-        user.status === "Completed"
-          ? "100%"
-          : user.status === "Active"
-          ? "50%"
-          : "0%",
-    }}
-  ></div>
+  <div className="w-20 h-2 bg-gray-300 rounded-full overflow-hidden">
+    <div
+      className="bg-lime-600 h-full rounded-full"
+      style={{
+        width:
+          user.status === "Completed"
+            ? "100%"
+            : user.status === "Active"
+            ? "50%"
+            : "0%",
+      }}
+    ></div>
+  </div>
 
   {/* Canceled Icons for Non-Active Status */}
   {user.status !== "Active" && user.status !== "Completed" && (
@@ -101,7 +111,8 @@ const ActiveProjects: React.FC<UserTableProps> = ({ title = "Active Projects" })
       <MdCancel />
     </div>
   )}
-                </td>
+</td>
+
                 <td className="border px-4 py-2 text-sm text-center">{user.startDate}</td>
                 <td className="border px-4 py-2 text-center relative">
                   <button
