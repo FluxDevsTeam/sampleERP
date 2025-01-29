@@ -4,8 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 @layer base {
   .inter {
     font-family: "Inter", sans-serif;
@@ -49,4 +47,9 @@
   .remove-scrollbar::-webkit-scrollbar-thumb:hover {
     background: transparent;
   }
+}
+
+input[type="checkbox"] {
+  /* margin: 10px; */
+  cursor: pointer;
 }

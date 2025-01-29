@@ -1,4 +1,4 @@
-import { sidebarLink } from "../utils/data-json";
+import { SidebarProps } from "../utils/data-json";
 import clsx from "clsx";
 import { Link, NavLink } from "react-router-dom";
 import Logo from "./Logo";
@@ -9,12 +9,13 @@ import { LogoutIcon, SettingsIcon } from "../utils/SvgIcons";
 //   MdKeyboardDoubleArrowRight,
 // } from "react-icons/md";
 
-interface SidebarProps {
+interface SidebarProp {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
+  data: SidebarProps[];
 }
 
-const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
+const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
   return (
     <aside
       className={clsx(
@@ -30,7 +31,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
 
         {/* DASHBOARD LINK */}
         <ul className="">
-          {sidebarLink.map((item) => {
+          {data.map((item) => {
             const { id, text, href: url, icon: img } = item;
 
             return (
