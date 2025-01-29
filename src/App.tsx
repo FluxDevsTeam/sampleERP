@@ -12,18 +12,35 @@ import {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Settings from "./pages/ceo/settingss/settings";
-import Logout from "./pages/ceo/logout/logout";
-import Staffs from "./pages/ceo/staffs/staffs";
 
+import Staffs from "./pages/ceo/staffs/staffs";
+import SignUp from "./pages/AuthPages/signup/SignUp";
+import Signin from "./pages/AuthPages/signin/Signin";
+//  Project Manager Route
+import {
+  ProjectManagerArchives,
+  ProjectManagerDashboard,
+  ProjectManagerSettings,
+  ProjectManagerAllProject,
+  ProjectManagerCustomers,
+  ProjectManagerFinances,
+  ProjectManagerRequests,
+  ProjectManagerStaffs,
+  ProjectManagerLayout,
+} from "./pages/project-manager";
 
 const router = createBrowserRouter([
-  // {
-  //   path: "/",
-  //   element: <Landing />,
-  // },
-  // DASHBOARD ROUTE
   {
-    path: "/dashboard",
+    path: "/",
+    element: <Signin />,
+  },
+  {
+    path: "/signup",
+    element: <SignUp />,
+  },
+  // CEO DASHBOARD ROUTE
+  {
+    path: "/ceo/dashboard",
     element: <SharedLayout />,
     children: [
       {
@@ -62,9 +79,44 @@ const router = createBrowserRouter([
         path: "settings",
         element: <Settings />,
       },
+    ],
+  },
+  // PROJECT MANAGER ROUTE
+  {
+    path: "/project-manager/dashboard",
+    element: <ProjectManagerLayout />,
+    children: [
       {
-        path: "logout",
-        element: <Logout />,
+        index: true,
+        element: <ProjectManagerDashboard />,
+      },
+      {
+        path: "all-projects",
+        element: <ProjectManagerAllProject />,
+      },
+      {
+        path: "customers",
+        element: <ProjectManagerCustomers />,
+      },
+      {
+        path: "finances",
+        element: <ProjectManagerFinances />,
+      },
+      {
+        path: "requests",
+        element: <ProjectManagerRequests />,
+      },
+      {
+        path: "archives",
+        element: <ProjectManagerArchives />,
+      },
+      {
+        path: "staffs",
+        element: <ProjectManagerStaffs />,
+      },
+      {
+        path: "settings",
+        element: <ProjectManagerSettings />,
       },
     ],
   },
