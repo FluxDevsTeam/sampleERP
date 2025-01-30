@@ -7,7 +7,11 @@ import {
   Requests,
   SharedLayout,
   Archives,
+
 } from "./pages/ceo";
+import ActiveProjects from "./pages/project-manager-page/allProjects/_projectPages/ActiveProjects";
+import CompletedProjects from "./pages/project-manager-page/allProjects/_projectPages/CompletedProjects";
+import CancelledProjects from "./pages/project-manager-page/allProjects/_projectPages/CancelledProjects";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -133,6 +137,18 @@ const router = createBrowserRouter([
       {
         path: "settings",
         element: <ProjectManagerSettings />,
+      },
+      {
+        path: "active-projects",
+        element: <ActiveProjects />,
+      },
+      {
+        path: "completed-projects",
+        element: <CompletedProjects />,
+      },
+      {
+        path: "cancelled-projects",
+        element: <CancelledProjects />,
       },
     ],
   },

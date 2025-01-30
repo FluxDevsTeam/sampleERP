@@ -1,4 +1,4 @@
-export { default as ProjectManagerAllProject } from "./allProjects/ProjectManagerAllProject";
+export { default as ProjectManagerAllProject } from "./allProjects/AllProjects";
 export { default as ProjectManagerCustomers } from "./customers/ProjectManagerCustomers";
 export { default as ProjectManagerFinances } from "./finances/ProjectManagerFinances";
 export { default as ProjectManagerRequests } from "./requests/ProjectManagerRequests";

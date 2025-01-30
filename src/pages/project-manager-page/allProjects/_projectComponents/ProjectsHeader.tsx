@@ -1,4 +1,4 @@
-import { projectSummary} from "../projectUtils/header-json";
+import { projectSummary} from "../_projectUtils/header-json";
 import { MdArrowOutward } from "react-icons/md";
 import Frame180 from "../../../../assets/images/Frame180.png";
 

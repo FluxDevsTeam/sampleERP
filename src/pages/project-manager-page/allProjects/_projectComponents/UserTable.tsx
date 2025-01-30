@@ -1,4 +1,4 @@
-import { users} from "../projectUtils/header-json";
+import { users} from "../_projectUtils/header-json"
 import { HiDotsVertical } from "react-icons/hi";
 import userpic  from "../../../../assets/images/16.png";
 import { FiFilter } from "react-icons/fi";
@@ -56,26 +56,47 @@ const UserTable: React.FC<UserTableProps> = ({ title = "Activities" }) => {
               <p className="text-sm">{user.email}</p>
             </div>
           </td>
-          <td className="border px-4 py-2 text-sm text-center">{user.id}</td>
+          <td className="border px-4 py-2 text-sm text-center"><p className='p-1 bg-blue-100'>{user.id}</p></td>
           <td className="border px-4 py-2 text-sm text-center">{user.quantity}</td>
           <td className="border px-4 py-2 text-sm text-center">
-          <button className="border rounded-full border-black  p-2 px-5">
+          <button className="border rounded-full border-neutral-900 border-2  p-2 px-5">
              View
             </button>
 
           </td>
-          <td className="px-4 py-2  flex items-center justify-center space-x-2">
-  {user.status === "Active" ? (
-    <span className="w-3 h-3 bg-lime-600 border rounded-full mb-4"></span>
-  ) : (
-    <span className="w-3 h-3 bg-red-500 border rounded-full mb-4"></span>
-  )}
-  <p className="text-sm mb-4">{user.status}</p>
+         
+          <td className="px-4 py-2 flex items-center justify-center space-x-2">
+  {/* Status Indicator */}
+  <div className="flex items-center space-x-2">
+    {user.status === "Completed" || user.status === "Active" ? (
+      <div className="w-3 h-3 bg-gray-300 border rounded-full flex items-center justify-start overflow-hidden">
+        <div
+          className="bg-lime-600 h-full rounded-full"
+          style={{
+            width: user.status === "Completed" ? "100%" : "50%",
+          }}
+        ></div>
+      </div>
+    ) : (
+      <span className="w-3 h-3 bg-red-500 border rounded-full"></span>
+    )}
+    <p className="text-sm">{user.status}</p>
+  </div>
 
-  {user.status === "Active" ? (
-    <span className="w-10 h-2 bg-lime-600 border rounded-full mb-4"></span>
+  {/* Additional Status Representation */}
+  {user.status === "Completed" ? (
+    <span className="w-10 h-2 bg-lime-600 border rounded-full"></span>
+  ) : user.status === "Active" ? (
+    <div className="w-10 h-2 bg-gray-300 rounded-full overflow-hidden">
+      <div
+        className="bg-lime-600 h-full rounded-full"
+        style={{
+          width: "50%",
+        }}
+      ></div>
+    </div>
   ) : (
-    <div className="text-red-500 flex space-x-1 mb-4">
+    <div className="text-red-500 flex space-x-1">
       <MdCancel />
       <MdCancel />
       <MdCancel />

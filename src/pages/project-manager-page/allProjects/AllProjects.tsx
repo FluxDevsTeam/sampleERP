@@ -1,6 +1,5 @@
-import ProjectsHeader from "./projectComponents/ProjectsHeader";
-import UserTable from "./projectComponents/UserTable";
-
+import UserTable from "./_projectComponents/UserTable";
+import ProjectsHeader from "./_projectComponents/ProjectsHeader";
 
 const AllProjects = () => {
   return (
