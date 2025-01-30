@@ -27,7 +27,23 @@ import {
   ProjectManagerRequests,
   ProjectManagerStaffs,
   ProjectManagerLayout,
-} from "./pages/project-manager";
+} from "./pages/project-manager-page";
+// ARTISAN IMPORT ROUTE
+import {
+  ArtisanDashboard,
+  ArtisanLayout,
+  ArtisanPayment,
+  ArtisanSetting,
+} from "./pages/artisan-page";
+
+// STORE KEEPER IMPORT ROUTE
+import {
+  StoreKeeperDashboard,
+  StoreKeeperLayout,
+  Orders,
+  RawMaterial,
+  StoreKeeperSettings,
+} from "./pages/store-keeper-page";
 
 const router = createBrowserRouter([
   {
@@ -117,6 +133,48 @@ const router = createBrowserRouter([
       {
         path: "settings",
         element: <ProjectManagerSettings />,
+      },
+    ],
+  },
+  // ARTISAN ROUTE
+  {
+    path: "/artisan/dashboard",
+    element: <ArtisanLayout />,
+    children: [
+      {
+        index: true,
+        element: <ArtisanDashboard />,
+      },
+      {
+        path: "payment",
+        element: <ArtisanPayment />,
+      },
+      {
+        path: "settings",
+        element: <ArtisanSetting />,
+      },
+    ],
+  },
+  // STORE KEEPER ROUTE
+  {
+    path: "/store-keeper/dashboard",
+    element: <StoreKeeperLayout />,
+    children: [
+      {
+        index: true,
+        element: <StoreKeeperDashboard />,
+      },
+      {
+        path: "orders",
+        element: <Orders />,
+      },
+      {
+        path: "raw-materials",
+        element: <RawMaterial />,
+      },
+      {
+        path: "settings",
+        element: <StoreKeeperSettings />,
       },
     ],
   },

@@ -7,6 +7,8 @@ import {
   ProjectsIcon,
   StaffIcon,
   TransferIcon,
+  OrdersIcon,
+  RawMaterialIcon,
 } from "./SvgIcons";
 import { ReactElement } from "react";
 
@@ -91,5 +93,39 @@ export const projectManagerSidebarLink: SidebarProps[] = [
     text: "archives",
     href: "/project-manager/dashboard/archives",
     icon: <ArchiveIcon className="currentColor" />,
+  },
+];
+export const artisanSidebarLink: SidebarProps[] = [
+  {
+    id: nanoid(),
+    text: "Dashboard",
+    href: "/artisan/dashboard",
+    icon: <HomeIcon className="currentColor" />,
+  },
+  {
+    id: nanoid(),
+    text: "payment",
+    href: "/artisan/dashboard/payment",
+    icon: <FinancesIcon className="currentColor" />,
+  },
+];
+export const storeKeeperSidebarLink: SidebarProps[] = [
+  {
+    id: nanoid(),
+    text: "Dashboard",
+    href: "/store-keeper/dashboard",
+    icon: <HomeIcon className="currentColor" />,
+  },
+  {
+    id: nanoid(),
+    text: "orders",
+    href: "/store-keeper/dashboard/orders",
+    icon: <OrdersIcon className="currentColor" />,
+  },
+  {
+    id: nanoid(),
+    text: "raw materials",
+    href: "/store-keeper/dashboard/raw-materials",
+    icon: <RawMaterialIcon className="currentColor" />,
   },
 ];

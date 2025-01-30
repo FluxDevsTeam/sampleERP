@@ -355,6 +355,48 @@ export const SettingsIcon = ({ className, ...rest }: IconProps) => {
     </svg>
   );
 };
+export const RawMaterialIcon = ({ className, ...rest }: IconProps) => {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 22 22"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...rest}
+    >
+      <path
+        d="M1.625 5.79167L8.91667 1.625L20.375 5.79167M1.625 5.79167V11L13.0833 15.1667L20.375 11V5.79167M1.625 5.79167L13.0833 9.95833L20.375 5.79167"
+        stroke={className ?? "#737373"}
+        stroke-width="2"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M1.625 11V16.2083L13.0833 20.375L20.375 16.2083V11"
+        stroke={className ?? "#737373"}
+        stroke-width="2"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+};
+export const OrdersIcon = ({ className, ...rest }: IconProps) => {
+  return (
+    <svg
+      width="24"
+      height="26"
+      viewBox="0 0 24 26"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...rest}
+    >
+      <path
+        d="M23.2681 18.2368L16.4688 25.0483L13.1851 21.7524L14.2837 20.6538L16.4688 22.8267L22.1694 17.1382L23.2681 18.2368ZM11 8.3125H6.3125V6.75H11V8.3125ZM11 11.4375H6.3125V9.875H11V11.4375ZM6.3125 13H11V14.5625H6.3125V13ZM4.75 8.3125H3.1875V6.75H4.75V8.3125ZM4.75 11.4375H3.1875V9.875H4.75V11.4375ZM3.1875 13H4.75V14.5625H3.1875V13ZM12.5625 8.3125V2.0625H1.625V23.9375H12.5625V25.5H0.0625V0.5H13.6733L20.375 7.20166V16.125L18.8125 17.6875V8.3125H12.5625ZM14.125 6.75H17.7017L14.125 3.17334V6.75Z"
+        fill={className ?? "#737373"}
+      />
+    </svg>
+  );
+};
 export const ChromeIcon = () => {
   return (
     <svg
