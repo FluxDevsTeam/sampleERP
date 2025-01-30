@@ -55,28 +55,28 @@ export const projectSummary: ProjectSummary[] = [
     type: "Total Projects",
     number: 150,
     description: "This is the total number of projects tracked in the system.",
-    path: "/dashboard/all-projects",
+    path: "/ceo/dashboard/all-projects",
   },
   {
     id: nanoid(),
     type: "Active Projects",
     number: 45,
     description: "These are the projects currently in progress.",
-    path: "/dashboard/active-projects",
+    path: "/ceo/dashboard/active-projects",
   },
   {
     id: nanoid(),
     type: "Completed",
     number: 90,
     description: "Projects that have been successfully completed.",
-    path: "/dashboard/completed-projects", // Added path for consistency
+    path: "/ceo/dashboard/completed-projects", // Added path for consistency
   },
   {
     id: nanoid(),
     type: "Cancelled",
     number: 15,
     description: "These projects were cancelled before completion.",
-    path: "/dashboard/cancelled-projects",
+    path: "/ceo/dashboard/cancelled-projects",
   },
 ];
 

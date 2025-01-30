@@ -1,8 +1,8 @@
-import ProjectsHeader from "../allProjects/projectComponents/ProjectsHeader";
-import Piechart from "../allProjects/projectComponents/Piechart";
-import Barchart from "../allProjects/projectComponents/Barchart";
-import Areachart from "../allProjects/projectComponents/Areachart";
-import Transactions from "../allProjects/projectComponents/Transactions";
+import ProjectsHeader from "../allProjects/_projectComponents/ProjectsHeader";
+import Piechart from "../allProjects/_projectComponents/Piechart";
+import Barchart from "../allProjects/_projectComponents/Barchart";
+import Areachart from "../allProjects/_projectComponents/Areachart";
+import Transactions from "../allProjects/_projectComponents/Transactions";
 
 const Dashboard = () => {
   return(

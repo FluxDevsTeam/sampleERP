@@ -1,15 +1,15 @@
-import { products } from "../projectUtils/header-json";
-import userpic from "../../../../assets/images/16.png";
+import userpic from "../../../assets/images/16.png";
 import { FiFilter } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { products } from "../allProjects/_projectUtils/header-json";
 
-import ProjectsHeader from "./ProjectsHeader";
+import ProjectsHeader from "../allProjects/_projectComponents/ProjectsHeader";
 
 interface UserTableProps {
   title?: string;
 }
 
-const Product: React.FC<UserTableProps> = ({ title = "Manage Products" }) => {
+const Products: React.FC<UserTableProps> = ({ title = "Manage Products" }) => {
 
 
   const navigate = useNavigate()
@@ -23,7 +23,7 @@ const Product: React.FC<UserTableProps> = ({ title = "Manage Products" }) => {
   <h1 className="text-3xl font-bold py-3">New Product</h1>
   <p
         className="text-2xl text-blue-200 bg-white p-2 w-fit cursor-pointer"
-        onClick={() => navigate('/dashboard/details')}
+        onClick={() => navigate('/project-manager/dashboard/product-details')}
       >
         + Add Product
       </p>
@@ -86,4 +86,4 @@ const Product: React.FC<UserTableProps> = ({ title = "Manage Products" }) => {
   );
 };
 
-export default Product;
+export default Products;
