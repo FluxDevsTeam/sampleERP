@@ -10,7 +10,7 @@ import Piechart from "../allProjects/_projectComponents/Piechart";
 
 function ProjectDashboard() {
   return (
-    <div className="p-6 bg-[#F0F4F8]">
+    <div className="">
       <ProjectsHeader />
       <Header  />
       <ProjectCard />

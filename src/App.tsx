@@ -36,6 +36,7 @@ import ActiveProjects from "./pages/project-manager-page/allProjects/_projectPag
 import CompletedProjects from "./pages/project-manager-page/allProjects/_projectPages/CompletedProjects";
 import CancelledProjects from "./pages/project-manager-page/allProjects/_projectPages/CancelledProjects";
 import ProductDetails from "./pages/project-manager-page/products/ProductDetails";
+
 // ARTISAN IMPORT ROUTE
 import {
   ArtisanDashboard,
