@@ -32,7 +32,7 @@ const ProjectsHeader: React.FC<HeaderProps> = ({ title = "Manage Projects" }) =>
 
   return (
     <div className="p-6">
-      <p className="text-3xl text-black font-bold py-6">{title}</p>
+      <p className="md:text-3xl text-black font-bold py-6">{title}</p>
       <div className="lg:grid lg:grid-cols-4 lg:space-x-4 space-x-0 grid grid-cols-1 lg:space-y-0 space-y-4">
         {projectSummary.map((project, index) => (
           <div

@@ -12,7 +12,7 @@ interface UserTableProps {
 
 
 
-const UserTable: React.FC<UserTableProps> = ({ title = "Activities" }) => {
+const UserTable: React.FC<UserTableProps> = ({ title = "Total Projects" }) => {
 
   const [visiblePopupIndex, setVisiblePopupIndex] = useState<number | null>(null);
 

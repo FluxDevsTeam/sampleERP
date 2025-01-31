@@ -16,8 +16,8 @@ export default function ProductDetails(){
   <h1 className="text-3xl font-bold py-3 cursor-pointer" onClick={() => navigate('/project-manager/dashboard/products')}> Back</h1>
   <p className="text-2xl  text-blue-200 bg-white p-2 w-fit">+ Add Product</p>
 </div>
-<div className="w-[70%] h-auto mx-auto  bg-white p-8">
-    <div className="flex flex-col justify-center items-center space-y-4">
+<div className="md:w-[70%] w-full  h-auto mx-auto  bg-white p-8">
+    <div className="flex flex-col justify-center items-center space-y-4 mx-4">
         <p className="text-blue-200">Dining set</p>
         <img src={userpic} alt="logo" className="w-[200px] h-[200px]"  />
      <p>Customer : <span className="text-blue-200">Loki</span> </p>   

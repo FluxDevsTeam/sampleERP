@@ -20,9 +20,9 @@ const Products: React.FC<UserTableProps> = ({ title = "Manage Products" }) => {
   return (
     <div className="w-full pb-10 bg-gray-100">
     <div className="p-6 w-full">
-  <h1 className="text-3xl font-bold py-3">New Product</h1>
+  <h1 className="md:text-3xl font-bold py-3">New Product</h1>
   <p
-        className="text-2xl text-blue-200 bg-white p-2 w-fit cursor-pointer"
+        className="md:text-2xl text-blue-200 bg-white p-2 w-fit cursor-pointer"
         onClick={() => navigate('/project-manager/dashboard/product-details')}
       >
         + Add Product
@@ -31,15 +31,15 @@ const Products: React.FC<UserTableProps> = ({ title = "Manage Products" }) => {
 
       <ProjectsHeader />
       <div className="flex justify-between items-center p-6  px-6">
-        <h1 className="text-3xl font-bold py-3">{title}</h1>
-        <div className="flex bg-white p-2 px-3 space-x-2 text-lg">
+        <h1 className="md:text-3xl font-bold py-3">{title}</h1>
+        <div className="flex bg-white p-2 px-3 space-x-2 md:text-lg">
           <span className="mt-1">
             <FiFilter />
           </span>
           <p>filter</p>
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full md:w-[99%] px-3 ">
         <table className="table-auto bg-white w-full border-collapse">
           <thead className="bg-gray-100 hidden sm:table-header-group">
             <tr>
