@@ -33,7 +33,7 @@ const CompletedProjects: React.FC<UserTableProps> = ({ title = "Completed Projec
           <p>filter</p>
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto px-4">
         <table className="table-auto bg-white w-full border-collapse">
           <thead className="bg-gray-100 hidden sm:table-header-group">
             <tr>

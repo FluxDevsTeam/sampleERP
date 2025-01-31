@@ -7,3 +7,4 @@ export { default as ProjectManagerDashboard } from "./dashboard/ProjectManagerDa
 export { default as ProjectManagerStaffs } from "./staffs/ProjectManagerStaffs";
 export { default as ProjectManagerSettings } from "./settings/ProjectManagerSettings";
 export { default as ProjectManagerLayout } from "./ProjectManagerLayout";
+export { default as ProjectManagerCustomers } from "./customers/ProjectManagerCustomers";

@@ -31,8 +31,9 @@ import {
   ProjectManagerRequests,
   ProjectManagerStaffs,
   ProjectManagerLayout,
+  ProjectManagerCustomers
 } from "./pages/project-manager-page";
-import ActiveProjects from "./pages/project-manager-page/allProjects/_projectPages/ActiveProjects";
+import ActiveProjects from "./pages/project-manager-page/allProjects/_projectPages/ActivePage";
 import CompletedProjects from "./pages/project-manager-page/allProjects/_projectPages/CompletedProjects";
 import CancelledProjects from "./pages/project-manager-page/allProjects/_projectPages/CancelledProjects";
 import ProductDetails from "./pages/project-manager-page/products/ProductDetails";
@@ -170,6 +171,10 @@ const router = createBrowserRouter([
       {
         path: "product-details",
         element: <ProductDetails />,
+      },
+      {
+        path: "customers",
+        element: <ProjectManagerCustomers />,
       },
     ],
   },

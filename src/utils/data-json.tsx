@@ -77,6 +77,12 @@ export const projectManagerSidebarLink: SidebarProps[] = [
   },
   {
     id: nanoid(),
+    text: "customers",
+    href: "/project-manager/dashboard/customers",
+    icon: <TransferIcon className="currentColor" />,
+  },
+  {
+    id: nanoid(),
     text: "finances",
     href: "/project-manager/dashboard/finances",
     icon: <FinancesIcon className="currentColor" />,

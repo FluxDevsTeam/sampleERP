@@ -11,8 +11,8 @@ export default function ProductDetails(){
     const navigate = useNavigate()
 
     return (
-        <div className="w-full pb-10 bg-gray-100">
-             <div className="p-6 w-full my-4">
+        <div className="w-full h-auto pb-10 bg-gray-100">
+             <div className="p-6 w-full ">
   <h1 className="text-3xl font-bold py-3 cursor-pointer" onClick={() => navigate('/project-manager/dashboard/products')}> Back</h1>
   <p className="text-2xl  text-blue-200 bg-white p-2 w-fit">+ Add Product</p>
 </div>
