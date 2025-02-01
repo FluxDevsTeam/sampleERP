@@ -63,7 +63,7 @@ const CompletedProjects: React.FC<UserTableProps> = ({ title = "Completed Projec
                     <p className="text-sm">{user.email}</p>
                   </div>
                 </td>
-                <td className="border px-4 py-2 text-sm text-center">{user.id}</td>
+                <td className="border px-4 py-2 text-sm text-center"><p className='p-1 bg-blue-100'>{user.id}</p></td>
                 <td className="border px-4 py-2 text-sm text-center">{user.quantity}</td>
                 <td className="border px-4 py-2 text-sm text-center">
                   <button className="border-neutral-900 border-2 rounded-full border-black p-2 px-5">

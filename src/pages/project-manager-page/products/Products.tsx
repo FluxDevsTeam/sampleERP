@@ -14,7 +14,7 @@ const Products: React.FC<UserTableProps> = ({ title = "Manage Products" }) => {
 
   const navigate = useNavigate()
 
-  // Filter users to only include those with "In Progress" status
+
 
 
   return (

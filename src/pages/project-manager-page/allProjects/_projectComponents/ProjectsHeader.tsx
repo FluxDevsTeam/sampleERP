@@ -36,9 +36,9 @@ const ProjectsHeader: React.FC<HeaderProps> = ({ title = "Manage Projects" }) =>
       <div className="lg:grid lg:grid-cols-4 lg:space-x-4 space-x-0 grid grid-cols-1 lg:space-y-0 space-y-4">
         {projectSummary.map((project, index) => (
           <div
-            className={`border rounded-lg space-y-4 p-4 cursor-pointer ${
-              activeProject === project.id ? "bg-blue-100 text-blue-500" : "bg-white"
-            }`}
+          className={`border rounded-lg space-y-4 p-4 cursor-pointer transition-all duration-300 ${
+            activeProject === project.id ? "bg-blue-100 text-blue-500" : "bg-white"
+          }`}
             key={index}
             onClick={() => handleNavigate(project.path, project.id)} // Pass the path and ID
           >
