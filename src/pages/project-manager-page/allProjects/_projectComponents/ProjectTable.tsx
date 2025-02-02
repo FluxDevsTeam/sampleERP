@@ -12,7 +12,7 @@ const ProjectTable: React.FC= () => {
 
 
   return (
-    <div className="md:w-[97%] w-full pb-10 bg-gray-100 px-3">
+    <div className="md:w-[97%] w-full pb-10 bg-gray-100 px-3 md:my-10">
       <div className="overflow-x-auto">
         <table className="table-auto bg-white w-full border-collapse">
           <thead className="bg-gray-100 hidden sm:table-header-group">
