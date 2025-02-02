@@ -7,7 +7,11 @@ import {
   Requests,
   SharedLayout,
   Archives,
+
 } from "./pages/ceo";
+import CeoActiveProjects from "./pages/ceo/allProjects/_projectPages/ActiveProjects";
+import CeoCompletedProjects from "./pages/ceo/allProjects/_projectPages/CompletedProjects";
+import CeoCancelledProjects from "./pages/ceo/allProjects/_projectPages/CeoCancelledProjects";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,12 +26,18 @@ import {
   ProjectManagerDashboard,
   ProjectManagerSettings,
   ProjectManagerAllProject,
-  ProjectManagerCustomers,
+  Products,
   ProjectManagerFinances,
   ProjectManagerRequests,
   ProjectManagerStaffs,
   ProjectManagerLayout,
+  ProjectManagerCustomers
 } from "./pages/project-manager-page";
+import ActiveProjects from "./pages/project-manager-page/allProjects/_projectPages/ActivePage";
+import CompletedProjects from "./pages/project-manager-page/allProjects/_projectPages/CompletedProjects";
+import CancelledProjects from "./pages/project-manager-page/allProjects/_projectPages/CancelledProjects";
+import ProductDetails from "./pages/project-manager-page/products/ProductDetails";
+
 // ARTISAN IMPORT ROUTE
 import {
   ArtisanDashboard,
@@ -95,6 +105,18 @@ const router = createBrowserRouter([
         path: "settings",
         element: <Settings />,
       },
+      {
+        path: "active-projects",
+        element: <CeoActiveProjects />,
+      },
+      {
+        path: "completed-projects",
+        element: <CeoCompletedProjects />,
+      },
+      {
+        path: "cancelled-projects",
+        element: <CeoCancelledProjects />,
+      },
     ],
   },
   // PROJECT MANAGER ROUTE
@@ -111,8 +133,8 @@ const router = createBrowserRouter([
         element: <ProjectManagerAllProject />,
       },
       {
-        path: "customers",
-        element: <ProjectManagerCustomers />,
+        path: "products",
+        element: <Products />,
       },
       {
         path: "finances",
@@ -133,6 +155,26 @@ const router = createBrowserRouter([
       {
         path: "settings",
         element: <ProjectManagerSettings />,
+      },
+      {
+        path: "active-projects",
+        element: <ActiveProjects />,
+      },
+      {
+        path: "completed-projects",
+        element: <CompletedProjects />,
+      },
+      {
+        path: "cancelled-projects",
+        element: <CancelledProjects />,
+      },
+      {
+        path: "product-details",
+        element: <ProductDetails />,
+      },
+      {
+        path: "customers",
+        element: <ProjectManagerCustomers />,
       },
     ],
   },

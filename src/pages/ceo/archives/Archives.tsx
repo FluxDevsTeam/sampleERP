@@ -1,4 +1,4 @@
-import UserTable from "../allProjects/projectComponents/UserTable";
+import UserTable from "../allProjects/_projectComponents/UserTable";
 
 const Archives = () => {
   return (

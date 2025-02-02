@@ -1,5 +1,4 @@
 import { nanoid } from "nanoid";
-
 import {
   ArchiveIcon,
   FinancesIcon,
@@ -69,6 +68,12 @@ export const projectManagerSidebarLink: SidebarProps[] = [
     text: "all projects",
     href: "/project-manager/dashboard/all-projects",
     icon: <ProjectsIcon className="currentColor" />,
+  },
+  {
+    id: nanoid(),
+    text: "products",
+    href: "/project-manager/dashboard/products",
+    icon: <TransferIcon className="currentColor" />,
   },
   {
     id: nanoid(),

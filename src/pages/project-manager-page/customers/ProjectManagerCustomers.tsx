@@ -1,5 +1,5 @@
 const ProjectManagerCustomers = () => {
-  return <div>customers</div>;
-};
-
-export default ProjectManagerCustomers;
+    return <div></div>;
+  };
+  
+  export default ProjectManagerCustomers;
