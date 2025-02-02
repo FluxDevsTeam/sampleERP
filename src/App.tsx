@@ -45,6 +45,8 @@ import {
   StoreKeeperSettings,
 } from "./pages/store-keeper-page";
 
+import Shop from "./pages/shop/shop";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -178,7 +180,13 @@ const router = createBrowserRouter([
       },
     ],
   },
+  // SHOP ROUTE
+  {
+    path: "/shop/*",
+    element: <Shop />,
+  },
 ]);
+
 const App = () => {
   return (
     <>

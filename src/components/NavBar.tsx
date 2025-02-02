@@ -1,12 +1,12 @@
-// import { Sling as Hamburger } from "hamburger-react";
 import SearchBar from "./SearchBar";
 import { IoMenu } from "react-icons/io5";
 export interface NavBarProps {
   toggleSidebar: () => void;
   isSidebarOpen: boolean;
+  title: string; // Add title prop
 }
 
-const NavBar = ({ toggleSidebar }: NavBarProps) => {
+const NavBar = ({ toggleSidebar, isSidebarOpen, title='Welcome Admin' }: NavBarProps) => {
   return (
     <nav className="h-[77px] bg-blue-400 flex items-center px-2.5 w-full ">
       <div className="flex justify-between items-center w-full">
@@ -25,8 +25,8 @@ const NavBar = ({ toggleSidebar }: NavBarProps) => {
             color="#F8F8F8"
             rounded
           /> */}
-          <h4 className="text-white font-semibold text-lg  md:text-2xl whitespace-nowrap">
-            Welcome Admin!
+          <h4 className="text-white font-semibold text-lg md:text-2xl whitespace-nowrap">
+            {title}
           </h4>
         </div>
         <SearchBar />
