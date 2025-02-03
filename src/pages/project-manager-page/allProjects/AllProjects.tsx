@@ -1,11 +1,10 @@
-import UserTable from "./_projectComponents/UserTable";
-import ProjectsHeader from "./_projectComponents/ProjectsHeader";
+import ProjectManagement from "./_projectComponents/ProjectManagement";
 
 const AllProjects = () => {
   return (
     <div className='w-full  bg-gray-100 '>
-  <ProjectsHeader />
-  <UserTable  />
+  <ProjectManagement />
+ 
     </div>
 
 

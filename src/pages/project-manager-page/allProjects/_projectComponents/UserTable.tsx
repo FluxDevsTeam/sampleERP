@@ -1,4 +1,4 @@
-import { users} from "../_projectUtils/header-json"
+
 import { HiDotsVertical } from "react-icons/hi";
 import userpic  from "../../../../assets/images/16.png";
 import { FiFilter } from "react-icons/fi";
@@ -8,11 +8,13 @@ import { MdCancel } from "react-icons/md";
 
 interface UserTableProps {
   title?: string; 
+  users: any;
 }
 
 
 
-const UserTable: React.FC<UserTableProps> = ({ title = "Total Projects" }) => {
+
+const UserTable: React.FC<UserTableProps> = ({ title = "Total Projects" , users}) => {
 
   const [visiblePopupIndex, setVisiblePopupIndex] = useState<number | null>(null);
 
