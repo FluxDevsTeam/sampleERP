@@ -1,18 +1,21 @@
-import { users} from "../_projectUtils/header-json";
+
 import { HiDotsVertical } from "react-icons/hi";
 import userpic  from "../../../../assets/images/16.png";
 import { FiFilter } from "react-icons/fi";
 import { useState } from "react";
 import PopUp from "./PopUp";
 import { MdCancel } from "react-icons/md";
+import { Task } from "../_projectUtils/header-json";
 
 interface UserTableProps {
   title?: string; 
+  users?: Task[];
 }
 
 
 
-const UserTable: React.FC<UserTableProps> = ({ title = "Activities" }) => {
+
+const UserTable: React.FC<UserTableProps> = ({ title = "Total Projects" , users}) => {
 
   const [visiblePopupIndex, setVisiblePopupIndex] = useState<number | null>(null);
 
@@ -40,12 +43,12 @@ const UserTable: React.FC<UserTableProps> = ({ title = "Activities" }) => {
       </tr>
     </thead>
     <tbody>
-      {users.map((user, index) => (
+      {users?.map((user, index) => (
         <tr
           key={user.id}
           className="border sm:table-row flex flex-col sm:flex-row sm:space-x-0 space-y-2 sm:space-y-0"
         >
-          <td className="border px-4 py-2 flex flex-col sm:flex-row sm:items-center">
+          <td className=" px-4 py-2 flex flex-col sm:flex-row sm:items-center">
             <img
               src={userpic}
               alt="user picture"
@@ -56,15 +59,15 @@ const UserTable: React.FC<UserTableProps> = ({ title = "Activities" }) => {
               <p className="text-sm">{user.email}</p>
             </div>
           </td>
-          <td className="border px-4 py-2 text-sm text-center">{user.id}</td>
+          <td className="border px-4 py-2 text-sm text-center"><p className='p-1 bg-blue-100'>{user.id}</p></td>
           <td className="border px-4 py-2 text-sm text-center">{user.quantity}</td>
           <td className="border px-4 py-2 text-sm text-center">
-          <button className="border rounded-full border-black  p-2 px-5">
+          <button className="border rounded-full border-neutral-900 border-2  p-2 px-5">
              View
             </button>
 
           </td>
-          
+         
           <td className="px-4 py-2 flex items-center justify-center space-x-2">
   {/* Status Indicator */}
   <div className="flex items-center space-x-2">

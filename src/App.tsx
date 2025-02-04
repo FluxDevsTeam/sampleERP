@@ -9,9 +9,9 @@ import {
   Archives,
 
 } from "./pages/ceo";
-import CeoActiveProjects from "./pages/ceo/allProjects/_projectPages/ActiveProjects";
-import CeoCompletedProjects from "./pages/ceo/allProjects/_projectPages/CompletedProjects";
-import CeoCancelledProjects from "./pages/ceo/allProjects/_projectPages/CeoCancelledProjects";
+//import CeoActiveProjects from "./pages/ceo/allProjects/_projectPages/ActiveProjects";
+//import CeoCompletedProjects from "./pages/ceo/allProjects/_projectPages/CompletedProjects";
+//import CeoCancelledProjects from "./pages/ceo/allProjects/_projectPages/CeoCancelledProjects";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -33,9 +33,9 @@ import {
   ProjectManagerLayout,
   ProjectManagerCustomers
 } from "./pages/project-manager-page";
-import ActiveProjects from "./pages/project-manager-page/allProjects/_projectPages/ActivePage";
-import CompletedProjects from "./pages/project-manager-page/allProjects/_projectPages/CompletedProjects";
-import CancelledProjects from "./pages/project-manager-page/allProjects/_projectPages/CancelledProjects";
+//import ActiveProjects from "./pages/project-manager-page/allProjects/_projectPages/ActivePage";
+//import CompletedProjects from "./pages/project-manager-page/allProjects/_projectPages/CompletedProjects";
+//import CancelledProjects from "./pages/project-manager-page/allProjects/_projectPages/CancelledProjects";
 import ProductDetails from "./pages/project-manager-page/products/ProductDetails";
 
 // ARTISAN IMPORT ROUTE
@@ -105,7 +105,7 @@ const router = createBrowserRouter([
         path: "settings",
         element: <Settings />,
       },
-      {
+     /* {
         path: "active-projects",
         element: <CeoActiveProjects />,
       },
@@ -116,7 +116,7 @@ const router = createBrowserRouter([
       {
         path: "cancelled-projects",
         element: <CeoCancelledProjects />,
-      },
+      },*/
     ],
   },
   // PROJECT MANAGER ROUTE
@@ -156,7 +156,7 @@ const router = createBrowserRouter([
         path: "settings",
         element: <ProjectManagerSettings />,
       },
-      {
+    /*  {
         path: "active-projects",
         element: <ActiveProjects />,
       },
@@ -167,7 +167,7 @@ const router = createBrowserRouter([
       {
         path: "cancelled-projects",
         element: <CancelledProjects />,
-      },
+      }, */
       {
         path: "product-details",
         element: <ProductDetails />,

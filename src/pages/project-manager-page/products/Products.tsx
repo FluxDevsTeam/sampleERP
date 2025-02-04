@@ -59,7 +59,7 @@ const Products: React.FC<UserTableProps> = ({ title = "Manage Products" }) => {
                 className="border sm:table-row flex flex-col sm:flex-row sm:space-x-0 space-y-2 sm:space-y-0"
               >
                 <td className="border px-4 py-2 text-sm text-center">{user.id}</td>
-                <td className="border px-4 py-2 flex flex-col sm:flex-row sm:items-center">
+                <td className=" px-4 py-2 flex flex-col sm:flex-row sm:items-center ">
                 
                   <img
                     src={userpic}

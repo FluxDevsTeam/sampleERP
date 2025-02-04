@@ -5,10 +5,11 @@ import { FiFilter } from "react-icons/fi";
 import { useState } from "react";
 import PopUp from "./PopUp";
 import { MdCancel } from "react-icons/md";
+import { Task } from "../_projectUtils/header-json";
 
 interface UserTableProps {
   title?: string; 
-  users: any;
+  users?: Task[];
 }
 
 
@@ -42,12 +43,12 @@ const UserTable: React.FC<UserTableProps> = ({ title = "Total Projects" , users}
       </tr>
     </thead>
     <tbody>
-      {users.map((user, index) => (
+      {users?.map((user, index) => (
         <tr
           key={user.id}
           className="border sm:table-row flex flex-col sm:flex-row sm:space-x-0 space-y-2 sm:space-y-0"
         >
-          <td className="border px-4 py-2 flex flex-col sm:flex-row sm:items-center">
+          <td className=" px-4 py-2 flex flex-col sm:flex-row sm:items-center">
             <img
               src={userpic}
               alt="user picture"
