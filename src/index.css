@@ -47,6 +47,9 @@
   .remove-scrollbar::-webkit-scrollbar-thumb:hover {
     background: transparent;
   }
+  :root {
+    --radius: 0.5rem;
+  }
 }
 
 input[type="checkbox"] {

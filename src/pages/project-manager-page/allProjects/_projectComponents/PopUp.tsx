@@ -1,16 +1,24 @@
+import { Button } from "@/components/ui/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
-
-
-
-
-const PopUp = () =>{
-    return (
-
-        <div className="absolute bg-white border rounded-md shadow-md flex flex-col justify-center items-center  w-[150px] h-[100px] z-10 top-full right-0  mt-2">
-      <p className="text-sm cursor-pointer hover:text-blue-500">Restore</p>
-      <p className="text-sm mt-2 cursor-pointer hover:text-red-500">Delete</p>
-    </div>
-    )
+export function PopoverDemo() {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline">Open popover</Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-50">
+        <div className="flex flex-col space-y-3">
+          <p>Edit</p>
+          <p>Delete</p>
+        </div>
+        
+        
+      </PopoverContent>
+    </Popover>
+  )
 }
-
-export default PopUp

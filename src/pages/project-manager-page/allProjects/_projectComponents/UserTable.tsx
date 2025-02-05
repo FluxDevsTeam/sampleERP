@@ -1,12 +1,18 @@
 
 import { HiDotsVertical } from "react-icons/hi";
 import userpic  from "../../../../assets/images/16.png";
-import { FiFilter } from "react-icons/fi";
-import { useState } from "react";
-import PopUp from "./PopUp";
+//import { FiFilter } from "react-icons/fi";
+//import { useState } from "react";
 import { MdCancel } from "react-icons/md";
 import { Task } from "../_projectUtils/header-json";
 
+import { Button } from "@/components/ui/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import FilterDropdown from "./FilterDropdown";
 interface UserTableProps {
   title?: string; 
   users?: Task[];
@@ -17,17 +23,17 @@ interface UserTableProps {
 
 const UserTable: React.FC<UserTableProps> = ({ title = "Total Projects" , users}) => {
 
-  const [visiblePopupIndex, setVisiblePopupIndex] = useState<number | null>(null);
+  //const [visiblePopupIndex, setVisiblePopupIndex] = useState<number | null>(null);
 
-  const togglePopup = (index: number) => {
+  /*const togglePopup = (index: number) => {
     setVisiblePopupIndex(visiblePopupIndex === index ? null : index);
-  };
+  };*/
 
 
     return (
       <div className="p-6 ">
      <div className='flex justify-between items-center px-6'>   <h1 className="text-3xl font-bold py-3">{title}</h1>
-       <div className="flex bg-white p-2 px-3 space-x-2 text-lg"><span className="mt-1"><FiFilter /> </span> <p className=" ">filter</p> </div>
+       <div> <FilterDropdown /> </div>
         </div>
         <div className="overflow-x-auto">
   <table className="table-auto bg-white w-full border-collapse">
@@ -43,7 +49,7 @@ const UserTable: React.FC<UserTableProps> = ({ title = "Total Projects" , users}
       </tr>
     </thead>
     <tbody>
-      {users?.map((user, index) => (
+      {users?.map((user) => (
         <tr
           key={user.id}
           className="border sm:table-row flex flex-col sm:flex-row sm:space-x-0 space-y-2 sm:space-y-0"
@@ -110,14 +116,21 @@ const UserTable: React.FC<UserTableProps> = ({ title = "Total Projects" , users}
 
           <td className="border px-4 py-2 text-sm text-center">{user.startDate}</td>
           <td className="border px-4 py-2 text-center relative">
-            <button
-              onClick={() => togglePopup(index)}
-              className="focus:outline-none"
-            >
-              <HiDotsVertical />
-            </button>
-            {visiblePopupIndex === index && <PopUp />}
+          <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="border-none"><HiDotsVertical /> </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-70">
+        <div className="flex flex-col space-y-4 ">
+          <p className="hover:text-red-300 cursor-pointer">Edit</p>
+          <p className="hover:text-red-300 cursor-pointer">Delete</p>
+        </div>
+        
+        
+      </PopoverContent>
+    </Popover>
           </td>
+          
         </tr>
       ))}
     </tbody>
