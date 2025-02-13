@@ -1,8 +1,8 @@
 import userpic from "../../../assets/images/16.png";
-import { FiFilter } from "react-icons/fi";
+//import { FiFilter } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { products } from "../allProjects/_projectUtils/header-json";
-
+import FilterDropdown from "./_productComponents/FilterDropdown";
 import ProjectsHeader from "../allProjects/_projectComponents/ProjectsHeader";
 
 interface UserTableProps {
@@ -32,12 +32,7 @@ const Products: React.FC<UserTableProps> = ({ title = "Manage Products" }) => {
       <ProjectsHeader />
       <div className="flex justify-between items-center p-6  px-6">
         <h1 className="md:text-3xl font-bold py-3">{title}</h1>
-        <div className="flex bg-white p-2 px-3 space-x-2 md:text-lg">
-          <span className="mt-1">
-            <FiFilter />
-          </span>
-          <p>filter</p>
-        </div>
+         <div> <FilterDropdown /> </div>
       </div>
       <div className="overflow-x-auto w-full md:w-[99%] px-3 ">
         <table className="table-auto bg-white w-full border-collapse">

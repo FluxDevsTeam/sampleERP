@@ -77,7 +77,7 @@ const UserTable: React.FC<UserTableProps> = ({ title = "Total Projects" , users}
           <td className="px-4 py-2 flex items-center justify-center space-x-2">
   {/* Status Indicator */}
   <div className="flex items-center space-x-2">
-    {user.status === "Completed" || user.status === "Active" ? (
+    {user.status === "Completed" || user.status === "In Progress" ? (
       <div className="w-3 h-3 bg-gray-300 border rounded-full flex items-center justify-start overflow-hidden">
         <div
           className="bg-lime-600 h-full rounded-full"
@@ -95,7 +95,7 @@ const UserTable: React.FC<UserTableProps> = ({ title = "Total Projects" , users}
   {/* Additional Status Representation */}
   {user.status === "Completed" ? (
     <span className="w-10 h-2 bg-lime-600 border rounded-full"></span>
-  ) : user.status === "Active" ? (
+  ) : user.status === "In Progress" ? (
     <div className="w-10 h-2 bg-gray-300 rounded-full overflow-hidden">
       <div
         className="bg-lime-600 h-full rounded-full"

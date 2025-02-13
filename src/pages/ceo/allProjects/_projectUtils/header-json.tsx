@@ -5,7 +5,7 @@ export interface Task {
   email: string;
   id:number; 
   quantity: number;
-  status: 'Active' | 'Cancelled' | 'Completed';
+  status: 'In Progress' | 'Cancelled' | 'Completed';
   startDate: string; 
 
 }
@@ -22,7 +22,7 @@ export interface Ptask {
   name: string;
   desc: string;
   id:number; 
-  status: 'Active' | 'Cancelled' | 'Completed';
+  status: 'In Progress' | 'Cancelled' | 'Completed';
   startDate: string;
   endDate:string; 
 
@@ -139,7 +139,7 @@ export const users: Task[] = [
     email: "john.doe@example.com",
     id:52443,
     quantity: 10,
-    status: "Active",
+    status: "In Progress",
     startDate: "2024-01-01",
     
   },
@@ -148,7 +148,7 @@ export const users: Task[] = [
     email: "jane.smith@example.com",
     id: 64649,
     quantity: 20,
-    status: "Active",
+    status: "In Progress",
     startDate: "2024-02-15",
    
   },
@@ -166,7 +166,7 @@ export const users: Task[] = [
     email: "sarah.connor@example.com",
     id: 74536,
     quantity: 15,
-    status: "Active",
+    status: "In Progress",
     startDate: "2024-04-25",
    
   },
@@ -255,7 +255,7 @@ export const projects: Ptask[] = [
     name: "John Doe",
     desc: "john.doe@example.com",
     id:52443,
-    status: "Active",
+    status: "In Progress",
     startDate: "2024-01-01",
     endDate: "2024-01-01",
     
@@ -264,7 +264,7 @@ export const projects: Ptask[] = [
     name: "Jane Smith",
     desc: "jane.smith@example.com",
     id: 64649,
-    status: "Active",
+    status: "In Progress",
     startDate: "2024-01-01",
     endDate: "2024-02-15",
    

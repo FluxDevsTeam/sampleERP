@@ -14,7 +14,7 @@ export default function ProjectManagement() {
     if (filterType === "Total Projects") {
       setFilteredUsers(users)
     } else {
-      const status = filterType === "Active Projects" ? "Active" : filterType
+      const status = filterType === "Active Projects" ? "In Progress" : filterType
       const filtered = users.filter((user) => user.status === status)
       setFilteredUsers(filtered)
     }

@@ -4,8 +4,8 @@ import Frame180 from "../../../../assets/images/Frame180.png"
 
 interface HeaderProps {
   title?: string
-  onFilterClick: (filterType: string) => void
-  activeFilter: string
+  onFilterClick?: (filterType: string) => void
+  activeFilter?: string
 }
 
 const ProjectsHeader: React.FC<HeaderProps> = ({ title = "Manage Projects", onFilterClick, activeFilter }) => {
@@ -16,7 +16,7 @@ const ProjectsHeader: React.FC<HeaderProps> = ({ title = "Manage Projects", onFi
         {projectSummary.map((project, index) => (
           <div
             key={index}
-            onClick={() => onFilterClick(project.type)}
+            onClick={() => onFilterClick?(project.type)}
             className={`border rounded-lg space-y-4 p-4 cursor-pointer transition-all duration-300 ${activeFilter === project.type ? "bg-blue-100" : "bg-white"}`}
           >
             <div className="flex justify-between items-center text-2xl">

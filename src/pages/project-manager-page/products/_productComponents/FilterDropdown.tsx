@@ -14,12 +14,14 @@ export default function FilterDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent  className="w-40 flex flex-col justify-center items-center ">
         <DropdownMenuItem className="cursor-pointer">
-         By Date
+          Option 1
         </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer" >
-          By Project id
+          Option 2
         </DropdownMenuItem>
-       
+        <DropdownMenuItem className="cursor-pointer">
+          Option 3
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
