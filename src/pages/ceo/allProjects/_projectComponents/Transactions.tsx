@@ -1,38 +1,40 @@
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
-import { transactions } from "../_projectUtils/header-json"
-import ellipse from "../../../../assets/images/Ellipse 10.png";
+const KeyMetricsChart = () => {
+  // Key metrics data inside the component
+  const keyMetricsData = [
+    { name: "Total Income", value: 4255000.0 },
+    { name: "Total Expenses", value: 720000.0 },
+    { name: "Net Profit", value: 3535000.0 },
+    { name: "Gross Profit", value: 4015000.0 },
+    { name: "Current Assets", value: 180000.0 },
+    { name: "Inventory Value", value: 621000.0 },
+  ];
 
+  return (
+    <div className="bg-white p-4 rounded-lg shadow-md">
+      <p className="text-xl font-bold mb-2">Financial Overview</p>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={keyMetricsData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" angle={-15} textAnchor="end" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="value" fill="#0088FE" name="Amount" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
 
-const Transactions=()=>{
-
- 
-
-    return (
-        <div className="">
-            <p className="text-3xl font-bold text-black lg:pt-0 pt-6">Transactions</p>
-
-            <div className="bg-white w-full h-[350px] my-6 flex justify-center items-center">
-  <div className="space-y-4">
-    {transactions.map((transaction, index) => (
-      <div className="grid grid-cols-3 px-4" key={index}>
-        <p>
-          <img
-            src={ellipse}
-            alt="header logo"
-            className="w-[32px] h-[32px]"
-          />
-        </p>
-        <div className="flex flex-col ">
-          <p className="text-md font-bold">{transaction.text}</p>
-          <p className="text-sm">{transaction.date.toLocaleDateString()}</p>
-        </div>
-        <p className="text-lime-500 ml-6">${transaction.price}</p>
-      </div>
-    ))}
-  </div>
-</div>
-</div>
-    )
-}
-
-export default Transactions
+export default KeyMetricsChart;

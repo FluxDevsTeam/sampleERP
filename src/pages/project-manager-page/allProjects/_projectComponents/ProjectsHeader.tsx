@@ -12,18 +12,20 @@ const ProjectsHeader: React.FC<HeaderProps> = ({ title = "Manage Projects", onFi
   return (
     <div className="p-6">
       <p className="md:text-3xl text-black font-bold py-6">{title}</p>
-      <div className="lg:grid lg:grid-cols-4 lg:space-x-4 space-x-0 grid grid-cols-1 lg:space-y-0 space-y-4">
+      
+      {/* Added a wrapping div */}
+      <div className="md:grid md:grid-cols-4 grid grid-cols-1 md:space-x-4 space-x-0 md:space-y-0 space-y-4">
         {projectSummary.map((project, index) => (
           <div
             key={index}
-            onClick={() => onFilterClick?(project.type)}
-            className={`border rounded-lg space-y-4 p-4 cursor-pointer transition-all duration-300 ${activeFilter === project.type ? "bg-blue-100" : "bg-white"}`}
+            onClick={() => onFilterClick?.(project.type)}
+            className={`border rounded-lg p-4 cursor-pointer transition-all duration-300 ${
+              activeFilter === project.type ? "bg-blue-100" : "bg-white"
+            }`}
           >
             <div className="flex justify-between items-center text-2xl">
               <p>{project.type}</p>
-              <p>
-                <img src={Frame180 || "/placeholder.svg"} alt="header logo" />
-              </p>
+              <img src={Frame180 || "/placeholder.svg"} alt="header logo" />
             </div>
             <p className="text-black text-3xl font-bold">{project.number}</p>
             <div className="flex space-x-8 text-sm">
@@ -40,4 +42,3 @@ const ProjectsHeader: React.FC<HeaderProps> = ({ title = "Manage Projects", onFi
 }
 
 export default ProjectsHeader
-

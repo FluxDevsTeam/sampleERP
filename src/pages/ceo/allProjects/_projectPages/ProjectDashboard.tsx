@@ -2,8 +2,8 @@ import ProjectsHeader from "../_projectComponents/ProjectsHeader";
 import Header from "../_projectComponents/Header";
 import ProjectCard from "../_projectComponents/ProjectCard";
 import Areachart from "../_projectComponents/Areachart";
-import Piechart from "../_projectComponents/Piechart";
-import Barchart from "../_projectComponents/Barchart";
+import Piechart from "../_projectComponents/IncomeBreakdownPiechart";
+import Barchart from "../_projectComponents/ExpenseBreakdownBarchart";
 import Transactions from "../_projectComponents/Transactions";
 import ProjectTable from "../_projectComponents/ProjectTable";
 
