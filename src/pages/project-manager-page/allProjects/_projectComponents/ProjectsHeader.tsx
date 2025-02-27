@@ -15,7 +15,7 @@ interface HeaderProps {
   title?: string;
   onFilterClick?: (filterType: string) => void;
   activeFilter?: string;
-  projectStatistics?: ProjectStatistics; // ✅ Ensures correct typing
+  projectStatistics?: ProjectStatistics; 
 }
 
 // Define the project summary structure with a type-safe key
@@ -23,7 +23,7 @@ const projectSummary: { id: string; type: string; key: keyof ProjectStatistics; 
   {
     id: nanoid(),
     type: "Total Projects",
-    key: "total_projects", // ✅ Ensures the key matches ProjectStatistics
+    key: "total_projects", 
     description: "This is the total number of projects tracked in the system.",
   },
   {
@@ -70,7 +70,7 @@ const ProjectsHeader: React.FC<HeaderProps> = ({
               <img src={Frame180 || "/placeholder.svg"} alt="header logo" />
             </div>
             <p className="text-black text-3xl font-bold">
-              {projectStatistics ? projectStatistics[project.key] : 0} {/* ✅ Type-safe */}
+              {projectStatistics ? projectStatistics[project.key] : 0} 
             </p>
             <div className="flex space-x-8 text-sm">
               <span className="text-green-200">
