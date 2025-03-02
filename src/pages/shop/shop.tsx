@@ -2,21 +2,19 @@ import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  // faDatabase,
   faHome,
-  faBox,
-  faInfoCircle,
-  faEnvelope,
-  faToolbox,
-  faArchive,
+  faMoneyBill,
+  faReceipt,
+  faTools,
 } from "@fortawesome/free-solid-svg-icons";
 import Navbar from "../../components/NavBar";
 import Sidebar from "../../components/Sidebar";
-import { Dashboard } from "../ceo";
-import Products from "./Products";
-import About from "./About";
-import Contact from "./Contact";
-import { AllProjects } from "../ceo";
-import { Archives } from "../ceo";
+import Dashboard from "./Dashboard";
+import Orders from "./Orders";
+import RawMaterials from "./RawMaterials";
+import Sold from "./Sold";
+// import DashboardTable from "./shop-components/DashboardTable";
 
 const Shop = () => {
   document.title = "Shop";
@@ -38,45 +36,27 @@ const Shop = () => {
     },
     {
       id: "2",
-      text: "All Projects",
-      href: "/shop/all-projects",
-      name: "All Projects",
-      link: "/shop/all-projects",
-      icon: <FontAwesomeIcon className="text-2xl pr-[3px]" icon={faToolbox} />,
+      text: "Orders",
+      href: "/shop/orders",
+      name: "Orders",
+      link: "/shop/orders",
+      icon: <FontAwesomeIcon className="text-2xl pr-[7.3px] ml-[2px]" icon={faReceipt} />,
     },
     {
       id: "3",
-      icon: <FontAwesomeIcon className="text-2xl pr-1" icon={faBox} />,
-      text: "Products",
-      href: "/shop/products",
+      icon: <FontAwesomeIcon className="text-2xl pr-1" icon={faTools} />,
+      text: "Raw Materials",
+      href: "/shop/raw-materials",
       name: "Products",
-      link: "/shop/products",
+      link: "/shop/raw-materials",
     },
     {
       id: "4",
-      text: "About Us",
-      href: "/shop/about",
-      name: "About Us",
-      link: "/about",
-      icon: (
-        <FontAwesomeIcon className="text-2xl pr-1" icon={faInfoCircle} />
-      ),
-    },
-    {
-      id: "5",
-      text: "Contact",
-      href: "/shop/contact",
-      name: "Contact",
-      link: "/contact",
-      icon: <FontAwesomeIcon className="text-2xl pr-1" icon={faEnvelope} />,
-    },
-    {
-      id: "6",
-      text: "Archives",
-      href: "/shop/archives",
-      name: "Archives",
-      link: "/archives",
-      icon: <FontAwesomeIcon className="text-2xl pr-1" icon={faArchive} />,
+      icon: <FontAwesomeIcon className="text-2xl pr-1" icon={faMoneyBill} />,
+      text: "Sold",
+      href: "/shop/sold",
+      name: "Sold",
+      link: "/shop/sold",
     },
   ];
 
@@ -91,15 +71,13 @@ const Shop = () => {
         <Navbar
           toggleSidebar={toggleSidebar}
           isSidebarOpen={isSidebarOpen}
-          title="Welcome, Shopper"
+          title="Welcome, Shopkeeper"
         />
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/all-projects" element={<AllProjects />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/archives" element={<Archives />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/raw-materials" element={<RawMaterials />} />
+          <Route path="/sold" element={<Sold />} />
         </Routes>
       </div>
     </div>
