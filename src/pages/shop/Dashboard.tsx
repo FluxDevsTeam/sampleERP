@@ -5,28 +5,42 @@ import { useEffect, useState } from "react";
 export const Dashboard = () => {
   const tableHeaders = ["Product", "Category", "Stock Status", "Details"];
   const [totalStock, setTotalStock] = useState(Math.floor(Math.random() * 100));
-  const [totalShopValue, setTotalShopValue] = useState(Math.floor(Math.random() * 100));
+  const [totalShopValue, setTotalShopValue] = useState(
+    Math.floor(Math.random() * 100)
+  );
   const [monthlyStock, setMonthlyStock] = useState(
     Math.floor(Math.random() * 100)
   );
-  const [weeklyStock, setWeeklyStock] = useState(Math.floor(Math.random() * 100));
+  const [weeklyStock, setWeeklyStock] = useState(
+    Math.floor(Math.random() * 100)
+  );
 
   useEffect(() => {
     async function fetchStockInfo() {
+      // Get token from localStorage
+      const token = localStorage.getItem("authToken");
+
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+
       // INVENTORY ITEM
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/",
+          {
+            headers: headers,
+          }
         );
 
-        const logData = await response.json();
+        if (!response.ok) {
+          throw new Error("Authentication failed");
+        }
 
+        const logData = await response.json();
         let logTotalStock = logData.count;
         setTotalStock(logTotalStock);
-
-        if (!response.ok) {
-          throw new Error("Iyegs man, Rest Bro");
-        }
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -34,16 +48,24 @@ export const Dashboard = () => {
       // INVENTORY DASHBOARD
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/",
+          {
+            headers: headers,
+          }
         );
+
+        if (!response.ok) {
+          throw new Error("Authentication failed");
+        }
 
         const logData = await response.json();
         console.log(logData);
 
         const logMonthlySales = logData.total_sold_this_month;
         setMonthlyStock(logMonthlySales);
-        
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error fetching dashboard:", error);
+      }
     }
 
     fetchStockInfo();
@@ -52,45 +74,45 @@ export const Dashboard = () => {
   return (
     <>
       <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
-      <h1
-        style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-        className="font-semibold py-5 mt-2"
-      >
-        Inventory Summary
-      </h1>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-11">
-        <DashboardData
-        info="Total Stock"
-        digits={totalStock}
-        trend="up"
-        ></DashboardData>
-        <DashboardData
-        info="Total Shop Value"
-        digits={totalShopValue}
-        trend="down"
-        ></DashboardData>
-        <DashboardData
-        info="Monthly Stock Added"
-        digits={monthlyStock}
-        trend="up"
-        ></DashboardData>
-        <DashboardData
-        info="Weekly Stock"
-        digits={weeklyStock}
-        trend="up"
-        ></DashboardData>
-      </div>
-
-      <div>
         <h1
-        style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-        className="font-semibold py-5 mt-2"
+          style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
+          className="font-semibold py-5 mt-2"
         >
-        Low Stock Alerts
+          Inventory Summary
         </h1>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-11">
+          <DashboardData
+            info="Total Stock"
+            digits={totalStock}
+            trend="up"
+          ></DashboardData>
+          <DashboardData
+            info="Total Shop Value"
+            digits={totalShopValue}
+            trend="down"
+          ></DashboardData>
+          <DashboardData
+            info="Monthly Stock Added"
+            digits={monthlyStock}
+            trend="up"
+          ></DashboardData>
+          <DashboardData
+            info="Weekly Stock"
+            digits={weeklyStock}
+            trend="up"
+          ></DashboardData>
+        </div>
 
-        <DashboardTable headers={tableHeaders} />
-      </div>
+        <div>
+          <h1
+            style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
+            className="font-semibold py-5 mt-2"
+          >
+            Low Stock Alerts
+          </h1>
+
+          <DashboardTable headers={tableHeaders} />
+        </div>
       </div>
     </>
   );
