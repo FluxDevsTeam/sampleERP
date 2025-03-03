@@ -1,6 +1,7 @@
 import DashboardData from "./shop-components/DashboardData";
 import DashboardTable from "./shop-components/DashboardTable";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Dashboard = () => {
   const tableHeaders = ["Product", "Category", "Stock Status", "Details"];
@@ -15,23 +16,25 @@ export const Dashboard = () => {
     Math.floor(Math.random() * 100)
   );
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     async function fetchStockInfo() {
       // Get token from localStorage
-      const token = localStorage.getItem("authToken");
+      // const token = localStorage.getItem("authToken");
 
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      };
+      // const headers = {
+      //   Authorization: `Bearer ${token}`,
+      //   "Content-Type": "application/json",
+      // };
 
       // INVENTORY ITEM
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/",
-          {
-            headers: headers,
-          }
+          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/"
+          // {
+          //   headers: headers,
+          // }
         );
 
         if (!response.ok) {
@@ -42,16 +45,16 @@ export const Dashboard = () => {
         let logTotalStock = logData.count;
         setTotalStock(logTotalStock);
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching items:", error);
       }
 
       // INVENTORY DASHBOARD
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/",
-          {
-            headers: headers,
-          }
+          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/"
+          // {
+          //   headers: headers,
+          // }
         );
 
         if (!response.ok) {
@@ -59,7 +62,7 @@ export const Dashboard = () => {
         }
 
         const logData = await response.json();
-        console.log(logData);
+        // console.log(logData);
 
         const logMonthlySales = logData.total_sold_this_month;
         setMonthlyStock(logMonthlySales);
@@ -110,7 +113,6 @@ export const Dashboard = () => {
           >
             Low Stock Alerts
           </h1>
-
           <DashboardTable headers={tableHeaders} />
         </div>
       </div>

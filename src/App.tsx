@@ -46,7 +46,6 @@ import {
 } from "./pages/store-keeper-page";
 
 import Shop from "./pages/shop/shop.tsx";
-import AddItemPage from "./pages/shop/shop-components/AddItemPage";
 
 const router = createBrowserRouter([
   {
@@ -185,10 +184,6 @@ const router = createBrowserRouter([
   {
     path: "/shop/*",
     element: <Shop />,
-  },
-  {
-    path: "/shop/add-item", // Changed from /add-item to /shop/add-item
-    element: <AddItemPage />,
   },
 ]);
 

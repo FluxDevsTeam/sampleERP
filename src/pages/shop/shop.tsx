@@ -14,6 +14,8 @@ import Dashboard from "./Dashboard";
 import Orders from "./Orders";
 import RawMaterials from "./RawMaterials";
 import Sold from "./Sold";
+import AddItemPage from "./shop-components/AddNewItemPage";
+import AddCategoryPage from "./shop-components/AddNewCategory";
 // import DashboardTable from "./shop-components/DashboardTable";
 
 const Shop = () => {
@@ -40,7 +42,12 @@ const Shop = () => {
       href: "/shop/orders",
       name: "Orders",
       link: "/shop/orders",
-      icon: <FontAwesomeIcon className="text-2xl pr-[7.3px] ml-[2px]" icon={faReceipt} />,
+      icon: (
+        <FontAwesomeIcon
+          className="text-2xl pr-[7.3px] ml-[2px]"
+          icon={faReceipt}
+        />
+      ),
     },
     {
       id: "3",
@@ -75,6 +82,8 @@ const Shop = () => {
         />
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/add-new-item" element={<AddItemPage />} />
+          <Route path="/add-new-category" element={<AddCategoryPage />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/raw-materials" element={<RawMaterials />} />
           <Route path="/sold" element={<Sold />} />

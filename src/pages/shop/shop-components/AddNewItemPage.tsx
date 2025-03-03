@@ -1,51 +1,67 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { Whisper, Tooltip } from "rsuite";
+import "rsuite/dist/rsuite.min.css";
 
 const AddItemPage: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
+    []
+  );
+
   const [formData, setFormData] = useState({
     name: "",
-    inventory_category: "",
+    category: "",
     stock: "",
     description: "",
     dimensions: "",
     cost_price: "",
     selling_price: "",
+    archived: "",
     image: null as File | null,
   });
+
+  async function skFn() {
+    try {
+      const response = await fetch(
+        "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item-category/"
+      );
+
+      if (!response.ok) {
+        throw new Error("Iyegs man, rest bro");
+      }
+
+      const logData = await response.json();
+      console.log(logData);
+
+      setCategories(logData.results);
+    } catch (error) {}
+  }
+
+  useEffect(() => {
+    skFn();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Create FormData object
       const formDataToSend = new FormData();
-
-      // Create category object
-      const categoryData = {
-        name: formData.inventory_category,
-      };
-
-      // Append all fields
       formDataToSend.append("name", formData.name);
-      formDataToSend.append("inventory_category", JSON.stringify(categoryData));
+      formDataToSend.append("category", formData.category);
       formDataToSend.append("stock", formData.stock);
       formDataToSend.append("description", formData.description);
       formDataToSend.append("dimensions", formData.dimensions);
       formDataToSend.append("cost_price", formData.cost_price);
+      formDataToSend.append("archived", formData.archived);
       formDataToSend.append("selling_price", formData.selling_price);
 
       if (formData.image) {
         formDataToSend.append("image", formData.image);
-      }
-
-      // Log FormData contents for debugging
-      for (let pair of formDataToSend.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
       }
 
       const response = await fetch(
@@ -56,43 +72,28 @@ const AddItemPage: React.FC = () => {
         }
       );
 
-      const responseData = await response.json();
-      console.log("API Response:", responseData);
+      console.log(response);
 
       if (!response.ok) {
-        throw new Error(responseData.message || "Failed to add item");
+        throw new Error("Failed to add item");
       }
 
       alert("Item added successfully!");
-      navigate("/shop/dashboard");
+      navigate(`/shop/dashboard`);
     } catch (error) {
       console.error("Error adding item:", error);
-      alert(
-        `Failed to add item: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
+      alert("Failed to add item");
     } finally {
       setLoading(false);
     }
   };
 
-  // Add disable state for submit button
-  const isFormValid = () => {
-    return (
-      formData.name &&
-      formData.inventory_category &&
-      formData.stock &&
-      formData.cost_price &&
-      formData.selling_price
-    );
-  };
+  const checkCheck = ()=> {
+    console.log("it is clicked");
+    
+  }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData({ ...formData, image: e.target.files[0] });
-    }
-  };
+  //   console.log(handleSubmit);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -100,15 +101,16 @@ const AddItemPage: React.FC = () => {
         <div className="flex items-center mb-6">
           <button
             onClick={() => navigate("/shop/dashboard")}
-            className="mr-4 text-gray-600 hover:text-gray-800"
+            className="mr-4 text-gray-20 hover:text-gray-600"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-800">Add New Item</h1>
+          <h1 className="text-2xl font-bold text-gray-20">Add New Item</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* item name */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Name
@@ -123,23 +125,40 @@ const AddItemPage: React.FC = () => {
                 }
               />
             </div>
+
+            {/* category */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Category
               </label>
-              <input
-                type="text"
+              <select
                 required
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                value={formData.inventory_category}
+                value={formData.category}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    inventory_category: e.target.value,
-                  })
+                  setFormData({ ...formData, category: e.target.value })
                 }
-              />
+              >
+                <option value="">Select a category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              <Whisper
+              followCursor
+              speaker={<Tooltip className="text-red-500">Can't find the category you are looking for? Click to add new category</Tooltip>}>
+                <button
+                className=" text-gray-20 border-2 border-gray-500 rounded-md mt-2 p-2"
+                onClick={() => navigate("/shop/add-new-category")}
+              >
+                New category
+              </button>
+              </Whisper>
             </div>
+
+            {/* stock */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Stock
@@ -154,6 +173,8 @@ const AddItemPage: React.FC = () => {
                 }
               />
             </div>
+
+            {/* dimensions */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Dimensions
@@ -167,6 +188,8 @@ const AddItemPage: React.FC = () => {
                 }
               />
             </div>
+
+            {/* cost price */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Cost Price
@@ -181,6 +204,8 @@ const AddItemPage: React.FC = () => {
                 }
               />
             </div>
+
+            {/* selling price */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Selling Price
@@ -195,7 +220,10 @@ const AddItemPage: React.FC = () => {
                 }
               />
             </div>
+
           </div>
+
+          {/* description */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Description
@@ -209,6 +237,14 @@ const AddItemPage: React.FC = () => {
               }
             />
           </div>
+
+          {/* archived */}
+          <div>
+            <label>Archived</label>
+            <input className="ml-4" type="checkbox" onClick={checkCheck}/>
+          </div>
+
+          {/* image */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Image
@@ -216,20 +252,21 @@ const AddItemPage: React.FC = () => {
             <input
               type="file"
               accept="image/*"
-              onChange={handleFileChange}
+              onChange={(e) => {
+                if (e.target.files) {
+                  setFormData({ ...formData, image: e.target.files[0] });
+                }
+              }}
               className="mt-1 block w-full"
             />
           </div>
-          <div className="flex gap-4 justify-end">
+
+          {/* add button */}
+          <div className="flex justify-end">
             <button
               type="submit"
-              disabled={!isFormValid() || loading}
-              className={`px-6 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors 
-                ${
-                  !isFormValid() || loading
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
+              disabled={loading}
+              className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-600"
             >
               {loading ? "Adding..." : "Add Item"}
             </button>

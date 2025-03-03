@@ -3,7 +3,13 @@ import { ThreeDots } from "react-loader-spinner";
 import { Whisper, Tooltip } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencil, faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPencil,
+  faPlus,
+  faTrash,
+  faArrowLeft,
+  faArrowRight,
+} from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
 // Add interface for product details
@@ -11,6 +17,7 @@ interface ProductDetails {
   name: string;
   category: string;
   id: number;
+  categoryId: number;
   image: string;
   description: string;
   dimensions: string;
@@ -41,58 +48,60 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
     null
   );
   const [showImagePreview, setShowImagePreview] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
   const navigate = useNavigate();
 
   const fetchItems = async () => {
     try {
+      setLoading(true);
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/"
+        `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/?page=${currentPage}&page_size=${itemsPerPage}`
       );
 
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
 
-      const logData = await response.json();
-      console.log("API Response:", logData);
+      const data = await response.json();
+      console.log("API Response:", data); // Add this to debug
 
-      if (logData.results && Array.isArray(logData.results)) {
-        const updatedTableData: TableData[] = logData.results.map(
-          (item: any) => {
-            // console.log("Processing item:", item);
-            return {
-              Product: item.name || "N/A",
-              Category: item.inventory_category?.name || "N/A",
-              "Stock Status": item.stock || 0,
-              Details: (
-                <button
-                  onClick={() =>
-                    handleViewDetails({
-                      name: item.name,
-                      category: item.inventory_category?.name || "",
-                      id: item.id,
-                      image: item.image,
-                      description: item.description,
-                      dimensions: item.dimensions,
-                      costPrice: item.cost_price,
-                      sellingPrice: item.selling_price,
-                      totalPrice: item.total_price,
-                      profitPerItem: item.profit_per_item,
-                      archived: item.archived,
-                    })
-                  }
-                  className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
-                >
-                  View
-                </button>
-              ),
-            };
-          }
-        );
+      setTotalPages(Math.ceil(data.count / itemsPerPage));
 
-        console.log(updatedTableData);
-        setTableData(updatedTableData);
-      }
+      const updatedTableData: TableData[] = data.results.map((item: any) => {
+        return {
+          Product: `${item.name} / ${item.id}`,
+          Category: item.inventory_category?.name || "-",
+          "Stock Status": item.stock,
+          Details: (
+            <button
+              onClick={() =>
+                handleViewDetails({
+                  name: item.name,
+                  category:
+                    item.inventory_category?.name || "No category added",
+                  categoryId: item.inventory_category?.id,
+                  id: item.id,
+                  image: item.image,
+                  description: item.description,
+                  dimensions: item.dimensions,
+                  costPrice: item.cost_price,
+                  sellingPrice: item.selling_price,
+                  totalPrice: item.total_price,
+                  profitPerItem: item.profit_per_item,
+                  archived: item.archived,
+                })
+              }
+              className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+            >
+              View
+            </button>
+          ),
+        };
+      });
+
+      setTableData(updatedTableData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -102,16 +111,36 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [currentPage]);
 
   const handleViewDetails = (product: ProductDetails) => {
     setSelectedProduct(product);
     setShowModal(true);
   };
 
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  const handleLastPage = () => {
+    setCurrentPage(totalPages);
+  };
+
+  const handleFirstPage = () => {
+    setCurrentPage(1);
+  };
+
   return (
     <div className="relative">
-      <div className="overflow-x-auto pb-16">
+      <div className="overflow-x-auto pb-8">
         {loading ? (
           <div className="w-1/5 mx-auto">
             <ThreeDots
@@ -128,15 +157,11 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
         ) : (
           <div>
             <button
-              onClick={() => navigate("/shop/add-item")}
+              onClick={() => navigate("/shop/add-new-item")}
               className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
             >
               <FontAwesomeIcon className="pr-2" icon={faPlus} />
               Add Item
-            </button>
-            <button className="mb-4 px-4 py-2 bg-blue-400 text-white rounded">
-              <FontAwesomeIcon className="pr-2" icon={faXmark} />
-              Remove Item
             </button>
             <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
               <thead>
@@ -170,6 +195,62 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
         )}
       </div>
 
+      {/* PAGINATION FOR TABLE */}
+      <div className="flex justify-center items-center mb-11 space-x-4">
+        <button
+          onClick={handleFirstPage}
+          disabled={currentPage === 1}
+          className={`px-3 py-2 rounded text-sm ${
+            currentPage === 1
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-blue-400 hover:bg-blue-500 text-white"
+          }`}
+        >
+          First
+        </button>
+
+        <button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className={`px-3 py-2 rounded text-sm ${
+            currentPage === 1
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-blue-400 hover:bg-blue-500 text-white"
+          }`}
+        >
+          <FontAwesomeIcon icon={faArrowLeft} className="mr-1" />
+        </button>
+
+        <span className="text-gray-500 text-sm">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          className={`px-3 py-2 rounded text-sm ${
+            currentPage === totalPages
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-blue-400 hover:bg-blue-500 text-white"
+          }`}
+        >
+          <FontAwesomeIcon icon={faArrowRight} className="ml-1" />
+        </button>
+
+        <button
+          onClick={handleLastPage}
+          disabled={currentPage === totalPages}
+          className={`px-3 py-2 rounded text-sm ${
+            currentPage === totalPages
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-blue-400 hover:bg-blue-500 text-white"
+          }`}
+        >
+          Last
+        </button>
+      </div>
+
+      {/*   PRODUCT DETAILS   */}
       {showModal && selectedProduct && (
         <div className="fixed inset-0 flex items-center justify-center z-100">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 border-2 border-gray-800 shadow-lg">
@@ -230,18 +311,31 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
               {selectedProduct.archived ? "Yes" : "No"}
             </p>
             <p className="text-xs text-red-600">
-              Take note of product id -{" "}
+              Product id -{" "}
               <span className="font-bold">{selectedProduct.id}</span>
             </p>
+            <p className="text-xs text-red-600">
+              Category id -{" "}
+              <span className="font-bold">
+                {selectedProduct.categoryId
+                  ? `${selectedProduct.categoryId}`
+                  : "no category"}
+              </span>
+            </p>
 
-            <button className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 font-bold">
+            <button className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold">
               <FontAwesomeIcon className="pr-1 text-blue-400" icon={faPencil} />
               Edit details
+            </button>
+            <button className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold">
+              <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
+              Delete Item
             </button>
           </div>
         </div>
       )}
 
+      {/*   IMAGE PREVIEW   */}
       {showImagePreview && selectedProduct && (
         <div
           className="fixed inset-0 bg-opacity-90 flex items-center justify-center z-[200]"
