@@ -69,7 +69,7 @@ const EditAsset = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["assets"] })
       queryClient.invalidateQueries({ queryKey: ["asset", id] })
-      navigate("/admin/dashboard")
+      navigate("/admin/dashboard/assets")
     },
     onError: (error) => {
       setFormError("Failed to update asset. Please try again.")
