@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import {
   Dialog,
@@ -21,6 +21,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const BASE_URL = "https://kidsdesigncompany.pythonanywhere.com/api/assets/";
 
@@ -33,29 +42,52 @@ interface Asset {
   get_total_value: number;
 }
 
-interface AssetsResponse {
-  assets: Asset[];
+interface PaginatedAssetsResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: {
+    assets: Asset[];
+  };
 }
 
-const fetchAssets = async (): Promise<AssetsResponse> => {
-  const response = await axios.get(BASE_URL);
-  return { assets: response.data.results.assets };
+const fetchAssets = async (page = 1): Promise<PaginatedAssetsResponse> => {
+  const response = await axios.get(`${BASE_URL}?page=${page}`);
+  return response.data;
 };
 
 const AssetsTable = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get current page from URL or default to 1
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  
   // States for modal and selected asset
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
 
-  // Use a consistent query key for assets data
-  const { data, isLoading, error } = useQuery<AssetsResponse>({
-    queryKey: ["assets"],
-    queryFn: fetchAssets,
+  // Use a consistent query key for assets data that includes the page
+  const { 
+    data, 
+    isLoading, 
+    error 
+  } = useQuery({
+    queryKey: ["assets", currentPage],
+    queryFn: () => fetchAssets(currentPage),
   });
+
+  // Calculate total pages when data changes
+  useEffect(() => {
+    if (data?.count) {
+      // Assuming the API returns 10 items per page by default
+      const itemsPerPage = 10; 
+      setTotalPages(Math.ceil(data.count / itemsPerPage));
+    }
+  }, [data]);
 
   // Delete asset mutation
   const deleteAssetMutation = useMutation({
@@ -63,6 +95,7 @@ const AssetsTable = () => {
       await axios.delete(`${BASE_URL}${assetId}/`);
     },
     onSuccess: () => {
+      // Invalidate all assets queries to refresh the latest data
       queryClient.invalidateQueries({ queryKey: ["assets"] });
       setIsDeleteDialogOpen(false);
       setIsModalOpen(false);
@@ -78,7 +111,6 @@ const AssetsTable = () => {
   // Handle edit button click
   const handleEdit = () => {
     if (selectedAsset?.id) {
-      console.log("Navigating to edit page:", `/admin/dashboard/edit-asset/${selectedAsset.id}`);
       navigate(`/admin/dashboard/edit-asset/${selectedAsset.id}`);
     }
   };
@@ -95,17 +127,45 @@ const AssetsTable = () => {
     }
   };
 
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setSearchParams({ page: page.toString() });
+  };
+
+  // Prefetch next page for smoother navigation
+  useEffect(() => {
+    if (currentPage < totalPages) {
+      const nextPage = currentPage + 1;
+      queryClient.prefetchQuery({
+        queryKey: ["assets", nextPage],
+        queryFn: () => fetchAssets(nextPage),
+      });
+    }
+  }, [currentPage, queryClient, totalPages]);
+
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {(error as Error).message}</p>;
 
+  const assets = data?.results?.assets || [];
+  const hasNextPage = !!data?.next;
+  const hasPreviousPage = !!data?.previous;
+
   return (
-    <div className="overflow-x-auto p-4">
-      <Link
-        to="/admin/dashboard/add-asset"
-        className="bg-neutral-900 text-white px-4 py-2 rounded-md mb-4 inline-block"
-      >
-        Add Asset
-      </Link>
+    <div className="h-screen p-4">
+      <div className="flex justify-between items-center mb-4">
+        <Link
+          to="/admin/dashboard/add-asset"
+          className="bg-neutral-900 text-white px-4 py-2 rounded-md inline-block"
+        >
+          Add Asset
+        </Link>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">
+            Showing page {currentPage} of {totalPages}
+          </span>
+        </div>
+      </div>
+
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr className="bg-gray-100">
@@ -117,7 +177,7 @@ const AssetsTable = () => {
           </tr>
         </thead>
         <tbody>
-          {data?.assets?.map((asset) => (
+          {assets.map((asset) => (
             <tr
               key={asset.id}
               className="text-center border hover:bg-gray-50 cursor-pointer"
@@ -132,6 +192,80 @@ const AssetsTable = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <Pagination className="mt-4">
+        <PaginationContent>
+          {/* Previous Button */}
+          <PaginationItem>
+            <PaginationPrevious 
+              onClick={() => hasPreviousPage && handlePageChange(currentPage - 1)}
+              className={!hasPreviousPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+            />
+          </PaginationItem>
+          
+          {/* First page */}
+          {currentPage > 2 && (
+            <PaginationItem>
+              <PaginationLink onClick={() => handlePageChange(1)}>1</PaginationLink>
+            </PaginationItem>
+          )}
+          
+          {/* Ellipsis for pages before current */}
+          {currentPage > 3 && (
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          )}
+          
+          {/* Page before current */}
+          {currentPage > 1 && (
+            <PaginationItem>
+              <PaginationLink onClick={() => handlePageChange(currentPage - 1)}>
+                {currentPage - 1}
+              </PaginationLink>
+            </PaginationItem>
+          )}
+          
+          {/* Current page */}
+          <PaginationItem>
+            <PaginationLink isActive>{currentPage}</PaginationLink>
+          </PaginationItem>
+          
+          {/* Page after current */}
+          {currentPage < totalPages && (
+            <PaginationItem>
+              <PaginationLink onClick={() => handlePageChange(currentPage + 1)}>
+                {currentPage + 1}
+              </PaginationLink>
+            </PaginationItem>
+          )}
+          
+          {/* Ellipsis for pages after current */}
+          {currentPage < totalPages - 2 && (
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          )}
+          
+          {/* Last page */}
+          {currentPage < totalPages - 1 && totalPages > 1 && (
+            <PaginationItem>
+              <PaginationLink onClick={() => handlePageChange(totalPages)}>
+                {totalPages}
+              </PaginationLink>
+            </PaginationItem>
+          )}
+          
+          {/* Next Button */}
+          <PaginationItem>
+            <PaginationNext 
+              onClick={() => hasNextPage && handlePageChange(currentPage + 1)}
+              className={!hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
 
       {/* Asset Details Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -150,6 +284,18 @@ const AssetsTable = () => {
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium">Value:</span>
                 <span className="col-span-2">${selectedAsset.value}</span>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">Expected Lifespan:</span>
+                <span className="col-span-2">{selectedAsset.expected_lifespan}</span>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">Available:</span>
+                <span className="col-span-2">{selectedAsset.is_still_available ? "Yes" : "No"}</span>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">Total Value:</span>
+                <span className="col-span-2">${selectedAsset.get_total_value}</span>
               </div>
             </div>
           )}

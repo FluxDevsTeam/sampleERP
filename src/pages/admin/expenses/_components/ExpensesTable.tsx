@@ -129,7 +129,7 @@ const ExpensesTable: React.FC = () => {
 
       <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
         <thead>
-          <tr className="bg-gray-800 text-white">
+          <tr className="bg-gray-500 text-white">
             <th className="border px-4 py-2">Date</th>
             <th className="border px-4 py-2">ID</th>
             <th className="border px-4 py-2">Name</th>
@@ -142,14 +142,18 @@ const ExpensesTable: React.FC = () => {
         <tbody>
           {data?.daily_data.map((day) => (
             <React.Fragment key={day.date}>
-              <tr
-                className="bg-gray-200 cursor-pointer"
-                onClick={() => toggleCollapse(day.date)}
-              >
-                <td className="border px-4 py-2 font-bold" colSpan={7}>
-                  {day.date} (Total: {day.daily_total}) {collapsed[day.date] ? "▲" : "▼"}
-                </td>
-              </tr>
+             <tr
+  className="bg-gray-400 cursor-pointer"
+  onClick={() => toggleCollapse(day.date)}
+>
+  <td className="border px-4 py-2 font-bold" colSpan={7}>
+    <div className="flex justify-between w-full">
+      <span>{day.date}</span>
+      <span>(Total: {day.daily_total})</span>
+    </div>
+  </td>
+</tr>
+
               {!collapsed[day.date] &&
                 day.entries.map((entry) => (
                   <tr 

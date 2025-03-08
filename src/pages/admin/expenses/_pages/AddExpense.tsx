@@ -19,24 +19,29 @@ interface ExpenseData {
   date: string
 }
 
+// Improved hook with proper loading state
 const useCreateExpense = () => {
-  return {
-    mutate: async (
-      expenseData: ExpenseData,
-      options?: {
-        onSuccess?: () => void
-        onError?: (error: any) => void
-      }
-    ) => {
-      try {
-        await axios.post("https://kidsdesigncompany.pythonanywhere.com/api/expense/", expenseData)
-        options?.onSuccess?.()
-      } catch (error) {
-        options?.onError?.(error)
-      }
-    },
-    isPending: false
+  const [isPending, setIsPending] = useState(false)
+  
+  const mutate = async (
+    expenseData: ExpenseData,
+    options?: {
+      onSuccess?: () => void
+      onError?: (error: any) => void
+    }
+  ) => {
+    setIsPending(true)
+    try {
+      await axios.post("https://kidsdesigncompany.pythonanywhere.com/api/expense/", expenseData)
+      options?.onSuccess?.()
+    } catch (error) {
+      options?.onError?.(error)
+    } finally {
+      setIsPending(false)
+    }
   }
+  
+  return { mutate, isPending }
 }
 
 const AddExpense = () => {
@@ -54,21 +59,50 @@ const AddExpense = () => {
     date: new Date().toISOString().split('T')[0]
   })
 
+  // Improved handler that correctly processes inputs
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value, type } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "number" ? parseFloat(value) || 0 : value,
-    }))
+    const { name, value } = e.target
+    
+    if (name === "amount" || name === "quantity") {
+      // For number fields, allow direct input but convert to number
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value === "" ? 0 : Number(value)
+      }))
+    } else {
+      // For text fields
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value
+      }))
+    }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Form validation
+    if (!formData.name.trim()) {
+      toast.error("Please enter an expense name")
+      return
+    }
+    
+    if (formData.amount <= 0) {
+      toast.error("Amount must be greater than zero")
+      return
+    }
+    
+    if (formData.quantity <= 0) {
+      toast.error("Quantity must be greater than zero")
+      return
+    }
+    
+    // Submit the form
     mutate(formData, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["expenses"], refetchType: "active" })
+        queryClient.invalidateQueries({ queryKey: ["expenses"] })
         toast.success("Expense added successfully!")
         navigate("/admin/dashboard/expenses")
       },
@@ -110,26 +144,30 @@ const AddExpense = () => {
         <div className="space-y-2">
           <Label htmlFor="amount">Amount:</Label>
           <Input
-            type="number"
+            type="text" 
+            inputMode="decimal"
             id="amount"
             name="amount"
             value={formData.amount}
             onChange={handleChange}
-            step="0.01"
             required
+            pattern="[0-9]*\.?[0-9]+"
+            placeholder="Enter amount"
           />
         </div>
         
         <div className="space-y-2">
           <Label htmlFor="quantity">Quantity:</Label>
           <Input
-            type="number"
+            type="text"
+            inputMode="numeric"
             id="quantity"
             name="quantity"
             value={formData.quantity}
             onChange={handleChange}
-            min="1"
             required
+            pattern="[0-9]+"
+            placeholder="Enter quantity"
           />
         </div>
         
