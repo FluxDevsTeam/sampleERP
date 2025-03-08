@@ -1,4 +1,16 @@
 import axios from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+interface Product {
+  id: number;
+  name: string;
+  quantity: number;
+  progress: string;
+  overhead_cost: number;
+  total_production_cost: number;
+  selling_price: number;
+  profit: number;
+}
 
 
 export const fetchProducts = async () => {
@@ -9,13 +21,37 @@ export const fetchProducts = async () => {
     return data;
   }; 
 
-  /*export const fetchProducts = async () => {
-    const response = await fetch("https://kidsdesigncompany.pythonanywhere.com/api/product/");
-    if (!response.ok) {
-      throw new Error("Failed to fetch products");
-    }
-    const data = await response.json();
-    console.log("API Response:", data); // Debugging API response
-    return data.products || []; // Ensure it returns an array
-  }; */
-  
+ 
+const API_URL = "https://kidsdesigncompany.pythonanywhere.com/api/product"; 
+
+// **Update Project (PATCH)**
+export const useUpdateProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, updatedData }: { id: string; updatedData: Partial<Product> }) => {
+      const response = await axios.patch(`${API_URL}/${id}`, updatedData, {
+        headers: { "Content-Type": "application/json" },
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] }); // Refetch updated data
+    },
+  });
+};
+
+// **Delete Project (DELETE)**
+export const useDeleteProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await axios.delete(`${API_URL}/${id}`);
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] }); // Refetch data
+    },
+  });
+};

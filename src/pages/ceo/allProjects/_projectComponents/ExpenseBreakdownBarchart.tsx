@@ -25,11 +25,11 @@ const ExpenseBreakdownBarchart = () => {
   if (error) return <p>Error: {(error as Error).message}</p>;
 
   return (
-    <div>
+    <div className="">
       <p className="text-3xl font-bold text-black lg:pt-0 pt-6">Expense Breakdown</p>
       <ResponsiveContainer width="100%" height={350}>
         <BarChart data={chartData} className="bg-white my-6 border rounded-lg py-4">
-          <XAxis dataKey="name" tick={{ fontSize: 12 }} angle={-30} textAnchor="end" />
+          <XAxis dataKey="name" tick={{ fontSize: 12 }} angle={-25} textAnchor="end" />
           <YAxis />
           <Tooltip />
           <Bar dataKey="expense">

@@ -99,6 +99,12 @@ export const projectManagerSidebarLink: SidebarProps[] = [
     href: "/project-manager/dashboard/archives",
     icon: <ArchiveIcon className="currentColor" />,
   },
+  {
+    id: nanoid(),
+    text: "man",
+    href: "/project-manager/dashboard/archives",
+    icon: <ArchiveIcon className="currentColor" />,
+  },
 ];
 export const artisanSidebarLink: SidebarProps[] = [
   {
@@ -133,4 +139,43 @@ export const storeKeeperSidebarLink: SidebarProps[] = [
     href: "/store-keeper/dashboard/raw-materials",
     icon: <RawMaterialIcon className="currentColor" />,
   },
+];
+ 
+  export const adminSidebarLink: SidebarProps[] = [
+    {
+      id: nanoid(),
+      text: "Dashboard",
+      href: "/admin/dashboard",
+      icon: <HomeIcon className="currentColor" />,
+    },
+    {
+      id: nanoid(),
+      text: "assets",
+      href: "/admin/dashboard/assets",
+      icon: <OrdersIcon className="currentColor" />,
+    },
+    {
+      id: nanoid(),
+      text: "expenses",
+      href: "/admin/dashboard/expenses",
+      icon: <RawMaterialIcon className="currentColor" />,
+    },
+    {
+      id: nanoid(),
+      text: "contractors",
+      href: "/admin/dashboard/contractors",
+      icon: <StaffIcon className="currentColor" />,
+    },
+    {
+      id: nanoid(),
+      text: "paid",
+      href: "/admin/dashboard/paid",
+      icon: <ArchiveIcon className="currentColor" />,
+    },
+    {
+      id: nanoid(),
+      text: "workers",
+      href: "/admin/dashboard/workers",
+      icon: <FinancesIcon className="currentColor" />,
+    },
 ];

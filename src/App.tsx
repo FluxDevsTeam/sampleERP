@@ -9,6 +9,15 @@ import {
   Archives,
 
 } from "./pages/ceo";
+
+import { Workers,AdminDashboard,Expenses,AdminLayout,Contractors,Assets,Paid } from "./pages/admin";
+import AddAsset from "./pages/admin/assests/_pages/AddAsset";
+import EditAsset from "./pages/admin/assests/_pages/EditAsset";
+import AddExpense from "./pages/admin/expenses/_pages/AddExpense";
+import EditExpense from "./pages/admin/expenses/_pages/EditExpense";
+//import CreateAsset from "./pages/admin/assests/_pages/NewItem";
+
+
 //import CeoActiveProjects from "./pages/ceo/allProjects/_projectPages/ActiveProjects";
 //import CeoCompletedProjects from "./pages/ceo/allProjects/_projectPages/CompletedProjects";
 //import CeoCancelledProjects from "./pages/ceo/allProjects/_projectPages/CeoCancelledProjects";
@@ -218,6 +227,55 @@ const router = createBrowserRouter([
         path: "settings",
         element: <StoreKeeperSettings />,
       },
+    ],
+  },
+
+  //admin dashboard 
+  {
+    path: "/admin/dashboard",
+    element: <AdminLayout />,
+    children: [
+      {
+        index: true,
+        element: <AdminDashboard />,
+      },
+      {
+        path: "assets",
+        element: <Assets />,
+      },
+      {
+        path: "expenses",
+        element: <Expenses />,
+      },
+      {
+        path: "workers",
+        element: <Workers />,
+      },
+      {
+        path: "contractors",
+        element: <Contractors />,
+      },
+      {
+        path: "paid",
+        element: <Paid />,
+      },
+      {
+        path: "add-asset",
+        element: <AddAsset />,
+      },
+      {
+        path: "edit-asset/:id",
+        element: <EditAsset />,
+      },
+      {
+        path: "add-expense",
+        element: <AddExpense />,
+      },
+      {
+        path: "edit-expense/:id",
+        element: <EditExpense />,
+      },
+   
     ],
   },
 ]);
