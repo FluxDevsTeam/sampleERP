@@ -1,5 +1,5 @@
 import RawMaterialsData from "./shop-components/RawMaterialsData";
-import DashboardTable from "./shop-components/DashboardTable";
+import DashboardTable from "./shop-components/Inventory Item Components/InventoryTable";
 
 const RawMaterials = () => {
   document.title = "RawMaterials | Shop Keeper";
@@ -9,8 +9,7 @@ const RawMaterials = () => {
   return (
     <>
       <div className="w-11/12 mx-auto my-0 pl-1 pt-2">
-
-      <h1>should work w/ the raw marerials api</h1>
+        <h1>should work w/ the raw marerials api</h1>
         <h1
           style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
           className="font-semibold py-5 mt-2"

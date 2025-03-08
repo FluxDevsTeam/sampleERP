@@ -25,7 +25,6 @@ interface ProductDetails {
   sellingPrice: number;
   totalPrice: number;
   profitPerItem: number;
-  archived: boolean;
 }
 
 interface TableProps {
@@ -40,7 +39,7 @@ interface TableData {
   [key: string]: string | number | JSX.Element;
 }
 
-const DashboardTable: React.FC<TableProps> = ({ headers }) => {
+const Table: React.FC<TableProps> = ({ headers }) => {
   const [tableData, setTableData] = useState<TableData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -65,13 +64,13 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
       }
 
       const data = await response.json();
-      console.log("API Response:", data); // Add this to debug
+      // console.log("API Response:", data);
 
       setTotalPages(Math.ceil(data.count / itemsPerPage));
 
       const updatedTableData: TableData[] = data.results.map((item: any) => {
         return {
-          Product: `${item.name} / ${item.id}`,
+          Product: item.name,
           Category: item.inventory_category?.name || "-",
           "Stock Status": item.stock,
           Details: (
@@ -90,7 +89,6 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
                   sellingPrice: item.selling_price,
                   totalPrice: item.total_price,
                   profitPerItem: item.profit_per_item,
-                  archived: item.archived,
                 })
               }
               className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
@@ -112,6 +110,20 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
   useEffect(() => {
     fetchItems();
   }, [currentPage]);
+
+  useEffect(() => {
+    if (showModal || showImagePreview) {
+      document.body.style.overflow = "hidden";
+      // document.body.style.opacity = "0.5";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to reset overflow when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [showModal, showImagePreview]);
 
   const handleViewDetails = (product: ProductDetails) => {
     setSelectedProduct(product);
@@ -136,6 +148,41 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
 
   const handleFirstPage = () => {
     setCurrentPage(1);
+  };
+
+  // DELETING ITEM
+  const deleteItem = () => {
+    if (selectedProduct) {
+      fetch(
+        `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${selectedProduct.id}/`,
+        {
+          method: "DELETE",
+        }
+      )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to delete item");
+          }
+          alert("Item deleted successfully!");
+          setShowModal(false);
+          // fetchItems();
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error deleting item:", error);
+          alert("Failed to delete item");
+        });
+    }
+  };
+
+
+  // NAVIGATION TO EDIT PAGE
+  const editItem = () => {
+    if (selectedProduct) {
+      navigate(`/shop/edit-item/${selectedProduct.id}`, {
+        state: { productData: selectedProduct },
+      });
+    }
   };
 
   return (
@@ -253,7 +300,11 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
       {/*   PRODUCT DETAILS   */}
       {showModal && selectedProduct && (
         <div className="fixed inset-0 flex items-center justify-center z-100">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 border-2 border-gray-800 shadow-lg">
+          <div
+            className="absolute inset-0 bg-black opacity-50"
+            onClick={() => setShowModal(false)}
+          ></div>
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 border-2 border-gray-800 shadow-lg relative z-10">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-gray-20">
                 {selectedProduct.name}{" "}
@@ -266,17 +317,28 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
                 ✕
               </button>
             </div>
-            <Whisper
-              followCursor
-              speaker={<Tooltip>Click for full view</Tooltip>}
-            >
+            {!showImagePreview && (
+              <Whisper
+                followCursor
+                speaker={<Tooltip>Click for full view</Tooltip>}
+              >
+                <img
+                  src={selectedProduct.image}
+                  alt={selectedProduct.name}
+                  className="block w-1/5 h-auto mb-2 cursor-pointer"
+                  onClick={() => setShowImagePreview(true)}
+                />
+              </Whisper>
+            )}
+            {/* If showImagePreview is true, render the image directly without Whisper */}
+            {showImagePreview && (
               <img
                 src={selectedProduct.image}
                 alt={selectedProduct.name}
                 className="block w-1/5 h-auto mb-2 cursor-pointer"
                 onClick={() => setShowImagePreview(true)}
               />
-            </Whisper>
+            )}
             <div className="space-y-2"></div>
             <p className="text-sm text-gray-20 mb-3">
               <span className="font-semibold">Category:</span>{" "}
@@ -284,50 +346,42 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
             </p>
             <p className="text-sm text-gray-20 mb-3">
               <span className="font-semibold">Description:</span>{" "}
-              {selectedProduct.description}
+              {selectedProduct.description
+                ? selectedProduct.description
+                : "no description"}
             </p>
             <p className="text-sm text-gray-20 mb-3">
               <span className="font-semibold">Dimensions:</span>{" "}
-              {selectedProduct.dimensions}
+              {selectedProduct.dimensions} cm
             </p>
             <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Cost Price:</span> $
+              <span className="font-semibold">Cost Price:</span> &#8358;{" "}
               {selectedProduct.costPrice}
             </p>
             <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Selling Price:</span> $
+              <span className="font-semibold">Selling Price:</span> &#8358;{" "}
               {selectedProduct.sellingPrice}
             </p>
             <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Total Price:</span> $
+              <span className="font-semibold">Total Price:</span> &#8358;{" "}
               {selectedProduct.totalPrice}
             </p>
             <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Profit per item:</span> $
+              <span className="font-semibold">Profit per item:</span> &#8358;{" "}
               {selectedProduct.profitPerItem}
             </p>
-            <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Archived:</span>{" "}
-              {selectedProduct.archived ? "Yes" : "No"}
-            </p>
-            <p className="text-xs text-red-600">
-              Product id -{" "}
-              <span className="font-bold">{selectedProduct.id}</span>
-            </p>
-            <p className="text-xs text-red-600">
-              Category id -{" "}
-              <span className="font-bold">
-                {selectedProduct.categoryId
-                  ? `${selectedProduct.categoryId}`
-                  : "no category"}
-              </span>
-            </p>
 
-            <button className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold">
+            <button
+              onClick={editItem}
+              className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold"
+            >
               <FontAwesomeIcon className="pr-1 text-blue-400" icon={faPencil} />
               Edit details
             </button>
-            <button className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold">
+            <button
+              onClick={deleteItem}
+              className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
+            >
               <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
               Delete Item
             </button>
@@ -343,7 +397,7 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
         >
           <div className="relative max-w-4xl mx-4 rounded-lg shadow-lg">
             <img
-              className="max-h-[70vh] w-auto object-contain"
+              className="max-h-[90vh] w-auto object-contain"
               src={selectedProduct.image}
               alt="product image"
             />
@@ -354,4 +408,4 @@ const DashboardTable: React.FC<TableProps> = ({ headers }) => {
   );
 };
 
-export default DashboardTable;
+export default Table;

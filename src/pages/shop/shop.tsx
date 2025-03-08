@@ -6,17 +6,18 @@ import {
   faHome,
   faMoneyBill,
   faReceipt,
-  faTools,
 } from "@fortawesome/free-solid-svg-icons";
 import Navbar from "../../components/NavBar";
 import Sidebar from "../../components/Sidebar";
-import Dashboard from "./Dashboard";
-import Orders from "./Orders";
-import RawMaterials from "./RawMaterials";
+import Dashboard from "./Inventory";
+// import RawMaterials from "./RawMaterials";
 import Sold from "./Sold";
-import AddItemPage from "./shop-components/AddNewItemPage";
-import AddCategoryPage from "./shop-components/AddNewCategory";
-// import DashboardTable from "./shop-components/DashboardTable";
+import AddItemPage from "./shop-components/Inventory Item Components/AddNewItemPage";
+import AddNewSoldItemPage from "./shop-components/Sold Components/AddNewSoldItemPage";
+import AddCategoryPage from "./shop-components/Inventory Item Components/AddNewCategory";
+
+import EditItemPage from "./shop-components/Inventory Item Components/EditItemPage";
+import Inventory from "./Dashboard";
 
 const Shop = () => {
   document.title = "Shop";
@@ -38,24 +39,16 @@ const Shop = () => {
     },
     {
       id: "2",
-      text: "Orders",
-      href: "/shop/orders",
-      name: "Orders",
-      link: "/shop/orders",
+      text: "Inventory",
+      href: "/shop/inventory",
+      name: "Inventory",
+      link: "/shop/inventory",
       icon: (
         <FontAwesomeIcon
           className="text-2xl pr-[7.3px] ml-[2px]"
           icon={faReceipt}
         />
       ),
-    },
-    {
-      id: "3",
-      icon: <FontAwesomeIcon className="text-2xl pr-1" icon={faTools} />,
-      text: "Raw Materials",
-      href: "/shop/raw-materials",
-      name: "Products",
-      link: "/shop/raw-materials",
     },
     {
       id: "4",
@@ -81,11 +74,13 @@ const Shop = () => {
           title="Welcome, Shopkeeper"
         />
         <Routes>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/inventory" element={<Dashboard />} />
           <Route path="/add-new-item" element={<AddItemPage />} />
           <Route path="/add-new-category" element={<AddCategoryPage />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/raw-materials" element={<RawMaterials />} />
+          <Route path="/edit-item" element={<EditItemPage />} />
+          <Route path="/dashboard" element={<Inventory />} />
+          <Route path="/add-new-sold-item" element={<AddNewSoldItemPage />} />
+          {/* <Route path="/raw-materials" element={<RawMaterials />} /> */}
           <Route path="/sold" element={<Sold />} />
         </Routes>
       </div>

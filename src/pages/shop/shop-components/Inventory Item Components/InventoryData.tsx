@@ -1,12 +1,12 @@
 
 
-interface DashboardDataProps {
+interface InventoryDataProps {
   info: string;
   digits: number;
   trend: string;
 }
 
-const DashboardData = (dashboardData: DashboardDataProps) => {
+const InventoryData = (InventoryData: InventoryDataProps) => {
   return (
     
     <div>
@@ -15,18 +15,18 @@ const DashboardData = (dashboardData: DashboardDataProps) => {
           style={{ fontSize: "clamp(14px, 3vw, 28px)" }}
           className="text-blue-400 font-bold"
         >
-          {dashboardData.info}
+          {InventoryData.info}
         </p>
         <p
           style={{ fontSize: "clamp(14px, 3vw, 32px)" }}
           className="font-black"
         >
-          {dashboardData.digits}
+          {InventoryData.digits}
         </p>
-        <p className="text-xs">Trend: {dashboardData.trend}</p>
+        <p className="text-xs">Trend: {InventoryData.trend}</p>
       </div>
     </div>
   );
 };
 
-export default DashboardData;
+export default InventoryData;

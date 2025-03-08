@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { Whisper, Tooltip } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
+import { ThreeDots } from "react-loader-spinner";
+import { deleteCategory } from "../../shop-utils/categoryOperations";
 
 const AddItemPage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,6 +13,7 @@ const AddItemPage: React.FC = () => {
   const [categories, setCategories] = useState<{ id: number; name: string }[]>(
     []
   );
+  const [deletingCategory, setDeletingCategory] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -20,7 +23,6 @@ const AddItemPage: React.FC = () => {
     dimensions: "",
     cost_price: "",
     selling_price: "",
-    archived: "",
     image: null as File | null,
   });
 
@@ -57,7 +59,6 @@ const AddItemPage: React.FC = () => {
       formDataToSend.append("description", formData.description);
       formDataToSend.append("dimensions", formData.dimensions);
       formDataToSend.append("cost_price", formData.cost_price);
-      formDataToSend.append("archived", formData.archived);
       formDataToSend.append("selling_price", formData.selling_price);
 
       if (formData.image) {
@@ -88,12 +89,9 @@ const AddItemPage: React.FC = () => {
     }
   };
 
-  const checkCheck = ()=> {
-    console.log("it is clicked");
-    
-  }
-
-  //   console.log(handleSubmit);
+  const handleDeleteCategory = () => {
+    deleteCategory(formData.category, setDeletingCategory, skFn);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -110,7 +108,7 @@ const AddItemPage: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* item name */}
+            {/* item name */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Name
@@ -147,14 +145,52 @@ const AddItemPage: React.FC = () => {
                 ))}
               </select>
               <Whisper
-              followCursor
-              speaker={<Tooltip className="text-red-500">Can't find the category you are looking for? Click to add new category</Tooltip>}>
-                <button
-                className=" text-gray-20 border-2 border-gray-500 rounded-md mt-2 p-2"
-                onClick={() => navigate("/shop/add-new-category")}
+                followCursor
+                speaker={
+                  <Tooltip className="text-red-500">
+                    Can't find the category you are looking for? Click to add
+                    new category
+                  </Tooltip>
+                }
               >
-                New category
-              </button>
+                <button
+                  className=" text-gray-20 border-2 border-gray-500 rounded-md mt-2 mr-2 p-2"
+                  onClick={() => navigate("/shop/add-new-category")}
+                >
+                  Add category
+                </button>
+              </Whisper>
+              <Whisper
+                followCursor
+                speaker={
+                  <Tooltip className="text-red-500">
+                    Choose category then click here to delete category
+                  </Tooltip>
+                }
+              >
+                <button
+                  className={`text-gray-20 border-2 border-gray-500 rounded-md mt-2 p-2 relative ${
+                    deletingCategory ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={handleDeleteCategory}
+                  disabled={deletingCategory}
+                >
+                  {deletingCategory ? (
+                    <div className="flex items-center space-x-2">
+                      <span>Deleting</span>
+                      <ThreeDots
+                        visible={true}
+                        height="20"
+                        width="20"
+                        color="gray"
+                        radius="9"
+                        ariaLabel="deleting-category"
+                      />
+                    </div>
+                  ) : (
+                    "Delete category"
+                  )}
+                </button>
               </Whisper>
             </div>
 
@@ -181,6 +217,7 @@ const AddItemPage: React.FC = () => {
               </label>
               <input
                 type="text"
+                required
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
                 value={formData.dimensions}
                 onChange={(e) =>
@@ -220,7 +257,6 @@ const AddItemPage: React.FC = () => {
                 }
               />
             </div>
-
           </div>
 
           {/* description */}
@@ -236,12 +272,6 @@ const AddItemPage: React.FC = () => {
                 setFormData({ ...formData, description: e.target.value })
               }
             />
-          </div>
-
-          {/* archived */}
-          <div>
-            <label>Archived</label>
-            <input className="ml-4" type="checkbox" onClick={checkCheck}/>
           </div>
 
           {/* image */}
