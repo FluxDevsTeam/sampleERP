@@ -1,206 +1,207 @@
-import { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
-import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query"
-import axios from "axios"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
-interface ExpenseData {
-  id?: number
-  name: string
-  expense_category: string | null
-  amount: number
-  quantity: number
-  description: string
-  linked_project: string | null
-  date: string
+// Define TypeScript interfaces
+interface Category {
+  id: number;
+  name: string;
 }
 
-const fetchExpense = async (id: string): Promise<ExpenseData> => {
-  const { data } = await axios.get<ExpenseData>(
-    `https://kidsdesigncompany.pythonanywhere.com/api/expense/${id}/`
-  )
-  return data
+// Interface for form state
+interface ExpenseFormData {
+  id?: number;
+  name: string;
+  expense_category: string; // Now storing category name instead of ID
+  linked_project: number | null;
+  sold_item: string | null;
+  amount: string;
+  quantity: string;
+  description?: string;
 }
 
-const EditExpense = () => {
-  const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  
-  const [formData, setFormData] = useState<ExpenseData>({
-    name: "",
-    expense_category: null,
-    amount: 0,
-    quantity: 1,
-    description: "",
-    linked_project: null,
-    date: new Date().toISOString().split('T')[0]
-  })
+// Fetch categories
+const fetchCategories = async (): Promise<Category[]> => {
+  const { data } = await axios.get<{ results: Category[] }>(
+    "https://kidsdesigncompany.pythonanywhere.com/api/expense-category/"
+  );
+  return data.results;
+};
 
-  // Fetch the expense data
-  const { data: expense, isLoading, error } = useQuery({
-    queryKey: ["expense", id],
-    queryFn: () => fetchExpense(id as string),
-    enabled: !!id
-  })
+const AddExpense: React.FC = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  // Update the expense data
-  const updateMutation = useMutation({
-    mutationFn: (data: ExpenseData) => 
-      axios.put(`https://kidsdesigncompany.pythonanywhere.com/api/expense/${id}/`, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["expenses"] })
-      queryClient.invalidateQueries({ queryKey: ["expense", id] })
-      toast.success("Expense updated successfully!")
-      navigate("/admin/dashboard/expenses")
+  // Fetch categories using React Query
+  const { data: categories, isLoading } = useQuery<Category[]>({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
+
+  // Mutation to add an expense
+  const addExpenseMutation = useMutation({
+    mutationFn: async (newExpense: ExpenseFormData) => {
+      try {
+        const response = await axios.post(
+          "https://kidsdesigncompany.pythonanywhere.com/api/expense/", 
+          newExpense
+        );
+        return response.data;
+      } catch (error) {
+        console.error("Full error details:", error);
+        throw error;
+      }
     },
-    onError: (error) => {
-      console.error("Failed to update expense:", error)
-      toast.error("Failed to update expense. Please try again.")
-    }
-  })
+    onSuccess: () => {
+      toast.success("Expense added successfully!");
+      navigate("/admin/dashboard/expenses");
+    },
+    onError: () => {
+      toast.error("Failed to add expense. Please try again.");
+    },
+  });
 
-  // Populate form when data is loaded
-  useEffect(() => {
-    if (expense) {
-      setFormData({
-        ...expense,
-        // Ensure numeric values are treated as numbers
-        amount: typeof expense.amount === 'string' ? parseFloat(expense.amount) : expense.amount,
-        quantity: typeof expense.quantity === 'string' ? parseFloat(expense.quantity) : expense.quantity,
-        // Ensure date is in the right format
-        date: expense.date ? expense.date.split('T')[0] : new Date().toISOString().split('T')[0]
-      })
-    }
-  }, [expense])
+  const [formData, setFormData] = useState<ExpenseFormData>({
+    name: "",
+    expense_category: "", // Now storing the category name
+    amount: "",
+    quantity: "1",
+    linked_project: null,
+    sold_item: null,
+    description: "",
+  });
 
+  // Handle form input change
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
-    const { name, value, type } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "number" ? parseFloat(value) || 0 : value,
-    }))
-  }
+    const { name, value } = e.target;
+  
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value, // ✅ Directly store category name
+    }));
+  };
+  
 
+  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    updateMutation.mutate(formData)
-  }
+    e.preventDefault();
+  
+    // Find the selected category object based on the stored category name
+    const selectedCategory = categories?.find(
+      (cat) => cat.name === formData.expense_category
+    );
+  
+    if (!selectedCategory) {
+      toast.error("Please select a valid category.");
+      return;
+    }
+  
+    // Convert formData into the correct structure before submitting
+    const formattedData = {
+      ...formData,
+      expense_category: { id: selectedCategory.id }, // Convert category name to ID
+    };
+  
+    console.log("Submitting expense data:", formattedData);
+    addExpenseMutation.mutate(formattedData);
+  };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg font-medium text-gray-600">Loading expense data...</div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="p-6 bg-white rounded shadow-md">
-        <h2 className="text-xl font-bold text-red-500">Error loading expense</h2>
-        <p>Failed to load expense details. Please try again later.</p>
-        <Button 
-          className="mt-4"
-          onClick={() => navigate("/admin/dashboard/expenses")}
-        >
-          Return to Expenses
-        </Button>
-      </div>
-    )
-  }
+  if (isLoading) return <p>Loading categories...</p>;
 
   return (
-    <div className="p-6 bg-white rounded shadow-md">
-      <h1 className="text-2xl font-bold mb-4">Edit Expense</h1>
+    <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
+      <h2 className="text-xl font-bold mb-4">Add New Expense</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Name:</Label>
-          <Input
+        {/* Name */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Name</label>
+          <input
             type="text"
-            id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
+            placeholder="Expense Name"
+            className="w-full border px-3 py-2 rounded-md"
             required
           />
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="date">Date:</Label>
-          <Input
-            type="date"
-            id="date"
-            name="date"
-            value={formData.date}
+
+        {/* Category */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Category</label>
+          <select
+            name="expense_category"
+            value={formData.expense_category} // Now binding to the category name
             onChange={handleChange}
-            required
-          />
+            className="w-full border px-3 py-2 rounded-md"
+          >
+            <option value="">Select Category</option>
+            {categories?.map((category) => (
+              <option key={category.id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="amount">Amount:</Label>
-          <Input
+
+        {/* Amount */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Amount</label>
+          <input
             type="number"
-            id="amount"
             name="amount"
             value={formData.amount}
             onChange={handleChange}
+            placeholder="Amount"
             step="0.01"
+            className="w-full border px-3 py-2 rounded-md"
             required
           />
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="quantity">Quantity:</Label>
-          <Input
+
+        {/* Quantity */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Quantity</label>
+          <input
             type="number"
-            id="quantity"
             name="quantity"
             value={formData.quantity}
             onChange={handleChange}
-            min="1"
+            placeholder="Quantity"
+            className="w-full border px-3 py-2 rounded-md"
             required
           />
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="description">Description:</Label>
-          <Textarea
-            id="description"
+
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Description</label>
+          <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
-            className="min-h-24"
+            placeholder="Description (Optional)"
+            className="w-full border px-3 py-2 rounded-md"
+            rows={3}
           />
         </div>
-        
-        <div className="flex gap-2 pt-4">
-          <Button
-            type="submit"
-            className="bg-neutral-900 text-white hover:bg-neutral-800"
-            disabled={updateMutation.isPending}
-          >
-            {updateMutation.isPending ? "Saving..." : "Update Expense"}
-          </Button>
-          
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate("/admin/dashboard/expenses")}
-          >
-            Cancel
-          </Button>
-        </div>
+
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          className="w-full bg-neutral-900 text-white py-2 rounded-md"
+          disabled={addExpenseMutation.isPending}
+        >
+          {addExpenseMutation.isPending ? "Adding..." : "Add Expense"}
+        </Button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default EditExpense
+export default AddExpense;

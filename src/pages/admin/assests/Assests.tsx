@@ -3,7 +3,7 @@ import Header from "./_components/AssetsHeader"
 //import AssetsTable from "./_pages/table"
 const Assests = () => {
   return (
-    <div className="min-h-full overflow-auto">
+    <div className="min-h-screen ">
       <Header />
       <AssetsTable /></div>
 

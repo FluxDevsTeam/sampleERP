@@ -24,8 +24,9 @@ import {
     handlePageChange,
   }) => {
     return (
-      <Pagination className="overflow-hidden mt-4">
-        <PaginationContent>
+      <Pagination >
+        <div className="overflow-hidden">
+        <PaginationContent >
           <PaginationItem>
             <PaginationPrevious
               onClick={() => hasPreviousPage && handlePageChange(currentPage - 1)}
@@ -70,6 +71,7 @@ import {
             />
           </PaginationItem>
         </PaginationContent>
+        </div>
       </Pagination>
     );
   };

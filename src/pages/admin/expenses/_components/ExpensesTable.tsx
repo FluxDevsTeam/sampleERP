@@ -131,7 +131,7 @@ const ExpensesTable: React.FC = () => {
         <thead>
           <tr className="bg-gray-500 text-white">
             <th className="border px-4 py-2">Date</th>
-            <th className="border px-4 py-2">ID</th>
+            <th className="border px-4 py-2">Sold Item</th>
             <th className="border px-4 py-2">Name</th>
             <th className="border px-4 py-2">Category</th>
             <th className="border px-4 py-2">Project</th>
@@ -162,7 +162,7 @@ const ExpensesTable: React.FC = () => {
                     onClick={() => handleRowClick(entry)}
                   >
                     <td className="border px-4 py-2">{new Date(day.date).toLocaleDateString()}</td>
-                    <td className="border px-4 py-2">{entry.id}</td>
+                    <td className="border px-4 py-2">{entry.sold_item}</td>
                     <td className="border px-4 py-2">{entry.name}</td>
                     <td className="border px-4 py-2">{entry.expense_category ? entry.expense_category.name : "N/A"}</td>
                     <td className="border px-4 py-2">{entry.linked_project ? entry.linked_project.name : "N/A"}</td>
@@ -249,4 +249,4 @@ const ExpensesTable: React.FC = () => {
   );
 };
 
-export default ExpensesTable;
+export default ExpensesTable

@@ -107,7 +107,7 @@ const AssetsTable = () => {
 
   return (
   
-    <div className=" p-4">
+    <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <Link
           to="/admin/dashboard/add-asset"
