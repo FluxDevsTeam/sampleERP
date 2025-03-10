@@ -1,207 +1,147 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
-// Define TypeScript interfaces
-interface Category {
-  id: number;
-  name: string;
-}
-
-// Interface for form state
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import SkeletonLoader from "../_components/SkeletonLoader";
 interface ExpenseFormData {
-  id?: number;
   name: string;
-  expense_category: string; // Now storing category name instead of ID
-  linked_project: number | null;
-  sold_item: string | null;
-  amount: string;
-  quantity: string;
-  description?: string;
+  amount: number | "";
+  quantity: number | "";
 }
 
-// Fetch categories
-const fetchCategories = async (): Promise<Category[]> => {
-  const { data } = await axios.get<{ results: Category[] }>(
-    "https://kidsdesigncompany.pythonanywhere.com/api/expense-category/"
-  );
-  return data.results;
-};
-
-const AddExpense: React.FC = () => {
+const EditExpense: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
-  // Fetch categories using React Query
-  const { data: categories, isLoading } = useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: fetchCategories,
+  
+  const [formData, setFormData] = useState<ExpenseFormData>({
+    name: "",
+    amount: "",
+    quantity: "",
   });
 
-  // Mutation to add an expense
-  const addExpenseMutation = useMutation({
-    mutationFn: async (newExpense: ExpenseFormData) => {
-      try {
-        const response = await axios.post(
-          "https://kidsdesigncompany.pythonanywhere.com/api/expense/", 
-          newExpense
-        );
-        return response.data;
-      } catch (error) {
-        console.error("Full error details:", error);
-        throw error;
-      }
+  // Fetch expense data
+  const { data: expense, isLoading } = useQuery({
+    queryKey: ["expense", id],
+    queryFn: async () => {
+      const { data } = await axios.get(`https://kidsdesigncompany.pythonanywhere.com/api/expense/${id}/`);
+      return data;
+    },
+  });
+
+  // Update mutation
+  const updateExpenseMutation = useMutation({
+    mutationFn: async (data: ExpenseFormData) => {
+      await axios.put(`https://kidsdesigncompany.pythonanywhere.com/api/expense/${id}/`, data);
     },
     onSuccess: () => {
-      toast.success("Expense added successfully!");
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+      toast.success("Expense updated successfully!");
       navigate("/admin/dashboard/expenses");
     },
     onError: () => {
-      toast.error("Failed to add expense. Please try again.");
+      toast.error("Failed to update expense. Please try again.");
     },
   });
 
-  const [formData, setFormData] = useState<ExpenseFormData>({
-    name: "",
-    expense_category: "", // Now storing the category name
-    amount: "",
-    quantity: "1",
-    linked_project: null,
-    sold_item: null,
-    description: "",
-  });
+  // Populate form when expense data is loaded
+  useEffect(() => {
+    if (expense) {
+      setFormData({
+        name: expense.name || "",
+        amount: expense.amount || "",
+        quantity: expense.quantity || "",
+      });
+    }
+  }, [expense]);
 
-  // Handle form input change
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
+  // Handle input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-  
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value, // ✅ Directly store category name
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "amount" || name === "quantity" ? (value === "" ? "" : Number(value)) : value,
     }));
   };
-  
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-  
-    // Find the selected category object based on the stored category name
-    const selectedCategory = categories?.find(
-      (cat) => cat.name === formData.expense_category
-    );
-  
-    if (!selectedCategory) {
-      toast.error("Please select a valid category.");
-      return;
-    }
-  
-    // Convert formData into the correct structure before submitting
-    const formattedData = {
+    updateExpenseMutation.mutate({
       ...formData,
-      expense_category: { id: selectedCategory.id }, // Convert category name to ID
-    };
-  
-    console.log("Submitting expense data:", formattedData);
-    addExpenseMutation.mutate(formattedData);
+      amount: Number(formData.amount) || 0,
+      quantity: Number(formData.quantity) || 1,
+    });
   };
 
-  if (isLoading) return <p>Loading categories...</p>;
-
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-xl font-bold mb-4">Add New Expense</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Name */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Expense Name"
-            className="w-full border px-3 py-2 rounded-md"
-            required
-          />
-        </div>
+    <div className="container mx-auto p-4">
+      <Card className="max-w-md mx-auto">
+        <CardHeader>
+          <CardTitle>Edit Expense</CardTitle>
+        </CardHeader>
+        {isLoading ? (
+          <p className="text-center text-gray-500"><SkeletonLoader/></p>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-        {/* Category */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Category</label>
-          <select
-            name="expense_category"
-            value={formData.expense_category} // Now binding to the category name
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded-md"
-          >
-            <option value="">Select Category</option>
-            {categories?.map((category) => (
-              <option key={category.id} value={category.name}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </div>
+              <div className="space-y-2">
+                <Label htmlFor="amount">Amount</Label>
+                <Input
+                  id="amount"
+                  name="amount"
+                  type="number"
+                  value={formData.amount}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-        {/* Amount */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Amount</label>
-          <input
-            type="number"
-            name="amount"
-            value={formData.amount}
-            onChange={handleChange}
-            placeholder="Amount"
-            step="0.01"
-            className="w-full border px-3 py-2 rounded-md"
-            required
-          />
-        </div>
-
-        {/* Quantity */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Quantity</label>
-          <input
-            type="number"
-            name="quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            placeholder="Quantity"
-            className="w-full border px-3 py-2 rounded-md"
-            required
-          />
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Description</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Description (Optional)"
-            className="w-full border px-3 py-2 rounded-md"
-            rows={3}
-          />
-        </div>
-
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          className="w-full bg-neutral-900 text-white py-2 rounded-md"
-          disabled={addExpenseMutation.isPending}
-        >
-          {addExpenseMutation.isPending ? "Adding..." : "Add Expense"}
-        </Button>
-      </form>
+              <div className="space-y-2">
+                <Label htmlFor="quantity">Quantity</Label>
+                <Input
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate("/admin/dashboard/expenses")}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={updateExpenseMutation.isPending}>
+                {updateExpenseMutation.isPending ? "Updating..." : "Update Expense"}
+              </Button>
+            </CardFooter>
+          </form>
+        )}
+      </Card>
     </div>
   );
 };
 
-export default AddExpense;
+export default EditExpense;

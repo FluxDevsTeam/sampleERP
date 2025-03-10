@@ -45,22 +45,28 @@ const Modals = ({ selectedAsset, isModalOpen, setIsModalOpen, isDeleteDialogOpen
                 <span className="font-medium">Value:</span>
                 <span className="col-span-2">${selectedAsset.value}</span>
               </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">Expected Lifespan :</span>
+                <span className="col-span-2">{selectedAsset.expected_lifespan}</span>
+              </div>
+             
             </div>
           )}
 
-          <DialogFooter className="flex justify-between">
-            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-              Close
-            </Button>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={handleEdit}>
-                Edit
-              </Button>
-              <Button variant="destructive" onClick={handleDelete}>
-                Delete
-              </Button>
-            </div>
-          </DialogFooter>
+<DialogFooter className="flex justify-between">
+  <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+    Close
+  </Button>
+  <div className="flex gap-2">
+    <Button variant="outline" onClick={handleEdit}>
+      Edit
+    </Button>
+    <Button variant="destructive" onClick={handleDelete}>
+      Delete
+    </Button>
+  </div>
+</DialogFooter>
+
         </DialogContent>
       </Dialog>
 

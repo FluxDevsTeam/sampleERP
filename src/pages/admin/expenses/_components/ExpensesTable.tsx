@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import SkeletonLoader from "./SkeletonLoader";
 import {
   Dialog,
   DialogContent,
@@ -83,6 +85,7 @@ const ExpensesTable: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
       setIsDeleteDialogOpen(false);
       setIsModalOpen(false);
+      toast.success("Expense deleted successfully!");
     },
   });
 
@@ -108,6 +111,7 @@ const ExpensesTable: React.FC = () => {
   const confirmDelete = () => {
     if (selectedEntry?.id) {
       deleteExpenseMutation.mutate(selectedEntry.id);
+        
     }
   };
 
@@ -115,7 +119,7 @@ const ExpensesTable: React.FC = () => {
     setCollapsed((prev) => ({ ...prev, [date]: !prev[date] }));
   };
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <SkeletonLoader/>;
   if (error) return <p>Error loading data</p>;
 
   return (
@@ -229,22 +233,20 @@ const ExpensesTable: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the expense and remove the data from the server.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
-              {deleteExpenseMutation.isPending ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. It will permanently delete the asset.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={confirmDelete}>Confirm</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
     </div>
   );
 };

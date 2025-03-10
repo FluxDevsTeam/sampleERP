@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { toast } from "sonner";
+import SkeletonLoader from "../_components/SkeletonLoader"
 import { 
   Card,
   CardContent, 
@@ -70,9 +72,11 @@ const EditAsset = () => {
       queryClient.invalidateQueries({ queryKey: ["assets"] })
       queryClient.invalidateQueries({ queryKey: ["asset", id] })
       navigate("/admin/dashboard/assets")
+      toast.success("Assets updated successfully!");
     },
     onError: (error) => {
       setFormError("Failed to update asset. Please try again.")
+       toast.error("Failed to update asset. Please try again.");
       console.error("Update error:", error)
       setIsSubmitting(false)
     }
@@ -119,7 +123,7 @@ const EditAsset = () => {
     updateAssetMutation.mutate(assetData)
   }
 
-  if (isLoading) return <p className="p-4">Loading asset data...</p>
+  if (isLoading) return <p className="p-4"><SkeletonLoader/> </p>
   if (error) return <p className="p-4">Error: {(error as Error).message}</p>
 
   return (
