@@ -40,7 +40,7 @@ const AddAsset = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["assets"], refetchType: "active" })
         toast.success("Asset added successfully!")
-        navigate("/admin/dashboard/assets")
+        navigate("/admin/assets")
       },
       onError: () => {
         toast.error("Failed to add asset. Please try again.")

@@ -71,7 +71,7 @@ const EditAsset = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["assets"] })
       queryClient.invalidateQueries({ queryKey: ["asset", id] })
-      navigate("/admin/dashboard/assets")
+      navigate("/admin/assets")
       toast.success("Assets updated successfully!");
     },
     onError: (error) => {

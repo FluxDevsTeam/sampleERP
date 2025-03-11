@@ -24,26 +24,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-interface ExpenseCategory {
-  id: number;
-  name: string;
-}
-
-interface LinkedProject {
-  id: number;
-  name: string;
-}
-
 interface Entry {
   id: number;
-  name: string;
-  expense_category: ExpenseCategory | null;
-  description: string;
-  linked_project: LinkedProject | null;
-  sold_item: any | null;
   amount: string;
-  quantity: string;
   date: string;
+  salary: number;
+  contract: number;
 }
 
 interface DailyData {
@@ -52,22 +38,19 @@ interface DailyData {
   daily_total: number;
 }
 
-interface ExpensesData {
+interface PaidData {
   monthly_total: number;
   weekly_total: number;
-  daily_total: number;
-  monthly_project_expenses_total: number;
-  monthly_shop_expenses_total: number;
   daily_data: DailyData[];
 }
 
-const fetchExpenses = async (): Promise<ExpensesData> => {
-  const { data } = await axios.get<ExpensesData>("https://kidsdesigncompany.pythonanywhere.com/api/expense/");
+const fetchPaid = async (): Promise<PaidData> => {
+  const { data } = await axios.get<PaidData>("https://kidsdesigncompany.pythonanywhere.com/api/paid/");
   return data;
 };
 
-const ExpensesTable: React.FC = () => {
-  const { data, isLoading, error } = useQuery<ExpensesData>({ queryKey: ["expenses"], queryFn: fetchExpenses });
+const PaidTable: React.FC = () => {
+  const { data, isLoading, error } = useQuery<PaidData>({ queryKey: ["paid"], queryFn: fetchPaid });
   const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -77,15 +60,15 @@ const ExpensesTable: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const deleteExpenseMutation = useMutation({
+  const deletePaidMutation = useMutation({
     mutationFn: async (entryId: number) => {
-      await axios.delete(`https://kidsdesigncompany.pythonanywhere.com/api/expense/${entryId}/`);
+      await axios.delete(`https://kidsdesigncompany.pythonanywhere.com/api/paid/${entryId}/`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["paid"] });
       setIsDeleteDialogOpen(false);
       setIsModalOpen(false);
-      toast.success("Expense deleted successfully!");
+      toast.success("Payment deleted successfully!");
     },
   });
 
@@ -98,7 +81,7 @@ const ExpensesTable: React.FC = () => {
   // Handle edit button click
   const handleEdit = () => {
     if (selectedEntry?.id) {
-      navigate(`/admin/edit-expense/${selectedEntry.id}`);
+      navigate(`/admin/edit-payment/${selectedEntry.id}`);
     }
   };
 
@@ -110,8 +93,7 @@ const ExpensesTable: React.FC = () => {
   // Confirm delete
   const confirmDelete = () => {
     if (selectedEntry?.id) {
-      deleteExpenseMutation.mutate(selectedEntry.id);
-        
+      deletePaidMutation.mutate(selectedEntry.id);
     }
   };
 
@@ -119,44 +101,41 @@ const ExpensesTable: React.FC = () => {
     setCollapsed((prev) => ({ ...prev, [date]: !prev[date] }));
   };
 
-  if (isLoading) return <SkeletonLoader/>;
+  if (isLoading) return <SkeletonLoader />;
   if (error) return <p>Error loading data</p>;
 
   return (
     <div className="overflow-x-auto p-4">
-<Link
-        to="/admin/add-expense"
+      <Link
+        to="/admin/add-payment"
         className="bg-neutral-900 text-white px-4 py-2 rounded-md mb-4 inline-block"
       >
-        Add Expense
+        Add Payment
       </Link>
 
       <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
         <thead>
           <tr className="bg-gray-500 text-white">
             <th className="border px-4 py-2">Date</th>
-            <th className="border px-4 py-2">Sold Item</th>
-            <th className="border px-4 py-2">Name</th>
-            <th className="border px-4 py-2">Category</th>
-            <th className="border px-4 py-2">Project</th>
             <th className="border px-4 py-2">Amount</th>
-            <th className="border px-4 py-2">Quantity</th>
+            <th className="border px-4 py-2">Salary</th>
+            <th className="border px-4 py-2">Contract</th>
           </tr>
         </thead>
         <tbody>
           {data?.daily_data.map((day) => (
             <React.Fragment key={day.date}>
-             <tr
-  className="bg-gray-400 cursor-pointer"
-  onClick={() => toggleCollapse(day.date)}
->
-  <td className="border px-4 py-2 font-bold" colSpan={7}>
-    <div className="flex justify-between w-full">
-      <span>{day.date}</span>
-      <span>(Total: {day.daily_total})</span>
-    </div>
-  </td>
-</tr>
+              <tr
+                className="bg-gray-400 cursor-pointer"
+                onClick={() => toggleCollapse(day.date)}
+              >
+                <td className="border px-4 py-2 font-bold" colSpan={4}>
+                  <div className="flex justify-between w-full">
+                    <span>{day.date}</span>
+                    <span>(Total: {day.daily_total})</span>
+                  </div>
+                </td>
+              </tr>
 
               {!collapsed[day.date] &&
                 day.entries.map((entry) => (
@@ -166,54 +145,40 @@ const ExpensesTable: React.FC = () => {
                     onClick={() => handleRowClick(entry)}
                   >
                     <td className="border px-4 py-2">{new Date(day.date).toLocaleDateString()}</td>
-                    <td className="border px-4 py-2">{entry.sold_item}</td>
-                    <td className="border px-4 py-2">{entry.name}</td>
-                    <td className="border px-4 py-2">{entry.expense_category ? entry.expense_category.name : "N/A"}</td>
-                    <td className="border px-4 py-2">{entry.linked_project ? entry.linked_project.name : "N/A"}</td>
                     <td className="border px-4 py-2">{entry.amount}</td>
-                    <td className="border px-4 py-2">{entry.quantity}</td>
+                    <td className="border px-4 py-2">{entry.salary}</td>
+                    <td className="border px-4 py-2">{entry.contract}</td>
                   </tr>
                 ))}
             </React.Fragment>
           ))}
         </tbody>
       </table>
+      
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Expense Details</DialogTitle>
-            <DialogDescription>View details for the selected expense.</DialogDescription>
+            <DialogTitle>Payment Details</DialogTitle>
+            <DialogDescription>View details for the selected payment.</DialogDescription>
           </DialogHeader>
 
           {selectedEntry && (
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Name:</span>
-                <span className="col-span-2">{selectedEntry.name}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Category:</span>
-                <span className="col-span-2">{selectedEntry.expense_category ? selectedEntry.expense_category.name : "N/A"}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Description:</span>
-                <span className="col-span-2">{selectedEntry.description}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Project:</span>
-                <span className="col-span-2">{selectedEntry.linked_project ? selectedEntry.linked_project.name : "N/A"}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium">Amount:</span>
                 <span className="col-span-2">{selectedEntry.amount}</span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Quantity:</span>
-                <span className="col-span-2">{selectedEntry.quantity}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium">Date:</span>
                 <span className="col-span-2">{new Date(selectedEntry.date).toLocaleDateString()}</span>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">Salary ID:</span>
+                <span className="col-span-2">{selectedEntry.salary}</span>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">Contract ID:</span>
+                <span className="col-span-2">{selectedEntry.contract}</span>
               </div>
             </div>
           )}
@@ -233,22 +198,23 @@ const ExpensesTable: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. It will permanently delete the asset.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={confirmDelete}>Confirm</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+      
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. It will permanently delete the payment.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Confirm</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
 
-export default ExpensesTable
+export default PaidTable;

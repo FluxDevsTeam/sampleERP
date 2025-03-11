@@ -36,7 +36,7 @@ const Header = () => {
         {[
           { label: "Monthly Total", value: data?.monthly_total },
           { label: "Weekly Total", value: data?.weekly_total },
-          { label: "Daily Total", value: `$${data?.daily_total}` },
+          { label: "Daily Total", value: `${data?.monthly_shop_expenses_total}` },
           { label: "Total Project Expenses", value: data?.monthly_project_expenses_total }
         ].map((item, index) => (
           <div key={index} className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">

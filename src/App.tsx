@@ -55,6 +55,8 @@ import {
 } from "./pages/store-keeper-page";
 
 import { ShopDashboard,ShopSharedLayout } from "./pages/shop";
+import EditPayment from "./pages/admin/paid/_pages/EditPayment";
+import AddPayment from "./pages/admin/paid/_pages/AddPayment";
 
 const router = createBrowserRouter([
   {
@@ -230,6 +232,14 @@ const router = createBrowserRouter([
       {
         path: "paid",
         element: <Paid />,
+      },
+      {
+        path: "add-payment",
+        element: <AddPayment />,
+      },
+      {
+        path: "edit-payment/:id",
+        element: <EditPayment />,
       },
       {
         path: "add-asset",

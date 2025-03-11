@@ -118,7 +118,7 @@ const AddExpense: React.FC = () => {
     },
     onSuccess: () => {
       toast.success("Expense added successfully!");
-      navigate("/admin/dashboard/expenses");
+      navigate("/admin/expenses");
     },
     onError: (error: any) => {
       const errorMessage = error.response?.data

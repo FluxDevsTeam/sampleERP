@@ -76,7 +76,7 @@ const AssetsTable = () => {
 
   const handleEdit = () => {
     if (selectedAsset?.id) {
-      navigate(`/admin/dashboard/edit-asset/${selectedAsset.id}`);
+      navigate(`/admin/edit-asset/${selectedAsset.id}`);
     }
   };
 
@@ -115,7 +115,7 @@ const AssetsTable = () => {
     <div className="p-4 flex flex-col h-full">
       <div className="flex justify-between items-center mb-4">
         <Link
-          to="/admin/dashboard/add-asset"
+          to="/admin/add-asset"
           className="bg-neutral-900 text-white px-4 py-2 rounded-md inline-block"
         >
           Add Asset

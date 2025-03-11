@@ -1,8 +1,11 @@
-
-
+import PaidTable from "./_components/PaidTable"
+import Header from "./_components/Header"
 const Paid = () => {
   return (
-    <div>Paid</div>
+    <div>
+      <Header/>
+      <PaidTable/>
+    </div>
   )
 }
 

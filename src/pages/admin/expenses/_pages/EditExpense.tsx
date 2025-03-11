@@ -42,7 +42,7 @@ const EditExpense: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
       toast.success("Expense updated successfully!");
-      navigate("/admin/dashboard/expenses");
+      navigate("/admin/expenses");
     },
     onError: () => {
       toast.error("Failed to update expense. Please try again.");
