@@ -1,15 +1,24 @@
 import { useEffect, useState } from "react";
 import { ThreeDots } from "react-loader-spinner";
+import { Whisper, Tooltip } from "rsuite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlus,
+  faChevronDown,
+  faChevronUp,
+  faTrash,
+  faPencil,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import Modal from "../Modal";
 
 interface SoldEntry {
   id: number;
   quantity: string;
   date: string;
-  sold_to: { id: number; name: string } | null;
-  linked_project: { id: number; name: string } | null;
+  sold_to: { id: number; name: string };
+  linked_project: { id: number; name: string };
   name: string;
   logistics: string;
   cost_price: string;
@@ -29,12 +38,27 @@ interface ApiResponse {
   monthly_total: number;
 }
 
+interface SelectedSale {
+  id: number;
+  name: string;
+}
+
 const SoldTable: React.FC = () => {
+  document.title = "Sold Items - KDC Admin";
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [soldData, setSoldData] = useState<DailyData[]>([]);
-  const [monthlyTotal, setMonthlyTotal] = useState(0);
   const [openDates, setOpenDates] = useState<{ [key: string]: boolean }>({});
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSale, setSelectedSale] = useState<SelectedSale | null>(null);
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "success" as "success" | "error",
+  });
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const fetchItems = async () => {
     try {
@@ -51,7 +75,6 @@ const SoldTable: React.FC = () => {
       console.log(data);
 
       setSoldData(data.daily_data);
-      setMonthlyTotal(data.monthly_total);
     } catch (error) {
       console.error("Error fetching sold items:", error);
     } finally {
@@ -78,6 +101,64 @@ const SoldTable: React.FC = () => {
     });
   };
 
+  const handleNameClick = (entry: SoldEntry) => {
+    setSelectedSale({
+      id: entry.id,
+      name: entry.name,
+    });
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalConfig({ ...modalConfig, isOpen: false });
+    if (modalConfig.type === "success") {
+      fetchItems();
+      setShowModal(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetch(
+        `https://kidsdesigncompany.pythonanywhere.com/api/sold/${id}/`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        setModalConfig({
+          isOpen: true,
+          title: "Success",
+          message: "Sale record deleted successfully",
+          type: "success",
+        });
+      } else {
+        throw new Error("Failed to delete sale record");
+      }
+    } catch (error) {
+      console.error("Error deleting sale record:", error);
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to delete sale record",
+        type: "error",
+      });
+    }
+  };
+
+  const confirmDeleteSale = (id: number) => {
+    setConfirmDelete(true);
+    setSelectedSale({ id, name: selectedSale?.name || "" });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (selectedSale) {
+      await handleDelete(selectedSale.id);
+      setConfirmDelete(false);
+    }
+  };
+
   return (
     <div className="relative">
       <div className="overflow-x-auto pb-8">
@@ -87,13 +168,13 @@ const SoldTable: React.FC = () => {
               visible={true}
               height="80"
               width="80"
-              color="black"
+              color="#60A5FA"
               radius="9"
               ariaLabel="three-dots-loading"
             />
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 ">
             <button
               onClick={() => navigate("/shop/add-new-sold-item")}
               className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
@@ -101,31 +182,22 @@ const SoldTable: React.FC = () => {
               <FontAwesomeIcon className="pr-2" icon={faPlus} />
               Record Sale
             </button>
-            <div className="bg-blue-50 px-2 py-3 rounded-lg">
-              <h2
-                className="text-xl font-bold text-blue-900"
-                style={{ fontSize: "clamp(13.5px, 3vw, 17px)" }}
-              >
-                Monthly Total: ₦{monthlyTotal.toLocaleString()}
-              </h2>
-            </div>
 
             {soldData.map((dayData) => (
               <div
                 key={dayData.date}
-                className="bg-white shadow-md rounded-lg overflow-auto"
+                className="bg-white shadow-md rounded-lg overflow-auto border-2 border-red-950"
               >
                 <div
                   className="bg-blue-20 text-slate-200 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-200 hover:text-blue-20 w-full"
                   onClick={() => toggleDate(dayData.date)}
                 >
                   <div className="flex items-center space-x-2">
-                    {/* <FontAwesomeIcon
+                    <FontAwesomeIcon
                       icon={
                         openDates[dayData.date] ? faChevronUp : faChevronDown
                       }
-                      className= font-bold"text-white"
-                    /> */}
+                    />
                     <h3
                       className="text-lg font-semibold"
                       style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
@@ -137,7 +209,7 @@ const SoldTable: React.FC = () => {
                     className="font-bold"
                     style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
                   >
-                    Total: ₦{dayData.daily_total.toLocaleString()}
+                    Total: ₦{dayData.daily_total}
                   </p>
                 </div>
 
@@ -145,6 +217,9 @@ const SoldTable: React.FC = () => {
                   <table className="min-w-full overflow-auto">
                     <thead className="bg-gray-800">
                       <tr>
+                        {/* <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
+                          ID of sold item
+                        </th> */}
                         <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
                           Name
                         </th>
@@ -155,10 +230,10 @@ const SoldTable: React.FC = () => {
                           Sold To
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Project
+                          Logistics
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Logistics
+                          Project
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
                           Cost Price
@@ -177,31 +252,44 @@ const SoldTable: React.FC = () => {
                     <tbody className="divide-y divide-gray-200">
                       {dayData.entries.map((entry) => (
                         <tr key={entry.id} className="hover:bg-gray-50">
-                          {/* <td className="px-4 py-3 text-sm">{entry.id}</td> */}
-                          <td className="px-4 py-3 text-sm">{entry.name}</td>
-                          <td className="px-4 py-3 text-sm">
-                            {entry.quantity.toLocaleString()}
+                          <td
+                            className="px-4 py-3 text-sm cursor-pointer hover:text-blue-600"
+                            onClick={() => handleNameClick(entry)}
+                          >
+                            <Whisper
+                              followCursor
+                              speaker={
+                                <Tooltip>
+                                  Click to edit or delete record of sale
+                                </Tooltip>
+                              }
+                            >
+                              {entry.name}
+                            </Whisper>
                           </td>
                           <td className="px-4 py-3 text-sm">
-                            {entry.sold_to?.name || "-"}
+                            {entry.quantity}
                           </td>
                           <td className="px-4 py-3 text-sm">
-                            {entry.linked_project?.name || "-"}
+                            {entry.sold_to?.name || "—"}
                           </td>
                           <td className="px-4 py-3 text-sm">
-                            {entry.logistics || "-"}
+                            {entry.logistics || "—"}
                           </td>
                           <td className="px-4 py-3 text-sm">
-                            ₦{entry.cost_price.toLocaleString()}
+                            {entry.linked_project?.name || "—"}
                           </td>
                           <td className="px-4 py-3 text-sm">
-                            ₦{entry.selling_price.toLocaleString()}
+                            ₦{entry.cost_price}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            ₦{entry.selling_price}
                           </td>
                           <td className="px-4 py-3 text-sm text-blue-600">
-                            ₦{entry.total_price.toLocaleString()}
+                            ₦{entry.total_price}
                           </td>
                           <td className="px-4 py-3 text-sm text-blue-400">
-                            ₦{entry.profit.toLocaleString()}
+                            ₦{entry.profit}
                           </td>
                         </tr>
                       ))}
@@ -213,6 +301,84 @@ const SoldTable: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* delete and edit options modal */}
+      {showModal && selectedSale && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg mb-4 font-medium">
+                <span className="font-semibold  text-blue-20">
+                  {selectedSale.name}
+                </span>
+              </h3>
+
+              <FontAwesomeIcon
+                icon={faXmark}
+                onClick={() => setShowModal(false)}
+                className="cursor-pointer"
+              />
+            </div>
+            <div className="space-y-3">
+              <button
+                onClick={() =>
+                  navigate(`/shop/edit-sold-item/${selectedSale.id}`)
+                }
+                className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex items-center justify-center"
+              >
+                <FontAwesomeIcon icon={faPencil} className="mr-2" />
+                Edit Sale Record
+              </button>
+              <button
+                onClick={() => confirmDeleteSale(selectedSale.id)}
+                className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center"
+              >
+                <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                Delete Sale Record
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* confirmation modal */}
+      {confirmDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg mb-4 font-medium">Confirm Deletion</h3>
+              <FontAwesomeIcon
+                icon={faXmark}
+                onClick={() => setConfirmDelete(false)}
+                className="cursor-pointer"
+              />
+            </div>
+            <p>Are you sure you want to delete this sale record?</p>
+            <div className="space-y-3 mt-4">
+              <button
+                onClick={handleConfirmDelete}
+                className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="w-full py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors flex items-center justify-center"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Modal
+        isOpen={modalConfig.isOpen}
+        onClose={handleCloseModal}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+      />
     </div>
   );
 };

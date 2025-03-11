@@ -1,10 +1,23 @@
+interface ModalConfig {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  type: "success" | "error";
+}
+
 export const deleteCategory = async (
   categoryId: string | number,
   setLoading: (loading: boolean) => void,
+  setModalConfig: (config: ModalConfig) => void,
   onSuccess?: () => void
 ) => {
   if (!categoryId) {
-    alert("Please select a category to delete");
+    setModalConfig({
+      isOpen: true,
+      title: "Error",
+      message: "Please select a category to delete",
+      type: "error"
+    });
     return;
   }
 
@@ -21,13 +34,24 @@ export const deleteCategory = async (
       throw new Error("Failed to delete category");
     }
 
-    alert("Category deleted successfully!");
+    setModalConfig({
+      isOpen: true,
+      title: "Success",
+      message: "Category deleted successfully!",
+      type: "success"
+    });
+    
     if (onSuccess) {
       onSuccess();
     }
   } catch (error) {
     console.error("Error deleting category:", error);
-    alert("Failed to delete category");
+    setModalConfig({
+      isOpen: true,
+      title: "Error",
+      message: "Failed to delete category",
+      type: "error"
+    });
   } finally {
     setLoading(false);
   }

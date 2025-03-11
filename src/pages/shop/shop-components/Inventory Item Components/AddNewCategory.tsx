@@ -2,10 +2,17 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import Modal from "../Modal"; // Import the Modal component
 
 const AddCategoryPage: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "success" as "success" | "error",
+  });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -27,19 +34,33 @@ const AddCategoryPage: React.FC = () => {
         }
       );
 
-      console.log(response);
-
       if (!response.ok) {
         throw new Error("Failed to add item");
       }
 
-      alert("Category added successfully!");
-      navigate(`/shop/add-new-item`);
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Category added successfully!",
+        type: "success",
+      });
     } catch (error) {
       console.error("Error adding category:", error);
-      alert("Failed to add category");
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to add category",
+        type: "error",
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setModalConfig({ ...modalConfig, isOpen: false });
+    if (modalConfig.type === "success") {
+      navigate(`/shop/add-new-item`);
     }
   };
 
@@ -84,6 +105,13 @@ const AddCategoryPage: React.FC = () => {
           </div>
         </form>
       </div>
+      <Modal
+        isOpen={modalConfig.isOpen}
+        onClose={handleCloseModal}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+      />
     </div>
   );
 };

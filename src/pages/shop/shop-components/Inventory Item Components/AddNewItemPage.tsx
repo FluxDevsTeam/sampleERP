@@ -5,7 +5,8 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { Whisper, Tooltip } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
 import { ThreeDots } from "react-loader-spinner";
-import { deleteCategory } from "../../shop-utils/categoryOperations";
+import Modal from "../Modal"; // Import the Modal component
+import { deleteCategory } from "./categoryOperations";
 
 const AddItemPage: React.FC = () => {
   const navigate = useNavigate();
@@ -26,6 +27,13 @@ const AddItemPage: React.FC = () => {
     image: null as File | null,
   });
 
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "success" as "success" | "error",
+  });
+
   async function skFn() {
     try {
       const response = await fetch(
@@ -33,14 +41,16 @@ const AddItemPage: React.FC = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Iyegs man, rest bro");
+        throw new Error("Failed to fetch categories");
       }
 
       const logData = await response.json();
       console.log(logData);
 
       setCategories(logData.results);
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
   }
 
   useEffect(() => {
@@ -79,18 +89,68 @@ const AddItemPage: React.FC = () => {
         throw new Error("Failed to add item");
       }
 
-      alert("Item added successfully!");
-      navigate(`/shop/dashboard`);
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Item added successfully!",
+        type: "success",
+      });
     } catch (error) {
       console.error("Error adding item:", error);
-      alert("Failed to add item");
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to add item",
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteCategory = () => {
-    deleteCategory(formData.category, setDeletingCategory, skFn);
+  const handleCloseModal = () => {
+    setModalConfig({ ...modalConfig, isOpen: false });
+    if (modalConfig.type === "success") {
+      navigate(`/shop/dashboard`);
+    }
+  };
+
+  const handleDeleteCategory = async () => {
+    if (!formData.category) {
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: "Please select a category to delete",
+        type: "error",
+      });
+      return;
+    }
+
+    setDeletingCategory(true);
+    try {
+      await deleteCategory(
+        formData.category,
+        setDeletingCategory,
+        setModalConfig
+      );
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Category deleted successfully!",
+        type: "success",
+      });
+      skFn(); // Refresh categories
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to delete category",
+        type: "error",
+      });
+    } finally {
+      setDeletingCategory(false);
+    }
   };
 
   return (
@@ -303,6 +363,13 @@ const AddItemPage: React.FC = () => {
           </div>
         </form>
       </div>
+      <Modal
+        isOpen={modalConfig.isOpen}
+        onClose={handleCloseModal}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+      />
     </div>
   );
 };

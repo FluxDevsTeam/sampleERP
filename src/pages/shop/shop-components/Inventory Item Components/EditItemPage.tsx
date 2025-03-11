@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useParams} from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-// import { Whisper, Tooltip } from "rsuite";
+import Modal from "../Modal";
 
 const EditItemPage: React.FC = () => {
   const location = useLocation();
@@ -23,6 +23,20 @@ const EditItemPage: React.FC = () => {
     selling_price: location.state?.productData?.sellingPrice || "",
     image: null as File | null,
   });
+
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "success" as "success" | "error",
+  });
+
+  const handleCloseModal = () => {
+    setModalConfig({ ...modalConfig, isOpen: false });
+    if (modalConfig.type === "success") {
+      navigate("/shop/dashboard");
+    }
+  };
 
   useEffect(() => {
     // Fetch categories
@@ -52,13 +66,8 @@ const EditItemPage: React.FC = () => {
       if (formData.name !== location.state?.productData?.name) {
         formDataToSend.append("name", formData.name);
       }
-      if (
-        formData.category !== location.state?.productData?.category
-      ) {
-        formDataToSend.append(
-          "category",
-          formData.category
-        );
+      if (formData.category !== location.state?.productData?.category) {
+        formDataToSend.append("category", formData.category);
       }
       if (formData.stock !== location.state?.productData?.stock) {
         formDataToSend.append("stock", formData.stock);
@@ -93,16 +102,23 @@ const EditItemPage: React.FC = () => {
         const errorData = await response.json();
         throw new Error(errorData.detail || "Failed to update item");
       }
-      
-      alert("Item updated successfully!");
-      navigate("/shop/dashboard");
+
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Item updated successfully!",
+        type: "success",
+      });
     } catch (error) {
       console.error("Error updating item:", error);
-      alert(
-        `Failed to update item: ${
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: `Failed to update item: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
+        }`,
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -258,6 +274,13 @@ const EditItemPage: React.FC = () => {
           </div>
         </form>
       </div>
+      <Modal
+        isOpen={modalConfig.isOpen}
+        onClose={handleCloseModal}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+      />
     </div>
   );
 };

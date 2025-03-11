@@ -11,6 +11,7 @@ import {
   faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import Modal from "../Modal";
 
 // Add interface for product details
 interface ProductDetails {
@@ -51,6 +52,12 @@ const Table: React.FC<TableProps> = ({ headers }) => {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
   const navigate = useNavigate();
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "success" as "success" | "error",
+  });
 
   const fetchItems = async () => {
     try {
@@ -68,36 +75,38 @@ const Table: React.FC<TableProps> = ({ headers }) => {
 
       setTotalPages(Math.ceil(data.count / itemsPerPage));
 
-      const updatedTableData: TableData[] = data.results.map((item: any) => {
-        return {
-          Product: item.name,
-          Category: item.inventory_category?.name || "-",
-          "Stock Status": item.stock,
-          Details: (
-            <button
-              onClick={() =>
-                handleViewDetails({
-                  name: item.name,
-                  category:
-                    item.inventory_category?.name || "No category added",
-                  categoryId: item.inventory_category?.id,
-                  id: item.id,
-                  image: item.image,
-                  description: item.description,
-                  dimensions: item.dimensions,
-                  costPrice: item.cost_price,
-                  sellingPrice: item.selling_price,
-                  totalPrice: item.total_price,
-                  profitPerItem: item.profit_per_item,
-                })
-              }
-              className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
-            >
-              View
-            </button>
-          ),
-        };
-      });
+      const updatedTableData: TableData[] = data.results.items.map(
+        (item: any) => {
+          return {
+            Product: item.name,
+            Category: item.inventory_category?.name || "-",
+            "Stock Status": item.stock,
+            Details: (
+              <button
+                onClick={() =>
+                  handleViewDetails({
+                    name: item.name,
+                    category:
+                      item.inventory_category?.name || "No category added",
+                    categoryId: item.inventory_category?.id,
+                    id: item.id,
+                    image: item.image,
+                    description: item.description,
+                    dimensions: item.dimensions,
+                    costPrice: item.cost_price,
+                    sellingPrice: item.selling_price,
+                    totalPrice: item.total_price,
+                    profitPerItem: item.profit_per_item,
+                  })
+                }
+                className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+              >
+                View
+              </button>
+            ),
+          };
+        }
+      );
 
       setTableData(updatedTableData);
     } catch (error) {
@@ -163,18 +172,25 @@ const Table: React.FC<TableProps> = ({ headers }) => {
           if (!response.ok) {
             throw new Error("Failed to delete item");
           }
-          alert("Item deleted successfully!");
+          setModalConfig({
+            isOpen: true,
+            title: "Success",
+            message: "Item deleted successfully!",
+            type: "success",
+          });
           setShowModal(false);
-          // fetchItems();
-          window.location.reload();
         })
         .catch((error) => {
           console.error("Error deleting item:", error);
-          alert("Failed to delete item");
+          setModalConfig({
+            isOpen: true,
+            title: "Error",
+            message: "Failed to delete item",
+            type: "error",
+          });
         });
     }
   };
-
 
   // NAVIGATION TO EDIT PAGE
   const editItem = () => {
@@ -182,6 +198,13 @@ const Table: React.FC<TableProps> = ({ headers }) => {
       navigate(`/shop/edit-item/${selectedProduct.id}`, {
         state: { productData: selectedProduct },
       });
+    }
+  };
+
+  const handleCloseModal = () => {
+    setModalConfig({ ...modalConfig, isOpen: false });
+    if (modalConfig.type === "success") {
+      window.location.reload();
     }
   };
 
@@ -194,7 +217,8 @@ const Table: React.FC<TableProps> = ({ headers }) => {
               visible={true}
               height="80"
               width="80"
-              color="black"
+              // color="black"
+              color="#60A5FA"
               radius="9"
               ariaLabel="three-dots-loading"
               wrapperStyle={{}}
@@ -404,6 +428,14 @@ const Table: React.FC<TableProps> = ({ headers }) => {
           </div>
         </div>
       )}
+
+      <Modal
+        isOpen={modalConfig.isOpen}
+        onClose={handleCloseModal}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+      />
     </div>
   );
 };

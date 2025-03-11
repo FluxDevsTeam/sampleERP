@@ -2,22 +2,21 @@ import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  // faDatabase,
   faHome,
   faMoneyBill,
   faReceipt,
 } from "@fortawesome/free-solid-svg-icons";
 import Navbar from "../../components/NavBar";
 import Sidebar from "../../components/Sidebar";
+import Inventory from "./Dashboard";
 import Dashboard from "./Inventory";
-// import RawMaterials from "./RawMaterials";
-import Sold from "./Sold";
+import EditItemPage from "./shop-components/Inventory Item Components/EditItemPage";
 import AddItemPage from "./shop-components/Inventory Item Components/AddNewItemPage";
-import AddNewSoldItemPage from "./shop-components/Sold Components/AddNewSoldItemPage";
 import AddCategoryPage from "./shop-components/Inventory Item Components/AddNewCategory";
 
-import EditItemPage from "./shop-components/Inventory Item Components/EditItemPage";
-import Inventory from "./Dashboard";
+import Sold from "./Sold";
+import AddNewSoldItemPage from "./shop-components/Sold Components/AddNewSoldItemPage";
+import EditSoldItemPage from "./shop-components/Sold Components/EditSoldItemPage";
 
 const Shop = () => {
   document.title = "Shop";
@@ -34,7 +33,7 @@ const Shop = () => {
       text: "Dashboard",
       href: "/shop/dashboard",
       name: "Dashboard",
-      link: "/shop/dashboard",
+      // link: "/shop/dashboard",
       icon: <FontAwesomeIcon className="text-[22px]" icon={faHome} />,
     },
     {
@@ -42,7 +41,7 @@ const Shop = () => {
       text: "Inventory",
       href: "/shop/inventory",
       name: "Inventory",
-      link: "/shop/inventory",
+      // link: "/shop/inventory",
       icon: (
         <FontAwesomeIcon
           className="text-2xl pr-[7.3px] ml-[2px]"
@@ -56,7 +55,7 @@ const Shop = () => {
       text: "Sold",
       href: "/shop/sold",
       name: "Sold",
-      link: "/shop/sold",
+      // link: "/shop/sold",
     },
   ];
 
@@ -77,10 +76,10 @@ const Shop = () => {
           <Route path="/inventory" element={<Dashboard />} />
           <Route path="/add-new-item" element={<AddItemPage />} />
           <Route path="/add-new-category" element={<AddCategoryPage />} />
-          <Route path="/edit-item" element={<EditItemPage />} />
           <Route path="/dashboard" element={<Inventory />} />
           <Route path="/add-new-sold-item" element={<AddNewSoldItemPage />} />
-          {/* <Route path="/raw-materials" element={<RawMaterials />} /> */}
+          <Route path="/edit-item/:id" element={<EditItemPage />} />
+          <Route path="/edit-sold-item/:id" element={<EditSoldItemPage />} />
           <Route path="/sold" element={<Sold />} />
         </Routes>
       </div>

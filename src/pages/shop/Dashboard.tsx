@@ -4,11 +4,13 @@ import Table from "./shop-components/Inventory Item Components/InventoryTable";
 import { useEffect, useState } from "react";
 
 const Dashboard = () => {
+  document.title = "Dashboard - KDC Admin";
+
   const tableHeaders = ["Product", "Category", "Stock Status", "Details"];
-  const [totalStock, setTotalStock] = useState(419);
+  // const [totalStock, setTotalStock] = useState(419);
   const [totalCostValue, setTotalCostValue] = useState(419);
   const [monthlyStock, setMonthlyStock] = useState(419);
-  const [weeklyStock, setWeeklyStock] = useState(419);
+  // const [weeklyStock, setWeeklyStock] = useState(419);
   const [totalProfitPotential, setTotalProfitPotential] = useState(419);
   const [profitThisMonth, setProfitThisMonth] = useState(419);
   const [totalShopValue, setTotalShopValue] = useState(419);
@@ -21,7 +23,7 @@ const Dashboard = () => {
       // INVENTORY DASHBOARD
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/shopkeeper-dashboard/"
         );
 
         if (!response.ok) {
@@ -29,7 +31,7 @@ const Dashboard = () => {
         }
 
         const logData = await response.json();
-        // console.log(logData);
+        console.log(logData);
 
         setMonthlyStock(logData.total_added_this_month);
         setTotalCostValue(logData.total_cost_value);
@@ -51,11 +53,11 @@ const Dashboard = () => {
     <div className="w-11/12 mx-auto mt-6 pl-1 pt-2">
       <div className="mb-16">
         <div className="grid grid-cols-4 gap-3 mb-20">
-          <DashboardData info="Total Stock" digits={totalStock}></DashboardData>
-          <DashboardData
+          {/* <DashboardData info="Total Stock" digits={totalStock}></DashboardData> */}
+          {/* <DashboardData
             info="Weekly Stock"
             digits={weeklyStock}
-          ></DashboardData>
+          ></DashboardData> */}
           <DashboardData
             info="Monthly Stock Added"
             digits={monthlyStock}

@@ -4,8 +4,13 @@ import { useEffect, useState } from "react";
 // import { useNavigate } from "react-router-dom";
 
 export const Inventory = () => {
+
+  document.title = "Inventory - KDC Admin"
   const tableHeaders = ["Product", "Category", "Stock Status", "Details"];
-  const [totalStock, setTotalStock] = useState(419);
+  const [totalCostValue, setTotalCostValue] = useState(419);
+  const [totalProfit, setTotalProfit] = useState(419);
+  const [totalStockCount, setTotalStockCount] = useState(419);
+  const [totalStockValue, setTotalStockValue] = useState(419);
 
   // const navigate = useNavigate();
 
@@ -24,7 +29,10 @@ export const Inventory = () => {
         const logData = await response.json();
         console.log(logData);
 
-        setTotalStock(logData.count);
+        setTotalCostValue(logData.results.total_cost_value);
+        setTotalProfit(logData.results.total_profit);
+        setTotalStockCount(logData.results.total_stock_count);
+        setTotalStockValue(logData.results.total_stock_value);
       } catch (error) {
         console.error("Error fetching items:", error);
       }
@@ -60,23 +68,23 @@ export const Inventory = () => {
         </h1>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-11">
           <InventoryData
-            info="Total Stock"
-            digits={totalStock}
+            info="Total Stock Count"
+            digits={totalStockCount}
             trend="up"
           ></InventoryData>
           <InventoryData
-            info="Total Stock"
-            digits={totalStock}
+            info="Total Cost Value"
+            digits={totalCostValue}
             trend="up"
           ></InventoryData>
           <InventoryData
-            info="Total Stock"
-            digits={totalStock}
+            info="Total Profit"
+            digits={totalProfit}
             trend="up"
           ></InventoryData>
           <InventoryData
-            info="Total Stock"
-            digits={totalStock}
+            info="Total Stock Value"
+            digits={totalStockValue}
             trend="up"
           ></InventoryData>
         </div>

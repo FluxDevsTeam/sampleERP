@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -13,43 +13,107 @@ interface Project {
   name: string;
 }
 
-interface Item {
+interface InventoryItem {
   id: number;
   name: string;
 }
 
-const AddNewSoldItemPage: React.FC = () => {
+const Modal = ({
+  isOpen,
+  onClose,
+  type,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  type: "success" | "error";
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div
+        className={`bg-white p-6 rounded-lg shadow-xl max-w-sm w-full mx-4 border-t-4 ${
+          type === "success" ? "border-green-500" : "border-red-500"
+        }`}
+      >
+        <h2
+          className={`text-2xl font-bold mb-4 ${
+            type === "success" ? "text-blue-600" : "text-red-600"
+          }`}
+        >
+          {type === "success" ? "Success!" : "Error"}
+        </h2>
+        <p className="mb-6">
+          {type === "success"
+            ? "Sale has been successfully recorded."
+            : "There was an error recording the sale. Please try again."}
+        </p>
+        <button
+          onClick={onClose}
+          className={`w-full py-2 px-4 text-white rounded ${
+            type === "success"
+              ? "bg-blue-600 hover:bg-blue-20"
+              : "bg-red-500 hover:bg-red-600"
+          }`}
+        >
+          {type === "success" ? "Continue" : "Close"}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const AddNewSoldItemPage = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [saleType, setSaleType] = useState<"customer" | "project">("customer");
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [item, setItem] = useState<Item[]>([]);
-  const [saleType, setSaleType] = useState<"customer" | "project" | null>(null);
-
+  const [items, setItems] = useState<InventoryItem[]>([]);
   const [formData, setFormData] = useState({
-    item: "",
     quantity: "",
     customer: "",
     project: "",
+    item: "",
     logistics: "",
   });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [customersRes, projectsRes, itemRes] = await Promise.all([
-          fetch("https://kidsdesigncompany.pythonanywhere.com/api/customer/"),
-          fetch("https://kidsdesigncompany.pythonanywhere.com/api/project/"),
-          fetch("https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/"),
-        ]);
+        const [customerResponse, projectResponse, itemResponse] =
+          await Promise.all([
+            fetch("https://kidsdesigncompany.pythonanywhere.com/api/customer/"),
+            fetch("https://kidsdesigncompany.pythonanywhere.com/api/project/"),
+            fetch(
+              "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/"
+            ),
+          ]);
 
-        const customersData = await customersRes.json();
-        const projectsData = await projectsRes.json();
-        const itemData = await itemRes.json();
+        if (!customerResponse.ok || !projectResponse.ok || !itemResponse.ok)
+          throw new Error("Failed to fetch data");
 
-        setCustomers(customersData.results.all_customers || []);
-        setProjects(projectsData.results || []);
-        setItem(itemData.results || []);
+        const customerData = await customerResponse.json();
+        const projectData = await projectResponse.json();
+        const itemData = await itemResponse.json();
+
+        console.log(projectData);
+        
+
+        setCustomers(customerData.results.all_customers);
+        setProjects(projectData.all_projects);
+        setItems(itemData.results.items);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -58,20 +122,31 @@ const AddNewSoldItemPage: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleSaleTypeChange = (type: "customer" | "project") => {
-    setSaleType(type);
-    // Reset the other field when changing type
-    setFormData((prev) => ({
-      ...prev,
-      customer: type === "project" ? "" : prev.customer,
-      project: type === "customer" ? "" : prev.project,
-      logistics: type === "project" ? "" : prev.logistics,
-    }));
-  };
+  useEffect(() => {
+    setFormData({
+      quantity: "",
+      customer: "",
+      project: "",
+      item: "",
+      logistics: "",
+    });
+  }, [saleType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+
+    // Prepare submit data based on sale type
+    const submitData = Object.fromEntries(
+      Object.entries(formData).map(([key, value]) => {
+        if (saleType === "project" && ["customer", "logistics"].includes(key)) {
+          return [key, null];
+        }
+        if (saleType === "customer" && key === "project") {
+          return [key, null];
+        }
+        return [key, value || null];
+      })
+    );
 
     try {
       const response = await fetch(
@@ -81,168 +156,170 @@ const AddNewSoldItemPage: React.FC = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(submitData),
         }
       );
 
-      if (!response.ok) throw new Error("Failed to add sold item");
+      if (!response.ok) {
+        throw new Error("Failed to submit");
+      }
 
-      alert("Sale recorded successfully!");
-      navigate("/shop/sold");
+      setShowSuccessModal(true);
     } catch (error) {
       console.error("Error:", error);
-      alert("Failed to record sale");
-    } finally {
-      setLoading(false);
+      setShowErrorModal(true);
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
-        <div className="flex items-center mb-6">
-          <button
-            onClick={() => navigate("/shop/sold")}
-            className="mr-4 text-gray-20 hover:text-gray-600"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-20">Record New Sale</h1>
+    <div className="max-w-2xl mx-auto p-4">
+      <div className="flex items-center mb-6">
+        <button
+          onClick={() => navigate("/shop/sold")}
+          className="mr-4 text-gray-20 hover:text-gray-600"
+        >
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
+        <h1 className="text-2xl font-bold text-gray-20">Record Sale</h1>
+      </div>
+
+      <div className="mb-6">
+        <label className="block mb-2 font-semibold">Sale Type:</label>
+        <div className="flex gap-4">
+          <label className="flex items-center">
+            <input
+              type="radio"
+              value="customer"
+              checked={saleType === "customer"}
+              onChange={(e) =>
+                setSaleType(e.target.value as "customer" | "project")
+              }
+              className="mr-2"
+            />
+            Customer Sale
+          </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              value="project"
+              checked={saleType === "project"}
+              onChange={(e) =>
+                setSaleType(e.target.value as "customer" | "project")
+              }
+              className="mr-2"
+            />
+            Project Sale
+          </label>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block mb-1">Item:</label>
+          <select
+            name="item"
+            value={formData.item}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          >
+            <option value="">Select an item</option>
+            {items.map(item => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block mb-1">Quantity:</label>
+          <input
+            type="number"
+            name="quantity"
+            value={formData.quantity}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          />
+        </div>
+          
+        {/* CUSTOMER SALE TYPE */}
+        {saleType === "customer" && (
+          <>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Sale Type
-              </label>
+              <label className="block mb-1">Customer:</label>
               <select
+                name="customer"
+                value={formData.customer}
+                onChange={handleChange}
+                className="w-full border rounded p-2"
                 required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-2 py-2"
-                value={saleType || ""}
-                onChange={(e) =>
-                  handleSaleTypeChange(e.target.value as "customer" | "project")
-                }
               >
-                <option value="">Select sale type</option>
-                <option value="customer">Customer</option>
-                <option value="project">Project</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Item
-              </label>
-
-              <select
-                required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                value={formData.item}
-                onChange={(e) =>
-                  setFormData({ ...formData, item: e.target.value })
-                }
-              >
-                <option value="">Select item</option>
-                {item.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name}
+                <option value="">Select a customer</option>
+                {customers.map((customer) => (
+                  <option key={customer.id} value={customer.id}>
+                    {customer.name}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Common fields */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Quantity
-              </label>
+              <label className="block mb-1">Logistics:</label>
               <input
                 type="number"
-                required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                value={formData.quantity}
-                onChange={(e) =>
-                  setFormData({ ...formData, quantity: e.target.value })
-                }
+                name="logistics"
+                value={formData.logistics}
+                onChange={handleChange}
+                className="w-full border rounded p-2"
               />
             </div>
+          </>
+        )}
 
-            {saleType === "customer" && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Customer
-                  </label>
-                  <select
-                    required
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                    value={formData.customer}
-                    onChange={(e) =>
-                      setFormData({ ...formData, customer: e.target.value })
-                    }
-                  >
-                    <option value="">Select customer</option>
-                    {customers.map((customer) => (
-                      <option key={customer.id} value={customer.id}>
-                        {customer.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Logistics
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                    value={formData.logistics}
-                    onChange={(e) =>
-                      setFormData({ ...formData, logistics: e.target.value })
-                    }
-                  />
-                </div>
-              </>
-            )}
-
-            {saleType === "project" && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Project
-                </label>
-                <select
-                  required
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                  value={formData.project}
-                  onChange={(e) =>
-                    setFormData({ ...formData, project: e.target.value })
-                  }
-                >
-                  <option value="">Select project</option>
-                  {projects.map((project) => (
-                    <option key={project.id} value={project.id}>
-                      {project.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-          </div>
-
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+        {/* PROJECT SALE TYPE */}
+        {saleType === "project" && (
+          <div>
+            <label className="block mb-1">Project:</label>
+            <select
+              name="project"
+              value={formData.project}
+              onChange={handleChange}
+              className="w-full border rounded p-2"
+              required
             >
-              {loading ? "Recording..." : "Record Sale"}
-            </button>
+              <option value="">Select a project</option>
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
           </div>
-        </form>
-      </div>
+        )}
+
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Submit
+          </button>
+      </form>
+
+      <Modal
+        isOpen={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+          navigate("/shop/sold");
+        }}
+        type="success"
+      />
+
+      <Modal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        type="error"
+      />
     </div>
   );
 };
