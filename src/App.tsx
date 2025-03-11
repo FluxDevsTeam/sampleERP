@@ -40,15 +40,12 @@ FactoryManagerWorkers}
 //  Project Manager Route
 import {
   ProjectManagerDashboard,
-  ProjectManagerAllProject,
+  ProjectManagerProjects,
   ProjectManagerProducts,
   ProjectManagerLayout,
   ProjectManagerCustomers
 } from "./pages/project-manager-page";
-//import ActiveProjects from "./pages/project-manager-page/allProjects/_projectPages/ActivePage";
-//import CompletedProjects from "./pages/project-manager-page/allProjects/_projectPages/CompletedProjects";
-//import CancelledProjects from "./pages/project-manager-page/allProjects/_projectPages/CancelledProjects";
-import ProductDetails from "./pages/project-manager-page/products/ProductDetails";
+
 
 
 // STORE KEEPER IMPORT ROUTE
@@ -70,15 +67,15 @@ const router = createBrowserRouter([
   },
   // CEO DASHBOARD ROUTE
   {
-    path: "/ceo/dashboard",
+    path: "/ceo",
     element: <CEOSharedLayout />,
     children: [
       {
-        index: true,
+         path: "dashboard",
         element: <CEODashboard />,
       },
       {
-        path: "ceo/projects",
+        path: "projects",
         element: <CEOProjects />,
       },
       {
@@ -91,7 +88,7 @@ const router = createBrowserRouter([
       },
       {
         path: "assets",
-        element: <CEOAssets/>,
+        element: <CEOAssets />,
       },
       {
         path: "products",
@@ -102,32 +99,28 @@ const router = createBrowserRouter([
         element: <CEOStore />,
       },
       {
-        path: "products",
-        element: <CEOProducts />,
-      },
-
-     {
         path: "overhead",
         element: <CEOOverhead />,
-      },
-      {
-        path: "products",
-        element: <CEOShop />,
       },
       {
         path: "expenses",
         element: <CEOExpenses />,
       },
+      {
+        path: "shop",
+        element: <CEOShop />,
+      },
     ],
-  },
+  } ,
+  
 
   // FACTORY MANAGER ROUTE 
   {
-    path: "/factory-manager/dashboard",
+    path: "/factory-manager",
     element: <FactoryManagerSharedLayout />,
     children: [
       {
-        index: true,
+        path: "dashboard",
         element: <FactoryManagerDashboard />,
       },
       {
@@ -168,21 +161,16 @@ const router = createBrowserRouter([
     element: <ProjectManagerLayout />,
     children: [
       {
-        index: true,
+        path: "dashboard",
         element: <ProjectManagerDashboard />,
       },
       {
         path: "projects",
-        element: <ProjectManagerAllProject />,
+        element: <ProjectManagerProjects />,
       },
       {
         path: "products",
         element: <ProjectManagerProducts />,
-      },
-   
-      {
-        path: "product-details",
-        element: <ProductDetails />,
       },
       {
         path: "customers",
@@ -193,24 +181,24 @@ const router = createBrowserRouter([
  
   // STORE KEEPER ROUTE
   {
-    path: "/store-keeper/dashboard",
+    path: "/store-keeper",
     element: <StoreKeeperLayout />,
     children: [
       {
-        index: true,
+        path:"dashboard",
         element: <StoreKeeperDashboard />,
       },
       
     ],
   },
 
-   // STORE KEEPER ROUTE
+   // SHOP ROUTE
    {
-    path: "/shop/dashboard",
+    path: "/shop",
     element: <ShopSharedLayout />,
     children: [
       {
-        index: true,
+       path : "dashboard",
         element: <ShopDashboard />,
       },
       
@@ -219,11 +207,11 @@ const router = createBrowserRouter([
 
   //admin dashboard 
   {
-    path: "/admin/dashboard",
+    path: "/admin",
     element: <AdminLayout />,
     children: [
       {
-        index: true,
+        path :"dashboard",
         element: <AdminDashboard />,
       },
       {

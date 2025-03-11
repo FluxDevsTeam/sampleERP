@@ -27,13 +27,13 @@ export const sidebarLink: SidebarProps[] = [
   },
   {
     id: nanoid(),
-    text: "projects",
-    href: "/ceo/projects",
+    text: "Projects",
+    href: "/ceo/projects",  // Removed "dashboard"
     icon: <ProjectsIcon className="currentColor" />,
   },
   {
     id: nanoid(),
-    text: "customers",
+    text: "Customers",
     href: "/ceo/customers",
     icon: <TransferIcon className="currentColor" />,
   },
@@ -41,19 +41,13 @@ export const sidebarLink: SidebarProps[] = [
     id: nanoid(),
     text: "Workers",
     href: "/ceo/workers",
-    icon: <FinancesIcon className="currentColor" />,
+    icon: <ArchiveIcon  className="currentColor" />,
   },
   {
     id: nanoid(),
     text: "Assets",
-    href: "/ceo/asssets",
-    icon: <StaffIcon className="currentColor" />,
-  },
-  {
-    id: nanoid(),
-    text: "shop",
-    href: "/ceo/shop",
-    icon: <ArchiveIcon className="currentColor" />,
+    href: "/ceo/assets",  // Fixed "asssets" typo and removed "dashboard"
+    icon: <FinancesIcon className="currentColor" />,
   },
   {
     id: nanoid(),
@@ -63,23 +57,31 @@ export const sidebarLink: SidebarProps[] = [
   },
   {
     id: nanoid(),
+    text: "Store",
+    href: "/ceo/store",
+    icon: <TransferIcon  className="currentColor" />,
+  },
+  {
+    id: nanoid(),
     text: "Expenses",
     href: "/ceo/expenses",
-    icon: <ArchiveIcon className="currentColor" />,
+    icon: <OrdersIcon className="currentColor" />,
   },
   {
     id: nanoid(),
     text: "Overhead",
-    href: "/ceo/overhead",
-    icon: <ArchiveIcon className="currentColor" />,
+    href: "/ceo/overhead",  // Removed "dashboard"
+    icon: <RawMaterialIcon className="currentColor" />,
   },
   {
     id: nanoid(),
-    text: "Store",
-    href: "/ceo/store",
-    icon: <ArchiveIcon className="currentColor" />,
+    text: "Shop",
+    href: "/ceo/shop",  // Removed "dashboard"
+    icon: <FinancesIcon className="currentColor" />,
   },
 ];
+
+
 export const projectManagerSidebarLink: SidebarProps[] = [
   {
     id: nanoid(),
@@ -90,20 +92,20 @@ export const projectManagerSidebarLink: SidebarProps[] = [
   {
     id: nanoid(),
     text: "projects",
-    href: "/project-manager/all-projects",
+    href: "/project-manager/projects",
     icon: <ProjectsIcon className="currentColor" />,
   },
   {
     id: nanoid(),
     text: "products",
     href: "/project-manager/products",
-    icon: <TransferIcon className="currentColor" />,
+    icon: <OrdersIcon className="currentColor" />,
   },
   {
     id: nanoid(),
     text: "customers",
     href: "/project-manager/customers",
-    icon: <TransferIcon className="currentColor" />,
+    icon: <ArchiveIcon className="currentColor" />,
   },
   
 
@@ -119,7 +121,7 @@ export const FactoryManagerSidebarLink: SidebarProps[] = [
     id: nanoid(),
     text: "workers",
     href: "/factory-manager/workers",
-    icon: <FinancesIcon className="currentColor" />,
+    icon: <StaffIcon className="currentColor" />,
   },
   {
     id: nanoid(),
@@ -131,25 +133,25 @@ export const FactoryManagerSidebarLink: SidebarProps[] = [
     id: nanoid(),
     text: "customers",
     href: "/factory-manager/customers",
-    icon: <FinancesIcon className="currentColor" />,
+    icon: <RawMaterialIcon className="currentColor" />,
   },
   {
     id: nanoid(),
     text: "expenses",
     href: "/factory-manager/expenses",
-    icon: <FinancesIcon className="currentColor" />,
+    icon: <OrdersIcon className="currentColor" />,
   },
   {
     id: nanoid(),
     text: "projects",
     href: "/factory-manager/projects",
-    icon: <FinancesIcon className="currentColor" />,
+    icon: <ArchiveIcon className="currentColor" />,
   },
   {
     id: nanoid(),
     text: "products",
     href: "/factory-manager/products",
-    icon: <FinancesIcon className="currentColor" />,
+    icon: <ProjectsIcon className="currentColor" />,
   },
 ];
 
@@ -183,25 +185,25 @@ export const shopSidebarLink: SidebarProps[] = [
     {
       id: nanoid(),
       text: "assets",
-      href: "/admin/dashboard/assets",
+      href: "/admin/assets",
       icon: <OrdersIcon className="currentColor" />,
     },
     {
       id: nanoid(),
       text: "expenses",
-      href: "/admin/dashboard/expenses",
+      href: "/admin/expenses",
       icon: <RawMaterialIcon className="currentColor" />,
     },
     {
       id: nanoid(),
       text: "paid",
-      href: "/admin/dashboard/paid",
+      href: "/admin/paid",
       icon: <ArchiveIcon className="currentColor" />,
     },
     {
       id: nanoid(),
       text: "workers",
-      href: "/admin/dashboard/workers",
+      href: "/admin/workers",
       icon: <FinancesIcon className="currentColor" />,
     },
 ];

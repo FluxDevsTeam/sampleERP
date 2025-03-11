@@ -1,14 +1,11 @@
-import ProjectManagement from "./_projectComponents/ProjectManagement";
+
+
+
 
 const CEOProjects = () => {
   return (
-    <div className='w-full  bg-gray-100 '>
-  <ProjectManagement />
- 
-    </div>
-
-
+    <div>CEOProjects</div>
   )
-};
+}
 
-export default CEOProjects;
+export default CEOProjects
