@@ -1,7 +1,12 @@
-export { default as AllProjects } from "./allProjects/AllProjects";
-export { default as Dashboard } from "./dashboard/Dashboard";
-export { default as SharedLayout } from "./SharedLayout";
-export { default as Finances } from "./finances/Finances";
-export { default as Requests } from "./requests/Requests";
-export { default as Archives } from "./archives/Archives";
-export { default as Customers }  from "./customers/Customers";
+
+export { default as CEOProjects } from "./allProjects/CEOProjects";
+export { default as CEODashboard } from "./dashboard/CEODashboard";
+export { default as CEOSharedLayout } from "./CEOSharedLayout";
+export { default as CEOWorkers } from "./workers/CEOWorkers"
+export { default as CEOShop } from "./shop/CEOShop";
+export { default as CEOStore } from "./store/CEOStore";
+export { default as CEOCustomers }  from "./customers/CEOCustomers";
+export {default as CEOProducts } from "./products/CEOProducts"
+export { default as CEOExpenses} from "./expenses/CEOExpenses";
+export { default as CEOOverhead }  from "./overhead/CEOOverhead";
+export { default as CEOAssets }  from "./assets/CEOAssets";

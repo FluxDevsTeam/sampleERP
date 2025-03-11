@@ -1,44 +1,47 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import {
-  Dashboard,
-  AllProjects,
-  Customers,
-  Finances,
-  Requests,
-  SharedLayout,
-  Archives,
+  CEODashboard,
+ CEOProjects,
+  CEOCustomers,
+ CEOStore,
+ CEOWorkers,
+ CEOProducts,
+ CEOShop,
+ CEOExpenses,
+ CEOOverhead,
+CEOSharedLayout,
+CEOAssets,
 
 } from "./pages/ceo";
 
-import { Workers,AdminDashboard,Expenses,AdminLayout,Contractors,Assets,Paid } from "./pages/admin";
+import { Workers,AdminDashboard,Expenses,AdminLayout,Assets,Paid } from "./pages/admin";
 import AddAsset from "./pages/admin/assests/_pages/AddAsset";
 import EditAsset from "./pages/admin/assests/_pages/EditAsset";
 import AddExpense from "./pages/admin/expenses/_pages/AddExpense";
 import EditExpense from "./pages/admin/expenses/_pages/EditExpense";
-//import CreateAsset from "./pages/admin/assests/_pages/NewItem";
-
-
-//import CeoActiveProjects from "./pages/ceo/allProjects/_projectPages/ActiveProjects";
-//import CeoCompletedProjects from "./pages/ceo/allProjects/_projectPages/CompletedProjects";
-//import CeoCancelledProjects from "./pages/ceo/allProjects/_projectPages/CeoCancelledProjects";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Settings from "./pages/ceo/settingss/settings";
 
-import Staffs from "./pages/ceo/staffs/staffs";
 import SignUp from "./pages/AuthPages/signup/SignUp";
 import Signin from "./pages/AuthPages/signin/Signin";
+
+import {FactoryManagerCustomers,
+FactoryManagerSharedLayout,
+FactoryManagerAssets,
+FactoryManagerExpenses,
+FactoryManagerDashboard,
+FactoryManagerProducts,
+FactoryManagerProjects,
+FactoryManagerWorkers}
+ from "./pages/factory-manager-page";
+
+
 //  Project Manager Route
 import {
-  ProjectManagerArchives,
   ProjectManagerDashboard,
-  ProjectManagerSettings,
   ProjectManagerAllProject,
-  Products,
-  ProjectManagerFinances,
-  ProjectManagerRequests,
-  ProjectManagerStaffs,
+  ProjectManagerProducts,
   ProjectManagerLayout,
   ProjectManagerCustomers
 } from "./pages/project-manager-page";
@@ -47,22 +50,14 @@ import {
 //import CancelledProjects from "./pages/project-manager-page/allProjects/_projectPages/CancelledProjects";
 import ProductDetails from "./pages/project-manager-page/products/ProductDetails";
 
-// ARTISAN IMPORT ROUTE
-import {
-  ArtisanDashboard,
-  ArtisanLayout,
-  ArtisanPayment,
-  ArtisanSetting,
-} from "./pages/artisan-page";
 
 // STORE KEEPER IMPORT ROUTE
 import {
   StoreKeeperDashboard,
   StoreKeeperLayout,
-  Orders,
-  RawMaterial,
-  StoreKeeperSettings,
 } from "./pages/store-keeper-page";
+
+import { ShopDashboard,ShopSharedLayout } from "./pages/shop";
 
 const router = createBrowserRouter([
   {
@@ -76,61 +71,100 @@ const router = createBrowserRouter([
   // CEO DASHBOARD ROUTE
   {
     path: "/ceo/dashboard",
-    element: <SharedLayout />,
+    element: <CEOSharedLayout />,
     children: [
       {
         index: true,
-        element: <Dashboard />,
+        element: <CEODashboard />,
       },
       {
-        path: "all-projects",
-        element: <AllProjects />,
+        path: "ceo/projects",
+        element: <CEOProjects />,
       },
       {
         path: "customers",
-        element: <Customers />,
+        element: <CEOCustomers />,
       },
       {
-        path: "finances",
-        element: <Finances />,
+        path: "workers",
+        element: <CEOWorkers />,
       },
       {
-        path: "requests",
-        element: <Requests />,
-      },
-      // {
-      //   path: "unindexed-files",
-      //   element: <UnindexedFiles />,
-      // },
-      {
-        path: "archives",
-        element: <Archives />,
+        path: "assets",
+        element: <CEOAssets/>,
       },
       {
-        path: "staffs",
-        element: <Staffs />,
+        path: "products",
+        element: <CEOProducts />,
       },
       {
-        path: "settings",
-        element: <Settings />,
-      },
-     /* {
-        path: "active-projects",
-        element: <CeoActiveProjects />,
+        path: "store",
+        element: <CEOStore />,
       },
       {
-        path: "completed-projects",
-        element: <CeoCompletedProjects />,
+        path: "products",
+        element: <CEOProducts />,
+      },
+
+     {
+        path: "overhead",
+        element: <CEOOverhead />,
       },
       {
-        path: "cancelled-projects",
-        element: <CeoCancelledProjects />,
-      },*/
+        path: "products",
+        element: <CEOShop />,
+      },
+      {
+        path: "expenses",
+        element: <CEOExpenses />,
+      },
     ],
   },
+
+  // FACTORY MANAGER ROUTE 
+  {
+    path: "/factory-manager/dashboard",
+    element: <FactoryManagerSharedLayout />,
+    children: [
+      {
+        index: true,
+        element: <FactoryManagerDashboard />,
+      },
+      {
+        path: "projects",
+        element: <FactoryManagerProjects />,
+      },
+      {
+        path: "customers",
+        element: <FactoryManagerCustomers />,
+      },
+      {
+        path: "workers",
+        element: <FactoryManagerWorkers />,
+      },
+      {
+        path: "assets",
+        element: <FactoryManagerAssets/>,
+      },
+      {
+        path: "products",
+        element: <FactoryManagerProducts />,
+      },
+      {
+        path: "expenses",
+        element: <FactoryManagerExpenses />,
+      },
+    
+
+    
+    ],
+  },
+
+
+
   // PROJECT MANAGER ROUTE
   {
-    path: "/project-manager/dashboard",
+    path: "/project-manager",
     element: <ProjectManagerLayout />,
     children: [
       {
@@ -138,45 +172,14 @@ const router = createBrowserRouter([
         element: <ProjectManagerDashboard />,
       },
       {
-        path: "all-projects",
+        path: "projects",
         element: <ProjectManagerAllProject />,
       },
       {
         path: "products",
-        element: <Products />,
+        element: <ProjectManagerProducts />,
       },
-      {
-        path: "finances",
-        element: <ProjectManagerFinances />,
-      },
-      {
-        path: "requests",
-        element: <ProjectManagerRequests />,
-      },
-      {
-        path: "archives",
-        element: <ProjectManagerArchives />,
-      },
-      {
-        path: "staffs",
-        element: <ProjectManagerStaffs />,
-      },
-      {
-        path: "settings",
-        element: <ProjectManagerSettings />,
-      },
-    /*  {
-        path: "active-projects",
-        element: <ActiveProjects />,
-      },
-      {
-        path: "completed-projects",
-        element: <CompletedProjects />,
-      },
-      {
-        path: "cancelled-projects",
-        element: <CancelledProjects />,
-      }, */
+   
       {
         path: "product-details",
         element: <ProductDetails />,
@@ -187,25 +190,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-  // ARTISAN ROUTE
-  {
-    path: "/artisan/dashboard",
-    element: <ArtisanLayout />,
-    children: [
-      {
-        index: true,
-        element: <ArtisanDashboard />,
-      },
-      {
-        path: "payment",
-        element: <ArtisanPayment />,
-      },
-      {
-        path: "settings",
-        element: <ArtisanSetting />,
-      },
-    ],
-  },
+ 
   // STORE KEEPER ROUTE
   {
     path: "/store-keeper/dashboard",
@@ -215,18 +200,20 @@ const router = createBrowserRouter([
         index: true,
         element: <StoreKeeperDashboard />,
       },
+      
+    ],
+  },
+
+   // STORE KEEPER ROUTE
+   {
+    path: "/shop/dashboard",
+    element: <ShopSharedLayout />,
+    children: [
       {
-        path: "orders",
-        element: <Orders />,
+        index: true,
+        element: <ShopDashboard />,
       },
-      {
-        path: "raw-materials",
-        element: <RawMaterial />,
-      },
-      {
-        path: "settings",
-        element: <StoreKeeperSettings />,
-      },
+      
     ],
   },
 
@@ -251,10 +238,7 @@ const router = createBrowserRouter([
         path: "workers",
         element: <Workers />,
       },
-      {
-        path: "contractors",
-        element: <Contractors />,
-      },
+    
       {
         path: "paid",
         element: <Paid />,

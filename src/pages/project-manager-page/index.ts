@@ -1,10 +1,5 @@
 export { default as ProjectManagerAllProject } from "./allProjects/AllProjects";
-export { default as Products } from "./products/Products";
-export { default as ProjectManagerFinances } from "./finances/ProjectManagerFinances";
-export { default as ProjectManagerRequests } from "./requests/ProjectManagerRequests";
-export { default as ProjectManagerArchives } from "./archives/ProjectManagerArchives";
+export { default as ProjectManagerProducts } from "./products/ProjectManagerProducts";
 export { default as ProjectManagerDashboard } from "./dashboard/ProjectManagerDashboard";
-export { default as ProjectManagerStaffs } from "./staffs/ProjectManagerStaffs";
-export { default as ProjectManagerSettings } from "./settings/ProjectManagerSettings";
 export { default as ProjectManagerLayout } from "./ProjectManagerLayout";
 export { default as ProjectManagerCustomers } from "./customers/ProjectManagerCustomers";
