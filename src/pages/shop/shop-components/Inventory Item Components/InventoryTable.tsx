@@ -16,8 +16,8 @@ import Modal from "../Modal";
 // Add interface for product details
 interface ProductDetails {
   name: string;
-  category: string;
   id: number;
+  category: string;
   categoryId: number;
   image: string;
   description: string;
@@ -86,10 +86,10 @@ const Table: React.FC<TableProps> = ({ headers }) => {
                 onClick={() =>
                   handleViewDetails({
                     name: item.name,
+                    id: item.id,
                     category:
                       item.inventory_category?.name || "No category added",
                     categoryId: item.inventory_category?.id,
-                    id: item.id,
                     image: item.image,
                     description: item.description,
                     dimensions: item.dimensions,

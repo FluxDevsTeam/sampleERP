@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { ThreeDots } from "react-loader-spinner";
-import { Whisper, Tooltip } from "rsuite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlus,
@@ -18,6 +17,11 @@ interface SoldEntry {
   quantity: string;
   date: string;
   sold_to: { id: number; name: string };
+  item_sold: {
+    id: number;
+    dimensions: string;
+    inventory_category: { id: number; name: string };
+  };
   linked_project: { id: number; name: string };
   name: string;
   logistics: string;
@@ -59,6 +63,8 @@ const SoldTable: React.FC = () => {
     type: "success" as "success" | "error",
   });
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<SoldEntry | null>(null);
 
   const fetchItems = async () => {
     try {
@@ -99,14 +105,6 @@ const SoldTable: React.FC = () => {
       month: "short",
       day: "numeric",
     });
-  };
-
-  const handleNameClick = (entry: SoldEntry) => {
-    setSelectedSale({
-      id: entry.id,
-      name: entry.name,
-    });
-    setShowModal(true);
   };
 
   const handleCloseModal = () => {
@@ -156,7 +154,13 @@ const SoldTable: React.FC = () => {
     if (selectedSale) {
       await handleDelete(selectedSale.id);
       setConfirmDelete(false);
+      setShowDetailsModal(false);
     }
+  };
+
+  const handleViewDetails = (entry: SoldEntry) => {
+    setSelectedItem(entry);
+    setShowDetailsModal(true);
   };
 
   return (
@@ -214,7 +218,9 @@ const SoldTable: React.FC = () => {
                 </div>
 
                 {openDates[dayData.date] && (
+                  //////// Table
                   <table className="min-w-full overflow-auto">
+                    {/* Table headers */}
                     <thead className="bg-gray-800">
                       <tr>
                         {/* <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
@@ -247,25 +253,16 @@ const SoldTable: React.FC = () => {
                         <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
                           Profit
                         </th>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400"></th>
                       </tr>
                     </thead>
+
+                    {/* Table body */}
                     <tbody className="divide-y divide-gray-200">
                       {dayData.entries.map((entry) => (
                         <tr key={entry.id} className="hover:bg-gray-50">
-                          <td
-                            className="px-4 py-3 text-sm cursor-pointer hover:text-blue-600"
-                            onClick={() => handleNameClick(entry)}
-                          >
-                            <Whisper
-                              followCursor
-                              speaker={
-                                <Tooltip>
-                                  Click to edit or delete record of sale
-                                </Tooltip>
-                              }
-                            >
-                              {entry.name}
-                            </Whisper>
+                          <td className="px-4 py-3 text-sm cursor-pointer hover:text-blue-600">
+                            {entry.name}
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {entry.quantity}
@@ -290,6 +287,14 @@ const SoldTable: React.FC = () => {
                           </td>
                           <td className="px-4 py-3 text-sm text-blue-400">
                             ₦{entry.profit}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-blue-400">
+                            <button
+                              className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+                              onClick={() => handleViewDetails(entry)}
+                            >
+                              View
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -368,6 +373,91 @@ const SoldTable: React.FC = () => {
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showDetailsModal && selectedItem && (
+        <div className="fixed inset-0 flex items-center justify-center z-100">
+          <div
+            className="absolute inset-0 bg-black opacity-50"
+            onClick={() => setShowDetailsModal(false)}
+          ></div>
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 border-2 border-gray-800 shadow-lg relative z-10">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-20">
+                {selectedItem.name}
+              </h2>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-sm">
+                <span className="font-semibold">Item Category:</span>{" "}
+                {selectedItem.item_sold.inventory_category.name}
+              </p>
+              <p className="text-sm">
+                <span className="font-semibold">Date:</span>{" "}
+                {formatDate(selectedItem.date)}
+              </p>
+              <p className="text-sm">
+                <span className="font-semibold">Dimensions:</span>{" "}
+                {selectedItem.item_sold.dimensions}
+              </p>
+              <p className="text-sm">
+                <span className="font-semibold">Quantity:</span>{" "}
+                {selectedItem.quantity}
+              </p>
+              <p className="text-sm">
+                <span className="font-semibold">Project:</span>{" "}
+                {selectedItem.linked_project?.name || "—"}
+              </p>
+              <p className="text-sm">
+                <span className="font-semibold">Customer:</span>{" "}
+                {selectedItem.sold_to?.name || "—"}
+              </p>
+              <p className="text-sm">
+                <span className="font-semibold">Logistics:</span>{" "}
+                {selectedItem.logistics || "—"}
+              </p>
+              <p className="text-sm">
+                <span className="font-semibold">Cost Price:</span> ₦
+                {selectedItem.cost_price}
+              </p>
+              <p className="text-sm">
+                <span className="font-semibold">Selling Price:</span> ₦
+                {selectedItem.selling_price}
+              </p>
+              {/* <p className="text-sm">
+                <span className="font-semibold">Total Price:</span> ₦
+                {selectedItem.total_price}
+              </p> */}
+              <p className="text-sm">
+                <span className="font-semibold">Profit:</span> ₦
+                {selectedItem.profit}
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                navigate(`/shop/edit-sold-item/${selectedItem.id}`)
+              }
+              className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold"
+            >
+              <FontAwesomeIcon className="pr-1 text-blue-400" icon={faPencil} />
+              Edit details
+            </button>
+            <button
+              onClick={() => confirmDeleteSale(selectedItem.id)}
+              className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
+            >
+              <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
+              Delete Item
+            </button>
           </div>
         </div>
       )}
