@@ -91,8 +91,8 @@ const AdminDashboard = () => {
               cx="50%"
               cy="50%"
               outerRadius={100}
-              innerRadius={50} // Creates the donut effect
-              label={({ name, value }) => `${name} (${value}%)`} // Show category and percentage
+              innerRadius={50} 
+              label={({ name, value }) => `${name} (${value}%)`} 
             >
               {expenseCategoryBreakdown.map((_entry, index) => (
                 <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
