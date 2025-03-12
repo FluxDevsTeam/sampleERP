@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import Frame180 from "../../../../assets/images/Frame180.png";
+import { MdArrowOutward } from "react-icons/md";
 
 interface PaidData {
   monthly_total: number;
@@ -27,24 +28,22 @@ const Header = () => {
     <div className="p-6">
       <p className="md:text-3xl text-black font-bold py-6">Payments Overview</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="md:grid grid-cols-2 grid grid-cols-1 md:space-x-4 space-x-0 md:space-y-0 space-y-4">
         {[
           { label: "Monthly Total Paid", value: data?.monthly_total ?? 0 },
           { label: "Weekly Total Paid", value: data?.weekly_total ?? 0 },
         ].map((item, index) => (
-          <div
-            key={index}
-            className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between"
-          >
-            <div>
-              <p className="text-lg font-semibold">{item.label}</p>
-              <p className="text-2xl font-bold text-neutral-900">{item.value.toLocaleString()}</p>
+          <div key={index} className="p-4 border rounded-lg shadow-md">
+            <div className="flex justify-between items-center text-2xl">
+              <p>{item.label}</p>
+              <img src={Frame180 || "/placeholder.svg"} alt="icon" className="w-12 h-12" />
             </div>
-            <img
-              src={Frame180}
-              alt="icon"
-              className="w-12 h-12 object-contain"
-            />
+            <div className="flex space-x-8 text-sm">
+              <span className="text-green-200">
+                <MdArrowOutward />
+              </span>
+              <span>{item.value.toLocaleString()}</span>
+            </div>
           </div>
         ))}
       </div>
