@@ -139,7 +139,7 @@ const SoldTable: React.FC = () => {
       setModalConfig({
         isOpen: true,
         title: "Error",
-        message: "Failed to delete sale record",
+        message: "Failed to delete sale record.",
         type: "error",
       });
     }
