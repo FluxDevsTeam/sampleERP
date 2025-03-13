@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHome,
   faMoneyBill,
+  faPlusCircle,
   faReceipt,
 } from "@fortawesome/free-solid-svg-icons";
 import Navbar from "../../components/NavBar";
@@ -17,6 +18,10 @@ import AddCategoryPage from "./shop-components/Inventory Item Components/AddNewC
 import Sold from "./Sold";
 import AddNewSoldItemPage from "./shop-components/Sold Components/AddNewSoldItemPage";
 import EditSoldItemPage from "./shop-components/Sold Components/EditSoldItemPage";
+
+import Stock from "./Stock";
+import AddNewStockPage from "./shop-components/Stock Components/AddNewStock";
+import EditStockItemPage from "./shop-components/Stock Components/EditStockItemPage";
 
 const Shop = () => {
   document.title = "Shop";
@@ -57,6 +62,14 @@ const Shop = () => {
       name: "Sold",
       // link: "/shop/sold",
     },
+    {
+      id: "5",
+      icon: <FontAwesomeIcon className="text-2xl pr-1" icon={faPlusCircle} />,
+      text: "Stock Added",
+      href: "/shop/stock",
+      name: "Stock Added",
+      // link: "/shop/sold",
+    },
   ];
 
   return (
@@ -76,11 +89,14 @@ const Shop = () => {
           <Route path="/inventory" element={<Dashboard />} />
           <Route path="/add-new-item" element={<AddItemPage />} />
           <Route path="/add-new-category" element={<AddCategoryPage />} />
-          <Route path="/dashboard" element={<Inventory />} />
-          <Route path="/add-new-sold-item" element={<AddNewSoldItemPage />} />
           <Route path="/edit-item/:id" element={<EditItemPage />} />
-          <Route path="/edit-sold-item/:id" element={<EditSoldItemPage />} />
+          <Route path="/dashboard" element={<Inventory />} />
           <Route path="/sold" element={<Sold />} />
+          <Route path="/add-new-sold-item" element={<AddNewSoldItemPage />} />
+          <Route path="/edit-sold-item/:id" element={<EditSoldItemPage />} />
+          <Route path="/stock/" element={<Stock />} />
+          <Route path="/add-new-stock-item" element={<AddNewStockPage />} />
+          <Route path="/edit-stock-item/:id" element={<EditStockItemPage />} />
         </Routes>
       </div>
     </div>

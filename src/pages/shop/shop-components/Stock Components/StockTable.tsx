@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ThreeDots } from "react-loader-spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -12,50 +12,46 @@ import {
 import { useNavigate } from "react-router-dom";
 import Modal from "../Modal";
 
-interface SoldEntry {
+interface StockEntry {
   id: number;
   quantity: string;
   date: string;
-  sold_to: { id: number; name: string };
-  item_sold: {
+  inventory_item: {
     id: number;
+    name: string;
+    image: string;
     dimensions: string;
-    inventory_category: { id: number; name: string };
+    inventory_category?: { id: number; name: string } | null;
   };
-  linked_project: { id: number; name: string };
-  name: string;
-  logistics: string;
   cost_price: string;
-  selling_price: string;
-  total_price: number;
-  profit: number;
+  name: string;
 }
 
 interface DailyData {
   date: string;
-  entries: SoldEntry[];
-  daily_total: number;
+  entries: StockEntry[];
 }
 
 interface ApiResponse {
   daily_data: DailyData[];
-  monthly_total: number;
 }
 
-interface SelectedSale {
+interface SelectedStock {
   id: number;
   name: string;
 }
 
-const SoldTable: React.FC = () => {
-  document.title = "Sold Items - KDC Admin";
+const StockTable: React.FC = () => {
+  document.title = "Stock Items - KDC Admin";
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [soldData, setSoldData] = useState<DailyData[]>([]);
+  const [stockData, setStockData] = useState<DailyData[]>([]);
   const [openDates, setOpenDates] = useState<{ [key: string]: boolean }>({});
   const [showModal, setShowModal] = useState(false);
-  const [selectedSale, setSelectedSale] = useState<SelectedSale | null>(null);
+  const [selectedStock, setSelectedStock] = useState<SelectedStock | null>(
+    null
+  );
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     title: "",
@@ -64,13 +60,13 @@ const SoldTable: React.FC = () => {
   });
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<SoldEntry | null>(null);
+  const [selectedItem, setSelectedItem] = useState<StockEntry | null>(null);
 
   const fetchItems = async () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/sold/"
+        "https://kidsdesigncompany.pythonanywhere.com/api/add-stock/"
       );
 
       if (!response.ok) {
@@ -80,9 +76,9 @@ const SoldTable: React.FC = () => {
       const data: ApiResponse = await response.json();
       console.log(data);
 
-      setSoldData(data.daily_data);
+      setStockData(data.daily_data);
     } catch (error) {
-      console.error("Error fetching sold items:", error);
+      console.error("Error fetching stock items:", error);
     } finally {
       setLoading(false);
     }
@@ -115,10 +111,10 @@ const SoldTable: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (stockId: number) => {
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/sold/${id}/`,
+        `https://kidsdesigncompany.pythonanywhere.com/api/add-stock/${stockId}/`,
         {
           method: "DELETE",
         }
@@ -128,44 +124,44 @@ const SoldTable: React.FC = () => {
         setModalConfig({
           isOpen: true,
           title: "Success",
-          message: "Sale record deleted successfully",
+          message: "Stock record deleted successfully",
           type: "success",
         });
       } else {
-        throw new Error("Failed to delete sale record");
+        throw new Error("Failed to delete stock record");
       }
     } catch (error) {
-      console.error("Error deleting sale record:", error);
+      console.error("Error deleting stock record:", error);
       setModalConfig({
         isOpen: true,
         title: "Error",
-        message: "Failed to delete sale record.",
+        message: "Failed to delete stock record.",
         type: "error",
       });
     }
   };
 
-  const confirmDeleteSale = (id: number) => {
+  const confirmDeleteStock = (id: number) => {
     setConfirmDelete(true);
-    setSelectedSale({ id, name: selectedSale?.name || "" });
+    setSelectedStock({ id, name: selectedStock?.name || "" });
   };
 
   const handleConfirmDelete = async () => {
-    if (selectedSale) {
-      await handleDelete(selectedSale.id);
+    if (selectedStock) {
+      await handleDelete(selectedStock.id);
       setConfirmDelete(false);
       setShowDetailsModal(false);
     }
   };
 
-  const handleViewDetails = (entry: SoldEntry) => {
+  const handleViewDetails = (entry: StockEntry) => {
     setSelectedItem(entry);
     setShowDetailsModal(true);
   };
 
   return (
     <div className="relative">
-      <div className="overflow-x-auto pb-8">
+      <div className={`overflow-x-auto pb-8 ${confirmDelete ? "blur-sm" : ""}`}>
         {loading ? (
           <div className="w-1/5 mx-auto">
             <ThreeDots
@@ -180,14 +176,14 @@ const SoldTable: React.FC = () => {
         ) : (
           <div className="space-y-6 ">
             <button
-              onClick={() => navigate("/shop/add-new-sold-item")}
+              onClick={() => navigate("/shop/add-new-stock-item")}
               className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
             >
               <FontAwesomeIcon className="pr-2" icon={faPlus} />
-              Record Sale
+              Add Stock
             </button>
 
-            {soldData.map((dayData) => (
+            {stockData.map((dayData) => (
               <div
                 key={dayData.date}
                 className="bg-white shadow-md rounded-lg overflow-auto"
@@ -209,23 +205,12 @@ const SoldTable: React.FC = () => {
                       {formatDate(dayData.date)}
                     </h3>
                   </div>
-                  <p
-                    className="font-bold"
-                    style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
-                  >
-                    Total: ₦{dayData.daily_total}
-                  </p>
                 </div>
 
                 {openDates[dayData.date] && (
-                  //////// Table
                   <table className="min-w-full overflow-auto">
-                    {/* Table headers */}
                     <thead className="bg-gray-800">
                       <tr>
-                        {/* <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          ID of sold item
-                        </th> */}
                         <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
                           Name
                         </th>
@@ -233,60 +218,22 @@ const SoldTable: React.FC = () => {
                           Quantity
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Sold To
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Logistics
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Project
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Cost Price
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Selling Price
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Total
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Profit
+                          {/* Details */}
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-bold text-blue-400"></th>
                       </tr>
                     </thead>
-
-                    {/* Table body */}
                     <tbody className="divide-y divide-gray-200">
-                      {dayData.entries.map((entry) => (
-                        <tr key={entry.id} className="hover:bg-gray-50">
+                      {dayData.entries.map((entry, index) => (
+                        <tr
+                          key={entry.id ?? index}
+                          className="hover:bg-gray-50"
+                        >
                           <td className="px-4 py-3 text-sm cursor-pointer hover:text-blue-600">
-                            {entry.name}
+                            {entry.name} / {entry.id}
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {entry.quantity}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            {entry.sold_to?.name || "—"}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            {entry.logistics || "—"}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            {entry.linked_project?.name || "—"}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            ₦{entry.cost_price}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            ₦{entry.selling_price}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-blue-600">
-                            ₦{entry.total_price}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-blue-400">
-                            ₦{entry.profit}
                           </td>
                           <td className="px-4 py-3 text-sm text-blue-400">
                             <button
@@ -308,13 +255,13 @@ const SoldTable: React.FC = () => {
       </div>
 
       {/* delete and edit options modal */}
-      {showModal && selectedSale && (
+      {showModal && selectedStock && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-96">
             <div className="flex justify-between items-center">
               <h3 className="text-lg mb-4 font-medium">
                 <span className="font-semibold  text-blue-20">
-                  {selectedSale.name}
+                  {selectedStock.name}
                 </span>
               </h3>
 
@@ -327,26 +274,25 @@ const SoldTable: React.FC = () => {
             <div className="space-y-3">
               <button
                 onClick={() =>
-                  navigate(`/shop/edit-sold-item/${selectedSale.id}`)
+                  navigate(`/shop/edit-stock-item/${selectedStock.id}`)
                 }
                 className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex items-center justify-center"
               >
                 <FontAwesomeIcon icon={faPencil} className="mr-2" />
-                Edit Sale Record
+                Edit Stock Record
               </button>
               <button
-                onClick={() => confirmDeleteSale(selectedSale.id)}
+                onClick={() => confirmDeleteStock(selectedStock.id)}
                 className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center"
               >
                 <FontAwesomeIcon icon={faTrash} className="mr-2" />
-                Delete Sale Record
+                Delete Stock Record
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* confirmation modal */}
       {confirmDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-96">
@@ -358,7 +304,7 @@ const SoldTable: React.FC = () => {
                 className="cursor-pointer"
               />
             </div>
-            <p>Are you sure you want to delete this sale record?</p>
+            <p>Are you sure you want to delete this stock record?</p>
             <div className="space-y-3 mt-4">
               <button
                 onClick={handleConfirmDelete}
@@ -378,9 +324,11 @@ const SoldTable: React.FC = () => {
       )}
 
       {showDetailsModal && selectedItem && (
-        <div className={`fixed inset-0 flex items-center justify-center z-100 ${
-          confirmDelete ? "blur-sm" : ""
-        }`}>
+        <div
+          className={`fixed inset-0 flex items-center justify-center z-100 ${
+            confirmDelete ? "blur-sm" : ""
+          }`}
+        >
           <div
             className="absolute inset-0 bg-black opacity-50"
             onClick={() => setShowDetailsModal(false)}
@@ -400,53 +348,29 @@ const SoldTable: React.FC = () => {
 
             <div className="space-y-3">
               <p className="text-sm">
-                <span className="font-semibold">Item Category:</span>{" "}
-                {selectedItem.item_sold?.inventory_category.name}
+                <span className="font-semibold">Quantity:</span>{" "}
+                {selectedItem.quantity}
               </p>
               <p className="text-sm">
                 <span className="font-semibold">Date:</span>{" "}
                 {formatDate(selectedItem.date)}
               </p>
               <p className="text-sm">
+                <span className="font-semibold">Item Category:</span>{" "}
+                {selectedItem.inventory_item.inventory_category?.name || "—"}
+              </p>
+              <p className="text-sm">
                 <span className="font-semibold">Dimensions:</span>{" "}
-                {selectedItem.item_sold?.dimensions}
-              </p>
-              <p className="text-sm">
-                <span className="font-semibold">Quantity:</span>{" "}
-                {selectedItem.quantity}
-              </p>
-              <p className="text-sm">
-                <span className="font-semibold">Project:</span>{" "}
-                {selectedItem.linked_project?.name || "—"}
-              </p>
-              <p className="text-sm">
-                <span className="font-semibold">Customer:</span>{" "}
-                {selectedItem.sold_to?.name || "—"}
-              </p>
-              <p className="text-sm">
-                <span className="font-semibold">Logistics:</span>{" "}
-                {selectedItem.logistics || "—"}
+                {selectedItem.inventory_item.dimensions}
               </p>
               <p className="text-sm">
                 <span className="font-semibold">Cost Price:</span> ₦
                 {selectedItem.cost_price}
               </p>
-              <p className="text-sm">
-                <span className="font-semibold">Selling Price:</span> ₦
-                {selectedItem.selling_price}
-              </p>
-              {/* <p className="text-sm">
-                <span className="font-semibold">Total Price:</span> ₦
-                {selectedItem.total_price}
-              </p> */}
-              <p className="text-sm">
-                <span className="font-semibold">Profit:</span> ₦
-                {selectedItem.profit}
-              </p>
             </div>
             <button
               onClick={() =>
-                navigate(`/shop/edit-sold-item/${selectedItem.id}`)
+                navigate(`/shop/edit-stock-item/${selectedItem.id}`)
               }
               className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold"
             >
@@ -454,7 +378,7 @@ const SoldTable: React.FC = () => {
               Edit details
             </button>
             <button
-              onClick={() => confirmDeleteSale(selectedItem.id)}
+              onClick={() => confirmDeleteStock(selectedItem.id)}
               className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
             >
               <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
@@ -475,4 +399,4 @@ const SoldTable: React.FC = () => {
   );
 };
 
-export default SoldTable;
+export default StockTable;

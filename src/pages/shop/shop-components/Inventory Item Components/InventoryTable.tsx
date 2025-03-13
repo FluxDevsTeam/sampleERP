@@ -9,6 +9,7 @@ import {
   faTrash,
   faArrowLeft,
   faArrowRight,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import Modal from "../Modal";
@@ -58,6 +59,7 @@ const Table: React.FC<TableProps> = ({ headers }) => {
     message: "",
     type: "success" as "success" | "error",
   });
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const fetchItems = async () => {
     try {
@@ -160,35 +162,38 @@ const Table: React.FC<TableProps> = ({ headers }) => {
   };
 
   // DELETING ITEM
-  const deleteItem = () => {
+  const deleteItem = async () => {
     if (selectedProduct) {
-      fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${selectedProduct.id}/`,
-        {
-          method: "DELETE",
-        }
-      )
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to delete item");
+      try {
+        const response = await fetch(
+          `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${selectedProduct.id}/`,
+          {
+            method: "DELETE",
           }
-          setModalConfig({
-            isOpen: true,
-            title: "Success",
-            message: "Item deleted successfully!",
-            type: "success",
-          });
-          setShowModal(false);
-        })
-        .catch((error) => {
-          console.error("Error deleting item:", error);
-          setModalConfig({
-            isOpen: true,
-            title: "Error",
-            message: "Failed to delete item",
-            type: "error",
-          });
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to delete item");
+        }
+
+        setModalConfig({
+          isOpen: true,
+          title: "Success",
+          message: "Item deleted successfully!",
+          type: "success",
         });
+        setShowModal(false);
+        setConfirmDelete(false);
+        fetchItems(); // Refresh items
+      } catch (error) {
+        console.error("Error deleting item:", error);
+        setModalConfig({
+          isOpen: true,
+          title: "Error",
+          message: "Failed to delete item",
+          type: "error",
+        });
+      }
     }
   };
 
@@ -206,6 +211,14 @@ const Table: React.FC<TableProps> = ({ headers }) => {
     if (modalConfig.type === "success") {
       window.location.reload();
     }
+  };
+
+  const confirmDeleteItem = () => {
+    setConfirmDelete(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    await deleteItem();
   };
 
   return (
@@ -323,7 +336,11 @@ const Table: React.FC<TableProps> = ({ headers }) => {
 
       {/*   PRODUCT DETAILS   */}
       {showModal && selectedProduct && (
-        <div className="fixed inset-0 flex items-center justify-center z-100">
+        <div
+          className={`fixed inset-0 flex items-center justify-center z-100 ${
+            confirmDelete ? "blur-sm" : ""
+          }`}
+        >
           <div
             className="absolute inset-0 bg-black opacity-50"
             onClick={() => setShowModal(false)}
@@ -403,12 +420,43 @@ const Table: React.FC<TableProps> = ({ headers }) => {
               Edit details
             </button>
             <button
-              onClick={deleteItem}
+              onClick={confirmDeleteItem}
               className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
             >
               <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
               Delete Item
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* confirmation modal */}
+      {confirmDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg mb-4 font-medium">Confirm Deletion</h3>
+              <FontAwesomeIcon
+                icon={faXmark}
+                onClick={() => setConfirmDelete(false)}
+                className="cursor-pointer"
+              />
+            </div>
+            <p>Are you sure you want to delete this item?</p>
+            <div className="space-y-3 mt-4">
+              <button
+                onClick={handleConfirmDelete}
+                className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="w-full py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors flex items-center justify-center"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
