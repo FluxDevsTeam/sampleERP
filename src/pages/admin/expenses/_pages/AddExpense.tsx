@@ -5,14 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import SkeletonLoader from "../_components/SkeletonLoader";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -28,17 +20,19 @@ interface Category {
   name: string;
 }
 
-interface ExpenseData {
-  id?: number;
-  name: string;
-  category: number | null;
-  amount: number | "";
-  quantity: number | "";
-}
-
 interface NewCategoryData {
   name: string;
 }
+
+const fetchProjects = async () => {
+  const response = await axios.get("https://kidsdesigncompany.pythonanywhere.com/api/project/");
+  return response.data.all_projects || [];
+};
+
+const fetchShopItems = async () => {
+  const response = await axios.get("https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/");
+  return response.data.results?.items || [];
+};
 
 const fetchCategories = async (): Promise<Category[]> => {
   const { data } = await axios.get<{ results: Category[] }>(
@@ -47,265 +41,287 @@ const fetchCategories = async (): Promise<Category[]> => {
   return data.results;
 };
 
-const AddExpense: React.FC = () => {
-  const navigate = useNavigate();
+const CategoryDropdown = ({ selectedCategory, onCategoryChange }) => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
-  const { data: categories = [], isLoading } = useQuery<Category[]>({
+  const [newCategory, setNewCategory] = useState<NewCategoryData>({ name: "" });
+
+  const { data: categories = [], isLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: fetchCategories,
   });
 
-  const [formData, setFormData] = useState<ExpenseData>({
-    name: "",
-    category: null,
-    amount: "",
-    quantity: "",
-  });
-
-  const [newCategory, setNewCategory] = useState<NewCategoryData>({
-    name: "",
-  });
-
   const addCategoryMutation = useMutation({
     mutationFn: async (categoryData: NewCategoryData) => {
-      const response = await axios.post(
+      const response = await axios.post<Category>(
         "https://kidsdesigncompany.pythonanywhere.com/api/expense-category/",
         categoryData
       );
       return response.data;
     },
     onSuccess: (data) => {
-      // Add the new category to the existing categories in React Query cache
-      const newCategoryItem: Category = {
-        id: data.id,
-        name: data.name,
-      };
-      
-      queryClient.setQueryData(["categories"], (oldData: Category[] = []) => {
-        return [...oldData, newCategoryItem];
-      });
-      
-      // Set the newly created category as selected
-      setFormData((prev) => ({
-        ...prev,
-        category: data.id,
-      }));
-      
+      queryClient.setQueryData(["categories"], (oldData: Category[] = []) => [
+        ...oldData,
+        { id: data.id, name: data.name },
+      ]);
+
+      onCategoryChange(data.id);
       toast.success("Category added successfully!");
       setNewCategory({ name: "" });
       setIsDialogOpen(false);
     },
-    onError: (error: any) => {
-      const errorMessage = error.response?.data
-        ? Object.values(error.response.data).flat().join(", ")
-        : "Failed to add category. Please try again.";
-      toast.error(errorMessage);
-    },
+    onError: () => toast.error("Failed to add category."),
+  });
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-end justify-between">
+        <Label>Category</Label>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button type="button" variant="outline" size="sm">
+              Create New
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Category</DialogTitle>
+            </DialogHeader>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (newCategory.name.trim()) {
+                  addCategoryMutation.mutate(newCategory);
+                } else {
+                  toast.error("Category name is required");
+                }
+              }}
+            >
+              <div className="space-y-2">
+                <Label htmlFor="categoryName">Category Name</Label>
+                <Input
+                  id="categoryName"
+                  name="name"
+                  value={newCategory.name}
+                  onChange={(e) => setNewCategory({ name: e.target.value })}
+                  required
+                />
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={addCategoryMutation.isPending}>
+                  {addCategoryMutation.isPending ? "Creating..." : "Create Category"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <select
+        id="category"
+        name="category"
+        value={selectedCategory ?? ""}
+        onChange={(e) => onCategoryChange(e.target.value ? Number(e.target.value) : null)}
+        className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required
+      >
+        <option value="">Select Category</option>
+        {isLoading ? <option disabled>Loading...</option> : categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+      </select>
+    </div>
+  );
+};
+
+const AddExpense = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: "",
+    amount: "",
+    quantity: "",
+    selectedItem: "",
+    selectedType: "",
+    category: null,
+    description: "", // Added description field
+  });
+
+  const { data: projects = [], isLoading: isLoadingProjects } = useQuery({
+    queryKey: ["projects"],
+    queryFn: fetchProjects,
+  });
+
+  const { data: shopItems = [], isLoading: isLoadingShop } = useQuery({
+    queryKey: ["shopItems"],
+    queryFn: fetchShopItems,
   });
 
   const addExpenseMutation = useMutation({
-    mutationFn: async (newExpense: ExpenseData) => {
-      if (!newExpense.category) {
-        throw new Error("Category is required");
-      }
-      const response = await axios.post(
-        "https://kidsdesigncompany.pythonanywhere.com/api/expense/",
-        newExpense
-      );
+    mutationFn: async (newExpense) => {
+      if (!newExpense.selectedItem) throw new Error("Please select a project or shop item");
+      
+      // Format the data according to the API expectations
+      const formattedData = {
+        name: newExpense.name,
+        amount: Number(newExpense.amount),
+        quantity: Number(newExpense.quantity),
+        category: newExpense.category,
+        description: newExpense.description || "",
+        // Add the correct field based on selectedType
+        ...(newExpense.selectedType === "project" ? { linked_project: Number(newExpense.selectedItem) } : {}),
+        ...(newExpense.selectedType === "shop" ? { sold_item: Number(newExpense.selectedItem) } : {})
+      };
+
+      const response = await axios.post("https://kidsdesigncompany.pythonanywhere.com/api/expense/", formattedData);
       return response.data;
     },
     onSuccess: () => {
       toast.success("Expense added successfully!");
       navigate("/admin/expenses");
     },
-    onError: (error: any) => {
-      const errorMessage = error.response?.data
-        ? Object.values(error.response.data).flat().join(", ")
-        : "Failed to add expense. Please try again.";
-      toast.error(errorMessage);
+    onError: (error) => {
+      console.error("Error details:", error);
+      toast.error(error.response?.data?.message || "Failed to add expense.");
     },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  const handleSelectItemType = (type, itemId) => {
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        name === "category"
-          ? value ? Number(value) : null
-          : name === "amount" || name === "quantity"
-          ? value === "" ? "" : Number(value)
-          : value,
+      selectedItem: itemId,
+      selectedType: type,
+      // Clear the other selection when one is chosen
+      ...(type === "project" ? { shopItemId: "" } : { projectId: "" })
     }));
-  };
-
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewCategory((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleAddCategory = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newCategory.name.trim()) {
-      toast.error("Category name is required");
-      return;
-    }
-    addCategoryMutation.mutate(newCategory);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Skip category validation if the dialog is open
-    if (!formData.category && !isDialogOpen) {
-      toast.error("Please select a category");
-      return;
-    }
-    
-    // If dialog is open, delay form submission and open the category modal
-    if (isDialogOpen) {
-      e.preventDefault();
-      return;
-    }
-    
-    addExpenseMutation.mutate({
-      ...formData,
-      amount: Number(formData.amount) || 0,
-      quantity: Number(formData.quantity) || 1,
-    });
   };
 
   return (
     <div className="container mx-auto p-4">
-      <Card className="max-w-md mx-auto">
-        <CardHeader>
-          <CardTitle>Add New Expense</CardTitle>
-        </CardHeader>
-        {isLoading ? (
-          <p className="text-center text-gray-500"><SkeletonLoader/></p>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+      <h1 className="text-2xl font-bold mb-6">Add New Expense</h1>
+      
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          addExpenseMutation.mutate(formData);
+        }}
+        className="space-y-4 max-w-2xl mx-auto"
+      >
+        <div>
+          <Label htmlFor="name">Name</Label>
+          <Input 
+            id="name"
+            name="name" 
+            value={formData.name} 
+            onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))} 
+            required 
+          />
+        </div>
 
-              <div className="space-y-2">
-                <div className="flex items-end justify-between">
-                  <Label htmlFor="category">Category</Label>
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button type="button" variant="outline" size="sm">
-                        Create New
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Create New Category</DialogTitle>
-                      </DialogHeader>
-                      <form onSubmit={handleAddCategory}>
-                        <div className="space-y-4 py-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="categoryName">Category Name</Label>
-                            <Input
-                              id="categoryName"
-                              name="name"
-                              value={newCategory.name}
-                              onChange={handleCategoryChange}
-                              required
-                            />
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button 
-                            type="button" 
-                            variant="outline" 
-                            onClick={() => setIsDialogOpen(false)}
-                          >
-                            Cancel
-                          </Button>
-                          <Button 
-                            type="submit" 
-                            disabled={addCategoryMutation.isPending}
-                          >
-                            {addCategoryMutation.isPending ? "Creating..." : "Create Category"}
-                          </Button>
-                        </DialogFooter>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-                <select
-                  id="category"
-                  name="category"
-                  value={formData.category ?? ""}
-                  onChange={handleChange}
-                  className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required={!isDialogOpen} // Only required when dialog is closed
-                >
-                  <option value="">Select Category</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+        <div>
+          <Label htmlFor="description">Description (Optional)</Label>
+          <Input 
+            id="description"
+            name="description" 
+            value={formData.description} 
+            onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))} 
+          />
+        </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount</Label>
-                <Input
-                  id="amount"
-                  name="amount"
-                  type="number"
-                  value={formData.amount}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+        <div>
+          <Label htmlFor="amount">Amount</Label>
+          <Input 
+            id="amount"
+            name="amount" 
+            type="number" 
+            value={formData.amount} 
+            onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))} 
+            required 
+          />
+        </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="quantity">Quantity</Label>
-                <Input
-                  id="quantity"
-                  name="quantity"
-                  type="number"
-                  value={formData.quantity}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/admin/dashboard/expenses")}
+        <div>
+          <Label htmlFor="quantity">Quantity</Label>
+          <Input 
+            id="quantity"
+            name="quantity" 
+            type="number" 
+            value={formData.quantity} 
+            onChange={(e) => setFormData((prev) => ({ ...prev, quantity: e.target.value }))} 
+            required 
+          />
+        </div>
+
+        <div className="space-y-1">
+          <Label className="text-lg font-medium">Select Item Type</Label>
+          <div className="grid grid-cols-2 gap-4 mt-2">
+            <div className="col-span-1">
+              <Label htmlFor="projectSelect" className="block mb-2">Project</Label>
+              <select
+                id="projectSelect"
+                onChange={(e) => handleSelectItemType("project", e.target.value)}
+                value={formData.selectedType === "project" ? formData.selectedItem : ""}
+                disabled={formData.selectedType === "shop" && formData.selectedItem !== ""}
+                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
               >
-                Cancel
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={addExpenseMutation.isPending || isDialogOpen}
+                <option value="">Select a Project</option>
+                {isLoadingProjects ? 
+                  <option disabled>Loading...</option> : 
+                  projects.map((proj) => (
+                    <option key={proj.id} value={proj.id}>{proj.name}</option>
+                  ))
+                }
+              </select>
+            </div>
+            
+            <div className="col-span-1">
+              <Label htmlFor="shopSelect" className="block mb-2">Shop Item</Label>
+              <select
+                id="shopSelect"
+                onChange={(e) => handleSelectItemType("shop", e.target.value)}
+                value={formData.selectedType === "shop" ? formData.selectedItem : ""}
+                disabled={formData.selectedType === "project" && formData.selectedItem !== ""}
+                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
               >
-                {addExpenseMutation.isPending ? "Adding..." : "Add Expense"}
-              </Button>
-            </CardFooter>
-          </form>
-        )}
-      </Card>
+                <option value="">Select a Shop Item</option>
+                {isLoadingShop ? 
+                  <option disabled>Loading...</option> : 
+                  shopItems.map((item) => (
+                    <option key={item.id} value={item.id}>{item.name}</option>
+                  ))
+                }
+              </select>
+            </div>
+          </div>
+          {formData.selectedType && (
+            <p className="text-sm text-blue-600 mt-1">
+              Selected {formData.selectedType === "project" ? "Project" : "Shop Item"}
+            </p>
+          )}
+        </div>
+
+        <CategoryDropdown 
+          selectedCategory={formData.category} 
+          onCategoryChange={(categoryId) => setFormData((prev) => ({ ...prev, category: categoryId }))} 
+        />
+
+        <div className="flex gap-4 pt-4">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => navigate("/admin/expenses")}
+          >
+            Cancel
+          </Button>
+          <Button 
+            type="submit" 
+            disabled={addExpenseMutation.isPending || !formData.selectedItem || !formData.category}
+            className="flex-1"
+          >
+            {addExpenseMutation.isPending ? "Adding..." : "Add Expense"}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };

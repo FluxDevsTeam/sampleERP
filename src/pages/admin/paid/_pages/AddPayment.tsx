@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -16,7 +16,8 @@ import { Label } from "@/components/ui/label";
 
 interface PaymentData {
   amount: number;
-  salary?: number; // Making salary optional to satisfy API
+  recipientId: number;
+  recipientType: "contractor" | "salary-worker";
 }
 
 const AddPayment = () => {
@@ -25,55 +26,75 @@ const AddPayment = () => {
 
   const [formData, setFormData] = useState<PaymentData>({
     amount: 0,
-    salary: undefined, // Keeping it optional
+    recipientId: 0,
+    recipientType: "contractor",
   });
+
+  const [contractors, setContractors] = useState([]);
+  const [salaryWorkers, setSalaryWorkers] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [contractorRes, salaryRes] = await Promise.all([
+          axios.get("https://kidsdesigncompany.pythonanywhere.com/api/contractors/"),
+          axios.get("https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/")
+        ]);
+
+        setContractors(contractorRes.data.results.contractor);
+        setSalaryWorkers(salaryRes.data.results.workers);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Failed to fetch contractors and salary workers");
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const createPaymentMutation = useMutation({
     mutationFn: async (paymentData: PaymentData) => {
-      const response = await axios.post(
-        "https://kidsdesigncompany.pythonanywhere.com/api/paid/",
-        paymentData
-      );
-      return response.data;
+      const formattedData =
+        paymentData.recipientType === "contractor"
+          ? { amount: paymentData.amount, contract: paymentData.recipientId }
+          : { amount: paymentData.amount, salary: paymentData.recipientId };
+
+      try {
+        const response = await axios.post(
+          "https://kidsdesigncompany.pythonanywhere.com/api/paid/",
+          formattedData
+        );
+        return response.data;
+      } catch (error: any) {
+        throw error.response?.data || "Failed to process payment";
+      }
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paid"] });
       toast.success("Payment added successfully!");
-      console.log("Payment Response:", data);
       navigate("/admin/paid");
     },
     onError: (error: any) => {
-      console.error("Error adding payment:", error.response?.data || error.message);
-      
-      // Extracting error message safely
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.error?.[0] ||
-        "Failed to add payment. Please try again.";
-
-      toast.error(errorMessage);
+      console.error("Error adding payment:", error);
+      toast.error(error.error?.[0] || "Failed to add payment. Please try again.");
     },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
-      [name]: value.trim() === "" ? undefined : Number(value),
+      [name]: name === "amount" || name === "recipientId" ? Number(value) : value,
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Ensuring the payload has correct values
-    const payload: PaymentData = { amount: formData.amount };
-    if (formData.salary !== undefined) {
-      payload.salary = formData.salary;
+    if (!formData.recipientId) {
+      toast.error("Please select a valid recipient.");
+      return;
     }
-
-    createPaymentMutation.mutate(payload);
+    createPaymentMutation.mutate(formData);
   };
 
   return (
@@ -97,25 +118,49 @@ const AddPayment = () => {
               />
             </div>
 
-            {/* Salary Field (Optional) */}
             <div className="space-y-2">
-              <Label htmlFor="salary">Salary</Label>
-              <Input
-                id="salary"
-                name="salary"
-                type="number"
-                min="1"
-                value={formData.salary || ""}
+              <Label htmlFor="recipientType">Recipient Type</Label>
+              <select
+                id="recipientType"
+                name="recipientType"
+                value={formData.recipientType}
                 onChange={handleChange}
-              />
+                className="w-full p-2 border rounded"
+              >
+                <option value="contractor">Contractor</option>
+                <option value="salary-worker">Salary Worker</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="recipientId">Select Recipient</Label>
+              <select
+                id="recipientId"
+                name="recipientId"
+                value={formData.recipientId}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+                required
+              >
+                <option value="">-- Select --</option>
+                {formData.recipientType === "contractor" ? (
+                  contractors.map((contractor: any) => (
+                    <option key={contractor.id} value={contractor.id}>
+                      {contractor.first_name} {contractor.last_name}
+                    </option>
+                  ))
+                ) : (
+                  salaryWorkers.map((worker: any) => (
+                    <option key={worker.id} value={worker.id}>
+                      {worker.first_name} {worker.last_name}
+                    </option>
+                  ))
+                )}
+              </select>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate("/admin/paid")}
-            >
+            <Button type="button" variant="outline" onClick={() => navigate("/admin/paid")}>
               Cancel
             </Button>
             <Button type="submit" disabled={createPaymentMutation.isPending}>

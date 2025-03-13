@@ -129,7 +129,7 @@ const EditExpense: React.FC = () => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate("/admin/dashboard/expenses")}
+                onClick={() => navigate("/admin/expenses")}
               >
                 Cancel
               </Button>

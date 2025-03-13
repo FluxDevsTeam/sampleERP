@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
@@ -13,10 +13,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PaymentData {
   amount: number;
   salary?: number;
+  contract?: number;
+  recipientType: "contractor" | "salary-worker";
+  recipientId: number;
 }
 
 const EditPayment = () => {
@@ -26,8 +30,12 @@ const EditPayment = () => {
 
   const [formData, setFormData] = useState<PaymentData>({
     amount: 0,
-    salary: undefined,
+    recipientType: "salary-worker",
+    recipientId: 0,
   });
+
+  const [contractors, setContractors] = useState<any[]>([]);
+  const [salaryWorkers, setSalaryWorkers] = useState<any[]>([]);
 
   // Fetch Payment Data
   const { data, isLoading, error } = useQuery({
@@ -38,15 +46,38 @@ const EditPayment = () => {
       );
       return response.data;
     },
-    enabled: !!id, // Fetch only if ID exists
+    enabled: !!id,
   });
+
+  // Fetch Contractors and Salary Workers
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [contractorRes, salaryRes] = await Promise.all([
+          axios.get("https://kidsdesigncompany.pythonanywhere.com/api/contractors/"),
+          axios.get("https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/")
+        ]);
+
+        setContractors(contractorRes.data.results.contractor);
+        setSalaryWorkers(salaryRes.data.results.workers);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Failed to fetch contractors and salary workers");
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Populate form when data is fetched
   useEffect(() => {
     if (data) {
       setFormData({
         amount: data.amount,
-        salary: data.salary ?? 0, // Ensure salary is a valid number
+        recipientType: data.salary ? "salary-worker" : "contractor",
+        recipientId: data.salary || data.contract || 0,
+        salary: data.salary,
+        contract: data.contract
       });
     }
   }, [data]);
@@ -54,9 +85,14 @@ const EditPayment = () => {
   // Update Payment Mutation
   const updatePaymentMutation = useMutation({
     mutationFn: async (paymentData: PaymentData) => {
+      // Format the data based on recipient type
+      const formattedData = paymentData.recipientType === "contractor"
+        ? { amount: paymentData.amount, contract: paymentData.recipientId }
+        : { amount: paymentData.amount, salary: paymentData.recipientId };
+
       const response = await axios.put(
         `https://kidsdesigncompany.pythonanywhere.com/api/paid/${id}/`,
-        paymentData
+        formattedData
       );
       return response.data;
     },
@@ -73,16 +109,27 @@ const EditPayment = () => {
     },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value ? Number(value) : 0, // Ensure numeric values
+      [name]: name === "amount" || name === "recipientId" ? Number(value) : value,
+    }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "recipientId" ? Number(value) : value,
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.recipientId) {
+      toast.error("Please select a valid recipient.");
+      return;
+    }
     updatePaymentMutation.mutate(formData);
   };
 
@@ -111,15 +158,46 @@ const EditPayment = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="salary">Salary</Label>
-              <Input
-                id="salary"
-                name="salary"
-                type="number"
-                min="1"
-                value={formData.salary ?? ""}
-                onChange={handleChange}
-              />
+              <Label htmlFor="recipientType">Recipient Type</Label>
+              <Select 
+                value={formData.recipientType} 
+                onValueChange={(value) => handleSelectChange("recipientType", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Recipient Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="contractor">Contractor</SelectItem>
+                  <SelectItem value="salary-worker">Salary Worker</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="recipientId">Select Recipient</Label>
+              <Select 
+                value={formData.recipientId.toString()} 
+                onValueChange={(value) => handleSelectChange("recipientId", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Recipient" />
+                </SelectTrigger>
+                <SelectContent>
+                  {formData.recipientType === "contractor" ? (
+                    contractors.map((contractor) => (
+                      <SelectItem key={contractor.id} value={contractor.id.toString()}>
+                        {contractor.first_name} {contractor.last_name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    salaryWorkers.map((worker) => (
+                      <SelectItem key={worker.id} value={worker.id.toString()}>
+                        {worker.first_name} {worker.last_name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
