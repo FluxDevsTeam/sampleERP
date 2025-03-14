@@ -72,10 +72,7 @@ interface ExpensesData {
 const fetchExpenses = async (): Promise<ExpensesData> => {
   const { data } = await axios.get<ExpensesData>("https://kidsdesigncompany.pythonanywhere.com/api/expense/");
   return data;
-
 };
-
-
 
 const ExpensesTable: React.FC = () => {
   const { data, isLoading, error } = useQuery<ExpensesData>({ queryKey: ["expenses"], queryFn: fetchExpenses });
@@ -83,7 +80,7 @@ const ExpensesTable: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   console.log(data);
-  
+
   // States for modal and selected entry
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -130,13 +127,7 @@ const ExpensesTable: React.FC = () => {
     setCollapsed((prev) => ({ ...prev, [date]: !prev[date] }));
   };
 
-  // Helper function to format sold item for display
-  const formatSoldItem = (soldItem: SoldItem | null) => {
-    if (!soldItem) return "N/A";
-    return `ID: ${soldItem.id} - $${soldItem.selling_price}`;
-  };
-
-  if (isLoading) return <SkeletonLoader/>;
+  if (isLoading) return <SkeletonLoader />;
   if (error) return <p>Error loading data</p>;
 
   return (
@@ -152,7 +143,7 @@ const ExpensesTable: React.FC = () => {
         <thead>
           <tr className="bg-gray-500 text-white">
             <th className="border px-4 py-2">Date</th>
-            <th className="border px-4 py-2">Sold Item</th>
+            <th className="border px-4 py-2">Sold Item Price</th>
             <th className="border px-4 py-2">Name</th>
             <th className="border px-4 py-2">Category</th>
             <th className="border px-4 py-2">Project</th>
@@ -177,13 +168,15 @@ const ExpensesTable: React.FC = () => {
 
               {!collapsed[day.date] &&
                 day.entries.map((entry) => (
-                  <tr 
-                    key={entry.id} 
+                  <tr
+                    key={entry.id}
                     className="hover:bg-gray-100 cursor-pointer"
                     onClick={() => handleRowClick(entry)}
                   >
                     <td className="border px-4 py-2">{new Date(day.date).toLocaleDateString()}</td>
-                    <td className="border px-4 py-2">{formatSoldItem(entry.sold_item)}</td>
+                    <td className="border px-4 py-2">
+                      {entry.sold_item ? `$${entry.sold_item.cost_price}` : "N/A"}
+                    </td>
                     <td className="border px-4 py-2">{entry.name}</td>
                     <td className="border px-4 py-2">{entry.expense_category ? entry.expense_category.name : "N/A"}</td>
                     <td className="border px-4 py-2">{entry.linked_project ? entry.linked_project.name : "N/A"}</td>
@@ -195,6 +188,7 @@ const ExpensesTable: React.FC = () => {
           ))}
         </tbody>
       </table>
+
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -270,6 +264,7 @@ const ExpensesTable: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
