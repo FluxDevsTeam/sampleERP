@@ -241,7 +241,7 @@ const Table: React.FC<TableProps> = ({ headers }) => {
               className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
             >
               <FontAwesomeIcon className="pr-2" icon={faPlus} />
-              Add Item
+              Add Item / Category
             </button>
             <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
               <thead>
