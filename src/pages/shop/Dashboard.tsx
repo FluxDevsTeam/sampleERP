@@ -1,16 +1,24 @@
 import DashboardData from "./shop-components/Dashboard Components/DashboardData";
-import Areachart from "./shop-components/Dashboard Components/AreaChart";
+import AmountSoldMonthlyBarChart from "./shop-components/Dashboard Components/Amount-Sold-Monthly-Chart";
+import MonthlyAddedValueSpikedChart from "./shop-components/Dashboard Components/Monthly-Added-Value-Spiked-Chart";
+import MonthlyProfitChart from "./shop-components/Dashboard Components/Monthly-Profit-Chart";
 import Table from "./shop-components/Inventory Item Components/InventoryTable";
+import CategoryTable from "./shop-components/Dashboard Components/CategoryTable";
 import { useEffect, useState } from "react";
 
 const Dashboard = () => {
   document.title = "Dashboard - KDC Admin";
 
   const tableHeaders = ["Product", "Category", "Stock Status", "Details"];
-  // const [totalStock, setTotalStock] = useState(419);
+  const categoryTableHeaders = [
+    "Category",
+    "Total Cost Value",
+    "Total Profit",
+    "Total Stock Value",
+  ];
+
   const [totalCostValue, setTotalCostValue] = useState(419);
   const [monthlyStock, setMonthlyStock] = useState(419);
-  // const [weeklyStock, setWeeklyStock] = useState(419);
   const [totalProfitPotential, setTotalProfitPotential] = useState(419);
   const [profitThisMonth, setProfitThisMonth] = useState(419);
   const [totalShopValue, setTotalShopValue] = useState(419);
@@ -52,12 +60,7 @@ const Dashboard = () => {
   return (
     <div className="w-11/12 mx-auto mt-6 pl-1 pt-2">
       <div className="mb-16">
-        <div className="grid grid-cols-4 gap-3 mb-20">
-          {/* <DashboardData info="Total Stock" digits={totalStock}></DashboardData> */}
-          {/* <DashboardData
-            info="Weekly Stock"
-            digits={weeklyStock}
-          ></DashboardData> */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-20">
           <DashboardData
             info="Monthly Stock Added"
             digits={monthlyStock}
@@ -67,12 +70,12 @@ const Dashboard = () => {
             digits={totalCostValue}
           ></DashboardData>
           <DashboardData
-            info="Profit this month"
-            digits={profitThisMonth}
-          ></DashboardData>
-          <DashboardData
             info="Total Profit Potential"
             digits={totalProfitPotential}
+          ></DashboardData>
+          <DashboardData
+            info="Total Profit this month"
+            digits={profitThisMonth}
           ></DashboardData>
           <DashboardData
             info="Total shop value"
@@ -92,18 +95,28 @@ const Dashboard = () => {
           ></DashboardData>
         </div>
 
-        <div className="grid items-center rounded-sm shadow-md py-4">
-          <Areachart></Areachart>
+        <div className="grid items-center rounded-sm mb-14">
+          <AmountSoldMonthlyBarChart></AmountSoldMonthlyBarChart>
+          <MonthlyAddedValueSpikedChart></MonthlyAddedValueSpikedChart>
+          <MonthlyProfitChart></MonthlyProfitChart>
         </div>
       </div>
 
       <h1
-        style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
+        style={{ fontSize: "clamp(16.5px, 3vw, 27px)" }}
         className="font-semibold mb-5"
       >
         Inventory Items
       </h1>
       <Table headers={tableHeaders} />
+
+      <h1
+        style={{ fontSize: "clamp(16.5px, 3vw, 27px)" }}
+        className="font-semibold mb-5"
+      >
+        Categories
+      </h1>
+      <CategoryTable headers={categoryTableHeaders} />
     </div>
   );
 };

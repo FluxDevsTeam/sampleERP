@@ -26,7 +26,7 @@ import EditStockItemPage from "./shop-components/Stock Components/EditStockItemP
 const Shop = () => {
   document.title = "Shop";
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);

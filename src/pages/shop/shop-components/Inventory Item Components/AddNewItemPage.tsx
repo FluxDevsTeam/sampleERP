@@ -47,7 +47,7 @@ const AddItemPage: React.FC = () => {
       const logData = await response.json();
       console.log(logData);
 
-      setCategories(logData.results);
+      setCategories(logData);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -139,7 +139,7 @@ const AddItemPage: React.FC = () => {
         message: "Category deleted successfully!",
         type: "success",
       });
-      skFn(); // Refresh categories
+      skFn();
     } catch (error) {
       console.error("Error deleting category:", error);
       setModalConfig({

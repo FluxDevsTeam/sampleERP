@@ -46,7 +46,7 @@ const EditItemPage: React.FC = () => {
           "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item-category/"
         );
         const data = await response.json();
-        setCategories(data.results);
+        setCategories(data);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }

@@ -10,6 +10,8 @@ import {
   faArrowLeft,
   faArrowRight,
   faXmark,
+  faAnglesLeft,
+  faAnglesRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import Modal from "../Modal";
@@ -50,7 +52,6 @@ const Table: React.FC<TableProps> = ({ headers }) => {
   );
   const [showImagePreview, setShowImagePreview] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
   const navigate = useNavigate();
   const [modalConfig, setModalConfig] = useState({
@@ -65,7 +66,7 @@ const Table: React.FC<TableProps> = ({ headers }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/?page=${currentPage}&page_size=${itemsPerPage}`
+        `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/`
       );
 
       if (!response.ok) {
@@ -74,8 +75,6 @@ const Table: React.FC<TableProps> = ({ headers }) => {
 
       const data = await response.json();
       // console.log("API Response:", data);
-
-      setTotalPages(Math.ceil(data.count / itemsPerPage));
 
       const updatedTableData: TableData[] = data.results.items.map(
         (item: any) => {
@@ -120,7 +119,17 @@ const Table: React.FC<TableProps> = ({ headers }) => {
 
   useEffect(() => {
     fetchItems();
-  }, [currentPage]);
+  }, []);
+
+  // Calculate pagination values
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(tableData.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
 
   useEffect(() => {
     if (showModal || showImagePreview) {
@@ -139,26 +148,6 @@ const Table: React.FC<TableProps> = ({ headers }) => {
   const handleViewDetails = (product: ProductDetails) => {
     setSelectedProduct(product);
     setShowModal(true);
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
-  };
-
-  const handleLastPage = () => {
-    setCurrentPage(totalPages);
-  };
-
-  const handleFirstPage = () => {
-    setCurrentPage(1);
   };
 
   // DELETING ITEM
@@ -217,20 +206,27 @@ const Table: React.FC<TableProps> = ({ headers }) => {
     setConfirmDelete(true);
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    const button = e.currentTarget;
+    button.disabled = true;
     await deleteItem();
   };
 
   return (
     <div className="relative">
-      <div className="overflow-x-auto pb-8">
+      <div
+        className={`overflow-x-auto pb-6 ${showImagePreview ? "blur-sm" : ""} ${
+          showModal ? "blur-sm" : ""
+        }`}
+      >
         {loading ? (
           <div className="w-1/5 mx-auto">
             <ThreeDots
               visible={true}
               height="80"
               width="80"
-              // color="black"
               color="#60A5FA"
               radius="9"
               ariaLabel="three-dots-loading"
@@ -261,7 +257,7 @@ const Table: React.FC<TableProps> = ({ headers }) => {
                 </tr>
               </thead>
               <tbody>
-                {tableData.map((row, index) => (
+                {currentItems.map((row, index) => (
                   <tr key={index} className="hover:bg-gray-100">
                     {headers.map((header) => (
                       <td
@@ -279,67 +275,49 @@ const Table: React.FC<TableProps> = ({ headers }) => {
         )}
       </div>
 
-      {/* PAGINATION FOR TABLE */}
-      <div className="flex justify-center items-center mb-11 space-x-4">
+      {/* Updated Pagination Controls */}
+      <div className="flex justify-center items-center mb-28 gap-2">
         <button
-          onClick={handleFirstPage}
+          onClick={() => handlePageChange(1)}
           disabled={currentPage === 1}
-          className={`px-3 py-2 rounded text-sm ${
-            currentPage === 1
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-400 hover:bg-blue-500 text-white"
-          }`}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
-          First
+          <FontAwesomeIcon icon={faAnglesLeft} />
+        </button>
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faArrowLeft} />
         </button>
 
-        <button
-          onClick={handlePrevPage}
-          disabled={currentPage === 1}
-          className={`px-3 py-2 rounded text-sm ${
-            currentPage === 1
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-400 hover:bg-blue-500 text-white"
-          }`}
-        >
-          <FontAwesomeIcon icon={faArrowLeft} className="mr-1" />
-        </button>
-
-        <span className="text-gray-500 text-sm">
+        <span className="mx-4">
           Page {currentPage} of {totalPages}
         </span>
 
         <button
-          onClick={handleNextPage}
+          onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className={`px-3 py-2 rounded text-sm ${
-            currentPage === totalPages
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-400 hover:bg-blue-500 text-white"
-          }`}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
-          <FontAwesomeIcon icon={faArrowRight} className="ml-1" />
+          <FontAwesomeIcon icon={faArrowRight} />
         </button>
-
         <button
-          onClick={handleLastPage}
+          onClick={() => handlePageChange(totalPages)}
           disabled={currentPage === totalPages}
-          className={`px-3 py-2 rounded text-sm ${
-            currentPage === totalPages
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-400 hover:bg-blue-500 text-white"
-          }`}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
-          Last
+          <FontAwesomeIcon icon={faAnglesRight} />
         </button>
       </div>
 
       {/*   PRODUCT DETAILS   */}
       {showModal && selectedProduct && (
         <div
-          className={`fixed inset-0 flex items-center justify-center z-100 ${
+          className={`fixed inset-0 flex items-center justify-center z-[100] ${
             confirmDelete ? "blur-sm" : ""
-          }`}
+          } ${showImagePreview ? "blur-sm" : ""}`}
         >
           <div
             className="absolute inset-0 bg-black opacity-50"
@@ -404,12 +382,12 @@ const Table: React.FC<TableProps> = ({ headers }) => {
               {selectedProduct.sellingPrice}
             </p>
             <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Total Price:</span> &#8358;{" "}
-              {selectedProduct.totalPrice}
-            </p>
-            <p className="text-sm text-gray-20 mb-3">
               <span className="font-semibold">Profit per item:</span> &#8358;{" "}
               {selectedProduct.profitPerItem}
+            </p>
+            <p className="text-sm text-gray-20 mb-3">
+              <span className="font-semibold">Total Price:</span> &#8358;{" "}
+              {selectedProduct.totalPrice}
             </p>
 
             <button
@@ -432,7 +410,7 @@ const Table: React.FC<TableProps> = ({ headers }) => {
 
       {/* confirmation modal */}
       {confirmDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
           <div className="bg-white rounded-lg p-6 w-96">
             <div className="flex justify-between items-center">
               <h3 className="text-lg mb-4 font-medium">Confirm Deletion</h3>

@@ -13,18 +13,16 @@ import { useNavigate } from "react-router-dom";
 import Modal from "../Modal";
 
 interface StockEntry {
-  id: number;
-  quantity: string;
+  cost_price: string;
   date: string;
+  id: number;
   inventory_item: {
     id: number;
     name: string;
     image: string;
-    dimensions: string;
-    inventory_category?: { id: number; name: string } | null;
   };
-  cost_price: string;
   name: string;
+  quantity: string;
 }
 
 interface DailyData {
@@ -220,7 +218,6 @@ const StockTable: React.FC = () => {
                         <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
                           {/* Details */}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400"></th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -230,7 +227,7 @@ const StockTable: React.FC = () => {
                           className="hover:bg-gray-50"
                         >
                           <td className="px-4 py-3 text-sm cursor-pointer hover:text-blue-600">
-                            {entry.name} / {entry.id}
+                            {entry.name}
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {entry.quantity}
@@ -354,14 +351,6 @@ const StockTable: React.FC = () => {
               <p className="text-sm">
                 <span className="font-semibold">Date:</span>{" "}
                 {formatDate(selectedItem.date)}
-              </p>
-              <p className="text-sm">
-                <span className="font-semibold">Item Category:</span>{" "}
-                {selectedItem.inventory_item.inventory_category?.name || "—"}
-              </p>
-              <p className="text-sm">
-                <span className="font-semibold">Dimensions:</span>{" "}
-                {selectedItem.inventory_item.dimensions}
               </p>
               <p className="text-sm">
                 <span className="font-semibold">Cost Price:</span> ₦
