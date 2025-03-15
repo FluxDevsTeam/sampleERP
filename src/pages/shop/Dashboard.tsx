@@ -2,14 +2,14 @@ import DashboardData from "./shop-components/Dashboard Components/DashboardData"
 import AmountSoldMonthlyBarChart from "./shop-components/Dashboard Components/Amount-Sold-Monthly-Chart";
 import MonthlyAddedValueSpikedChart from "./shop-components/Dashboard Components/Monthly-Added-Value-Spiked-Chart";
 import MonthlyProfitChart from "./shop-components/Dashboard Components/Monthly-Profit-Chart";
-import Table from "./shop-components/Inventory Item Components/InventoryTable";
+// import Table from "./shop-components/Inventory Item Components/InventoryTable";
 import CategoryTable from "./shop-components/Dashboard Components/CategoryTable";
 import { useEffect, useState } from "react";
 
 const Dashboard = () => {
   document.title = "Dashboard - KDC Admin";
 
-  const tableHeaders = ["Product", "Category", "Stock Status", "Details"];
+  // const tableHeaders = ["Product", "Category", "Stock Status", "Details"];
   const categoryTableHeaders = [
     "Category",
     "Total Cost Value",
@@ -95,20 +95,14 @@ const Dashboard = () => {
           ></DashboardData>
         </div>
 
-        <div className="grid items-center rounded-sm mb-14">
+        <div className="grid gap-10 md:grid-cols-2 items-center justify-center rounded-sm mb-9">
           <AmountSoldMonthlyBarChart></AmountSoldMonthlyBarChart>
           <MonthlyAddedValueSpikedChart></MonthlyAddedValueSpikedChart>
-          <MonthlyProfitChart></MonthlyProfitChart>
         </div>
-      </div>
 
-      <h1
-        style={{ fontSize: "clamp(16.5px, 3vw, 27px)" }}
-        className="font-semibold mb-5"
-      >
-        Inventory Items
-      </h1>
-      <Table headers={tableHeaders} />
+
+        <MonthlyProfitChart></MonthlyProfitChart>
+      </div>
 
       <h1
         style={{ fontSize: "clamp(16.5px, 3vw, 27px)" }}

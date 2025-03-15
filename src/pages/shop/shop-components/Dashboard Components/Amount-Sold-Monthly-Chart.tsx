@@ -10,22 +10,22 @@ import {
 } from "recharts";
 
 const AmountSoldMonthlyBarChart = () => {
-  const [month1, setMonth1] = useState("January");
+  const [month1, setMonth1] = useState("Jan");
   const [month1Num, setMonth1Num] = useState(
     Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
   );
 
-  const [month2, setMonth2] = useState("February");
+  const [month2, setMonth2] = useState("Feb");
   const [month2Num, setMonth2Num] = useState(
     Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
   );
 
-  const [month3, setMonth3] = useState("March");
+  const [month3, setMonth3] = useState("Mar");
   const [month3Num, setMonth3Num] = useState(
     Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
   );
 
-  const [month4, setMonth4] = useState("April");
+  const [month4, setMonth4] = useState("Apr");
   const [month4Num, setMonth4Num] = useState(
     Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
   );
@@ -35,37 +35,37 @@ const AmountSoldMonthlyBarChart = () => {
     Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
   );
 
-  const [month6, setMonth6] = useState("June");
+  const [month6, setMonth6] = useState("Jun");
   const [month6Num, setMonth6Num] = useState(
     Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
   );
 
-  const [month7, setMonth7] = useState("July");
+  const [month7, setMonth7] = useState("Jul");
   const [month7Num, setMonth7Num] = useState(
     Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
   );
 
-  const [month8, setMonth8] = useState("August");
+  const [month8, setMonth8] = useState("Aug");
   const [month8Num, setMonth8Num] = useState(
     Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
   );
 
-  const [month9, setMonth9] = useState("September");
+  const [month9, setMonth9] = useState("Sept");
   const [month9Num, setMonth9Num] = useState(
     Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
   );
 
-  const [month10, setMonth10] = useState("October");
+  const [month10, setMonth10] = useState("Oct");
   const [month10Num, setMonth10Num] = useState(
     Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
   );
 
-  const [month11, setMonth11] = useState("November");
+  const [month11, setMonth11] = useState("Nov");
   const [month11Num, setMonth11Num] = useState(
     Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
   );
 
-  const [month12, setMonth12] = useState("December");
+  const [month12, setMonth12] = useState("Dec");
   const [month12Num, setMonth12Num] = useState(
     Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
   );
@@ -147,13 +147,13 @@ const AmountSoldMonthlyBarChart = () => {
     <div>
       <h1
         style={{ fontSize: "clamp(16.5px, 3vw, 23px)" }}
-        className="font-semibold mb-5"
+        className="font-semibold mb-2"
       >
         Amount Sold Monthly
       </h1>
       <ResponsiveContainer
         width="100%"
-        height={400}
+        height={447}
       >
         <BarChart data={data} className="bg-white">
           <defs>
@@ -167,7 +167,7 @@ const AmountSoldMonthlyBarChart = () => {
           <YAxis />
           <Tooltip />
           <Bar
-            type="monotone"
+            // type="monotone"
             dataKey="value"
             stroke="#0178a3"
             fillOpacity={1}
