@@ -95,7 +95,7 @@ const Dashboard = () => {
           ></DashboardData>
         </div>
 
-        <div className="grid gap-10 md:grid-cols-2 items-center justify-center rounded-sm mb-9">
+        <div className="grid gap-10 md:grid-cols-2 items-center rounded-sm mb-9">
           <AmountSoldMonthlyBarChart></AmountSoldMonthlyBarChart>
           <MonthlyAddedValueSpikedChart></MonthlyAddedValueSpikedChart>
         </div>
