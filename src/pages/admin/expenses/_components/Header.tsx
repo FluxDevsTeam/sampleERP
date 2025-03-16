@@ -31,7 +31,7 @@ const Header = () => {
     <div className="p-6">
       <p className="md:text-3xl text-black font-bold py-6">Expenses Overview</p>
 
-      <div className="md:grid grid-cols-4 grid grid-cols-1 md:space-x-4 space-x-0 md:space-y-0 space-y-4">
+      <div className="md:grid md:grid-cols-4 grid grid-cols-1 md:space-x-4 space-x-0 md:space-y-0 space-y-4">
         {[
           { label: "Monthly Total", value: data?.monthly_total },
           { label: "Weekly Total", value: data?.weekly_total },

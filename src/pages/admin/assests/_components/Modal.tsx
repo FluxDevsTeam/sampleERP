@@ -53,18 +53,20 @@ const Modals = ({ selectedAsset, isModalOpen, setIsModalOpen, isDeleteDialogOpen
             </div>
           )}
 
-<DialogFooter className="flex justify-between">
+<DialogFooter >
+
+  <div className="flex justify-around items-center w-full ">
   <Button variant="outline" onClick={() => setIsModalOpen(false)}>
     Close
   </Button>
-  <div className="flex gap-2">
+
     <Button variant="outline" onClick={handleEdit}>
       Edit
     </Button>
     <Button variant="destructive" onClick={handleDelete}>
       Delete
     </Button>
-  </div>
+    </div>
 </DialogFooter>
 
         </DialogContent>

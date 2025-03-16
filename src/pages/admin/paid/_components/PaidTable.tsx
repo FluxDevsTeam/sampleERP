@@ -183,19 +183,21 @@ const PaidTable: React.FC = () => {
             </div>
           )}
 
-          <DialogFooter className="flex justify-between sm:justify-between">
-            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-              Close
-            </Button>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={handleEdit}>
-                Edit
-              </Button>
-              <Button variant="destructive" onClick={handleDelete}>
-                Delete
-              </Button>
-            </div>
-          </DialogFooter>
+<DialogFooter >
+
+<div className="flex justify-around items-center w-full ">
+<Button variant="outline" onClick={() => setIsModalOpen(false)}>
+  Close
+</Button>
+
+  <Button variant="outline" onClick={handleEdit}>
+    Edit
+  </Button>
+  <Button variant="destructive" onClick={handleDelete}>
+    Delete
+  </Button>
+  </div>
+</DialogFooter>
         </DialogContent>
       </Dialog>
       

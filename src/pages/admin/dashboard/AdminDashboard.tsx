@@ -36,7 +36,7 @@ const AdminDashboard = () => {
   return (
     <div className="p-6 space-y-6">
    <Header />
-      {/* Two charts in a row */}
+    
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Workers Data */}
         <div>

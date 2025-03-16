@@ -57,6 +57,12 @@ import {
 import { ShopDashboard,ShopSharedLayout } from "./pages/shop";
 import EditPayment from "./pages/admin/paid/_pages/EditPayment";
 import AddPayment from "./pages/admin/paid/_pages/AddPayment";
+import AddSalaryWorker from "./pages/admin/workers/_pages/_salaryWorkers/AddSalaryWorker";
+import AddContractor from "./pages/admin/workers/_pages/_contractors/AddContractor";
+import EditSalaryWorker from "./pages/admin/workers/_pages/_salaryWorkers/EditSalaryWorker";
+import EditContractor from "./pages/admin/workers/_pages/_contractors/EditContractor";
+import SalaryWorkerRecords from "./pages/admin/workers/_records/_salaryWorksRecords/SalaryWorkersecord";
+import ContractorRecords from "./pages/admin/workers/_records/_contractorsRecords/ContractorRecords";
 
 const router = createBrowserRouter([
   {
@@ -256,6 +262,30 @@ const router = createBrowserRouter([
       {
         path: "edit-expense/:id",
         element: <EditExpense />,
+      },
+      {
+        path: "add-worker",
+        element: <AddSalaryWorker />,
+      },
+      {
+        path: "add-contractor",
+        element: <AddContractor />,
+      },
+      {
+        path: "edit-worker/:id",
+        element: <EditSalaryWorker />,
+      },
+      {
+        path: "edit-contractor/:id",
+        element: <EditContractor />,
+      },
+      {
+        path: "salary-workers/:id/records",
+        element: <SalaryWorkerRecords />,
+      },
+      {
+        path: "contractors/:id/records",
+        element: <ContractorRecords/>,
       },
    
     ],

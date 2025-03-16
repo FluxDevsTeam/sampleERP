@@ -1,0 +1,93 @@
+import { useQuery } from "@tanstack/react-query";
+import SalaryWorkersHeader from "./SalaryWorkersHeader";
+import ContractorHeader from "./ContractorHeader";
+
+interface SalaryWorkersSummary {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: {
+    salary_workers_count: number;
+    active_salary_workers_count: number;
+    total_salary_workers_monthly_pay: number;
+    total_paid: number;
+  };
+}
+
+interface ContractorsSummary {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: {
+    all_contractors_count: number;
+    all_active_contractors_count: number;
+    total_contractors_monthly_pay: number;
+    total_contractors_weekly_pay: number;
+  };
+}
+
+// Fetch salary workers data
+const fetchSalaryWorkersData = async (): Promise<SalaryWorkersSummary> => {
+  const response = await fetch("https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/");
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+};
+
+// Fetch contractors data
+const fetchContractorsData = async (): Promise<ContractorsSummary> => {
+  const response = await fetch("https://kidsdesigncompany.pythonanywhere.com/api/contractors/");
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+};
+
+const Header = () => {
+  // Fetch salary workers data
+  const {
+    data: salaryWorkersData,
+    isLoading: isSalaryWorkersLoading,
+    error: salaryWorkersError,
+  } = useQuery<SalaryWorkersSummary, Error>({
+    queryKey: ["SalaryWorkersSummary"],
+    queryFn: fetchSalaryWorkersData,
+  });
+
+  // Fetch contractors data
+  const {
+    data: contractorsData,
+    isLoading: isContractorsLoading,
+    error: contractorsError,
+  } = useQuery<ContractorsSummary, Error>({
+    queryKey: ["ContractorsSummary"],
+    queryFn: fetchContractorsData,
+  });
+
+  if (isSalaryWorkersLoading || isContractorsLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (salaryWorkersError || contractorsError) {
+    return (
+      <p>
+        Error: {salaryWorkersError?.message || contractorsError?.message}
+      </p>
+    );
+  }
+
+  // Ensure data is defined before rendering child components
+  if (!salaryWorkersData || !contractorsData) {
+    return <p>No data available</p>;
+  }
+
+  return (
+    <div className="flex flex-col">
+      <SalaryWorkersHeader data={salaryWorkersData} />
+      <ContractorHeader data={contractorsData} />
+    </div>
+  );
+};
+
+export default Header;
