@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import AddRecordPopup from "./AddRecordPopUp";
 import EditRecordPopup from "./EditRecordPopUp";
 import {
@@ -35,8 +35,8 @@ const SalaryWorkerRecords = () => {
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<SalaryWorkerRecord | null>(null);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); // State for delete confirmation popup
-  const [recordToDelete, setRecordToDelete] = useState<number | null>(null); // Track which record to delete
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState<number | null>(null);
 
   const fetchRecords = async () => {
     const response = await axios.get(
@@ -59,7 +59,7 @@ const SalaryWorkerRecords = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["salary-worker-records", id] });
       toast.success("Record deleted successfully!");
-      setIsDeleteDialogOpen(false); // Close the confirmation popup
+      setIsDeleteDialogOpen(false);
     },
     onError: () => {
       toast.error("Failed to delete record. Please try again.");
@@ -67,13 +67,13 @@ const SalaryWorkerRecords = () => {
   });
 
   const handleDeleteRecord = (recordId: number) => {
-    setRecordToDelete(recordId); // Set the record to delete
-    setIsDeleteDialogOpen(true); // Open the confirmation popup
+    setRecordToDelete(recordId);
+    setIsDeleteDialogOpen(true);
   };
 
   const confirmDelete = () => {
     if (recordToDelete !== null) {
-      deleteRecordMutation.mutate(recordToDelete); // Perform the deletion
+      deleteRecordMutation.mutate(recordToDelete);
     }
   };
 
@@ -87,16 +87,14 @@ const SalaryWorkerRecords = () => {
 
   return (
     <div className="container mx-auto p-4">
-      
-      <div className="max-w-md mx-auto font-bold text-2xl p-4">  Salary Wokers Records</div>
+      <div className="max-w-md mx-auto font-bold text-2xl p-4">Salary Workers Records</div>
       <Button onClick={() => setIsAddPopupOpen(true)} className="mt-4">
         Add Record
       </Button>
-
       <div className="mt-4">
         {records?.map((record: SalaryWorkerRecord) => (
           <Card key={record.id} className="mb-4 shadow-md hover:shadow-lg transition-shadow duration-200">
-            <CardContent className="p-4 ">
+            <CardContent className="p-4 space-y-5">
               <p className="text-sm text-gray-500">
                 Name: {`${record.worker.first_name} ${record.worker.last_name}`}
               </p>
@@ -107,10 +105,7 @@ const SalaryWorkerRecords = () => {
               <Button variant="outline" onClick={() => handleEditRecord(record)}>
                 Edit
               </Button>
-              <Button
-                variant="destructive"
-                onClick={() => handleDeleteRecord(record.id)}
-              >
+              <Button variant="destructive" onClick={() => handleDeleteRecord(record.id)}>
                 Delete
               </Button>
             </CardFooter>
@@ -118,14 +113,7 @@ const SalaryWorkerRecords = () => {
         ))}
       </div>
 
-      {/* Add Record Popup */}
-      <AddRecordPopup
-        isOpen={isAddPopupOpen}
-        onClose={() => setIsAddPopupOpen(false)}
-        salaryWorkerId={id!}
-      />
-
-      {/* Edit Record Popup */}
+      <AddRecordPopup isOpen={isAddPopupOpen} onClose={() => setIsAddPopupOpen(false)} salaryWorkerId={id!} />
       {selectedRecord && (
         <EditRecordPopup
           isOpen={isEditPopupOpen}
@@ -134,8 +122,6 @@ const SalaryWorkerRecords = () => {
           record={selectedRecord}
         />
       )}
-
-      {/* Delete Confirmation Popup */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -148,9 +134,7 @@ const SalaryWorkerRecords = () => {
             <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>
-              Delete
-            </AlertDialogAction>
+            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -102,59 +102,63 @@ const PaidTable: React.FC = () => {
   };
 
   if (isLoading) return <SkeletonLoader />;
-  if (error) return <p>Error loading data</p>;
+  if (error) return <p className="text-red-600">Error: {(error as Error).message}</p>;
 
   return (
-    <div className="overflow-x-auto p-4">
-      <Link
-        to="/admin/add-payment"
-        className="bg-neutral-900 text-white px-4 py-2 rounded-md mb-4 inline-block"
-      >
-        Add Payment
-      </Link>
+    <div className="p-6 flex flex-col h-full bg-white">
+      <div className="flex justify-between items-center mb-6">
+        <Link
+          to="/admin/add-payment"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+        >
+          Add Payment
+        </Link>
+      </div>
 
-      <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
-        <thead>
-          <tr className="bg-gray-500 text-white">
-            <th className="border px-4 py-2">Date</th>
-            <th className="border px-4 py-2">Amount</th>
-            <th className="border px-4 py-2">Salary</th>
-            <th className="border px-4 py-2">Contract</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data?.daily_data.map((day) => (
-            <React.Fragment key={day.date}>
-              <tr
-                className="bg-gray-400 cursor-pointer"
-                onClick={() => toggleCollapse(day.date)}
-              >
-                <td className="border px-4 py-2 font-bold" colSpan={4}>
-                  <div className="flex justify-between w-full">
-                    <span>{day.date}</span>
-                    <span>(Total: {day.daily_total})</span>
-                  </div>
-                </td>
-              </tr>
+      <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
+        <table className="min-w-full bg-white">
+          <thead className="bg-gray-400">
+            <tr>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Date</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Amount</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Salary</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Contract</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {data?.daily_data.map((day) => (
+              <React.Fragment key={day.date}>
+                <tr
+                  className="bg-gray-100 cursor-pointer"
+                  onClick={() => toggleCollapse(day.date)}
+                >
+                  <td className="px-6 py-4 text-sm font-semibold text-neutral-900 uppercase" colSpan={4}>
+                    <div className="flex justify-between w-full">
+                      <span>{day.date}</span>
+                      <span>(Total: {day.daily_total})</span>
+                    </div>
+                  </td>
+                </tr>
 
-              {!collapsed[day.date] &&
-                day.entries.map((entry) => (
-                  <tr 
-                    key={entry.id} 
-                    className="hover:bg-gray-100 cursor-pointer"
-                    onClick={() => handleRowClick(entry)}
-                  >
-                    <td className="border px-4 py-2">{new Date(day.date).toLocaleDateString()}</td>
-                    <td className="border px-4 py-2">{entry.amount}</td>
-                    <td className="border px-4 py-2">{entry.salary}</td>
-                    <td className="border px-4 py-2">{entry.contract}</td>
-                  </tr>
-                ))}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
-      
+                {!collapsed[day.date] &&
+                  day.entries.map((entry) => (
+                    <tr
+                      key={entry.id}
+                      className="hover:bg-gray-50 transition duration-150 ease-in-out cursor-pointer"
+                      onClick={() => handleRowClick(entry)}
+                    >
+                      <td className="px-6 py-4 text-sm text-neutral-700">{new Date(day.date).toLocaleDateString()}</td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">{entry.amount}</td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">{entry.salary}</td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">{entry.contract}</td>
+                    </tr>
+                  ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -183,24 +187,22 @@ const PaidTable: React.FC = () => {
             </div>
           )}
 
-<DialogFooter >
-
-<div className="flex justify-around items-center w-full ">
-<Button variant="outline" onClick={() => setIsModalOpen(false)}>
-  Close
-</Button>
-
-  <Button variant="outline" onClick={handleEdit}>
-    Edit
-  </Button>
-  <Button variant="destructive" onClick={handleDelete}>
-    Delete
-  </Button>
-  </div>
-</DialogFooter>
+          <DialogFooter>
+            <div className="flex justify-around items-center w-full">
+              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+                Close
+              </Button>
+              <Button variant="outline" onClick={handleEdit}>
+                Edit
+              </Button>
+              <Button variant="destructive" onClick={handleDelete}>
+                Delete
+              </Button>
+            </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

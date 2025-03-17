@@ -1,4 +1,4 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
@@ -119,58 +119,68 @@ const Contractors = () => {
   }, [currentPage, queryClient, totalPages]);
 
   if (isLoading) return <SkeletonLoader />;
-  if (error) return <p>Error: {(error as Error).message}</p>;
+  if (error) return <p className="text-red-600">Error: {(error as Error).message}</p>;
 
   const contractors = data?.results?.contractor || [];
   const hasNextPage = !!data?.next;
   const hasPreviousPage = !!data?.previous;
 
   return (
-    <div className="p-4 flex flex-col h-full">
-      <div className="flex justify-between items-center mb-4">
+    <div className="p-6 flex flex-col h-full bg-white">
+      <div className="flex justify-between items-center mb-6">
         <Link
           to="/admin/add-contractor"
-          className="bg-neutral-900 text-white px-4 py-2 rounded-md inline-block"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
         >
           Add Contractor
         </Link>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-700">
             Showing page {currentPage} of {totalPages}
           </span>
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto">
-        <table className="min-w-full bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2">Name</th>
-              <th className="border px-4 py-2">Email</th>
-              <th className="border px-4 py-2">Craft Specialty</th>
-              <th className="border px-4 py-2">Years of Experience</th>
-              <th className="border px-4 py-2">Active</th>
+      <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
+        <table className="min-w-full bg-white">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Name</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Email</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Craft Specialty</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Years of Experience</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Active</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-200">
             {contractors.map((contractor) => (
               <tr
                 key={contractor.id}
-                className="text-center border hover:bg-gray-50 cursor-pointer"
+                className="hover:bg-gray-50 transition duration-150 ease-in-out cursor-pointer"
                 onClick={() => handleRowClick(contractor)}
               >
-                <td className="border px-4 py-2">{`${contractor.first_name} ${contractor.last_name}`}</td>
-                <td className="border px-4 py-2">{contractor.email}</td>
-                <td className="border px-4 py-2">{contractor.craft_specialty}</td>
-                <td className="border px-4 py-2">{contractor.years_of_experience}</td>
-                <td className="border px-4 py-2">{contractor.is_still_active ? "Yes" : "No"}</td>
+                <td className="px-6 py-4 text-sm text-neutral-700">{`${contractor.first_name} ${contractor.last_name}`}</td>
+                <td className="px-6 py-4 text-sm text-neutral-700">{contractor.email}</td>
+                <td className="px-6 py-4 text-sm text-neutral-700">{contractor.craft_specialty}</td>
+                <td className="px-6 py-4 text-sm text-neutral-700">{contractor.years_of_experience}</td>
+                <td className="px-6 py-4 text-sm text-neutral-700">
+                  {contractor.is_still_active ? (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Yes
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      No
+                    </span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-6">
         <PaginationComponent
           currentPage={currentPage}
           totalPages={totalPages}
@@ -180,18 +190,17 @@ const Contractors = () => {
         />
       </div>
 
-      {/* Importing Modals Component */}
       <Modals
-  isModalOpen={isModalOpen}
-  setIsModalOpen={setIsModalOpen}
-  selectedWorker={selectedContractor}
-  handleEdit={handleEdit}
-  handleDelete={handleDelete}
-  isDeleteDialogOpen={isDeleteDialogOpen}
-  setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-  confirmDelete={confirmDelete}
-  workerType="contractor" // Pass worker type
-/>
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        selectedWorker={selectedContractor}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        confirmDelete={confirmDelete}
+        workerType="contractor"
+      />
     </div>
   );
 };

@@ -30,7 +30,7 @@ const Header = () => {
                 <span className="text-green-200">
                   <MdArrowOutward />
                 </span>
-                <span>${Number(value).toLocaleString()}</span>
+                <span>NGN{Number(value).toLocaleString()}</span>
               </div>
             </div>
           ))}

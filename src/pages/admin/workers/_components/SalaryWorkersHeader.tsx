@@ -19,10 +19,10 @@ interface SalaryWorkersHeaderProps {
 
 const SalaryWorkersHeader = ({ data }: SalaryWorkersHeaderProps) => {
   const summaryItems = [
-    { label: "Total Salary Workers", value: data.results.salary_workers_count },
-    { label: "Active Salary Workers", value: data.results.active_salary_workers_count },
-    { label: "Total Monthly Pay", value: `NGN${data.results.total_salary_workers_monthly_pay}` },
-    { label: "Total Paid", value: `NGN${data.results.total_paid}` },
+    { label: "Total Salary Workers", value:`NGN ${data.results.salary_workers_count }`},
+    { label: "Active Salary Workers", value:`NGN ${data.results.active_salary_workers_count }`},
+    { label: "Total Monthly Pay", value: `NGN ${data.results.total_salary_workers_monthly_pay}` },
+    { label: "Total Paid", value: `NGN ${data.results.total_paid}` },
   ];
 
   return (

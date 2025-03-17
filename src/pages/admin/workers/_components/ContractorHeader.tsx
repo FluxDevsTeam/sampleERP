@@ -21,8 +21,8 @@ const ContractorHeader = ({ data }: ContractorHeaderProps) => {
   const summaryItems = [
     { label: "Total Contractors", value: data.results.all_contractors_count },
     { label: "Active Contractors", value: data.results.all_active_contractors_count },
-    { label: "Total Monthly Pay", value: `$${data.results.total_contractors_monthly_pay}` },
-    { label: "Total Weekly Pay", value: `$${data.results.total_contractors_weekly_pay}` },
+    { label: "Total Monthly Pay", value: `NGN ${data.results.total_contractors_monthly_pay}` },
+    { label: "Total Weekly Pay", value: `NGN ${data.results.total_contractors_weekly_pay}` },
   ];
 
   return (

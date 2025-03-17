@@ -43,7 +43,7 @@ const Modals = ({ selectedAsset, isModalOpen, setIsModalOpen, isDeleteDialogOpen
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium">Value:</span>
-                <span className="col-span-2">${selectedAsset.value}</span>
+                <span className="col-span-2">NGN{selectedAsset.value}</span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium">Expected Lifespan :</span>

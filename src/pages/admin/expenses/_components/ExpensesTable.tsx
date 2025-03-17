@@ -79,7 +79,6 @@ const ExpensesTable: React.FC = () => {
   const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  console.log(data);
 
   // States for modal and selected entry
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
@@ -128,66 +127,74 @@ const ExpensesTable: React.FC = () => {
   };
 
   if (isLoading) return <SkeletonLoader />;
-  if (error) return <p>Error loading data</p>;
+  if (error) return <p className="text-red-600">Error: {(error as Error).message}</p>;
 
   return (
-    <div className="overflow-x-auto p-4">
-      <Link
-        to="/admin/add-expense"
-        className="bg-neutral-900 text-white px-4 py-2 rounded-md mb-4 inline-block"
-      >
-        Add Expense
-      </Link>
+    <div className="p-6 flex flex-col h-full bg-white">
+      <div className="flex justify-between items-center mb-6">
+        <Link
+          to="/admin/add-expense"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+        >
+          Add Expense
+        </Link>
+      </div>
 
-      <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
-        <thead>
-          <tr className="bg-gray-500 text-white">
-            <th className="border px-4 py-2">Date</th>
-            <th className="border px-4 py-2">Sold Item Price</th>
-            <th className="border px-4 py-2">Name</th>
-            <th className="border px-4 py-2">Category</th>
-            <th className="border px-4 py-2">Project</th>
-            <th className="border px-4 py-2">Amount</th>
-            <th className="border px-4 py-2">Quantity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data?.daily_data.map((day) => (
-            <React.Fragment key={day.date}>
-              <tr
-                className="bg-gray-400 cursor-pointer"
-                onClick={() => toggleCollapse(day.date)}
-              >
-                <td className="border px-4 py-2 font-bold" colSpan={7}>
-                  <div className="flex justify-between w-full">
-                    <span>{day.date}</span>
-                    <span>(Total: {day.daily_total})</span>
-                  </div>
-                </td>
-              </tr>
+      <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
+        <table className="min-w-full bg-white">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Date</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Sold Item Price</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Name</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Category</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Project</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Amount</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Quantity</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {data?.daily_data.map((day) => (
+              <React.Fragment key={day.date}>
+                <tr
+                  className="bg-gray-100 cursor-pointer"
+                  onClick={() => toggleCollapse(day.date)}
+                >
+                  <td className="px-6 py-4 text-sm font-semibold text-neutral-900 uppercase" colSpan={7}>
+                    <div className="flex justify-between w-full">
+                      <span>{day.date}</span>
+                      <span>(Total: {day.daily_total})</span>
+                    </div>
+                  </td>
+                </tr>
 
-              {!collapsed[day.date] &&
-                day.entries.map((entry) => (
-                  <tr
-                    key={entry.id}
-                    className="hover:bg-gray-100 cursor-pointer"
-                    onClick={() => handleRowClick(entry)}
-                  >
-                    <td className="border px-4 py-2">{new Date(day.date).toLocaleDateString()}</td>
-                    <td className="border px-4 py-2">
-                      {entry.sold_item ? `$${entry.sold_item.cost_price}` : "N/A"}
-                    </td>
-                    <td className="border px-4 py-2">{entry.name}</td>
-                    <td className="border px-4 py-2">{entry.expense_category ? entry.expense_category.name : "N/A"}</td>
-                    <td className="border px-4 py-2">{entry.linked_project ? entry.linked_project.name : "N/A"}</td>
-                    <td className="border px-4 py-2">{entry.amount}</td>
-                    <td className="border px-4 py-2">{entry.quantity}</td>
-                  </tr>
-                ))}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+                {!collapsed[day.date] &&
+                  day.entries.map((entry) => (
+                    <tr
+                      key={entry.id}
+                      className="hover:bg-gray-50 transition duration-150 ease-in-out cursor-pointer"
+                      onClick={() => handleRowClick(entry)}
+                    >
+                      <td className="px-6 py-4 text-sm text-neutral-700">{new Date(day.date).toLocaleDateString()}</td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">
+                        {entry.sold_item ? `$${entry.sold_item.cost_price}` : "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">{entry.name}</td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">
+                        {entry.expense_category ? entry.expense_category.name : "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">
+                        {entry.linked_project ? entry.linked_project.name : "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">{entry.amount}</td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">{entry.quantity}</td>
+                    </tr>
+                  ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-md">
@@ -249,21 +256,19 @@ const ExpensesTable: React.FC = () => {
             </div>
           )}
 
-       <DialogFooter >
-       
-         <div className="flex justify-around items-center w-full ">
-         <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-           Close
-         </Button>
-       
-           <Button variant="outline" onClick={handleEdit}>
-             Edit
-           </Button>
-           <Button variant="destructive" onClick={handleDelete}>
-             Delete
-           </Button>
-           </div>
-       </DialogFooter>
+          <DialogFooter>
+            <div className="flex justify-around items-center w-full">
+              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+                Close
+              </Button>
+              <Button variant="outline" onClick={handleEdit}>
+                Edit
+              </Button>
+              <Button variant="destructive" onClick={handleDelete}>
+                Delete
+              </Button>
+            </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -272,7 +277,7 @@ const ExpensesTable: React.FC = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. It will permanently delete the asset.
+              This action cannot be undone. It will permanently delete the expense.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

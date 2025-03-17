@@ -157,7 +157,7 @@ const EditAsset = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="value">Asset Value ($)</Label>
+              <Label htmlFor="value">Asset Value (NGN)</Label>
               <Input
                 id="value"
                 name="value"

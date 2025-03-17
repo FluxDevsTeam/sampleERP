@@ -3,12 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import PaginationComponent from "./Pagination";
-import Modals from "./Modal"
-import { toast } from "sonner"
+import Modals from "./Modal";
+import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
-
-
-
 
 const BASE_URL = "https://kidsdesigncompany.pythonanywhere.com/api/assets/";
 
@@ -65,7 +62,7 @@ const AssetsTable = () => {
       queryClient.invalidateQueries({ queryKey: ["assets"] });
       setIsDeleteDialogOpen(false);
       setIsModalOpen(false);
-      toast.success("Expense deleted successfully!");
+      toast.success("Asset deleted successfully!");
     },
   });
 
@@ -104,57 +101,67 @@ const AssetsTable = () => {
     }
   }, [currentPage, queryClient, totalPages]);
 
-  if (isLoading) return <SkeletonLoader/>;
-  if (error) return <p>Error: {(error as Error).message}</p>;
+  if (isLoading) return <SkeletonLoader />;
+  if (error) return <p className="text-red-600">Error: {(error as Error).message}</p>;
 
   const assets = data?.results?.assets || [];
   const hasNextPage = !!data?.next;
   const hasPreviousPage = !!data?.previous;
 
   return (
-    <div className="p-4 flex flex-col h-full">
-      <div className="flex justify-between items-center mb-4">
+    <div className="p-6 flex flex-col h-full bg-white">
+      <div className="flex justify-between items-center mb-6">
         <Link
           to="/admin/add-asset"
-          className="bg-neutral-900 text-white px-4 py-2 rounded-md inline-block"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
         >
           Add Asset
         </Link>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-700">
             Showing page {currentPage} of {totalPages}
           </span>
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto">
-        <table className="min-w-full bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2">Name</th>
-              <th className="border px-4 py-2">Value</th>
-              <th className="border px-4 py-2">Expected Lifespan</th>
-              <th className="border px-4 py-2">Available</th>
+      <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
+        <table className="min-w-full bg-white">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Name</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Value</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Expected Lifespan</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Available</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-200">
             {assets.map((asset) => (
               <tr
                 key={asset.id}
-                className="text-center border hover:bg-gray-50 cursor-pointer"
+                className="hover:bg-gray-50 transition duration-150 ease-in-out cursor-pointer"
                 onClick={() => handleRowClick(asset)}
               >
-                <td className="border px-4 py-2">{asset.name}</td>
-                <td className="border px-4 py-2">${asset.value}</td>
-                <td className="border px-4 py-2">{asset.expected_lifespan}</td>
-                <td className="border px-4 py-2">{asset.is_still_available ? "Yes" : "No"}</td>
+                <td className="px-6 py-4 text-sm text-neutral-700 ">{asset.name}</td>
+                <td className="px-6 py-4 text-sm text-neutral-700">NGN {asset.value}</td>
+                <td className="px-6 py-4 text-sm text-neutral-700">{asset.expected_lifespan} years</td>
+                <td className="px-6 py-4 text-sm text-neutral-700">
+                  {asset.is_still_available ? (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Yes
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      No
+                    </span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-6">
         <PaginationComponent
           currentPage={currentPage}
           totalPages={totalPages}
@@ -164,7 +171,6 @@ const AssetsTable = () => {
         />
       </div>
 
-      {/* Importing Modals Component */}
       <Modals
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}

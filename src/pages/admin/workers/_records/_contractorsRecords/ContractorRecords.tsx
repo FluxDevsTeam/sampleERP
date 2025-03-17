@@ -93,7 +93,7 @@ const ContractorRecords = () => {
       <div className="mt-4">
         {records?.map((record: ContractorRecord) => (
           <Card key={record.id} className="mb-4 mb-4 shadow-md hover:shadow-lg transition-shadow duration-200">
-            <CardContent className="p-4">
+            <CardContent className="p-4 space-y-5">
               <p className="text-sm text-gray-500">
                 Contractor: {`${record.worker.first_name} ${record.worker.last_name}`}
               </p>

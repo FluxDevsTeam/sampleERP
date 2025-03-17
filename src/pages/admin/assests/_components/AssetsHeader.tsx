@@ -34,7 +34,7 @@ const Header = () => {
   const summaryItems = [
     { label: "Total Assets", value: data.results.total_assets_count },
     { label: "Good Assets", value: data.results.good_assets_count },
-    { label: "Good Assets Value", value: `$${data.results.good_assets_value}` },
+    { label: "Good Assets Value", value: `NGN ${data.results.good_assets_value}` },
     { label: "Depreciated Assets", value: data.results.depreciated_assets_count },
   ];
 

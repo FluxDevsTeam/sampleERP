@@ -42,7 +42,7 @@ const Header = () => {
               <span className="text-green-200">
                 <MdArrowOutward />
               </span>
-              <span>{item.value.toLocaleString()}</span>
+              <span>NGN {item.value.toLocaleString()}</span>
             </div>
           </div>
         ))}
