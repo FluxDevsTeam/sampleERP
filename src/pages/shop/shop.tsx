@@ -55,7 +55,7 @@ const Shop = () => {
       ),
     },
     {
-      id: "4",
+      id: "3",
       icon: <FontAwesomeIcon className="text-2xl pr-1" icon={faMoneyBill} />,
       text: "Sold",
       href: "/shop/sold",
@@ -63,7 +63,7 @@ const Shop = () => {
       // link: "/shop/sold",
     },
     {
-      id: "5",
+      id: "4",
       icon: <FontAwesomeIcon className="text-2xl pr-1" icon={faPlusCircle} />,
       text: "Stock Added",
       href: "/shop/stock",

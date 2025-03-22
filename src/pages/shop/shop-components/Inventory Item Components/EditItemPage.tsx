@@ -34,7 +34,7 @@ const EditItemPage: React.FC = () => {
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === "success") {
-      navigate("/shop/dashboard");
+      navigate("/shop/inventory");
     }
   };
 

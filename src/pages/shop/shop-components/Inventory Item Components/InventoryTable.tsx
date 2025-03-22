@@ -327,7 +327,6 @@ const Table: React.FC<TableProps> = ({ headers }) => {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-gray-20">
                 {selectedProduct.name}{" "}
-                <span className="font-normal">/ {selectedProduct.id}</span>
               </h2>
               <button
                 onClick={() => setShowModal(false)}
