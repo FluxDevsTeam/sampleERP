@@ -63,7 +63,9 @@ import EditContractor from "./pages/admin/workers/_pages/_contractors/EditContra
 import SalaryWorkerRecords from "./pages/admin/workers/_records/_salaryWorksRecords/SalaryWorkersecord";
 import ContractorRecords from "./pages/admin/workers/_records/_contractorsRecords/ContractorRecords";
 import ForgotPassword from "./pages/AuthPages/forgotPassword/ForgotPassword";
-
+import AddProject from "./pages/ceo/allProjects/_pages/AddProject";
+import EditProject from "./pages/ceo/allProjects/_pages/EditProject";
+import OtherProductionRecords from "./pages/ceo/allProjects/_pages/OtherProductionRecords";
 
 
 const router =  
@@ -124,6 +126,18 @@ createBrowserRouter([
       {
         path: "shop",
         element: <CEOShop />,
+      },
+      {
+        path: "add-project",
+        element: <AddProject />,
+      },
+      {
+        path: "edit-project/:id",
+        element: <EditProject />,
+      },
+      {
+        path: "projects/:projectId/records",
+        element: <OtherProductionRecords />,
       },
     ],
   } ,

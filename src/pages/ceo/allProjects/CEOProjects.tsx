@@ -1,10 +1,12 @@
-
-
+import ProjectsTable from "./_components/ProjectsTable"
+import Header from "./_components/Header"
 
 
 const CEOProjects = () => {
   return (
-    <div>CEOProjects</div>
+    <div>
+      <Header />
+      <ProjectsTable /></div>
   )
 }
 
