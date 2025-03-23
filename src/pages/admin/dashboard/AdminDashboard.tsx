@@ -5,6 +5,7 @@ import {
 } from "recharts";
 import axios from "axios";
 import Header from "./_components/Header";
+import SkeletonLoader from "./_components/SkeletonLoader";
 
 const fetchFinancialData = async () => {
   const { data } = await axios.get("https://kidsdesigncompany.pythonanywhere.com/api/admin-dashboard/");
@@ -14,7 +15,7 @@ const fetchFinancialData = async () => {
 const AdminDashboard = () => {
   const { data, isLoading, error } = useQuery({ queryKey: ["financialData"], queryFn: fetchFinancialData });
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <SkeletonLoader/>;
   if (error) return <p>Error loading data</p>;
 
   const workersData = Object.keys(data?.workers || {}).map((key) => ({

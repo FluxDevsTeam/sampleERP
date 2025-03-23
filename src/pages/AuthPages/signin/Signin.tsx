@@ -26,7 +26,7 @@ const Signin = () => {
             <FormInput name="password" type="password" label="Password" />
             <div className="flex justify-end w-full">
               <Link
-                to={"/"}
+                to={"/forgot-password"}
                 className="text-blue-40 text-sm  font-semibold hover:underline duration-500 "
               >
                 Forgot password?

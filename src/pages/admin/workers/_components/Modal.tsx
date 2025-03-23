@@ -39,7 +39,7 @@ interface ModalsProps {
   isDeleteDialogOpen: boolean;
   setIsDeleteDialogOpen: (open: boolean) => void;
   confirmDelete: () => void;
-  workerType: "salary-worker" | "contractor"; // Add this prop to differentiate
+  workerType: "salary-worker" | "contractor"; 
 }
 
 const Modals: React.FC<ModalsProps> = ({

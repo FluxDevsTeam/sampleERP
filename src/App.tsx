@@ -20,7 +20,6 @@ import EditAsset from "./pages/admin/assests/_pages/EditAsset";
 import AddExpense from "./pages/admin/expenses/_pages/AddExpense";
 import EditExpense from "./pages/admin/expenses/_pages/EditExpense";
 
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import SignUp from "./pages/AuthPages/signup/SignUp";
@@ -63,8 +62,12 @@ import EditSalaryWorker from "./pages/admin/workers/_pages/_salaryWorkers/EditSa
 import EditContractor from "./pages/admin/workers/_pages/_contractors/EditContractor";
 import SalaryWorkerRecords from "./pages/admin/workers/_records/_salaryWorksRecords/SalaryWorkersecord";
 import ContractorRecords from "./pages/admin/workers/_records/_contractorsRecords/ContractorRecords";
+import ForgotPassword from "./pages/AuthPages/forgotPassword/ForgotPassword";
 
-const router = createBrowserRouter([
+
+
+const router =  
+createBrowserRouter([
   {
     path: "/",
     element: <Signin />,
@@ -72,6 +75,10 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <SignUp />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
   },
   // CEO DASHBOARD ROUTE
   {
@@ -294,8 +301,7 @@ const router = createBrowserRouter([
 const App = () => {
   return (
     <>
-      <RouterProvider router={router} />
-      <ToastContainer position="top-center" />
+      <RouterProvider router= {router} />
     </>
   );
 };
