@@ -57,6 +57,14 @@ interface Project {
 interface Customer {
   id: number;
   name: string;
+  email?: string;
+  phone_number?: string;
+  address?: string;
+}
+
+// Interface for API error response
+interface ApiErrorResponse {
+  [key: string]: string[];
 }
 
 const EditProject = () => {
@@ -73,27 +81,19 @@ const EditProject = () => {
     date_delivered: "",
     is_delivered: false,
     archived: false,
-    customer_detail: 0,
+    customer_detail: "",
     selling_price: "",
     logistics: "",
     service_charge: "",
     note: "",
   })
 
-  // Mock customer data - in a real implementation, you would fetch this from API
-  const customers: Customer[] = [
-    { id: 1, name: "Adebayo Jubreel" },
-    { id: 2, name: "Julius Caesar" },
-    { id: 3, name: "Martha Ayodele" },
-    { id: 4, name: "Smith Wigglesworth" },
-    { id: 5, name: "iyegere" },
-    { id: 6, name: "john cena" },
-    { id: 7, name: "suskidee" },
-  ];
-
-  // Loading and error states
+  // Loading, error, and validation states
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formError, setFormError] = useState("")
+  const [errorDetails, setErrorDetails] = useState<ApiErrorResponse>({})
+  const [customers, setCustomers] = useState<Customer[]>([])
+  const [isLoadingCustomers, setIsLoadingCustomers] = useState(false)
 
   // Fetch project data
   const { data: project, isLoading, error } = useQuery<Project>({
@@ -104,6 +104,51 @@ const EditProject = () => {
     },
     enabled: !!id,
   })
+
+  // Fetch customers
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      setIsLoadingCustomers(true)
+      try {
+        const response = await axios.get('https://kidsdesigncompany.pythonanywhere.com/api/customer/')
+        
+        // Extract customers from the nested structure (similar to AddProject)
+        if (response.data && response.data.results && response.data.results.all_customers) {
+          setCustomers(response.data.results.all_customers)
+        } else {
+          // Fallback to mock data if API structure is unexpected
+          console.error("Unexpected API response structure:", response.data)
+          
+          // Use mock data as fallback (same as in the original component)
+          setCustomers([
+            { id: 1, name: "Adebayo Jubreel" },
+            { id: 2, name: "Julius Caesar" },
+            { id: 3, name: "Martha Ayodele" },
+            { id: 4, name: "Smith Wigglesworth" },
+            { id: 5, name: "iyegere" },
+            { id: 6, name: "john cena" },
+            { id: 7, name: "suskidee" },
+          ])
+        }
+      } catch (error) {
+        console.error("Error fetching customers:", error)
+        // Use mock data if API fails
+        setCustomers([
+          { id: 1, name: "Adebayo Jubreel" },
+          { id: 2, name: "Julius Caesar" },
+          { id: 3, name: "Martha Ayodele" },
+          { id: 4, name: "Smith Wigglesworth" },
+          { id: 5, name: "iyegere" },
+          { id: 6, name: "john cena" },
+          { id: 7, name: "suskidee" },
+        ])
+      } finally {
+        setIsLoadingCustomers(false)
+      }
+    }
+
+    fetchCustomers()
+  }, [])
 
   // Update form when project data is loaded
   useEffect(() => {
@@ -116,7 +161,7 @@ const EditProject = () => {
         date_delivered: project.date_delivered || "",
         is_delivered: project.is_delivered || false,
         archived: project.archived || false,
-        customer_detail: project.customer_detail?.id || 0,
+        customer_detail: project.customer_detail?.id.toString() || "",
         selling_price: project.selling_price || "",
         logistics: project.logistics || "",
         service_charge: project.service_charge || "",
@@ -136,10 +181,28 @@ const EditProject = () => {
       navigate("/ceo/projects")
       toast.success("Project updated successfully!")
     },
-    onError: (error) => {
-      setFormError("Failed to update project. Please try again.")
-      toast.error("Failed to update project. Please try again.")
+    onError: (error: any) => {
       console.error("Update error:", error)
+      
+      // Handle specific API error responses
+      if (error.response && error.response.data) {
+        if (typeof error.response.data === 'object') {
+          setErrorDetails(error.response.data)
+          
+          // Create a readable error message
+          const errorMessages = Object.entries(error.response.data)
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+            .join('; ')
+          
+          setFormError(`Validation error: ${errorMessages}`)
+        } else {
+          setFormError("Failed to update project. Please check your data and try again.")
+        }
+      } else {
+        setFormError("Failed to update project. Please try again.")
+      }
+      
+      toast.error("Failed to update project. Please check the form for errors.")
       setIsSubmitting(false)
     }
   })
@@ -173,7 +236,7 @@ const EditProject = () => {
   const handleCustomerChange = (value: string) => {
     setFormData({
       ...formData,
-      customer_detail: parseInt(value),
+      customer_detail: value,
     })
   }
 
@@ -182,6 +245,7 @@ const EditProject = () => {
     e.preventDefault()
     setIsSubmitting(true)
     setFormError("")
+    setErrorDetails({})
 
     // Validate form
     if (!formData.name || !formData.customer_detail) {
@@ -190,7 +254,7 @@ const EditProject = () => {
       return
     }
 
-    // Prepare data for submission
+    // Prepare data for submission (matching API format)
     const projectData = {
       name: formData.name,
       status: formData.status,
@@ -199,7 +263,8 @@ const EditProject = () => {
       date_delivered: formData.is_delivered ? formData.date_delivered : null,
       is_delivered: formData.is_delivered,
       archived: formData.archived,
-      customer_detail: formData.customer_detail,
+      // Use "customer" instead of "customer_detail" to match the API
+      customer: parseInt(formData.customer_detail),
       selling_price: formData.selling_price,
       logistics: formData.logistics,
       service_charge: formData.service_charge,
@@ -209,7 +274,7 @@ const EditProject = () => {
     updateProjectMutation.mutate(projectData)
   }
 
-  if (isLoading) return <p className="p-4">Loading</p>
+  if (isLoading) return <p className="p-4">Loading project data...</p>
   if (error) return <p className="p-4">Error: {(error as Error).message}</p>
 
   return (
@@ -239,26 +304,44 @@ const EditProject = () => {
                 onChange={handleChange}
                 placeholder="Enter project name"
                 required
+                className={errorDetails.name ? "border-red-500" : ""}
               />
+              {errorDetails.name && (
+                <p className="text-sm text-red-500">{errorDetails.name.join(', ')}</p>
+              )}
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="customer_detail">Customer*</Label>
               <Select 
-                value={formData.customer_detail.toString()} 
-                onValueChange={handleCustomerChange}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a customer" />
-                </SelectTrigger>
-                <SelectContent>
-                  {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={customer.id.toString()}>
-                      {customer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+  value={formData.customer_detail}
+  onValueChange={handleCustomerChange}
+  disabled={isLoadingCustomers}
+>
+  <SelectTrigger className={errorDetails.customer ? "border-red-500" : ""}>
+    <SelectValue placeholder="Select a customer" />
+  </SelectTrigger>
+  <SelectContent>
+    {isLoadingCustomers ? (
+      <SelectItem value="loading" disabled>
+        Loading customers...
+      </SelectItem>
+    ) : customers.length > 0 ? (
+      customers.map((customer) => (
+        <SelectItem key={customer.id} value={customer.id.toString()}>
+          {customer.name}
+        </SelectItem>
+      ))
+    ) : (
+      <SelectItem value="no-customers" disabled>
+        No customers found
+      </SelectItem>
+    )}
+  </SelectContent>
+</Select>
+              {errorDetails.customer && (
+                <p className="text-sm text-red-500">{errorDetails.customer.join(', ')}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -267,7 +350,7 @@ const EditProject = () => {
                 value={formData.status} 
                 onValueChange={(value) => handleSelectChange("status", value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className={errorDetails.status ? "border-red-500" : ""}>
                   <SelectValue placeholder="Select a status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -277,6 +360,9 @@ const EditProject = () => {
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
+              {errorDetails.status && (
+                <p className="text-sm text-red-500">{errorDetails.status.join(', ')}</p>
+              )}
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -289,7 +375,11 @@ const EditProject = () => {
                   value={formData.start_date}
                   onChange={handleChange}
                   required
+                  className={errorDetails.start_date ? "border-red-500" : ""}
                 />
+                {errorDetails.start_date && (
+                  <p className="text-sm text-red-500">{errorDetails.start_date.join(', ')}</p>
+                )}
               </div>
               
               <div className="space-y-2">
@@ -300,7 +390,11 @@ const EditProject = () => {
                   type="date"
                   value={formData.deadline}
                   onChange={handleChange}
+                  className={errorDetails.deadline ? "border-red-500" : ""}
                 />
+                {errorDetails.deadline && (
+                  <p className="text-sm text-red-500">{errorDetails.deadline.join(', ')}</p>
+                )}
               </div>
             </div>
             
@@ -314,7 +408,11 @@ const EditProject = () => {
                   value={formData.selling_price}
                   onChange={handleChange}
                   required
+                  className={errorDetails.selling_price ? "border-red-500" : ""}
                 />
+                {errorDetails.selling_price && (
+                  <p className="text-sm text-red-500">{errorDetails.selling_price.join(', ')}</p>
+                )}
               </div>
               
               <div className="space-y-2">
@@ -326,7 +424,11 @@ const EditProject = () => {
                   value={formData.date_delivered}
                   onChange={handleChange}
                   disabled={!formData.is_delivered}
+                  className={errorDetails.date_delivered ? "border-red-500" : ""}
                 />
+                {errorDetails.date_delivered && (
+                  <p className="text-sm text-red-500">{errorDetails.date_delivered.join(', ')}</p>
+                )}
               </div>
             </div>
             
@@ -339,7 +441,11 @@ const EditProject = () => {
                   type="number"
                   value={formData.logistics}
                   onChange={handleChange}
+                  className={errorDetails.logistics ? "border-red-500" : ""}
                 />
+                {errorDetails.logistics && (
+                  <p className="text-sm text-red-500">{errorDetails.logistics.join(', ')}</p>
+                )}
               </div>
               
               <div className="space-y-2">
@@ -350,7 +456,11 @@ const EditProject = () => {
                   type="number"
                   value={formData.service_charge}
                   onChange={handleChange}
+                  className={errorDetails.service_charge ? "border-red-500" : ""}
                 />
+                {errorDetails.service_charge && (
+                  <p className="text-sm text-red-500">{errorDetails.service_charge.join(', ')}</p>
+                )}
               </div>
             </div>
             
@@ -363,7 +473,11 @@ const EditProject = () => {
                 onChange={handleChange}
                 placeholder="Add any notes about this project"
                 rows={3}
+                className={errorDetails.note ? "border-red-500" : ""}
               />
+              {errorDetails.note && (
+                <p className="text-sm text-red-500">{errorDetails.note.join(', ')}</p>
+              )}
             </div>
             
             <div className="flex flex-col space-y-2">

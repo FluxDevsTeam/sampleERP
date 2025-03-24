@@ -1,8 +1,14 @@
-
+import PieCharts from "./_charts/PieCharts"
+import AreaCharts from "./_charts/AreaCharts"
+import OverheadCost from "./_components/OverheadCost"
 
 const CEODashboard = () => {
   return (
-    <div>CEODashboard</div>
+    <div>
+      <OverheadCost />
+      <PieCharts />
+      <AreaCharts />
+    </div>
   )
 }
 

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MdCancel } from 'react-icons/md';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 import ProjectModals from './Modal';
+import PaginationComponent from './Pagination';
 
 // Define the type for a single product
 interface Product {
@@ -97,7 +98,10 @@ interface Project {
 }
 
 // Define the type for the API response
-interface ApiResponse {
+interface PaginatedProjectsResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
   all_time_projects_count: number;
   all_projects_count: number;
   completed_projects_count: number;
@@ -109,26 +113,49 @@ interface ApiResponse {
 // Base URL for API requests
 const BASE_URL = 'https://kidsdesigncompany.pythonanywhere.com/api';
 
-// Fetch projects from the API
-const fetchProjects = async (): Promise<ApiResponse> => {
-  const response = await axios.get(`${BASE_URL}/project/`);
+// Fetch projects from the API with pagination
+const fetchProjects = async (page = 1): Promise<PaginatedProjectsResponse> => {
+  const response = await axios.get(`${BASE_URL}/project/?page=${page}`);
   return response.data;
 };
 
 const ProjectsTable = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const [totalPages, setTotalPages] = useState(1);
   
   // State for modal and selected project
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Use React Query to fetch data with the new object-based syntax
+  // Use React Query to fetch data with pagination
   const { data, error, isLoading } = useQuery({
-    queryKey: ['projects'], // Query key as an array
-    queryFn: fetchProjects, // Query function
+    queryKey: ['projects', currentPage],
+    queryFn: () => fetchProjects(currentPage),
   });
+
+  // Update total pages when data is loaded
+  useEffect(() => {
+    if (data?.count) {
+      const itemsPerPage = 10; // Adjust based on your API's pagination setup
+      setTotalPages(Math.ceil(data.count / itemsPerPage));
+    }
+  }, [data]);
+
+  // Prefetch next page
+  useEffect(() => {
+    if (currentPage < totalPages) {
+      const nextPage = currentPage + 1;
+      queryClient.prefetchQuery({
+        queryKey: ['projects', nextPage],
+        queryFn: () => fetchProjects(nextPage),
+      });
+    }
+  }, [currentPage, queryClient, totalPages]);
 
   // Delete project mutation
   const deleteProjectMutation = useMutation({
@@ -168,11 +195,18 @@ const ProjectsTable = () => {
     }
   };
 
+  // Handle page change
+  const handlePageChange = (newPage: number) => {
+    setSearchParams({ page: newPage.toString() });
+  };
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {(error as Error).message}</div>;
 
   // Extract the projects from the data
-  const filteredData = data?.all_projects || [];
+  const projects = data?.all_projects || [];
+  const hasNextPage = !!data?.next;
+  const hasPreviousPage = !!data?.previous;
 
   return (
     <div className="p-6 flex flex-col h-full bg-white">
@@ -183,6 +217,11 @@ const ProjectsTable = () => {
         >
           Add Project
         </Link>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-700">
+            Showing page {currentPage} of {totalPages}
+          </span>
+        </div>
       </div>
 
       <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
@@ -198,7 +237,7 @@ const ProjectsTable = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((project) => (
+            {projects.map((project) => (
               <tr 
                 key={project.id} 
                 className="border hover:bg-gray-50 transition duration-150 ease-in-out cursor-pointer"
@@ -268,6 +307,16 @@ const ProjectsTable = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="mt-6">
+        <PaginationComponent
+          currentPage={currentPage}
+          totalPages={totalPages}
+          hasNextPage={hasNextPage}
+          hasPreviousPage={hasPreviousPage}
+          handlePageChange={handlePageChange}
+        />
       </div>
 
       <ProjectModals

@@ -51,6 +51,24 @@ interface ProjectData {
 interface Customer {
   id: number;
   name: string;
+  email: string;
+  phone_number: string;
+  address: string;
+  project: any;
+  shop_item: any;
+  created_at: string | null;
+}
+
+// Interface for API response
+interface CustomerApiResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: {
+    all_customers_count: number;
+    active_customers: number;
+    all_customers: Customer[];
+  };
 }
 
 const AddProject = () => {
@@ -69,20 +87,19 @@ const AddProject = () => {
     const fetchCustomers = async () => {
       setIsLoadingCustomers(true);
       try {
-        const response = await axios.get('https://kidsdesigncompany.pythonanywhere.com/api/customers/');
-        setCustomers(response.data);
+        const response = await axios.get<CustomerApiResponse>('https://kidsdesigncompany.pythonanywhere.com/api/customer/');
+        
+        // Extract customers from the nested structure
+        if (response.data && response.data.results && response.data.results.all_customers) {
+          setCustomers(response.data.results.all_customers);
+        } else {
+          console.error("Unexpected API response structure:", response.data);
+          throw new Error("Unexpected API response structure");
+        }
       } catch (error) {
         console.error("Error fetching customers:", error);
-        // Fallback to static list if API fails
-        setCustomers([
-          { id: 1, name: "Adebayo Jubreel" },
-          { id: 2, name: "Julius Caesar" },
-          { id: 3, name: "Martha Ayodele" },
-          { id: 4, name: "Smith Wigglesworth" },
-          { id: 5, name: "iyegere" },
-          { id: 6, name: "john cena" },
-          { id: 7, name: "suskidee" },
-        ]);
+        // No fallback data anymore - we'll just show an error message
+        setCustomers([]);
       } finally {
         setIsLoadingCustomers(false);
       }
@@ -99,7 +116,7 @@ const AddProject = () => {
     date_delivered: "",
     is_delivered: false,
     archived: false,
-    customer_detail: 0,
+    customer_detail: "placeholder", // Initialize with a non-empty string placeholder
     selling_price: "",
     logistics: "0",
     service_charge: "0",
@@ -131,7 +148,7 @@ const AddProject = () => {
   const handleCustomerChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      customer_detail: parseInt(value),
+      customer_detail: value, // Store as string initially
     }));
   };
 
@@ -142,7 +159,7 @@ const AddProject = () => {
     setIsPending(true);
     
     // Validate form data
-    if (!formData.name || !formData.customer_detail) {
+    if (!formData.name || formData.customer_detail === "placeholder") {
       setFormError("Please fill all required fields");
       setIsPending(false);
       return;
@@ -157,7 +174,7 @@ const AddProject = () => {
       date_delivered: formData.is_delivered ? formData.date_delivered : null,
       is_delivered: formData.is_delivered,
       archived: formData.archived,
-      customer_detail: { id: formData.customer_detail },
+      customer: parseInt(formData.customer_detail),
       selling_price: formData.selling_price,
       logistics: formData.logistics || "0",
       service_charge: formData.service_charge || "0",
@@ -200,14 +217,6 @@ const AddProject = () => {
     }
   };
 
-  // Format customer detail properly for the API
-  const getFormattedData = () => {
-    return {
-      ...formData,
-      customer_detail: { id: formData.customer_detail }
-    };
-  };
-
   return (
     <div className="container mx-auto p-4">
       <Card className="max-w-2xl mx-auto">
@@ -242,7 +251,7 @@ const AddProject = () => {
             <div className="space-y-2">
               <Label htmlFor="customer_detail">Customer*</Label>
               <Select 
-                value={formData.customer_detail > 0 ? formData.customer_detail.toString() : ""} 
+                value={formData.customer_detail} 
                 onValueChange={handleCustomerChange}
                 disabled={isLoadingCustomers}
               >
@@ -250,17 +259,26 @@ const AddProject = () => {
                   <SelectValue placeholder="Select a customer" />
                 </SelectTrigger>
                 <SelectContent>
-                  {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={customer.id.toString()}>
-                      {customer.name}
-                    </SelectItem>
-                  ))}
+                  {isLoadingCustomers ? (
+                    <SelectItem value="placeholder" disabled>Loading customers...</SelectItem>
+                  ) : customers.length > 0 ? (
+                    customers.map((customer) => (
+                      <SelectItem key={customer.id} value={customer.id.toString()}>
+                        {customer.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="placeholder" disabled>No customers found</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
               {errorDetails.customer_detail && (
                 <p className="text-sm text-red-500">{Array.isArray(errorDetails.customer_detail) 
                   ? errorDetails.customer_detail.join(', ') 
                   : "Invalid customer selection"}</p>
+              )}
+              {customers.length === 0 && !isLoadingCustomers && (
+                <p className="text-sm text-amber-500">Failed to load customers from API. Please try refreshing the page.</p>
               )}
             </div>
 
