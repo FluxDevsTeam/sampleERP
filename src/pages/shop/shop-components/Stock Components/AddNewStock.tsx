@@ -109,8 +109,8 @@ const AddNewStockPage = () => {
 
     try {
       const submitData = {
-        item: formData.item,
         quantity: parseFloat(formData.quantity),
+        item: formData.item,
         date: formData.date,
       };
 

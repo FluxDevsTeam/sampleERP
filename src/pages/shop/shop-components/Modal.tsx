@@ -18,7 +18,7 @@ const Modal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black bg-opacity-50">
       <div className="bg-white rounded-lg p-6 max-w-sm w-full border-2 border-black-100">
         <div
           className={`text-2xl font-bold mb-4 ${

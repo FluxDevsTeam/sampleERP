@@ -46,6 +46,7 @@ import {
 } from "./pages/store-keeper-page";
 
 import Shop from "./pages/shop/shop.tsx";
+import Product from "./pages/product/product.tsx";
 
 const router = createBrowserRouter([
   {
@@ -185,6 +186,11 @@ const router = createBrowserRouter([
     path: "/shop/*",
     element: <Shop />,
   },
+
+  {
+    path: "/product/*",
+    element: <Product />
+  }
 ]);
 
 const App = () => {

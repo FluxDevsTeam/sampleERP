@@ -23,6 +23,7 @@ import Stock from "./Stock";
 import AddNewStockPage from "./shop-components/Stock Components/AddNewStock";
 import EditStockItemPage from "./shop-components/Stock Components/EditStockItemPage";
 
+
 const Shop = () => {
   document.title = "Shop";
 
@@ -86,14 +87,17 @@ const Shop = () => {
           title="Welcome, Shopkeeper"
         />
         <Routes>
+          <Route path="/dashboard" element={<Inventory />} />
           <Route path="/inventory" element={<Dashboard />} />
+          
           <Route path="/add-new-item" element={<AddItemPage />} />
           <Route path="/add-new-category" element={<AddCategoryPage />} />
           <Route path="/edit-item/:id" element={<EditItemPage />} />
-          <Route path="/dashboard" element={<Inventory />} />
+
           <Route path="/sold" element={<Sold />} />
           <Route path="/add-new-sold-item" element={<AddNewSoldItemPage />} />
           <Route path="/edit-sold-item/:id" element={<EditSoldItemPage />} />
+
           <Route path="/stock/" element={<Stock />} />
           <Route path="/add-new-stock-item" element={<AddNewStockPage />} />
           <Route path="/edit-stock-item/:id" element={<EditStockItemPage />} />

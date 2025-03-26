@@ -16,21 +16,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import Modal from "../Modal";
 
-// Add interface for product details
-interface ProductDetails {
-  name: string;
-  id: number;
-  category: string;
-  categoryId: number;
-  image: string;
-  description: string;
-  dimensions: string;
-  costPrice: number;
-  sellingPrice: number;
-  totalPrice: number;
-  profitPerItem: number;
-}
-
 interface TableProps {
   headers: string[];
 }
@@ -47,9 +32,7 @@ const Table: React.FC<TableProps> = ({ headers }) => {
   const [tableData, setTableData] = useState<TableData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [selectedProduct, setSelectedProduct] = useState<ProductDetails | null>(
-    null
-  );
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [showImagePreview, setShowImagePreview] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -74,7 +57,7 @@ const Table: React.FC<TableProps> = ({ headers }) => {
       }
 
       const data = await response.json();
-      // console.log("API Response:", data);
+      console.log("API Response:", data);
 
       const updatedTableData: TableData[] = data.results.items.map(
         (item: any) => {
@@ -84,24 +67,8 @@ const Table: React.FC<TableProps> = ({ headers }) => {
             "Stock Status": item.stock,
             Details: (
               <button
-                onClick={() =>
-                  handleViewDetails({
-                    name: item.name,
-                    id: item.id,
-                    category:
-                      item.inventory_category?.name || "No category added",
-                    categoryId: item.inventory_category?.id,
-                    image: item.image,
-                    description: item.description,
-                    dimensions: item.dimensions,
-                    costPrice: item.cost_price,
-                    sellingPrice: item.selling_price,
-                    totalPrice: item.total_price,
-                    profitPerItem: item.profit_per_item,
-                  })
-                }
-                className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
-              >
+                onClick={() => handleViewDetails(item)}
+                className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded">
                 View
               </button>
             ),
@@ -145,7 +112,7 @@ const Table: React.FC<TableProps> = ({ headers }) => {
     };
   }, [showModal, showImagePreview]);
 
-  const handleViewDetails = (product: ProductDetails) => {
+  const handleViewDetails = (product: any) => {
     setSelectedProduct(product);
     setShowModal(true);
   };
@@ -197,9 +164,9 @@ const Table: React.FC<TableProps> = ({ headers }) => {
 
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
-    if (modalConfig.type === "success") {
-      window.location.reload();
-    }
+    // if (modalConfig.type === "success") {
+    //   window.location.reload();
+    // }
   };
 
   const confirmDeleteItem = () => {
@@ -211,6 +178,9 @@ const Table: React.FC<TableProps> = ({ headers }) => {
   ) => {
     const button = e.currentTarget;
     button.disabled = true;
+    setTimeout(() => {
+      button.disabled = false;
+    }, 3000);
     await deleteItem();
   };
 
