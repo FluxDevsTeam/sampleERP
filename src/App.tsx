@@ -187,6 +187,7 @@ const router = createBrowserRouter([
     element: <Shop />,
   },
 
+  // product route
   {
     path: "/product/*",
     element: <Product />

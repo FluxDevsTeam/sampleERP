@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faTableCells } from "@fortawesome/free-solid-svg-icons";
 import Navbar from "../../components/NavBar";
 import Sidebar from "../../components/Sidebar";
 
-import ProductsTable from "./ProductsTable";
-import AddNewProductPage from "./AddNewProduct";
-import AddContractorPage from "./AddContractorPage";
-import AddWorkerPage from "./AddWorkerPage";
-import EditProduct from "./EditProduct";
+import Dashboard from "./Dashboard components/Dashboard";
+
+import ProductsTable from "./Product components/ProductsTable";
+import AddNewProductPage from "./Product components/AddNewProduct";
+import AddContractorPage from "./Product components/AddContractorPage";
+import AddWorkerPage from "./Product components/AddWorkerPage";
+import EditProduct from "./Product components/EditProduct";
 
 const Product = () => {
   document.title = "Product";
@@ -29,6 +31,12 @@ const Product = () => {
       //   link: "/product/dashboard",
       icon: <FontAwesomeIcon className="text-[22px]" icon={faHome} />,
     },
+    {
+      id: "2",
+      text: "Projects",
+      href: "/product/main",
+      icon: <FontAwesomeIcon className="text-[22px]" icon={faTableCells} />,
+    },
   ];
 
   return (
@@ -45,16 +53,11 @@ const Product = () => {
           title="Welcome, Mr. Product"
         />
         <Routes>
-          <Route path="/dashboard" element={<ProductsTable />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/main" element={<ProductsTable />} />
           <Route path="/add-product" element={<AddNewProductPage />} />
-
-          {/* <Route path="/add-contractor" element={<AddContractorPage />} /> */}
           <Route path="/add-contractor/:id" element={<AddContractorPage />} />
-
-          {/* <Route path="/add-worker" element={<AddWorkerPage />} /> */}
           <Route path="/add-worker/:id" element={<AddWorkerPage />} />
-
-          {/* <Route path="/edit-product" element={<EditProduct />} /> */}
           <Route path="/edit-product/:id" element={<EditProduct />} />
         </Routes>
       </div>

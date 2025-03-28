@@ -169,7 +169,7 @@ const AddNewProductPage = () => {
     <div className="max-w-2xl mx-auto p-4">
       <div className="flex items-center mb-6">
         <button
-          onClick={() => navigate("/product/dashboard")}
+          onClick={() => navigate("/product/main")}
           className="mr-4 text-gray-20 hover:text-gray-600"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
@@ -321,7 +321,7 @@ const AddNewProductPage = () => {
         isOpen={showSuccessModal}
         onClose={() => {
           setShowSuccessModal(false);
-          navigate("/product/dashboard");
+          navigate("/product/main");
         }}
         type="success"
       />

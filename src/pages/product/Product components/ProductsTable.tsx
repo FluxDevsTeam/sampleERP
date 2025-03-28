@@ -1,21 +1,17 @@
 import React, { useEffect, useState, JSX } from "react";
 import { ThreeDots } from "react-loader-spinner";
-// import { Whisper, Tooltip } from "rsuite";
-import "rsuite/dist/rsuite.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPencil,
   faPlus,
   faTrash,
   faArrowLeft,
-  // faArrowRight,
   faXmark,
   faAnglesLeft,
   faAnglesRight,
-  // faPlusCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
-import Modal from "../shop/shop-components/Modal";
+import Modal from "../../shop/shop-components/Modal";
 
 interface TableData {
   Product: string;
@@ -41,7 +37,10 @@ const ProductsTable: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [showContractorsModal, setShowContractorsModal] = useState(false);
   const [showWorkersModal, setShowWorkersModal] = useState(false);
-  // const [isReturnedFromAdd, setIsReturnedFromAdd] = useState(false);
+  const [showEditContractorModal, setShowEditContractorModal] = useState(false);
+  const [editingContractor, setEditingContractor] = useState<any | null>(null);
+  const [showEditWorkerModal, setShowEditWorkerModal] = useState(false);
+  const [editingWorker, setEditingWorker] = useState<any | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -173,24 +172,11 @@ const ProductsTable: React.FC = () => {
     };
   }, [showProductDetailsModal]);
 
-  // useEffect(() => {
-  //   if (location.state?.from === "addWorker" && !isReturnedFromAdd) {
-  //     setShowWorkersModal(true);
-  //     setIsReturnedFromAdd(true);
-  //   }
-  // }, [location]);
-
-  // useEffect(() => {
-  //   if (location.state?.showWorkersModal && selectedProduct) {
-  //     setShowWorkersModal(true);
-  //   }
-  // }, [location.state, selectedProduct]);
-
   useEffect(() => {
     // Check for returning from add contractor or add worker with updated product data
     if (
       (location.state?.from === "addWorker" ||
-        location.state?.from === "addContractor") &&
+        location.state?.from === "addContractor" || location.state?.from === "editProduct") &&
       location.state?.productData
     ) {
       setSelectedProduct(location.state.productData); // Set the updated product
@@ -205,8 +191,8 @@ const ProductsTable: React.FC = () => {
 
   const handleViewDetails = (product: any) => {
     setSelectedProduct(product);
-    setShowProductDetailsModal(true); // Open product modal
-    setShowWorkersModal(false); // Ensure workers modal doesn't open
+    setShowProductDetailsModal(true);
+    setShowWorkersModal(false);
   };
 
   // DELETING PRODUCT
@@ -232,7 +218,7 @@ const ProductsTable: React.FC = () => {
         });
         setShowProductDetailsModal(false);
         setConfirmDelete(false);
-        fetchProducts(); // Refresh products
+        fetchProducts();
       } catch (error) {
         console.error("Error deleting product:", error);
         setModalConfig({
@@ -287,6 +273,59 @@ const ProductsTable: React.FC = () => {
     }
   };
 
+  const handleEditContractor = (contractor: any) => {
+    setEditingContractor(contractor);
+    setShowEditContractorModal(true);
+  };
+
+  const saveEditedContractor = async () => {
+    if (!editingContractor) return;
+
+    try {
+      const response = await fetch(
+        `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/contractor/${editingContractor.id}/`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editingContractor),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update contractor");
+      }
+
+      const updatedContractor = await response.json();
+      const updatedProduct = {
+        ...selectedProduct,
+        contractors: selectedProduct.contractors.map((contractor: any) =>
+          contractor.id === updatedContractor.id
+            ? updatedContractor
+            : contractor
+        ),
+      };
+      setSelectedProduct(updatedProduct);
+
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Contractor updated successfully!",
+        type: "success",
+      });
+      setShowEditContractorModal(false);
+    } catch (error) {
+      console.error("Error updating contractor:", error);
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to update contractor",
+        type: "error",
+      });
+    }
+  };
+
   // DELETING WORKER
   const handleDeleteWorker = async (workerId: number) => {
     if (!confirm("Are you sure you want to remove this worker?")) return;
@@ -306,7 +345,9 @@ const ProductsTable: React.FC = () => {
       // Refresh product details
       const updatedProduct = {
         ...selectedProduct,
-        workers: selectedProduct.workers.filter((c: any) => c.id !== workerId),
+        salary_workers: selectedProduct.salary_workers.filter(
+          (worker: any) => worker.id !== workerId
+        ),
       };
       setSelectedProduct(updatedProduct);
 
@@ -327,11 +368,59 @@ const ProductsTable: React.FC = () => {
     }
   };
 
+  const handleEditWorker = (worker: any) => {
+    setEditingWorker(worker);
+    setShowEditWorkerModal(true);
+  };
+
+  const saveEditedWorker = async () => {
+    if (!editingWorker) return;
+
+    try {
+      const response = await fetch(
+        `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/salary/${editingWorker.id}/`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editingWorker),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update worker");
+      }
+
+      const updatedWorker = await response.json();
+      const updatedProduct = {
+        ...selectedProduct,
+        salary_workers: selectedProduct.salary_workers.map((worker: any) =>
+          worker.id === updatedWorker.id ? updatedWorker : worker
+        ),
+      };
+      setSelectedProduct(updatedProduct);
+
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Worker updated successfully!",
+        type: "success",
+      });
+      setShowEditWorkerModal(false);
+    } catch (error) {
+      console.error("Error updating worker:", error);
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to update worker",
+        type: "error",
+      });
+    }
+  };
+
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
-    // if (modalConfig.type === "success") {
-    //   window.location.reload();
-    // }
   };
 
   const confirmDeleteProduct = () => {
@@ -419,7 +508,6 @@ const ProductsTable: React.FC = () => {
       </div>
 
       {/* Pagination Controls */}
-
       <div
         className={`flex justify-center items-center mb-28 gap-2
          ${showContractorsModal ? "hidden" : ""} 
@@ -521,117 +609,122 @@ const ProductsTable: React.FC = () => {
                   alt={`${selectedProduct.name} image`}
                 />
               )}
+              {/* other prodict details */}
+              <div>
+                {/* COLOUR */}
+                <p className="text-sm text-gray-20 mb-3">
+                  <span className="font-semibold">Colour:</span>{" "}
+                  {selectedProduct.colour || "No colour available"}
+                </p>
 
-              {/* COLOUR */}
-              <p className="text-sm text-gray-20 mb-3">
-                <span className="font-semibold">Colour:</span>{" "}
-                {selectedProduct.colour || "No colour available"}
-              </p>
+                {/* DESIGN */}
+                <p className="text-sm text-gray-20 mb-3">
+                  <span className="font-semibold">Design:</span>{" "}
+                  {selectedProduct.design || "No design added"}
+                </p>
 
-              {/* DESIGN */}
-              <p className="text-sm text-gray-20 mb-3">
-                <span className="font-semibold">Design:</span>{" "}
-                {selectedProduct.design || "No design added"}
-              </p>
+                {/* SELLINg PRICE */}
+                <p className="text-sm text-gray-20 mb-3">
+                  <span className="font-semibold">Selling price:</span> ₦
+                  {selectedProduct.selling_price || "No selling price added"}
+                </p>
 
-              {/* SELLINg PRICE */}
-              <p className="text-sm text-gray-20 mb-3">
-                <span className="font-semibold">Selling price:</span> ₦
-                {selectedProduct.selling_price || "No selling price added"}
-              </p>
+                {/* DIMENSIONS */}
+                <p className="text-sm text-gray-20 mb-3">
+                  <span className="font-semibold">Dimensions:</span>{" "}
+                  {`${selectedProduct.dimensions}${" "}cm` ||
+                    "no dimensions added"}
+                </p>
 
-              {/* DIMENSIONS */}
-              <p className="text-sm text-gray-20 mb-3">
-                <span className="font-semibold">Dimensions:</span>{" "}
-                {`${selectedProduct.dimensions}${" "}cm` ||
-                  "no dimensions added"}
-              </p>
+                {/* OVERHEAD COST */}
+                <p className="text-sm text-gray-20 mb-3">
+                  <span className="font-semibold">Overhead cost:</span>{" "}
+                  {selectedProduct.overhead_cost || "no overhead cost added"}
+                </p>
 
-              {/* OVERHEAD COST */}
-              <p className="text-sm text-gray-20 mb-3">
-                <span className="font-semibold">Overhead cost:</span>{" "}
-                {selectedProduct.overhead_cost || "no overhead cost added"}
-              </p>
+                {/* Overhead cost base at creation:*/}
+                <p className="text-sm text-gray-20 mb-3">
+                  <span className="font-semibold">
+                    Overhead cost base at creation:
+                  </span>{" "}
+                  {selectedProduct.overhead_cost_base_at_creation}
+                </p>
 
-              {/* Overhead cost base at creation:*/}
-              <p className="text-sm text-gray-20 mb-3">
-                <span className="font-semibold">
-                  Overhead cost base at creation:
-                </span>{" "}
-                {selectedProduct.overhead_cost_base_at_creation}
-              </p>
+                {/* PRODUCTION NOTE */}
+                <p className="text-sm text-gray-20 mb-3">
+                  <span className="font-semibold">Production note:</span>{" "}
+                  {selectedProduct.production_note}
+                </p>
 
-              {/* PRODUCTION NOTE */}
-              <p className="text-sm text-gray-20 mb-3">
-                <span className="font-semibold">Production note:</span>{" "}
-                {selectedProduct.production_note}
-              </p>
+                {/* LINKED PROJECTS */}
+                <p className="text-sm text-gray-20 mb-3">
+                  <span className="font-semibold">Linked Project:</span>{" "}
+                  {selectedProduct.linked_project.name}
+                </p>
 
-              {/* LINKED PROJECTS */}
-              <p className="text-sm text-gray-20 mb-3">
-                <span className="font-semibold">Linked Project:</span>{" "}
-                {selectedProduct.linked_project.name}
-              </p>
-
-              {/* CALCULATIONS */}
-              <ol className="text-sm text-gray-20 mb-3">
-                <span
-                  className="inline-block mb-1 font-semibold text-blue-400 underline cursor-pointer"
-                  onClick={(e) => {
-                    const listItems = e.currentTarget.nextElementSibling;
-                    if (listItems) {
-                      listItems.classList.toggle("hidden");
-                    }
-                  }}
-                >
-                  Calculations
-                </span>
-                <div className="hidden">
-                  {selectedProduct.calculations ? (
-                    <>
-                      <li className="mb-1">
-                        <span className="font-semibold">Profit: </span>
-                        {selectedProduct.calculations.profit}
+                {/* CALCULATIONS */}
+                <ol className="text-sm text-gray-20 mb-3">
+                  <span
+                    className="inline-block mb-1 font-semibold text-blue-400 underline cursor-pointer"
+                    onClick={(e) => {
+                      const listItems = e.currentTarget.nextElementSibling;
+                      if (listItems) {
+                        listItems.classList.toggle("hidden");
+                      }
+                    }}
+                  >
+                    Calculations
+                  </span>
+                  <div className="hidden">
+                    {selectedProduct.calculations ? (
+                      <>
+                        <li className="mb-1">
+                          <span className="font-semibold">Profit: </span>
+                          {selectedProduct.calculations.profit}
+                        </li>
+                        <li className="mb-1">
+                          <span className="font-semibold">
+                            Profit per item:{" "}
+                          </span>
+                          {selectedProduct.calculations.profit_per_item}
+                        </li>
+                        <li className="mb-1">
+                          <span className="font-semibold">Quantity: </span>
+                          {selectedProduct.calculations.quantity}
+                        </li>
+                        <li className="mb-1">
+                          <span className="font-semibold">
+                            Total overhead Cost:{" "}
+                          </span>
+                          {selectedProduct.calculations.total_overhead_cost}
+                        </li>
+                        <li className="mb-1">
+                          <span className="font-semibold">
+                            Total per item:{" "}
+                          </span>
+                          {selectedProduct.calculations.total_per_item}
+                        </li>
+                        <li className="mb-1">
+                          <span className="font-semibold">
+                            Total production cost:{" "}
+                          </span>
+                          {selectedProduct.calculations.total_production_cost}
+                        </li>
+                        <li className="mb-1">
+                          <span className="font-semibold">
+                            Total raw material cost:{" "}
+                          </span>
+                          {selectedProduct.calculations.total_raw_material_cost}
+                        </li>
+                      </>
+                    ) : (
+                      <li className="italic text-gray-500">
+                        No calculations available
                       </li>
-                      <li className="mb-1">
-                        <span className="font-semibold">Profit per item: </span>
-                        {selectedProduct.calculations.profit_per_item}
-                      </li>
-                      <li className="mb-1">
-                        <span className="font-semibold">Quantity: </span>
-                        {selectedProduct.calculations.quantity}
-                      </li>
-                      <li className="mb-1">
-                        <span className="font-semibold">
-                          Total overhead Cost:{" "}
-                        </span>
-                        {selectedProduct.calculations.total_overhead_cost}
-                      </li>
-                      <li className="mb-1">
-                        <span className="font-semibold">Total per item: </span>
-                        {selectedProduct.calculations.total_per_item}
-                      </li>
-                      <li className="mb-1">
-                        <span className="font-semibold">
-                          Total production cost:{" "}
-                        </span>
-                        {selectedProduct.calculations.total_production_cost}
-                      </li>
-                      <li className="mb-1">
-                        <span className="font-semibold">
-                          Total raw material cost:{" "}
-                        </span>
-                        {selectedProduct.calculations.total_raw_material_cost}
-                      </li>
-                    </>
-                  ) : (
-                    <li className="italic text-gray-500">
-                      No calculations available
-                    </li>
-                  )}
-                </div>
-              </ol>
-
+                    )}
+                  </div>
+                </ol>
+              </div>
               {/* CONTRACTORS */}
               <p className="text-sm text-gray-20 mb-3">
                 <span
@@ -653,7 +746,7 @@ const ProductsTable: React.FC = () => {
               </p>
             </div>
 
-            {/* EDIT AND DELETE ICONS */}
+            {/* Product detail EDIT AND DELETE ICONS */}
             <div className="mt-6 flex items-center justify-between">
               <div className="flex space-x-2">
                 <button
@@ -686,7 +779,11 @@ const ProductsTable: React.FC = () => {
 
       {/* Contractors Modal */}
       {showContractorsModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150]">
+        <div
+          className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150] ${
+            modalConfig.isOpen ? "hidden" : ""
+          }`}
+        >
           <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg text-blue-400 font-bold">Contractors</h3>
@@ -722,18 +819,26 @@ const ProductsTable: React.FC = () => {
                           {contractor.linked_contractor?.last_name}
                         </p>
                         <p className="text-sm text-gray-500">
-                          Date: {contractor.date}
+                           Date: {new Date(contractor.date).toLocaleDateString("en-GB")}
                         </p>
                         <p className="text-sm text-gray-500">
                           Cost: ₦{contractor.cost || "-"}
                         </p>
                       </div>
-                      <button
-                        onClick={() => handleDeleteContractor(contractor.id)}
-                        className="text-red-400 hover:text-red-600 p-2"
-                      >
-                        <FontAwesomeIcon icon={faTrash} />
-                      </button>
+                      <div className="grid">
+                        <button
+                          onClick={() => handleDeleteContractor(contractor.id)}
+                          className="text-red-400 hover:text-red-600 p-2"
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                        <button
+                          onClick={() => handleEditContractor(contractor)}
+                          className="text-blue-400 hover:text-blue-600 p-2"
+                        >
+                          <FontAwesomeIcon icon={faPencil} />
+                        </button>
+                      </div>
                     </div>
                   )
                 )
@@ -749,7 +854,11 @@ const ProductsTable: React.FC = () => {
 
       {/* workers modal */}
       {showWorkersModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150]">
+        <div
+          className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150] ${
+            modalConfig.isOpen ? "hidden" : ""
+          } ${showEditWorkerModal ? "blur-sm" : ""}`}
+        >
           <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg text-blue-400 font-bold">Workers</h3>
@@ -789,12 +898,20 @@ const ProductsTable: React.FC = () => {
                           Date: {worker.date}
                         </p>
                       </div>
-                      <button
-                        onClick={() => handleDeleteWorker(worker.id)}
-                        className="text-red-400 hover:text-red-600 p-2"
-                      >
-                        <FontAwesomeIcon icon={faTrash} />
-                      </button>
+                      <div className="grid">
+                        <button
+                          onClick={() => handleDeleteWorker(worker.id)}
+                          className="text-red-400 hover:text-red-600 p-2"
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                        <button
+                          onClick={() => handleEditWorker(worker)}
+                          className="text-blue-400 hover:text-blue-600 p-2"
+                        >
+                          <FontAwesomeIcon icon={faPencil} />
+                        </button>
+                      </div>
                     </div>
                   )
                 )
@@ -803,6 +920,143 @@ const ProductsTable: React.FC = () => {
                   No workers attached
                 </p>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Contractor Modal */}
+      {showEditContractorModal && editingContractor && (
+        <div
+          className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150] ${
+            modalConfig.isOpen ? "hidden" : ""
+          }`}
+        >
+          <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-base text-blue-400 font-bold">
+                Edit Contractor
+              </h3>
+              <button
+                onClick={() => setShowEditContractorModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-500">
+                  {editingContractor.linked_contractor?.first_name || ""}{" "}
+                  {editingContractor.linked_contractor?.last_name || ""}
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700">
+                  Cost
+                </label>
+                <input
+                  type="number"
+                  value={editingContractor.cost || ""}
+                  onChange={(e) =>
+                    setEditingContractor({
+                      ...editingContractor,
+                      cost: e.target.value,
+                    })
+                  }
+                  className="mt-1 py-2 pl-3 block w-full border-gray-300 rounded-md shadow-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  value={editingContractor.date || ""}
+                  onChange={(e) =>
+                    setEditingContractor({
+                      ...editingContractor,
+                      date: e.target.value,
+                    })
+                  }
+                  className="mt-1 py-2 pl-3 block w-full border-gray-300 rounded-md shadow-sm"
+                />
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={() => setShowEditContractorModal(false)}
+                className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveEditedContractor}
+                className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Worker Modal */}
+      {showEditWorkerModal && editingWorker && (
+        <div
+          className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150] ${
+            modalConfig.isOpen ? "hidden" : ""
+          }`}
+        >
+          <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg text-blue-400 font-bold">Update date</h3>
+              <button
+                onClick={() => setShowEditWorkerModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-500">
+                  {editingWorker.linked_salary_worker?.first_name || ""}
+                  {editingWorker.linked_salary_worker?.last_name || ""}
+                </label>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  value={editingWorker.date || ""}
+                  onChange={(e) =>
+                    setEditingWorker({
+                      ...editingWorker,
+                      date: e.target.value,
+                    })
+                  }
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm py-2 pl-3"
+                />
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={() => setShowEditWorkerModal(false)}
+                className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveEditedWorker}
+                className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500"
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ThreeDots } from "react-loader-spinner";
 
-import Modal from "../shop/shop-components/Modal";
+import Modal from "../../shop/shop-components/Modal";
 
 interface Contractor {
   id: number;

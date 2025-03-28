@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ThreeDots } from "react-loader-spinner";
@@ -14,6 +14,8 @@ interface Worker {
 const AddWorkerPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const location = useLocation();
+  const from = location.state?.from;
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [selectedWorker, setSelectedWorker] = useState("");
   const [date, setDate] = useState(() => {
@@ -90,7 +92,28 @@ const AddWorkerPage: React.FC = () => {
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === "success") {
-      navigate("/product/dashboard");
+      // Fetch updated product data before navigating
+      const fetchUpdatedProduct = async () => {
+        try {
+          const response = await fetch(
+            `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`
+          );
+          if (!response.ok) throw new Error("Failed to fetch updated product");
+          const updatedProduct = await response.json();
+
+          navigate("/product/main", {
+            state: {
+              from: "addWorker",
+              productData: updatedProduct, // Pass updated product data
+            },
+          });
+        } catch (error) {
+          console.error("Error fetching updated product:", error);
+          navigate("/product/main");
+        }
+      };
+
+      fetchUpdatedProduct();
     }
   };
 
@@ -115,7 +138,7 @@ const AddWorkerPage: React.FC = () => {
     <div className="max-w-2xl mt-6 mx-auto p-4">
       <div className="flex items-center mb-6">
         <button
-          onClick={() => navigate("/product/dashboard")}
+          onClick={() => navigate("/product/main")}
           className="mr-4 text-gray-20 hover:text-gray-600"
         >
           <FontAwesomeIcon icon={faArrowLeft} />

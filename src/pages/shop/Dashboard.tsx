@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 const Dashboard = () => {
   document.title = "Dashboard - KDC Admin";
 
-  // const tableHeaders = ["Product", "Category", "Stock Status", "Details"];
   const categoryTableHeaders = [
     "Category",
     "Total Cost Value",

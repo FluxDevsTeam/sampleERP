@@ -1,61 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { ThreeDots } from "react-loader-spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-
-const Modal = ({
-  isOpen,
-  onClose,
-  type,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  type: "success" | "error";
-}) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div
-        className={`bg-white p-6 rounded-lg shadow-xl max-w-sm w-full mx-4 border-t-4 ${
-          type === "success" ? "border-green-500" : "border-red-500"
-        }`}
-      >
-        <h2
-          className={`text-2xl font-bold mb-4 ${
-            type === "success" ? "text-blue-600" : "text-red-600"
-          }`}
-        >
-          {type === "success" ? "Success!" : "Error"}
-        </h2>
-        <p className="mb-6">
-          {type === "success"
-            ? "Product Added Successfully."
-            : "There was an error adding product. Please try again."}
-        </p>
-        <button
-          onClick={onClose}
-          className={`w-full py-2 px-4 text-white rounded ${
-            type === "success"
-              ? "bg-blue-600 hover:bg-blue-20"
-              : "bg-red-500 hover:bg-red-600"
-          }`}
-        >
-          {type === "success" ? "Continue" : "Close"}
-        </button>
-      </div>
-    </div>
-  );
-};
+import Modal from "../../shop/shop-components/Modal";
 
 const EditProduct: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from;
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "success" as "success" | "error",
+  });
 
   const [productDetails, setProductDetails] = useState<any>(null);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showErrorModal, setShowErrorModal] = useState(false);
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -181,11 +143,48 @@ const EditProduct: React.FC = () => {
         throw new Error("Failed to update product details");
       }
 
-      setShowSuccessModal(true);
-      navigate("/product/dashboard");
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Updated successfully!",
+        type: "success",
+      });
     } catch (error) {
       console.error("Error updating product details:", error);
-      setShowErrorModal(true);
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to update item",
+        type: "error",
+      });
+    }
+  };
+
+  const handleCloseModal = () => {
+    setModalConfig({ ...modalConfig, isOpen: false });
+    if (modalConfig.type === "success") {
+      // Fetch updated product data before navigating
+      const fetchUpdatedProduct = async () => {
+        try {
+          const response = await fetch(
+            `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`
+          );
+          if (!response.ok) throw new Error("Failed to fetch updated product");
+          const updatedProduct = await response.json();
+
+          navigate("/product/main", {
+            state: {
+              from: "editProduct",
+              productData: updatedProduct, // Pass updated product data
+            },
+          });
+        } catch (error) {
+          console.error("Error fetching updated product:", error);
+          navigate("/product/main");
+        }
+      };
+
+      fetchUpdatedProduct();
     }
   };
 
@@ -210,7 +209,7 @@ const EditProduct: React.FC = () => {
     <div className="max-w-2xl mt-6 mx-auto p-4">
       <div className="flex items-center mb-6">
         <button
-          onClick={() => navigate("/product/dashboard")}
+          onClick={() => navigate("/product/main")}
           className="mr-4 text-gray-20 hover:text-gray-600"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
@@ -348,19 +347,13 @@ const EditProduct: React.FC = () => {
         </button>
       </form>
 
+      {/* Success/Error Modal */}
       <Modal
-        isOpen={showSuccessModal}
-        onClose={() => {
-          setShowSuccessModal(false);
-          navigate("/product/dashboard");
-        }}
-        type="success"
-      />
-
-      <Modal
-        isOpen={showErrorModal}
-        onClose={() => setShowErrorModal(false)}
-        type="error"
+        isOpen={modalConfig.isOpen}
+        onClose={handleCloseModal}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
       />
     </div>
   );

@@ -18,7 +18,6 @@ const DashboardData = (DashboardData: DashboardDataProps) => {
       >
         {DashboardData.digits}
       </h2>
-      {/* {DashboardData.chart && <div className="mt-4" style={{ maxWidth: '850px' }}>{DashboardData.chart}</div>} */}
     </div>
   );
 };

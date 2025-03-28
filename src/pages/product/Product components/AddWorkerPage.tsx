@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ThreeDots } from "react-loader-spinner";
+import Modal from "../../shop/shop-components/Modal";
 
-import Modal from "../shop/shop-components/Modal";
-
-interface Contractor {
+interface Worker {
   id: number;
   first_name: string;
   last_name: string;
 }
 
-const AddContractorPage: React.FC = () => {
+const AddWorkerPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [contractors, setContractors] = useState<Contractor[]>([]);
-  const [selectedContractor, setSelectedContractor] = useState("");
-  const [cost, setCost] = useState("");
+  const location = useLocation();
+  const from = location.state?.from;
+  const [workers, setWorkers] = useState<Worker[]>([]);
+  const [selectedWorker, setSelectedWorker] = useState("");
   const [date, setDate] = useState(() => {
     const today = new Date();
     return today.toISOString().split("T")[0];
@@ -31,60 +31,59 @@ const AddContractorPage: React.FC = () => {
   });
 
   useEffect(() => {
-    const fetchContractors = async () => {
+    const fetchworkers = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/contractors/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/"
         );
-        if (!response.ok) throw new Error("Failed to fetch contractors");
+        if (!response.ok) throw new Error("Failed to fetch workers");
         const data = await response.json();
         console.log(data);
 
-        setContractors(data.results.contractor);
+        setWorkers(data.results.workers);
       } catch (error) {
-        console.error("Error fetching contractors:", error);
+        console.error("Error fetching workers:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchContractors();
+    fetchworkers();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/contractor/`,
+        `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/salary/`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            contractor: selectedContractor,
-            cost: cost,
+            salary_worker: selectedWorker,
             date: date,
           }),
         }
       );
 
       if (!response.ok) {
-        throw new Error("Failed to add contractor");
+        throw new Error("Failed to add worker(s)");
       }
 
       setModalConfig({
         isOpen: true,
         title: "Success",
-        message: "Contractor added successfully!",
+        message: "Worker added successfully!",
         type: "success",
       });
     } catch (error) {
-      console.error("Error adding contractor:", error);
+      console.error("Error adding worker:", error);
       setModalConfig({
         isOpen: true,
         title: "Error",
-        message: "Failed to add contractor",
+        message: "Failed to add worker",
         type: "error",
       });
     }
@@ -104,7 +103,7 @@ const AddContractorPage: React.FC = () => {
 
           navigate("/product/main", {
             state: {
-              from: "addContractor",
+              from: "addWorker",
               productData: updatedProduct, // Pass updated product data
             },
           });
@@ -120,7 +119,7 @@ const AddContractorPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center">
+      <div className="w-1/5 mx-auto">
         <ThreeDots
           visible={true}
           height="80"
@@ -144,37 +143,25 @@ const AddContractorPage: React.FC = () => {
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-        <h1 className="text-2xl font-bold">Add Contractor(s)</h1>
+        <h1 className="text-2xl font-bold">Add Worker(s)</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block mb-1">Select Contractor</label>
+          <label className="block mb-1">Select worker</label>
           <select
-            value={selectedContractor}
-            onChange={(e) => setSelectedContractor(e.target.value)}
+            value={selectedWorker}
+            onChange={(e) => setSelectedWorker(e.target.value)}
             className="w-full border rounded p-2"
             required
           >
-            <option value="">Choose a contractor</option>
-            {contractors.map((contractor) => (
-              <option key={contractor.id} value={contractor.id}>
-                {contractor.first_name} {contractor.last_name}
+            <option value="">Add worker</option>
+            {workers.map((workerFn) => (
+              <option key={workerFn.id} value={workerFn.id}>
+                {workerFn.first_name} {workerFn.last_name}
               </option>
             ))}
           </select>
-        </div>
-
-        <div>
-          <label className="block mb-1">Cost</label>
-          <input
-            type="number"
-            value={cost}
-            onChange={(e) => setCost(e.target.value)}
-            className="w-full border rounded p-2"
-            required
-            placeholder="Enter cost"
-          />
         </div>
 
         <div>
@@ -192,7 +179,7 @@ const AddContractorPage: React.FC = () => {
           type="submit"
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
-          Add Contractor
+          Add worker
         </button>
       </form>
 
@@ -208,4 +195,4 @@ const AddContractorPage: React.FC = () => {
   );
 };
 
-export default AddContractorPage;
+export default AddWorkerPage;
