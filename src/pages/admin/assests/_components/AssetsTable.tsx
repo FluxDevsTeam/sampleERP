@@ -124,42 +124,79 @@ const AssetsTable = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
-        <table className="min-w-full bg-white">
+     <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
+        <table className="min-w-full bg-white divide-y divide-gray-200">
           <thead className="bg-gray-100">
             <tr>
               <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Name</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Value</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Expected Lifespan</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Available</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Progress</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Status</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Total Selling Price</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Start Date</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">End Date</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {assets.map((asset) => (
-              <tr
-                key={asset.id}
+            {projects.map((project) => (
+              <tr 
+                key={project.id} 
                 className="hover:bg-gray-50 transition duration-150 ease-in-out cursor-pointer"
-                onClick={() => handleRowClick(asset)}
+                onClick={() => handleRowClick(project)}
               >
-                <td className="px-6 py-4 text-sm text-neutral-700 ">{asset.name}</td>
-                <td className="px-6 py-4 text-sm text-neutral-700">NGN {asset.value}</td>
-                <td className="px-6 py-4 text-sm text-neutral-700">{asset.expected_lifespan} years</td>
+                <td className="px-6 py-4">
+                  <p className="text-sm font-medium text-neutral-900">{project.name}</p>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className="bg-lime-600 h-2.5 rounded-full"
+                      style={{ width: `${project.products.progress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs mt-1 text-neutral-500">{project.products.progress}%</p>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center space-x-2">
+                    {project.status === 'completed' || project.status === 'in progress' || project.status === 'delivered' ? (
+                      <div className="w-3 h-3 bg-gray-300 border rounded-full flex items-center justify-start overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${
+                            project.status === 'completed' ? 'bg-lime-600' :
+                            project.status === 'in progress' ? 'bg-yellow-500' :
+                            project.status === 'delivered' ? 'bg-blue-500' : ''
+                          }`}
+                          style={{
+                            width: project.status === 'completed' || project.status === 'delivered' ? '100%' : '50%',
+                          }}
+                        ></div>
+                      </div>
+                    ) : (
+                      <span className="w-3 h-3 bg-red-500 border rounded-full"></span>
+                    )}
+                    <p className={`text-sm ${
+                      project.status === 'completed' ? 'text-lime-600' :
+                      project.status === 'in progress' ? 'text-yellow-500' :
+                      project.status === 'delivered' ? 'text-blue-500' : 'text-red-500'
+                    }`}>
+                      {project.status}
+                    </p>
+                  </div>
+                </td>
                 <td className="px-6 py-4 text-sm text-neutral-700">
-                  {asset.is_still_available ? (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      Yes
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      No
-                    </span>
-                  )}
+                  ₦ {project.calculations.total_product_selling_price.toLocaleString()}
+                </td>
+                <td className="px-6 py-4 text-sm text-neutral-700">
+                  {new Date(project.start_date).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 text-sm text-neutral-700">
+                  {project.deadline ? new Date(project.deadline).toLocaleDateString() : "Not set"}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
 
       <div className="mt-6">
         <PaginationComponent

@@ -45,6 +45,7 @@ interface ProjectData {
   logistics: string;
   service_charge: string;
   note: string | null;
+  invoice_image?: File | null;
 }
 
 // Interface for customers
@@ -77,6 +78,10 @@ const AddProject = () => {
   const [isPending, setIsPending] = useState(false);
   const [formError, setFormError] = useState("");
   const [errorDetails, setErrorDetails] = useState<Record<string, string[]>>({});
+
+  // Invoice image states
+  const [invoiceImage, setInvoiceImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Get customers from API
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -116,12 +121,35 @@ const AddProject = () => {
     date_delivered: "",
     is_delivered: false,
     archived: false,
-    customer_detail: "placeholder", // Initialize with a non-empty string placeholder
+    customer_detail: "placeholder", 
     selling_price: "",
     logistics: "0",
     service_charge: "0",
     note: "",
   });
+
+  // Handle image file change
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type and size
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Invalid file type. Please upload a JPEG, PNG, GIF, or PDF.");
+        return;
+      }
+
+      if (file.size > maxSize) {
+        toast.error("File is too large. Maximum size is 5MB.");
+        return;
+      }
+
+      setInvoiceImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -165,8 +193,11 @@ const AddProject = () => {
       return;
     }
 
-    // Prepare data for API submission
-    const projectData: any = {
+    // Create FormData for multipart/form-data upload
+    const formDataToSubmit = new FormData();
+    
+    // Append all text fields
+    const projectData = {
       name: formData.name,
       status: formData.status,
       start_date: formData.start_date,
@@ -181,10 +212,27 @@ const AddProject = () => {
       note: formData.note || null,
     };
 
+    // Append text fields
+    Object.entries(projectData).forEach(([key, value]) => {
+      if (value !== null) {
+        formDataToSubmit.append(key, value.toString());
+      }
+    });
+
+    // Append invoice image if present
+    if (invoiceImage) {
+      formDataToSubmit.append('invoice_image', invoiceImage);
+    }
+
     try {
       const response = await axios.post(
         "https://kidsdesigncompany.pythonanywhere.com/api/project/",
-        projectData
+        formDataToSubmit,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
       );
 
       queryClient.invalidateQueries({ queryKey: ["projects"] });
@@ -218,12 +266,12 @@ const AddProject = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <Card className="max-w-2xl mx-auto">
+    <div className="container mx-auto p-4 ">
+      <Card className="max-w-2xl mx-auto ">
         <CardHeader>
           <CardTitle>Add New Project</CardTitle>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} >
           <CardContent className="space-y-4">
             {formError && (
               <Alert variant="destructive">
@@ -392,6 +440,28 @@ const AddProject = () => {
                 onChange={handleChange}
                 rows={3}
               />
+            </div>
+
+       
+ 
+            {/* Invoice Image Upload */}
+            <div className="space-y-2">
+              <Label htmlFor="invoice_image">Invoice Image</Label>
+              <Input
+                id="invoice_image"
+                type="file"
+                accept="image/jpeg,image/png,image/gif,application/pdf"
+                onChange={handleImageChange}
+                className="cursor-pointer"
+              />
+              {invoiceImage && (
+                <p className="text-sm text-green-600 mt-2">
+                  {invoiceImage.name} selected
+                </p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB
+              </p>
             </div>
 
             <div className="flex flex-col space-y-2">

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -44,10 +44,10 @@ export default function OverheadCost() {
     };
 
     if (isLoading) return <p>Loading...</p>;
-    if (error) return <p>Error fetching data: {(error as Error).message}</p>;
+    if (error) return <p>Error fetching data: {((error as AxiosError).message) || "Unknown error"}</p>;
 
     return (
-        <div className="p-6 max-w-md bg-white rounded-lg shadow-md">
+        <div className="p-6 max-w-md bg-[#f5f7fa] rounded-lg shadow-md">
             <h2 className="text-xl font-bold mb-4">Overhead Cost</h2>
             <p className="mb-4">
                 Current Base Cost: <strong>NGN{data?.overhead_cost_base ?? "N/A"}</strong>
@@ -63,9 +63,9 @@ export default function OverheadCost() {
                 <button
                     type="submit"
                     className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-                    disabled={mutation.isLoading}
+                    disabled={mutation.isPending}
                 >
-                    {mutation.isLoading ? "Updating..." : "Update Cost"}
+                    {mutation.isPending ? "Updating..." : "Update Cost"}
                 </button>
             </form>
         </div>

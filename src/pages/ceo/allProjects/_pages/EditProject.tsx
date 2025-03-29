@@ -88,6 +88,11 @@ const EditProject = () => {
     note: "",
   })
 
+  // Image states
+  const [invoiceImage, setInvoiceImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [currentInvoiceImage, setCurrentInvoiceImage] = useState<string | null>(null)
+
   // Loading, error, and validation states
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formError, setFormError] = useState("")
@@ -167,13 +172,49 @@ const EditProject = () => {
         service_charge: project.service_charge || "",
         note: project.note || "",
       })
+      
+      // Set current invoice image if it exists
+      if (project.invoice_image) {
+        setCurrentInvoiceImage(project.invoice_image)
+      }
     }
   }, [project])
 
+  // Handle image file change
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file type and size
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf']
+      const maxSize = 5 * 1024 * 1024 // 5MB
+
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Invalid file type. Please upload a JPEG, PNG, GIF, or PDF.")
+        return
+      }
+
+      if (file.size > maxSize) {
+        toast.error("File is too large. Maximum size is 5MB.")
+        return
+      }
+
+      setInvoiceImage(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
+  }
+
   // Update project mutation
   const updateProjectMutation = useMutation({
-    mutationFn: async (updatedProject: any) => {
-      return axios.put(`https://kidsdesigncompany.pythonanywhere.com/api/project/${id}/`, updatedProject)
+    mutationFn: async (updatedProject: FormData) => {
+      return axios.put(
+        `https://kidsdesigncompany.pythonanywhere.com/api/project/${id}/`,
+        updatedProject,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] })
@@ -254,7 +295,10 @@ const EditProject = () => {
       return
     }
 
-    // Prepare data for submission (matching API format)
+    // Create FormData for multipart/form-data upload
+    const formDataToSubmit = new FormData()
+    
+    // Append all text fields
     const projectData = {
       name: formData.name,
       status: formData.status,
@@ -263,15 +307,26 @@ const EditProject = () => {
       date_delivered: formData.is_delivered ? formData.date_delivered : null,
       is_delivered: formData.is_delivered,
       archived: formData.archived,
-      // Use "customer" instead of "customer_detail" to match the API
       customer: parseInt(formData.customer_detail),
       selling_price: formData.selling_price,
       logistics: formData.logistics,
       service_charge: formData.service_charge,
-      note: formData.note,
+      note: formData.note || null,
     }
 
-    updateProjectMutation.mutate(projectData)
+    // Append text fields
+    Object.entries(projectData).forEach(([key, value]) => {
+      if (value !== null) {
+        formDataToSubmit.append(key, value.toString())
+      }
+    })
+
+    // Append invoice image if present
+    if (invoiceImage) {
+      formDataToSubmit.append('invoice_image', invoiceImage)
+    }
+
+    updateProjectMutation.mutate(formDataToSubmit)
   }
 
   if (isLoading) return <p className="p-4">Loading project data...</p>
@@ -314,31 +369,31 @@ const EditProject = () => {
             <div className="space-y-2">
               <Label htmlFor="customer_detail">Customer*</Label>
               <Select 
-  value={formData.customer_detail}
-  onValueChange={handleCustomerChange}
-  disabled={isLoadingCustomers}
->
-  <SelectTrigger className={errorDetails.customer ? "border-red-500" : ""}>
-    <SelectValue placeholder="Select a customer" />
-  </SelectTrigger>
-  <SelectContent>
-    {isLoadingCustomers ? (
-      <SelectItem value="loading" disabled>
-        Loading customers...
-      </SelectItem>
-    ) : customers.length > 0 ? (
-      customers.map((customer) => (
-        <SelectItem key={customer.id} value={customer.id.toString()}>
-          {customer.name}
-        </SelectItem>
-      ))
-    ) : (
-      <SelectItem value="no-customers" disabled>
-        No customers found
-      </SelectItem>
-    )}
-  </SelectContent>
-</Select>
+                value={formData.customer_detail}
+                onValueChange={handleCustomerChange}
+                disabled={isLoadingCustomers}
+              >
+                <SelectTrigger className={errorDetails.customer ? "border-red-500" : ""}>
+                  <SelectValue placeholder="Select a customer" />
+                </SelectTrigger>
+                <SelectContent>
+                  {isLoadingCustomers ? (
+                    <SelectItem value="loading" disabled>
+                      Loading customers...
+                    </SelectItem>
+                  ) : customers.length > 0 ? (
+                    customers.map((customer) => (
+                      <SelectItem key={customer.id} value={customer.id.toString()}>
+                        {customer.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-customers" disabled>
+                      No customers found
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
               {errorDetails.customer && (
                 <p className="text-sm text-red-500">{errorDetails.customer.join(', ')}</p>
               )}
@@ -478,6 +533,27 @@ const EditProject = () => {
               {errorDetails.note && (
                 <p className="text-sm text-red-500">{errorDetails.note.join(', ')}</p>
               )}
+            </div>
+
+     
+            {/* Invoice Image Upload */}
+            <div className="space-y-2">
+              <Label htmlFor="invoice_image">Invoice Image</Label>
+              <Input
+                id="invoice_image"
+                type="file"
+                accept="image/jpeg,image/png,image/gif,application/pdf"
+                onChange={handleImageChange}
+                className="cursor-pointer"
+              />
+              {invoiceImage && (
+                <p className="text-sm text-green-600 mt-2">
+                  {invoiceImage.name} selected
+                </p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB
+              </p>
             </div>
             
             <div className="flex flex-col space-y-2">

@@ -299,7 +299,7 @@ const ProjectsTable = () => {
                   )}
                 </td>
                 <td className="px-4 py-2 text-center">
-                  ₦{project.calculations.total_product_selling_price}
+                  ₦ {project.calculations.total_product_selling_price}
                 </td>
                 <td className="px-4 py-2 text-center">{project.start_date}</td>
                 <td className="px-4 py-2 text-center">{project.deadline || "Not set"}</td>

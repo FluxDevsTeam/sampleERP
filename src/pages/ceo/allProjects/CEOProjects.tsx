@@ -6,7 +6,8 @@ const CEOProjects = () => {
   return (
     <div>
       <Header />
-      <ProjectsTable /></div>
+      <ProjectsTable />
+      </div>
   )
 }
 

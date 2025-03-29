@@ -42,7 +42,7 @@ const Header = () => {
     <div className="p-6">
       <p className="md:text-3xl text-black font-bold py-6">Project Overview</p>
 
-      <div className="md:grid md:grid-cols-4 grid grid-cols-1 md:space-x-4 space-x-0 md:space-y-0 space-y-4">
+      <div className="md:grid md:grid-cols-5 grid grid-cols-1 md:space-x-4 space-x-0 md:space-y-0 space-y-4">
         {summaryItems.map((item, index) => (
           <div key={index} className="p-4 border rounded-lg shadow-md">
             <div className="flex justify-between items-center text-xl">
