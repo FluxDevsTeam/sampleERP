@@ -28,6 +28,7 @@ const colors = [
   "indigo",
   "violet",
 ];
+import { Accordion, Placeholder } from "rsuite";
 
 const Dashboard = () => {
   document.title = "Product Dashboard - KDC Admin";
@@ -329,245 +330,198 @@ const Dashboard = () => {
     <div className="w-11/12 mx-auto mt-6 pl-1 pt-2">
       <div className="mb-16">
         <div className="grid items-center md:grid-cols-2 gap-3 mb-8 md:mb-20">
-          {/* BREAKDOWN YEAR */}
-          <details
-            className="bg-gray-100 border border-gray-300 rounded-lg shadow-md p-4 h-fit"
-            open={true}
-          >
-            <summary className="cursor-pointer text-lg font-bold text-blue-600 flex items-center justify-between">
-              <p style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}>
-                Breakdown year
-              </p>
-              <span className="ml-2">
-                <FontAwesomeIcon
-                  icon={faChevronDown}
-                  className="details-icon"
-                />
-              </span>
-            </summary>
-
-            <div
-              className="mt-2 text-gray
-            -4.500 space-y-2"
+          <Accordion className="border-gray-20 border-2">
+            <Accordion.Panel
+              header="Breakdown Year"
+              defaultExpanded
+              style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
             >
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">No shop projects year: </span>
-                {breakdownYear?.no_shop_projects_year || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Percentage projects: </span>
-                {breakdownYear?.percentage_projects || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Percentage shop: </span>
-                {breakdownYear?.percentage_shop || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Profit year:</span>{" "}
-                {breakdownYear?.profit_year || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Project expenses year: </span>
-                {breakdownYear?.project_expenses_year || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">
-                  Project shop income year:{" "}
-                </span>
-                {breakdownYear?.project_shop_income_year || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Project counts year: </span>
-                {breakdownYear?.projects_count_year || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">
-                  Total projects income year:{" "}
-                </span>
-                {breakdownYear?.total_projects_income_year || 0}
-              </p>
-            </div>
-          </details>
+              <div className="text-gray-500 space-y-2">
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">No shop projects year: </span>
+                  {breakdownYear?.no_shop_projects_year || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Percentage projects: </span>
+                  {breakdownYear?.percentage_projects || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Percentage shop: </span>
+                  {breakdownYear?.percentage_shop || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Profit year:</span>{" "}
+                  {breakdownYear?.profit_year || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Project expenses year: </span>
+                  {breakdownYear?.project_expenses_year || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">
+                    Project shop income year:{" "}
+                  </span>
+                  {breakdownYear?.project_shop_income_year || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Project counts year: </span>
+                  {breakdownYear?.projects_count_year || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">
+                    Total projects income year:{" "}
+                  </span>
+                  {breakdownYear?.total_projects_income_year || 0}
+                </p>
+              </div>
+            </Accordion.Panel>
+          </Accordion>
 
-          {/* BREASKDOWN MONTH */}
-          <details
-            className="bg-gray-100 border border-gray-300 rounded-lg shadow-md p-4 h-fit"
-            open={true}
-          >
-            <summary className="cursor-pointer text-lg font-bold text-blue-600 flex items-center justify-between">
-              <p style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}>
-                Breakdown month
-              </p>
-              <span className="ml-2">
-                <FontAwesomeIcon
-                  icon={faChevronDown}
-                  className="details-icon"
-                />
-              </span>
-            </summary>
-
-            <div
-              className="mt-2 text-gray
-            -4.500 space-y-2"
+          <Accordion className="border-gray-20 border-2">
+            <Accordion.Panel
+              header="Breakdown month"
+              style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
             >
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">No shop projects month: </span>
-                {breakdownMonth?.no_shop_projects_month || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Percentage projects: </span>
-                {breakdownMonth?.percentage_projects || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Percentage shop: </span>
-                {breakdownMonth?.percentage_shop || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Profit month:</span>{" "}
-                {breakdownMonth?.profit_month || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Project expenses month: </span>
-                {breakdownMonth?.project_expenses_month || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">
-                  Project shop income month:{" "}
-                </span>
-                {breakdownMonth?.project_shop_income_month || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Project counts month: </span>
-                {breakdownMonth?.projects_count_month || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">
-                  Total projects income month:{" "}
-                </span>
-                {breakdownMonth?.total_projects_income_month || 0}
-              </p>
-            </div>
-          </details>
+              <div className="text-gray-500 space-y-2">
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">
+                    No shop projects month:{" "}
+                  </span>
+                  {breakdownMonth?.no_shop_projects_month || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Percentage projects: </span>
+                  {breakdownMonth?.percentage_projects || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Percentage shop: </span>
+                  {breakdownMonth?.percentage_shop || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Profit month:</span>{" "}
+                  {breakdownMonth?.profit_month || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">
+                    Project expenses month:{" "}
+                  </span>
+                  {breakdownMonth?.project_expenses_month || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">
+                    Project shop income month:{" "}
+                  </span>
+                  {breakdownMonth?.project_shop_income_month || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Project counts month: </span>
+                  {breakdownMonth?.projects_count_month || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">
+                    Total projects income month:{" "}
+                  </span>
+                  {breakdownMonth?.total_projects_income_month || 0}
+                </p>
+              </div>
+            </Accordion.Panel>
+          </Accordion>
 
-          {/* EXPENSE BREAKDOWN YEAR */}
-          <details
-            className="bg-gray-100 border border-gray-300 rounded-lg shadow-md p-4 h-fit"
-            open={true}
-          >
-            <summary className="cursor-pointer text-lg font-bold text-blue-600 flex items-center justify-between">
-              <p style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}>
-                Expense breakdown year
-              </p>
-              <span className="ml-2">
-                <FontAwesomeIcon
-                  icon={faChevronDown}
-                  className="details-icon"
-                />
-              </span>
-            </summary>
-
-            <div
-              className="mt-2 text-gray
-            -700 space-y-2"
+          <Accordion className="border-gray-20 border-2">
+            <Accordion.Panel
+              header="Expense breakdown year"
+              style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
             >
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Contractors: </span>
-                {expenseBreakdownYear?.contractors || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Factory Expenses: </span>
-                {expenseBreakdownYear?.factory_expenses || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">
-                  Other production expenses:{" "}
-                </span>
-                {expenseBreakdownYear?.other_production_expensis || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Overhead:</span>{" "}
-                {expenseBreakdownYear?.overhead || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Raw materials: </span>
-                {expenseBreakdownYear?.raw_materials || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Sold cost: </span>
-                {expenseBreakdownYear?.sold_cost || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">
-                  Total project expenses year:{" "}
-                </span>
-                {expenseBreakdownYear?.total_project_expenses_year || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Yearly sold cost price: </span>
-                {expenseBreakdownYear?.yearly_sold_cost_price || 0}
-              </p>
-            </div>
-          </details>
+              <div className="text-gray-500 space-y-2">
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Contractors: </span>
+                  {expenseBreakdownYear?.contractors || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Factory Expenses: </span>
+                  {expenseBreakdownYear?.factory_expenses || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">
+                    Other production expenses:{" "}
+                  </span>
+                  {expenseBreakdownYear?.other_production_expensis || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Overhead:</span>{" "}
+                  {expenseBreakdownYear?.overhead || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Raw materials: </span>
+                  {expenseBreakdownYear?.raw_materials || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Sold cost: </span>
+                  {expenseBreakdownYear?.sold_cost || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">
+                    Total project expenses year:{" "}
+                  </span>
+                  {expenseBreakdownYear?.total_project_expenses_year || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">
+                    Yearly sold cost price:{" "}
+                  </span>
+                  {expenseBreakdownYear?.yearly_sold_cost_price || 0}
+                </p>
+              </div>
+            </Accordion.Panel>
+          </Accordion>
 
-          {/* EXPENSE BREASKDOWN MONTH */}
-          <details
-            className="bg-gray-100 border border-gray-300 rounded-lg shadow-md p-4 h-fit"
-            open={true}
-          >
-            <summary className="cursor-pointer text-lg font-bold text-blue-600 flex items-center justify-between">
-              <p style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}>
-                Expense breakdown month
-              </p>
-              <span className="ml-2">
-                <FontAwesomeIcon
-                  icon={faChevronDown}
-                  className="details-icon"
-                />
-              </span>
-            </summary>
-
-            <div
-              className="mt-2 text-gray
-            -4.500 space-y-2"
+          <Accordion className="border-gray-20 border-2">
+            <Accordion.Panel
+              header="Expense breakdown month"
+              style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
             >
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Contractors: </span>
-                {expenseBreakdownMonth?.contractors || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Factory Expenses: </span>
-                {expenseBreakdownMonth?.factory_expenses || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">
-                  Other production expenses:{" "}
-                </span>
-                {expenseBreakdownMonth?.other_production_expensis || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Overhead:</span>{" "}
-                {expenseBreakdownMonth?.overhead || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Raw materials: </span>
-                {expenseBreakdownMonth?.raw_materials || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Sold cost: </span>
-                {expenseBreakdownMonth?.sold_cost || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">
-                  Total project expenses month:{" "}
-                </span>
-                {expenseBreakdownMonth?.total_project_expenses_month || 0}
-              </p>
-              <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                <span className="font-semibold">Monthly sold cost price: </span>
-                {expenseBreakdownMonth?.monthly_sold_cost_price || 0}
-              </p>
-            </div>
-          </details>
+              <div className="text-gray-500 space-y-2">
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Contractors: </span>
+                  {expenseBreakdownMonth?.contractors || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Factory Expenses: </span>
+                  {expenseBreakdownMonth?.factory_expenses || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">
+                    Other production expenses:{" "}
+                  </span>
+                  {expenseBreakdownMonth?.other_production_expensis || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Overhead:</span>{" "}
+                  {expenseBreakdownMonth?.overhead || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Raw materials: </span>
+                  {expenseBreakdownMonth?.raw_materials || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">Sold cost: </span>
+                  {expenseBreakdownMonth?.sold_cost || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">
+                    Total project expenses month:{" "}
+                  </span>
+                  {expenseBreakdownMonth?.total_project_expenses_month || 0}
+                </p>
+                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
+                  <span className="font-semibold">
+                    Monthly sold cost price:{" "}
+                  </span>
+                  {expenseBreakdownMonth?.monthly_sold_cost_price || 0}
+                </p>
+              </div>
+            </Accordion.Panel>
+          </Accordion>
         </div>
 
         <div className="grid md:grid-cols-2 gap-7 items-center rounded-sm mb-9">

@@ -193,20 +193,19 @@ const ProductsTable: React.FC = () => {
         location.state?.from === "addContractor") &&
       location.state?.productData
     ) {
-      setSelectedProduct(location.state.productData); // Set the updated product
-      setShowProductDetailsModal(true); // Show the product modal
-      setShowWorkersModal(false); // Ensure workers modal doesn't open
-      setShowContractorsModal(false); // Ensure contractors modal doesn't open
+      setSelectedProduct(location.state.productData);
+      setShowProductDetailsModal(true);
+      setShowWorkersModal(false);
+      setShowContractorsModal(false);
       // setIsReturnedFromAdd(true);
-      // Clean up location state to prevent re-triggering
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
 
   const handleViewDetails = (product: any) => {
     setSelectedProduct(product);
-    setShowProductDetailsModal(true); // Open product modal
-    setShowWorkersModal(false); // Ensure workers modal doesn't open
+    setShowProductDetailsModal(true);
+    setShowWorkersModal(false);
   };
 
   // DELETING PRODUCT
