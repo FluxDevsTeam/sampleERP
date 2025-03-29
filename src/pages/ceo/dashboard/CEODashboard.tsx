@@ -7,7 +7,7 @@ const CEODashboard = () => {
   return (
     <div className="bg-white">
 
-      <div className="flex justify-around items-center p-8">
+      <div className="flex flex-col md:flex-row justify-around items-center p-8">
         <p className="md:text-4xl text-black font-bold py-6">CEO Dashboard</p>
         <OverheadCost />
       </div>
