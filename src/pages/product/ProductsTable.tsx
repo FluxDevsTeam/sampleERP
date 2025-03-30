@@ -41,7 +41,7 @@ const ProductsTable: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [showContractorsModal, setShowContractorsModal] = useState(false);
   const [showWorkersModal, setShowWorkersModal] = useState(false);
-  // const [isReturnedFromAdd, setIsReturnedFromAdd] = useState(false);
+  // const [showQuotationModal, setShowQuotationModal] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -70,7 +70,9 @@ const ProductsTable: React.FC = () => {
 
       const data = await response.json();
       // console.log("API Response:", data);
-      console.log(data);
+      // console.log(data);
+      console.log("is this");
+      
 
       const updatedTableData: TableData[] = data.results.map((item: any) => {
         return {
@@ -172,19 +174,6 @@ const ProductsTable: React.FC = () => {
       document.body.style.overflow = "unset";
     };
   }, [showProductDetailsModal]);
-
-  // useEffect(() => {
-  //   if (location.state?.from === "addWorker" && !isReturnedFromAdd) {
-  //     setShowWorkersModal(true);
-  //     setIsReturnedFromAdd(true);
-  //   }
-  // }, [location]);
-
-  // useEffect(() => {
-  //   if (location.state?.showWorkersModal && selectedProduct) {
-  //     setShowWorkersModal(true);
-  //   }
-  // }, [location.state, selectedProduct]);
 
   useEffect(() => {
     // Check for returning from add contractor or add worker with updated product data
@@ -477,17 +466,17 @@ const ProductsTable: React.FC = () => {
             <div>
               {/* PROGRESS BAR */}
               <p className="text-sm text-gray-20 mb-3">
-                <span className="font-semibold">Progress rate:</span>{" "}
+                <span className="font-semibold">Progressiveghjbjnkj ckvmsvsfvfsv:</span>{" "}
                 <span className="text-xs text-gray-500 mt-1">
                   {selectedProduct.progress}% complete
                 </span>
-                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                  <div
-                    className="bg-blue-400 h-2.5 rounded-full"
-                    style={{ width: `${selectedProduct.progress}%` }}
-                  ></div>
-                </div>
               </p>
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+                <div
+                  className="bg-blue-400 h-2.5 rounded-full"
+                  style={{ width: `${selectedProduct.progress}%` }}
+                ></div>
+              </div>
 
               {/* SKETCH VIEW */}
               <button
@@ -523,8 +512,8 @@ const ProductsTable: React.FC = () => {
 
               {/* COLOUR */}
               <p className="text-sm text-gray-20 mb-3">
-                <span className="font-semibold">Colour:</span>{" "}
-                {selectedProduct.colour || "No colour available"}
+                <span className="font-semibold">Corsffsfgfgfgfdgfgfgdfgdfgdfgdgdgdfgdfgdfgd:</span>{" "}
+                {selectedProduct.color || "No colour available"}
               </p>
 
               {/* DESIGN */}
@@ -637,7 +626,7 @@ const ProductsTable: React.FC = () => {
                   className="inline-block mb-1 font-semibold text-blue-400 underline cursor-pointer"
                   onClick={() => setShowContractorsModal(true)}
                 >
-                  Contractors
+                  Contrayugukhjnlmkgv gvjkmjvhgjhmjn
                 </span>
               </p>
 
@@ -686,7 +675,7 @@ const ProductsTable: React.FC = () => {
       {/* Contractors Modal */}
       {showContractorsModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150]">
-          <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
+          <div className="bg-white rounded-lg p-6 w-[800px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg text-blue-400 font-bold">Contractors</h3>
               <button

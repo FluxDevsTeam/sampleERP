@@ -380,6 +380,8 @@ const Dashboard = () => {
           <Accordion className="border-gray-20 border-2">
             <Accordion.Panel
               header="Breakdown month"
+              defaultExpanded
+
               style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
             >
               <div className="text-gray-500 space-y-2">
@@ -430,6 +432,8 @@ const Dashboard = () => {
           <Accordion className="border-gray-20 border-2">
             <Accordion.Panel
               header="Expense breakdown year"
+              defaultExpanded
+
               style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
             >
               <div className="text-gray-500 space-y-2">
@@ -477,7 +481,10 @@ const Dashboard = () => {
 
           <Accordion className="border-gray-20 border-2">
             <Accordion.Panel
+            // bodyFill
               header="Expense breakdown month"
+              defaultExpanded
+
               style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
             >
               <div className="text-gray-500 space-y-2">
