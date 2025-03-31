@@ -7,11 +7,13 @@ import Sidebar from "../../components/Sidebar";
 
 import Dashboard from "./Dashboard components/Dashboard";
 
-import ProductsTable from "./Product components/ProductsTable";
-import AddNewProductPage from "./Product components/AddNewProduct";
 import AddContractorPage from "./Product components/AddContractorPage";
+import AddNewProductPage from "./Product components/AddNewProduct";
 import AddWorkerPage from "./Product components/AddWorkerPage";
 import EditProduct from "./Product components/EditProduct";
+import ProductsTable from "./Product components/ProductsTable";
+import AddQuotation from "./Product components/AddQuotation";
+import EditQuotation from "./Product components/EditQuotation";
 
 const Product = () => {
   document.title = "Product";
@@ -59,6 +61,11 @@ const Product = () => {
           <Route path="/add-contractor/:id" element={<AddContractorPage />} />
           <Route path="/add-worker/:id" element={<AddWorkerPage />} />
           <Route path="/edit-product/:id" element={<EditProduct />} />
+          <Route path="/add-quotation/:productId" element={<AddQuotation />} />
+          <Route
+            path="/edit-quotation/:productId/:quotationId"
+            element={<EditQuotation />}
+          />
         </Routes>
       </div>
     </div>

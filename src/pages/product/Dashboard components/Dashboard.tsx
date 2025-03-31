@@ -28,7 +28,7 @@ const colors = [
   "indigo",
   "violet",
 ];
-import { Accordion, Placeholder } from "rsuite";
+import { Accordion } from "rsuite";
 
 const Dashboard = () => {
   document.title = "Product Dashboard - KDC Admin";
@@ -482,7 +482,7 @@ const Dashboard = () => {
           <Accordion className="border-gray-20 border-2">
             <Accordion.Panel
             // bodyFill
-              header="Expense breakdown month"
+              header="Expense breakuyi;k.nljn"
               defaultExpanded
 
               style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}

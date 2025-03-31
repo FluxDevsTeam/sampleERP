@@ -11,6 +11,7 @@ import {
   faAnglesRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
+// import { Accordion } from "rsuite";
 import Modal from "../../shop/shop-components/Modal";
 
 interface TableData {
@@ -30,31 +31,53 @@ const ProductsTable: React.FC = () => {
     "Progress",
     "Details",
   ];
+  // TABLE DATA
   const [tableData, setTableData] = useState<TableData[]>([]);
+
+  // LOADING
   const [loading, setLoading] = useState<boolean>(true);
+
+  // MODAL STATES
   const [showProductDetailsModal, setShowProductDetailsModal] =
     useState<boolean>(false);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+
+  // CONTRACTOR MODAL
   const [showContractorsModal, setShowContractorsModal] = useState(false);
-  const [showWorkersModal, setShowWorkersModal] = useState(false);
-  const [showEditContractorModal, setShowEditContractorModal] = useState(false);
   const [editingContractor, setEditingContractor] = useState<any | null>(null);
-  const [showEditWorkerModal, setShowEditWorkerModal] = useState(false);
+  const [showEditContractorModal, setShowEditContractorModal] = useState(false);
+
+  // WORKER MODAL
+  const [showWorkersModal, setShowWorkersModal] = useState(false);
   const [editingWorker, setEditingWorker] = useState<any | null>(null);
+  const [showEditWorkerModal, setShowEditWorkerModal] = useState(false);
+
+  // QUOTATION MODAL
+  const [showQuotationModal, setShowQuotationModal] = useState(false);
+  const [quotation, setQuotation] = useState<any | null>([]);
   const location = useLocation();
   const navigate = useNavigate();
 
+  // PAGINATION
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // SUCCESS AND ERROR MODAL
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     title: "",
     message: "",
     type: "success" as "success" | "error",
   });
+
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  // SKETCH AND IMAGE
   const [showSketch, setShowSketch] = useState(false);
   const [showImage, setShowImage] = useState(false);
+
+  // RAW MATERIALS Usdc
+  const [rawMaterials, setRawMaterials] = useState<any[]>([]);
 
   const fetchProducts = async () => {
     try {
@@ -176,7 +199,8 @@ const ProductsTable: React.FC = () => {
     // Check for returning from add contractor or add worker with updated product data
     if (
       (location.state?.from === "addWorker" ||
-        location.state?.from === "addContractor" || location.state?.from === "editProduct") &&
+        location.state?.from === "addContractor" ||
+        location.state?.from === "editProduct") &&
       location.state?.productData
     ) {
       setSelectedProduct(location.state.productData); // Set the updated product
@@ -188,6 +212,86 @@ const ProductsTable: React.FC = () => {
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
+
+  // Fetch quotation
+  useEffect(() => {
+    const fetchQuotation = async () => {
+      if (!selectedProduct?.id) return;
+
+      try {
+        const response = await fetch(
+          `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct?.id}/quotation/`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch quotation data");
+        }
+
+        const quotationData = await response.json();
+        console.log(quotationData);
+        setQuotation(quotationData.results);
+      } catch (error) {
+        console.error("Error fetching quotation data:", error);
+        // setQuotation([]);
+      }
+    };
+
+    fetchQuotation();
+  }, [selectedProduct?.id]);
+
+  useEffect(() => {
+    const fetchRawMaterials = async () => {
+      if (!selectedProduct?.id) return;
+
+      try {
+        const response = await fetch(
+          `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/raw-materials-used/`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch raw materials");
+        }
+
+        const data = await response.json();
+        setRawMaterials(data || []);
+      } catch (error) {
+        console.error("Error fetching raw materials:", error);
+      }
+    };
+
+    fetchRawMaterials();
+  }, [selectedProduct?.id]);
+
+  const deleteQuotation = async (id: number) => {
+    const url = `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct?.id}/quotation/${id}/`;
+
+    try {
+      const response = await fetch(url, { method: "DELETE" });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete quotation");
+      }
+
+      setQuotation((prevQuotation: any[]) =>
+        prevQuotation.filter((item) => item.id !== id)
+      );
+
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Quotation deleted successfully!",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Error deleting quotation:", error);
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to delete quotation",
+        type: "error",
+      });
+    }
+  };
 
   const handleViewDetails = (product: any) => {
     setSelectedProduct(product);
@@ -473,7 +577,7 @@ const ProductsTable: React.FC = () => {
               className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
             >
               <FontAwesomeIcon className="pr-2" icon={faPlus} />
-              Add Product
+              Add P
             </button>
             <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
               <thead>
@@ -543,7 +647,8 @@ const ProductsTable: React.FC = () => {
           className={`fixed overflow-scroll inset-0 flex items-center justify-center z-[100] 
             ${confirmDelete ? "blur-sm" : ""}
             ${showContractorsModal ? "hidden" : ""} 
-            ${showWorkersModal ? "hidden" : ""}`}
+            ${showWorkersModal ? "hidden" : ""}
+            ${showQuotationModal ? "hidden" : ""}`}
         >
           <div
             className="absolute overflow-scroll inset-0 bg-black opacity-50"
@@ -724,6 +829,39 @@ const ProductsTable: React.FC = () => {
                     )}
                   </div>
                 </ol>
+
+                <ol className="text-sm text-gray-20 mb-3">
+                  <span
+                    className="inline-block mb-1 font-semibold text-blue-400 underline cursor-pointer"
+                    onClick={(e) => {
+                      const listItems = e.currentTarget.nextElementSibling;
+                      if (listItems) {
+                        listItems.classList.toggle("hidden");
+                      }
+                    }}
+                  >
+                    Raw materials (qty)
+                  </span>
+                  <div className="hidden">
+                    {rawMaterials.length > 0 ? (
+                      rawMaterials.map((material, index) => (
+                        <li key={index} className="mb-1">
+                          <span className="font-semibold">
+                            {" "}
+                            {material.material_name} -{" "}
+                            <span className="font-normal">
+                              {material.total_quantity}
+                            </span>
+                          </span>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="italic text-gray-500">
+                        No raw materials available
+                      </li>
+                    )}
+                  </div>
+                </ol>
               </div>
               {/* CONTRACTORS */}
               <p className="text-sm text-gray-20 mb-3">
@@ -742,6 +880,16 @@ const ProductsTable: React.FC = () => {
                   onClick={() => setShowWorkersModal(true)}
                 >
                   Workers
+                </span>
+              </p>
+
+              {/* QUOTATION */}
+              <p className="text-sm text-gray-20 mb-3">
+                <span
+                  className="inline-block mb-1 font-semibold text-blue-400 underline cursor-pointer"
+                  onClick={() => setShowQuotationModal(true)}
+                >
+                  Quotation
                 </span>
               </p>
             </div>
@@ -786,7 +934,7 @@ const ProductsTable: React.FC = () => {
         >
           <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg text-blue-400 font-bold">Contractors</h3>
+              <h3 className="text-lg text-blue-400 font-bold">Contractors for {selectedProduct.name}</h3>
               <button
                 onClick={() => setShowContractorsModal(false)}
                 className="text-gray-500 hover:text-gray-700"
@@ -819,7 +967,10 @@ const ProductsTable: React.FC = () => {
                           {contractor.linked_contractor?.last_name}
                         </p>
                         <p className="text-sm text-gray-500">
-                           Date: {new Date(contractor.date).toLocaleDateString("en-GB")}
+                          Date:{" "}
+                          {new Date(contractor.date).toLocaleDateString(
+                            "en-GB"
+                          )}
                         </p>
                         <p className="text-sm text-gray-500">
                           Cost: ₦{contractor.cost || "-"}
@@ -861,7 +1012,7 @@ const ProductsTable: React.FC = () => {
         >
           <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg text-blue-400 font-bold">Workers</h3>
+              <h3 className="text-lg text-blue-400 font-bold">Workers for {selectedProduct.name}</h3>
               <button
                 onClick={() => setShowWorkersModal(false)}
                 className="text-gray-500 hover:text-gray-700"
@@ -1058,6 +1209,202 @@ const ProductsTable: React.FC = () => {
                 Save
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* QUOTATION MODAL */}
+      {showQuotationModal && (
+        <div
+          className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150] ${
+            modalConfig.isOpen ? "hidden" : ""
+          }`}
+        >
+          <div className="bg-white rounded-lg p-6 w-[500px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg text-blue-400 font-bold">
+                Quotation for {selectedProduct.name}
+                <button
+                  onClick={() =>
+                    navigate(`/product/add-quotation/${selectedProduct.id}`)
+                  }
+                  className="ml-3 px-2 py-1 text-sm bg-blue-400 rounded-md text-white"
+                >
+                  <FontAwesomeIcon icon={faPlus} />
+                </button>
+              </h3>
+              <button
+                onClick={() => setShowQuotationModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
+            </div>
+            {quotation && quotation.length > 0 ? (
+              <div>
+                {quotation.map((item: any, index: number) => (
+                  <div key={index} className="mb-2">
+                    <div className="mt-2">
+                      <p
+                        onClick={(e) => {
+                          const nextSibling =
+                            e.currentTarget.nextElementSibling;
+                          if (nextSibling) {
+                            nextSibling.classList.toggle("hidden");
+                          }
+                          if (nextSibling?.classList.contains("hidden")) {
+                            e.currentTarget.classList.add("mb-2");
+                          } else {
+                            e.currentTarget.classList.remove("mb-2");
+                          }
+                        }}
+                        className="font-semibold mb-2 underline cursor-pointer"
+                      >
+                        Quotation
+                      </p>
+
+                      <div className="hidden mb-2">
+                        {item.quotation?.length > 0 ? (
+                          item.quotation.map(
+                            (
+                              quotationFn: { name: string; quantity: number },
+                              index: number
+                            ) => (
+                              <span key={index} className="inline-block w-full">
+                                <span className="font-black">*</span>{" "}
+                                {quotationFn.name}: {quotationFn.quantity}
+                              </span>
+                            )
+                          )
+                        ) : (
+                          <p className="text-sm text-gray-500">
+                            No quotation available
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <p className="font-semibold">
+                      Department:{" "}
+                      <span className="font-normal text-blue-700">
+                        {item.department || "-"}
+                      </span>
+                    </p>
+                    <p className="font-semibold">
+                      Project name:{" "}
+                      <span className="font-normal text-blue-700">
+                        {item.project_name || "-"}
+                      </span>
+                    </p>
+
+                    {/* WORKERS */}
+                    <div className="mt-2">
+                      <p
+                        onClick={(e) => {
+                          const nextSibling =
+                            e.currentTarget.nextElementSibling;
+                          if (nextSibling) {
+                            nextSibling.classList.toggle("hidden");
+                          }
+                          if (nextSibling?.classList.contains("hidden")) {
+                            e.currentTarget.classList.add("mb-2");
+                          } else {
+                            e.currentTarget.classList.remove("mb-2");
+                          }
+                        }}
+                        className="font-semibold underline cursor-pointer"
+                      >
+                        Workers
+                      </p>
+
+                      <div className="hidden mb-2">
+                        {item.salary_worker?.length > 0 ? (
+                          item.salary_worker.map((workerFn: any) => (
+                            <li
+                              key={workerFn.name}
+                              className="text-sm text-gray-500"
+                            >
+                              {workerFn.name || "-"}
+                            </li>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-500">
+                            No workers available
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* CONTRACTORS */}
+                    <div className="mt-2">
+                      <p
+                        onClick={(e) => {
+                          const nextSibling =
+                            e.currentTarget.nextElementSibling;
+                          if (nextSibling) {
+                            nextSibling.classList.toggle("hidden");
+                          }
+                          if (nextSibling?.classList.contains("hidden")) {
+                            e.currentTarget.classList.add("mb-2");
+                          } else {
+                            e.currentTarget.classList.remove("mb-2");
+                          }
+                        }}
+                        className="font-semibold underline cursor-pointer"
+                      >
+                        Contractors
+                      </p>
+                      <div className="hidden mb-2">
+                        {item.contractor?.length > 0 ? (
+                          item.contractor.map((workerFn: any) => (
+                            <li
+                              key={workerFn.name}
+                              className="text-sm text-gray-500"
+                            >
+                              {workerFn.name || "-"}
+                            </li>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-500">
+                            No contractors available
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex space-x-2 mt-6">
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/product/edit-quotation/${selectedProduct.id}/${item.id}`
+                          )
+                        }
+                        className="p-1 px-3 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
+                      >
+                        <FontAwesomeIcon
+                          className="text-xs text-blue-400"
+                          icon={faPencil}
+                        />
+                        {/* <span>Update</span> */}
+                      </button>
+                      <button
+                        onClick={() => deleteQuotation(item.id)}
+                        className="p-1 px-3 text-red-400 rounded-lg border-2 border-red-400 font-bold"
+                      >
+                        <FontAwesomeIcon
+                          className="text-xs text-red-400"
+                          icon={faTrash}
+                        />
+                        {/* <span>Delete</span> */}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="italic text-gray-500">
+                No quotation items available
+              </p>
+            )}
           </div>
         </div>
       )}
