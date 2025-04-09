@@ -13,7 +13,7 @@ import {
   faAnglesLeft,
   faAnglesRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Modal from "../../Modal";
 
 interface TableProps {
@@ -37,6 +37,7 @@ const Table: React.FC<TableProps> = ({ headers, onModalChange }) => {
   const [showImagePreview, setShowImagePreview] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const location = useLocation();
   const navigate = useNavigate();
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
@@ -115,6 +116,22 @@ const Table: React.FC<TableProps> = ({ headers, onModalChange }) => {
       onModalChange(false);
     };
   }, [showModal, showImagePreview, onModalChange]);
+
+  useEffect(() => {
+    // Check for returning from add contractor or add worker or addQuotation with updated product data
+    if (
+      (location.state?.from === "addWorker" ||
+        location.state?.from === "addContractor" ||
+        location.state?.from === "addQuotation" ||
+        location.state?.from === "editItem" ||
+        location.state?.from === "editProduct") &&
+      location.state?.productData
+    ) {
+      setSelectedProduct(location.state.productData); // Set the updated product
+      setShowModal(true); // Show the modal with the updated product data
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleViewDetails = (product: any) => {
     setSelectedProduct(product);

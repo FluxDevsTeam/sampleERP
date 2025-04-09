@@ -60,6 +60,11 @@ import AddRMCategory from "./pages/store-keeper-page/dashboard/Dashboard Compone
 import RawMaterials from "./pages/store-keeper-page/raw-materials/RawMaterials";
 import AddNewRawMaterial from "./pages/store-keeper-page/raw-materials/Raw Materials Component/AddNewRawMaterial";
 import EditRawMaterial from "./pages/store-keeper-page/raw-materials/Raw Materials Component/EditRawMaterial";
+import Removed from "./pages/store-keeper-page/removed/Removed";
+import EditRemovedItem from "./pages/store-keeper-page/removed/Removed Components/EditRemovedItem";
+import AddRemovedItem from "./pages/store-keeper-page/removed/Removed Components/AddRemovedItem";
+import RecordRemoved from "./pages/store-keeper-page/record rm added/Record-Of-Added-RM-Quantity";
+import AddToRM from "./pages/store-keeper-page/record rm added/record rm added components/Add-To-RM";
 
 // shop import route
 import { ShopSharedLayout } from "./pages/shop";
@@ -245,7 +250,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "dashboard",
-        element: <StoreKeeperDashboard headers={["Name"]} />,
+        element: <StoreKeeperDashboard />,
       },
       {
         path: "add-raw-material-category",
@@ -262,6 +267,26 @@ const router = createBrowserRouter([
       {
         path: "edit-raw-material/:id",
         element: <EditRawMaterial />,
+      },
+      {
+        path: "removed",
+        element: <Removed />,
+      },
+      {
+        path: "add-removed",
+        element: <AddRemovedItem />,
+      },
+      {
+        path: "edit-removed/:id",
+        element: <EditRemovedItem />,
+      },
+      {
+        path: "record-rm-added",
+        element: <RecordRemoved />,
+      },
+      {
+        path: "add-to-raw-material",
+        element: <AddToRM />,
       },
     ],
   },

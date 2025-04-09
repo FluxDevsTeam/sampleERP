@@ -86,7 +86,7 @@ const ProductsTable: React.FC = () => {
         `https://kidsdesigncompany.pythonanywhere.com/api/product/`
       );
 
-      https: if (!response.ok) {
+      if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
 

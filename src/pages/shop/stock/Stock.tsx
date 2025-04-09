@@ -3,11 +3,7 @@ import {useState, useEffect} from "react";
 import StockTable from "./Stock Components/StockTable";
 
 const Stock = () => {
-  const [yearlyAddedStockCount, setyearlyAddedStockCount] = useState(419);
-  const [yearlyAddedTotalCostPrice, setyearlyAddedTotalCostPrice] = useState(419);
-  const [monthlyAddedStockCount, setmonthlyAddedStockCount] = useState(419);
-  const [monthlyAddedTotalCostPrice, setmonthlyAddedTotalCostPrice] = useState(419);
-  const [dailyAddedCostTotal, setdailyAddedCostTotal] = useState(419);
+  const [stockData, setStockData] = useState<any>([]);
 
     useEffect(() => {
         async function fetchStockInfo() {
@@ -23,12 +19,8 @@ const Stock = () => {
     
             const logData = await response.json();
             console.log(logData);
-    
-            setyearlyAddedStockCount(logData.yearly_added_stock_count);
-            setyearlyAddedTotalCostPrice(logData.yearly_added_total_cost_price);
-            setmonthlyAddedStockCount(logData.monthly_added_stock_count);
-            setmonthlyAddedTotalCostPrice(logData.monthly_added_total_cost_price);
-            setdailyAddedCostTotal(logData.daily_added_cost_total);
+
+            setStockData(logData);
   
           } catch (error) {
             console.error("Error fetching items:", error);
@@ -50,27 +42,27 @@ const Stock = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-11">
         <InventoryData
           info="Yearly Added Stock"
-          digits={yearlyAddedStockCount}
+          digits={stockData.yearly_added_stock_count}
           trend="up"
         ></InventoryData>
         <InventoryData
           info="Yearly Added Total Cost Price"
-          digits={yearlyAddedTotalCostPrice}
+          digits={stockData.yearly_added_total_cost_price}
           trend="up"
         ></InventoryData>
         <InventoryData
           info="Monthly Added Stock"
-          digits={monthlyAddedStockCount}
+          digits={stockData.monthly_added_stock_count}
           trend="up"
         ></InventoryData>
         <InventoryData
           info="Monthly Added Total Cost Price"
-          digits={monthlyAddedTotalCostPrice}
+          digits={stockData.monthly_added_total_cost_price}
           trend="up"
         ></InventoryData>
         <InventoryData
           info="Daily Added Cost Total"
-          digits={dailyAddedCostTotal}
+          digits={stockData.daily_added_cost_total}
           trend="up"
         ></InventoryData>
       </div>

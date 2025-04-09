@@ -17,6 +17,8 @@ import {
   faPlusCircle,
   faReceipt,
   faTableCells,
+  faMinusCircle,
+  faPlusMinus,
 } from "@fortawesome/free-solid-svg-icons";
 
 export interface SidebarProps {
@@ -160,6 +162,28 @@ export const storeKeeperSidebarLink: SidebarProps[] = [
     text: "Raw material",
     href: "/store-keeper/raw-materials",
     icon: <RawMaterialIcon className="currentColor" />,
+  },
+  {
+    id: nanoid(),
+    text: "Removed",
+    href: "/store-keeper/removed",
+    icon: (
+      <FontAwesomeIcon
+        className="text-2xl pr-[7.3px] ml-[2px]"
+        icon={faMinusCircle}
+      />
+    ),
+  },
+  {
+    id: nanoid(),
+    text: "Add to Raw Material",
+    href: "/store-keeper/record-rm-added",
+    icon: (
+      <FontAwesomeIcon
+        className="text-2xl pr-[7.3px] ml-[2px]"
+        icon={faPlusMinus}
+      />
+    ),
   },
 ];
 

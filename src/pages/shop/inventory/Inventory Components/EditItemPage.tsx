@@ -6,9 +6,10 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../Modal";
 
 const EditItemPage: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
-  const navigate = useNavigate();
+  const from = location.state?.from;
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<{ id: number; name: string }[]>(
     []
@@ -35,6 +36,27 @@ const EditItemPage: React.FC = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === "success") {
       navigate("/shop/inventory");
+      const fetchUpdatedProduct = async () => {
+        try {
+          const response = await fetch(
+            `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${id}/`
+          );
+          if (!response.ok) {
+            throw new Error("Iyegs... Failed to fetch updated product data");
+          }
+          const updatedData = await response.json();
+
+          navigate("/shop/inventory", {
+            state: {
+              from: "editItem",
+              productData: updatedData
+            },
+          });
+        } catch (error) {
+          navigate("/shop/inventory")
+        }
+      };
+      fetchUpdatedProduct();
     }
   };
 
@@ -138,7 +160,11 @@ const EditItemPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className={`max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 ${modalConfig.isOpen ? "hidden" : ""}`}>
+      <div
+        className={`max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 ${
+          modalConfig.isOpen ? "hidden" : ""
+        }`}
+      >
         <div className={`flex items-center mb-6`}>
           <button
             onClick={() => navigate("/shop/inventory")}

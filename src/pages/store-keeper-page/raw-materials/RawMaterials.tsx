@@ -63,7 +63,7 @@ export const RawMaterials: React.FC = () => {
       }
 
       const logData = await response.json();
-      console.log(logData);
+      // console.log(logData);
 
       setTotalStockValue(logData.results.total_stock_value);
       setTotalStoreCount(logData.results.total_store_count);

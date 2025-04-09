@@ -12,6 +12,10 @@ import {
 import { useNavigate } from "react-router-dom";
 import Modal from "../../Modal";
 
+interface InventoryCategory {
+  id: number;
+  name: string;
+}
 interface StockEntry {
   cost_price: string;
   date: string;
@@ -20,6 +24,9 @@ interface StockEntry {
     id: number;
     name: string;
     image: string;
+    dimensions: string;
+
+    inventory_category: InventoryCategory;
   };
   name: string;
   quantity: string;
@@ -59,6 +66,7 @@ const StockTable: React.FC = () => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<StockEntry | null>(null);
+  const [showImage, setShowImage] = useState(false);
 
   const fetchItems = async () => {
     try {
@@ -155,6 +163,7 @@ const StockTable: React.FC = () => {
   const handleViewDetails = (entry: StockEntry) => {
     setSelectedItem(entry);
     setShowDetailsModal(true);
+    setShowImage(false); // Reset image visibility when opening modal
   };
 
   return (
@@ -216,6 +225,9 @@ const StockTable: React.FC = () => {
                           Quantity
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
+                          Cost price
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
                           {/* Details */}
                         </th>
                       </tr>
@@ -231,6 +243,9 @@ const StockTable: React.FC = () => {
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {entry.quantity}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            {entry.cost_price}
                           </td>
                           <td className="px-4 py-3 text-sm text-blue-400">
                             <button
@@ -343,6 +358,24 @@ const StockTable: React.FC = () => {
               </button>
             </div>
 
+            {selectedItem.inventory_item.image && (
+              <div className="mb-4">
+                <button
+                  onClick={() => setShowImage(!showImage)}
+                  className="mb-2 px-4 py-2 text-blue-500 border border-blue-500 rounded hover:bg-blue-50"
+                >
+                  {showImage ? "Hide Image" : "View Image"}
+                </button>
+                {showImage && (
+                  <img
+                    src={selectedItem.inventory_item.image}
+                    alt={selectedItem.name}
+                    className="w-full h-48 object-cover rounded-lg mt-2"
+                  />
+                )}
+              </div>
+            )}
+
             <div className="space-y-3">
               <p className="text-sm">
                 <span className="font-semibold">Quantity:</span>{" "}
@@ -356,23 +389,37 @@ const StockTable: React.FC = () => {
                 <span className="font-semibold">Cost Price:</span> ₦
                 {selectedItem.cost_price}
               </p>
+              <p className="text-sm">
+                <span className="font-semibold">Inventory Category:</span>{" "}
+                {selectedItem.inventory_item.inventory_category.name}
+              </p>
+              <p className="text-sm">
+                <span className="font-semibold">Dimensions:</span>{" "}
+                {selectedItem.inventory_item.dimensions}
+              </p>
             </div>
-            <button
-              onClick={() =>
-                navigate(`/shop/edit-stock-item/${selectedItem.id}`)
-              }
-              className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold"
-            >
-              <FontAwesomeIcon className="pr-1 text-blue-400" icon={faPencil} />
-              Edit details
-            </button>
-            <button
-              onClick={() => confirmDeleteStock(selectedItem.id)}
-              className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
-            >
-              <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
-              Delete Item
-            </button>
+
+            <div className="mt-4 space-x-2">
+              <button
+                onClick={() =>
+                  navigate(`/shop/edit-stock-item/${selectedItem.id}`)
+                }
+                className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
+              >
+                <FontAwesomeIcon
+                  className="pr-1 text-blue-400"
+                  icon={faPencil}
+                />
+                Edit details
+              </button>
+              <button
+                onClick={() => confirmDeleteStock(selectedItem.id)}
+                className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 font-bold"
+              >
+                <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
+                Delete Item
+              </button>
+            </div>
           </div>
         </div>
       )}

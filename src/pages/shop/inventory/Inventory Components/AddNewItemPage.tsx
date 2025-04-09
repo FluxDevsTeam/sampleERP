@@ -158,7 +158,7 @@ const AddItemPage: React.FC = () => {
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center mb-6">
           <button
-            onClick={() => navigate("/shop/dashboard")}
+            onClick={() => navigate("/shop/inventory")}
             className="mr-4 text-gray-20 hover:text-gray-600"
           >
             <FontAwesomeIcon icon={faArrowLeft} />

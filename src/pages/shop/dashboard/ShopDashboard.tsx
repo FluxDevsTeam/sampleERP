@@ -15,14 +15,8 @@ const ShopDashboard = () => {
     "Total Stock Value",
   ];
 
-  const [totalCostValue, setTotalCostValue] = useState(419);
-  const [monthlyStock, setMonthlyStock] = useState(419);
-  const [totalProfitPotential, setTotalProfitPotential] = useState(419);
-  const [profitThisMonth, setProfitThisMonth] = useState(419);
-  const [totalShopValue, setTotalShopValue] = useState(419);
-  const [totalSoldThisMonth, setTotalSoldThisMonth] = useState(419);
-  const [yearlyAddedValue, setYearlyAddedValue] = useState(419);
-  const [yearlyProfit, setYearlyProfit] = useState(419);
+    const [dashboardData, setDashboardData] = useState<any>(null);
+  
 
   useEffect(() => {
     async function fetchStockInfo() {
@@ -39,14 +33,7 @@ const ShopDashboard = () => {
         const logData = await response.json();
         console.log(logData);
 
-        setMonthlyStock(logData.total_added_this_month);
-        setTotalCostValue(logData.total_cost_value);
-        setTotalProfitPotential(logData.total_profit_potential);
-        setProfitThisMonth(logData.total_profit_this_month);
-        setTotalShopValue(logData.total_shop_value);
-        setTotalSoldThisMonth(logData.total_sold_this_month);
-        setYearlyAddedValue(logData.yearly_added_value);
-        setYearlyProfit(logData.yearly_profit);
+        setDashboardData(logData);
       } catch (error) {
         console.error("Error fetching dashboard:", error);
       }
@@ -61,35 +48,35 @@ const ShopDashboard = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-20">
           <DashboardData
             info="Monthly Stock Added"
-            digits={monthlyStock}
+            digits={dashboardData?.total_added_this_month}
           ></DashboardData>
           <DashboardData
             info="Total Cost Value"
-            digits={totalCostValue}
+            digits={dashboardData?.total_cost_value}
           ></DashboardData>
           <DashboardData
             info="Total Profit Potential"
-            digits={totalProfitPotential}
+            digits={dashboardData?.total_profit_potential}
           ></DashboardData>
           <DashboardData
             info="Total Profit this month"
-            digits={profitThisMonth}
+            digits={dashboardData?.total_profit_this_month}
           ></DashboardData>
           <DashboardData
             info="Total shop value"
-            digits={totalShopValue}
+            digits={dashboardData?.total_shop_value}
           ></DashboardData>
           <DashboardData
             info="Total sold this month"
-            digits={totalSoldThisMonth}
+            digits={dashboardData?.total_sold_this_month}
           ></DashboardData>
           <DashboardData
             info="Yearly added value"
-            digits={yearlyAddedValue}
+            digits={dashboardData?.yearly_added_value}
           ></DashboardData>
           <DashboardData
             info="Yearly profit"
-            digits={yearlyProfit}
+            digits={dashboardData?.yearly_profit}
           ></DashboardData>
         </div>
 
