@@ -197,7 +197,7 @@ const EditAsset = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/admin/dashboard")}
+              onClick={() => navigate("/admin/assets")}
             >
               Cancel
             </Button>

@@ -1,5 +1,6 @@
-import AssetsTable from "./_components/AssetsTable"
 import Header from "./_components/AssetsHeader"
+import AssetsTable from "./_components/AssetsTable"
+
 
 const Assets = () => {
   return (

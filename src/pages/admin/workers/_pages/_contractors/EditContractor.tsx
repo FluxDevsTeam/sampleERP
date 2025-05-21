@@ -172,7 +172,7 @@ const EditContractor = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/admin/contractors")}
+              onClick={() => navigate("/admin/workers")}
             >
               Cancel
             </Button>

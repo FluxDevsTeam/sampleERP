@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const fetchAssets = async () => {
   const { data } = await axios.get("https://kidsdesigncompany.pythonanywhere.com/api/assets/");
-  return data.assets;
+  return data;
 };
 
 const AssetsTable = () => {
@@ -21,7 +21,7 @@ const AssetsTable = () => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Assets List</h2>
         <Link
-          to="/admin/dashboard/add-asset"
+          to="/admin/add-asset"
           className="bg-blue-600 text-white px-4 py-2 rounded-md"
         >
           Add New Asset
@@ -38,7 +38,7 @@ const AssetsTable = () => {
           </tr>
         </thead>
         <tbody>
-          {assets.map((asset: any, index: number) => (
+          {assets?.results?.assets?.map((asset: any, index: number) => (
             <tr key={index} className="border">
               <td className="border p-2">{asset.name}</td>
               <td className="border p-2">${asset.value}</td>

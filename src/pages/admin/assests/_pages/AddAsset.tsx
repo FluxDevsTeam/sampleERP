@@ -106,7 +106,7 @@ const AddAsset = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/admin/dashboard/assets")}
+              onClick={() => navigate("/admin/assets")}
             >
               Cancel
             </Button>

@@ -170,7 +170,7 @@ const AddSalaryWorker = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/admin/salary-workers")}
+              onClick={() => navigate("/admin/workers")}
             >
               Cancel
             </Button>
