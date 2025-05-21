@@ -1,20 +1,26 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import {
   CEODashboard,
- CEOProjects,
+  CEOProjects,
   CEOCustomers,
- CEOStore,
- CEOWorkers,
- CEOProducts,
- CEOShop,
- CEOExpenses,
- CEOOverhead,
-CEOSharedLayout,
-CEOAssets,
-
+  CEOStore,
+  CEOWorkers,
+  CEOProducts,
+  CEOShop,
+  CEOExpenses,
+  CEOOverhead,
+  CEOSharedLayout,
+  CEOAssets,
 } from "./pages/ceo";
 
-import { Workers,AdminDashboard,Expenses,AdminLayout,Assets,Paid } from "./pages/admin";
+import {
+  Workers,
+  AdminDashboard,
+  Expenses,
+  AdminLayout,
+  Assets,
+  Paid,
+} from "./pages/admin";
 import AddAsset from "./pages/admin/assests/_pages/AddAsset";
 import EditAsset from "./pages/admin/assests/_pages/EditAsset";
 import AddExpense from "./pages/admin/expenses/_pages/AddExpense";
@@ -25,35 +31,55 @@ import "react-toastify/dist/ReactToastify.css";
 import SignUp from "./pages/AuthPages/signup/SignUp";
 import Signin from "./pages/AuthPages/signin/Signin";
 
-import {FactoryManagerCustomers,
-FactoryManagerSharedLayout,
-FactoryManagerAssets,
-FactoryManagerExpenses,
-FactoryManagerDashboard,
-FactoryManagerProducts,
-FactoryManagerProjects,
-FactoryManagerWorkers}
- from "./pages/factory-manager-page";
-
+import {
+  FactoryManagerCustomers,
+  FactoryManagerSharedLayout,
+  FactoryManagerAssets,
+  FactoryManagerExpenses,
+  FactoryManagerDashboard,
+  FactoryManagerProducts,
+  FactoryManagerProjects,
+  FactoryManagerWorkers,
+} from "./pages/factory-manager-page";
 
 //  Project Manager Route
-import {
-  ProjectManagerDashboard,
-  ProjectManagerProjects,
-  ProjectManagerProducts,
-  ProjectManagerLayout,
-  ProjectManagerCustomers
-} from "./pages/project-manager-page";
-
-
+import { ProjectManagerLayout } from "./pages/project-manager-page";
+import ProjectManagerDashboard from "./pages/project-manager-page/dashboard/ProjectManagerDashboard";
+import ProductsTable from "./pages/project-manager-page/product/ProductsTable";
+import AddNewProductPage from "./pages/project-manager-page/product/Product Components/AddNewProduct";
+import AddContractorPage from "./pages/project-manager-page/product/Product Components/AddContractorPage";
+import AddWorkerPage from "./pages/project-manager-page/product/Product Components/AddWorkerPage";
+import EditProduct from "./pages/project-manager-page/product/Product Components/EditProduct";
+import AddQuotation from "./pages/project-manager-page/product/Product Components/AddQuotation";
+import EditQuotation from "./pages/project-manager-page/product/Product Components/EditQuotation";
 
 // STORE KEEPER IMPORT ROUTE
-import {
-  StoreKeeperDashboard,
-  StoreKeeperLayout,
-} from "./pages/store-keeper-page";
+import { StoreKeeperLayout } from "./pages/store-keeper-page";
+import StoreKeeperDashboard from "./pages/store-keeper-page/dashboard/StoreKeeperDashboard";
+import AddRMCategory from "./pages/store-keeper-page/dashboard/Dashboard Components/AddRMCategory";
+import RawMaterials from "./pages/store-keeper-page/raw-materials/RawMaterials";
+import AddNewRawMaterial from "./pages/store-keeper-page/raw-materials/Raw Materials Component/AddNewRawMaterial";
+import EditRawMaterial from "./pages/store-keeper-page/raw-materials/Raw Materials Component/EditRawMaterial";
+import Removed from "./pages/store-keeper-page/removed/Removed";
+import EditRemovedItem from "./pages/store-keeper-page/removed/Removed Components/EditRemovedItem";
+import AddRemovedItem from "./pages/store-keeper-page/removed/Removed Components/AddRemovedItem";
+import RecordRemoved from "./pages/store-keeper-page/record rm added/Record-Of-Added-RM-Quantity";
+import AddToRM from "./pages/store-keeper-page/record rm added/record rm added components/Add-To-RM";
 
-import { ShopDashboard,ShopSharedLayout } from "./pages/shop";
+// shop import route
+import { ShopSharedLayout } from "./pages/shop";
+import ShopDashboard from "./pages/shop/dashboard/ShopDashboard";
+import Inventory from "./pages/shop/inventory/Inventory";
+import Sold from "./pages/shop/sold/Sold";
+import Stock from "./pages/shop/stock/Stock";
+import AddItemPage from "./pages/shop/inventory/Inventory Components/AddNewItemPage";
+import AddCategoryPage from "./pages/shop/inventory/Inventory Components/AddNewCategory";
+import EditItemPage from "./pages/shop/inventory/Inventory Components/EditItemPage";
+import AddNewSoldItemPage from "./pages/shop/sold/Sold Components/AddNewSoldItemPage";
+import EditSoldItemPage from "./pages/shop/sold/Sold Components/EditSoldItemPage";
+import AddNewStockPage from "./pages/shop/stock/Stock Components/AddNewStock";
+import EditStockItemPage from "./pages/shop/stock/Stock Components/EditStockItemPage";
+
 import EditPayment from "./pages/admin/paid/_pages/EditPayment";
 import AddPayment from "./pages/admin/paid/_pages/AddPayment";
 import AddSalaryWorker from "./pages/admin/workers/_pages/_salaryWorkers/AddSalaryWorker";
@@ -67,9 +93,7 @@ import AddProject from "./pages/ceo/allProjects/_pages/AddProject";
 import EditProject from "./pages/ceo/allProjects/_pages/EditProject";
 import OtherProductionRecords from "./pages/ceo/allProjects/_pages/OtherProductionRecords";
 
-
-const router =  
-createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: "/",
     element: <Signin />,
@@ -82,13 +106,14 @@ createBrowserRouter([
     path: "/forgot-password",
     element: <ForgotPassword />,
   },
+
   // CEO DASHBOARD ROUTE
   {
     path: "/ceo",
     element: <CEOSharedLayout />,
     children: [
       {
-         path: "dashboard",
+        path: "dashboard",
         element: <CEODashboard />,
       },
       {
@@ -140,10 +165,9 @@ createBrowserRouter([
         element: <OtherProductionRecords />,
       },
     ],
-  } ,
-  
+  },
 
-  // FACTORY MANAGER ROUTE 
+  // FACTORY MANAGER ROUTE
   {
     path: "/factory-manager",
     element: <FactoryManagerSharedLayout />,
@@ -166,7 +190,7 @@ createBrowserRouter([
       },
       {
         path: "assets",
-        element: <FactoryManagerAssets/>,
+        element: <FactoryManagerAssets />,
       },
       {
         path: "products",
@@ -176,13 +200,8 @@ createBrowserRouter([
         path: "expenses",
         element: <FactoryManagerExpenses />,
       },
-    
-
-    
     ],
   },
-
-
 
   // PROJECT MANAGER ROUTE
   {
@@ -194,53 +213,143 @@ createBrowserRouter([
         element: <ProjectManagerDashboard />,
       },
       {
-        path: "projects",
-        element: <ProjectManagerProjects />,
+        path: "main",
+        element: <ProductsTable />,
       },
       {
-        path: "products",
-        element: <ProjectManagerProducts />,
+        path: "add-product",
+        element: <AddNewProductPage />,
       },
       {
-        path: "customers",
-        element: <ProjectManagerCustomers />,
+        path: "add-contractor/:id",
+        element: <AddContractorPage />,
+      },
+      {
+        path: "add-worker/:id",
+        element: <AddWorkerPage />,
+      },
+      {
+        path: "edit-product/:id",
+        element: <EditProduct />,
+      },
+      {
+        path: "add-quotation/:productId",
+        element: <AddQuotation />,
+      },
+      {
+        path: "edit-quotation/:productId/:quotationId",
+        element: <EditQuotation />,
       },
     ],
   },
- 
+
   // STORE KEEPER ROUTE
   {
     path: "/store-keeper",
     element: <StoreKeeperLayout />,
     children: [
       {
-        path:"dashboard",
+        path: "dashboard",
         element: <StoreKeeperDashboard />,
       },
-      
+      {
+        path: "add-raw-material-category",
+        element: <AddRMCategory />,
+      },
+      {
+        path: "raw-materials",
+        element: <RawMaterials />,
+      },
+      {
+        path: "add-raw-material",
+        element: <AddNewRawMaterial />,
+      },
+      {
+        path: "edit-raw-material/:id",
+        element: <EditRawMaterial />,
+      },
+      {
+        path: "removed",
+        element: <Removed />,
+      },
+      {
+        path: "add-removed",
+        element: <AddRemovedItem />,
+      },
+      {
+        path: "edit-removed/:id",
+        element: <EditRemovedItem />,
+      },
+      {
+        path: "record-rm-added",
+        element: <RecordRemoved />,
+      },
+      {
+        path: "add-to-raw-material",
+        element: <AddToRM />,
+      },
     ],
   },
 
-   // SHOP ROUTE
-   {
+  // SHOP ROUTE
+  {
     path: "/shop",
     element: <ShopSharedLayout />,
     children: [
       {
-       path : "dashboard",
+        path: "dashboard",
         element: <ShopDashboard />,
       },
-      
+      {
+        path: "inventory",
+        element: <Inventory />,
+      },
+      {
+        path: "add-new-item",
+        element: <AddItemPage />,
+      },
+      {
+        path: "add-new-category",
+        element: <AddCategoryPage />,
+      },
+      {
+        path: "edit-item/:id",
+        element: <EditItemPage />,
+      },
+      {
+        path: "sold",
+        element: <Sold />,
+      },
+      {
+        path: "add-new-sold-item",
+        element: <AddNewSoldItemPage />,
+      },
+      {
+        path: "edit-sold-item/:id",
+        element: <EditSoldItemPage />,
+      },
+      {
+        path: "stock",
+        element: <Stock />,
+      },
+      {
+        path: "add-new-stock-item",
+        element: <AddNewStockPage />,
+      },
+      {
+        path: "edit-stock-item/:id",
+        element: <EditStockItemPage />,
+      },
     ],
   },
 
-  //admin dashboard 
+  //admin dashboard
   {
     path: "/admin",
     element: <AdminLayout />,
     children: [
       {
-        path :"dashboard",
+        path: "dashboard",
         element: <AdminDashboard />,
       },
       {
@@ -255,7 +364,6 @@ createBrowserRouter([
         path: "workers",
         element: <Workers />,
       },
-    
       {
         path: "paid",
         element: <Paid />,
@@ -306,16 +414,16 @@ createBrowserRouter([
       },
       {
         path: "contractors/:id/records",
-        element: <ContractorRecords/>,
+        element: <ContractorRecords />,
       },
-   
     ],
   },
 ]);
+
 const App = () => {
   return (
     <>
-      <RouterProvider router= {router} />
+      <RouterProvider router={router} />
     </>
   );
 };
