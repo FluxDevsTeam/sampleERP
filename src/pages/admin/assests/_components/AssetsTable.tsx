@@ -109,7 +109,7 @@ const AssetsTable = () => {
       <div className="flex justify-between items-center mb-6">
         <div
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
+          className="cursor-pointer bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
         >
           Add Asset
         </div>

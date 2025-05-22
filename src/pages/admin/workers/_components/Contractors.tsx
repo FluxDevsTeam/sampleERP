@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {  useSearchParams } from "react-router-dom";
 import axios from "axios";
 import PaginationComponent from "./Pagination";
 import Modals from "./Modal";
@@ -50,7 +50,7 @@ const fetchContractors = async (page = 1): Promise<ContractorsResponse> => {
 };
 
 const Contractors = () => {
-  const navigate = useNavigate();
+
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
 

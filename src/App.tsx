@@ -93,6 +93,9 @@ import AddProject from "./pages/ceo/allProjects/_pages/AddProject";
 import EditProject from "./pages/ceo/allProjects/_pages/EditProject";
 import OtherProductionRecords from "./pages/ceo/allProjects/_pages/OtherProductionRecords";
 
+import Shop from "./pages/shop/shop.tsx";
+import Product from "./pages/product/product.tsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -418,6 +421,17 @@ const router = createBrowserRouter([
       },
     ],
   },
+  // SHOP ROUTE
+  {
+    path: "/shop/*",
+    element: <Shop />,
+  },
+
+  // product route
+  {
+    path: "/product/*",
+    element: <Product />
+  }
 ]);
 
 const App = () => {

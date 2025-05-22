@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MdCancel } from 'react-icons/md';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 import ProjectModals from './Modal';
 import PaginationComponent from './Pagination';
-
+import AddProjectModal from './AddProjectModal';
 // Define the type for a single product
 interface Product {
   id: number;
@@ -120,7 +120,7 @@ const fetchProjects = async (page = 1): Promise<PaginatedProjectsResponse> => {
 };
 
 const ProjectsTable = () => {
-  const navigate = useNavigate();
+
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -131,7 +131,7 @@ const ProjectsTable = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
+const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   // Use React Query to fetch data with pagination
   const { data, error, isLoading } = useQuery({
     queryKey: ['projects', currentPage],
@@ -176,12 +176,7 @@ const ProjectsTable = () => {
     setIsModalOpen(true);
   };
 
-  // Handle edit button click
-  const handleEdit = () => {
-    if (selectedProject?.id) {
-      navigate(`/ceo/edit-project/${selectedProject.id}`);
-    }
-  };
+ 
 
   // Handle delete button click
   const handleDelete = () => {
@@ -211,12 +206,12 @@ const ProjectsTable = () => {
   return (
     <div className="p-6 flex flex-col h-full bg-white">
       <div className="flex justify-between items-center mb-6">
-        <Link
-          to="/ceo/add-project"
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
+        <div
+          onClick={() => setIsAddModalOpen(true)}
+          className="cursor-pointer bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
         >
           Add Project
-        </Link>
+        </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-700">
             Showing page {currentPage} of {totalPages}
@@ -318,16 +313,18 @@ const ProjectsTable = () => {
           handlePageChange={handlePageChange}
         />
       </div>
-
+  < AddProjectModal 
+     open={isAddModalOpen}
+  onOpenChange={setIsAddModalOpen}
+        />
       <ProjectModals
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-        selectedProject={selectedProject}
-        handleEdit={handleEdit}
-        handleDelete={handleDelete}
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        confirmDelete={confirmDelete}
+       isModalOpen={isModalOpen}
+  setIsModalOpen={setIsModalOpen}
+  selectedProject={selectedProject}
+  handleDelete={handleDelete}
+  isDeleteDialogOpen={isDeleteDialogOpen}
+  setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+  confirmDelete={confirmDelete}
       />
     </div>
   );

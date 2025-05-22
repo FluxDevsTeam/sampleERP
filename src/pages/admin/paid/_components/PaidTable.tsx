@@ -168,6 +168,7 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 <AddPaymentModal
   open={isAddModalOpen}
   onOpenChange={setIsAddModalOpen}
+
 />
 
       {/* Details Modal */}

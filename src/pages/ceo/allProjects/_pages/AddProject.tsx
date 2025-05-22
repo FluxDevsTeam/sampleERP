@@ -30,23 +30,7 @@ import {
 } from "@/components/ui/alert"
 
 // Define the types for the project data
-interface ProjectData {
-  name: string;
-  status: string;
-  start_date: string;
-  deadline: string | null;
-  date_delivered: string | null;
-  is_delivered: boolean;
-  archived: boolean;
-  customer_detail: {
-    id: number;
-  };
-  selling_price: string;
-  logistics: string;
-  service_charge: string;
-  note: string | null;
-  invoice_image?: File | null;
-}
+
 
 // Interface for customers
 interface Customer {

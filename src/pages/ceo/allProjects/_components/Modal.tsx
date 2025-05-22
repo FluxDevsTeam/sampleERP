@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,8 +19,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
+import EditProjectModal from "./EditProjectModal"; 
 
-// Define the Project interface based on your data structure
 interface Project {
   id: number;
   name: string;
@@ -45,7 +45,6 @@ interface ProjectModalsProps {
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
   selectedProject: Project | null;
-  handleEdit: () => void;
   handleDelete: () => void;
   isDeleteDialogOpen: boolean;
   setIsDeleteDialogOpen: (open: boolean) => void;
@@ -56,18 +55,23 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   isModalOpen,
   setIsModalOpen,
   selectedProject,
-  handleEdit,
   handleDelete,
   isDeleteDialogOpen,
   setIsDeleteDialogOpen,
   confirmDelete,
 }) => {
   const navigate = useNavigate();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const handleViewOtherProductionRecords = () => {
     if (selectedProject?.id) {
       navigate(`/ceo/projects/${selectedProject.id}/records`);
     }
+  };
+
+  const handleEditSuccess = () => {
+    setIsEditModalOpen(false);
+    setIsModalOpen(false);
   };
 
   return (
@@ -93,10 +97,6 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium">Status:</span>
                 <span className="col-span-2 capitalize">{selectedProject.status}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Progress:</span>
-                <span className="col-span-2">{selectedProject.products.progress}%</span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium">Selling Price:</span>
@@ -129,7 +129,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
               <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                 Close
               </Button>
-              <Button variant="outline" onClick={handleEdit}>
+              <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
                 Edit
               </Button>
               <Button variant="destructive" onClick={handleDelete}>
@@ -143,6 +143,17 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
         </DialogContent>
       </Dialog>
 
+      {/* Edit Project Modal */}
+      {selectedProject && (
+        <EditProjectModal
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          projectId={selectedProject.id.toString()}
+          onSuccess={handleEditSuccess}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
