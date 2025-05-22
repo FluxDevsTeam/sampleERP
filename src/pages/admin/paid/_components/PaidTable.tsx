@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import AddPaymentModal from "./AddPaymentModal";
 import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
 import {
@@ -23,6 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import EditPaymentModal from "./EditPaymentModal"; // Import the modal component
 
 interface Entry {
   id: number;
@@ -52,13 +53,14 @@ const fetchPaid = async (): Promise<PaidData> => {
 const PaidTable: React.FC = () => {
   const { data, isLoading, error } = useQuery<PaidData>({ queryKey: ["paid"], queryFn: fetchPaid });
   const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>({});
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // States for modal and selected entry
+  // States for modals and selected entry
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const deletePaidMutation = useMutation({
     mutationFn: async (entryId: number) => {
@@ -67,22 +69,21 @@ const PaidTable: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paid"] });
       setIsDeleteDialogOpen(false);
-      setIsModalOpen(false);
+      setIsDetailsModalOpen(false);
       toast.success("Payment deleted successfully!");
     },
   });
 
-  // Handle row click to show modal
+  // Handle row click to show details modal
   const handleRowClick = (entry: Entry) => {
     setSelectedEntry(entry);
-    setIsModalOpen(true);
+    setIsDetailsModalOpen(true);
   };
 
   // Handle edit button click
   const handleEdit = () => {
-    if (selectedEntry?.id) {
-      navigate(`/admin/edit-payment/${selectedEntry.id}`);
-    }
+    setIsDetailsModalOpen(false);
+    setIsEditModalOpen(true);
   };
 
   // Handle delete button click
@@ -97,6 +98,12 @@ const PaidTable: React.FC = () => {
     }
   };
 
+  // Handle successful edit
+  const handleEditSuccess = () => {
+    setIsEditModalOpen(false);
+    setIsDetailsModalOpen(false);
+  };
+
   const toggleCollapse = (date: string) => {
     setCollapsed((prev) => ({ ...prev, [date]: !prev[date] }));
   };
@@ -107,12 +114,12 @@ const PaidTable: React.FC = () => {
   return (
     <div className="p-6 flex flex-col h-full bg-white">
       <div className="flex justify-between items-center mb-6">
-        <Link
-          to="/admin/add-payment"
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
+        <div
+        onClick={() => setIsAddModalOpen(true)}
+          className="cursor-pointer bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
         >
           Add Payment
-        </Link>
+        </div>
       </div>
 
       <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
@@ -158,8 +165,13 @@ const PaidTable: React.FC = () => {
           </tbody>
         </table>
       </div>
+<AddPaymentModal
+  open={isAddModalOpen}
+  onOpenChange={setIsAddModalOpen}
+/>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      {/* Details Modal */}
+      <Dialog open={isDetailsModalOpen} onOpenChange={setIsDetailsModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Payment Details</DialogTitle>
@@ -189,7 +201,7 @@ const PaidTable: React.FC = () => {
 
           <DialogFooter>
             <div className="flex justify-around items-center w-full">
-              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+              <Button variant="outline" onClick={() => setIsDetailsModalOpen(false)}>
                 Close
               </Button>
               <Button variant="outline" onClick={handleEdit}>
@@ -203,6 +215,17 @@ const PaidTable: React.FC = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Edit Payment Modal */}
+      {selectedEntry && (
+        <EditPaymentModal
+          id={selectedEntry.id.toString()}
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          onSuccess={handleEditSuccess}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

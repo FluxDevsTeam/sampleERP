@@ -6,6 +6,7 @@ import PaginationComponent from "./Pagination";
 import Modals from "./Modal";
 import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
+import AddContractorModal from "../_pages/_contractors/AddContractorModal";
 
 const BASE_URL = "https://kidsdesigncompany.pythonanywhere.com/api/contractors/";
 
@@ -58,6 +59,7 @@ const Contractors = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
+ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["contractors", currentPage],
@@ -88,11 +90,6 @@ const Contractors = () => {
     setIsModalOpen(true);
   };
 
-  const handleEdit = () => {
-    if (selectedContractor?.id) {
-      navigate(`/admin/edit-contractor/${selectedContractor.id}`);
-    }
-  };
 
   const handleDelete = () => {
     setIsDeleteDialogOpen(true);
@@ -128,12 +125,12 @@ const Contractors = () => {
   return (
     <div className="p-6 flex flex-col h-full bg-white">
       <div className="flex justify-between items-center mb-6">
-        <Link
-          to="/admin/add-contractor"
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
+        <div
+           onClick={() => setIsAddModalOpen(true)}
+          className="cursor-pointer bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
         >
           Add Contractor
-        </Link>
+        </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-700">
             Showing page {currentPage} of {totalPages}
@@ -190,11 +187,15 @@ const Contractors = () => {
         />
       </div>
 
+      < AddContractorModal 
+     open={isAddModalOpen}
+  onOpenChange={setIsAddModalOpen}
+        />
+
       <Modals
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         selectedWorker={selectedContractor}
-        handleEdit={handleEdit}
         handleDelete={handleDelete}
         isDeleteDialogOpen={isDeleteDialogOpen}
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}

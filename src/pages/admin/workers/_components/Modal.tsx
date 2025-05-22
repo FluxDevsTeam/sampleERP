@@ -1,4 +1,7 @@
 import React from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {  useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +21,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useNavigate } from "react-router-dom";
+import EditContractorModal from "../_pages/_contractors/EditContractorModal";
+import EditSalaryWorkerModal from "../_pages/_salaryWorkers/EditSalaryWorkerModal";
 
 interface Worker {
   id: number;
@@ -26,7 +30,7 @@ interface Worker {
   last_name: string;
   email: string;
   craft_specialty: string;
-  salary?: string; // Optional for contractors
+  salary?: string;
   is_still_active: boolean;
 }
 
@@ -34,33 +38,33 @@ interface ModalsProps {
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
   selectedWorker: Worker | null;
-  handleEdit: () => void;
   handleDelete: () => void;
   isDeleteDialogOpen: boolean;
   setIsDeleteDialogOpen: (open: boolean) => void;
   confirmDelete: () => void;
-  workerType: "salary-worker" | "contractor"; 
+  workerType: "salary-worker" | "contractor";
 }
 
 const Modals: React.FC<ModalsProps> = ({
   isModalOpen,
   setIsModalOpen,
   selectedWorker,
-  handleEdit,
   handleDelete,
   isDeleteDialogOpen,
   setIsDeleteDialogOpen,
   confirmDelete,
-  workerType, // New prop to determine worker type
+  workerType,
 }) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
+   const queryClient = useQueryClient();
+
 
   const handleViewRecords = () => {
     if (selectedWorker?.id) {
-      // Dynamically route based on worker type
       if (workerType === "salary-worker") {
         navigate(`/admin/salary-workers/${selectedWorker.id}/records`);
-      } else if (workerType === "contractor") {
+      } else {
         navigate(`/admin/contractors/${selectedWorker.id}/records`);
       }
     }
@@ -68,6 +72,7 @@ const Modals: React.FC<ModalsProps> = ({
 
   return (
     <>
+      {/* Details Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -104,12 +109,12 @@ const Modals: React.FC<ModalsProps> = ({
               </div>
             </div>
           )}
-          <DialogFooter>
+         <DialogFooter>
             <div className="flex justify-around items-center w-full">
               <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                 Close
               </Button>
-              <Button variant="outline" onClick={handleEdit}>
+              <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
                 Edit
               </Button>
               <Button variant="destructive" onClick={handleDelete}>
@@ -123,6 +128,36 @@ const Modals: React.FC<ModalsProps> = ({
         </DialogContent>
       </Dialog>
 
+      {/* Edit Modals */}
+      {workerType === "contractor" && selectedWorker && (
+        <EditContractorModal
+          id={selectedWorker.id.toString()}
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          onSuccess={() => {
+            setIsModalOpen(false);
+            queryClient.invalidateQueries({ 
+              queryKey: ["contractors"] 
+            });
+          }}
+        />
+      )}
+
+      {workerType === "salary-worker" && selectedWorker && (
+        <EditSalaryWorkerModal
+          id={selectedWorker.id.toString()}
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          onSuccess={() => {
+            setIsModalOpen(false);
+            queryClient.invalidateQueries({ 
+              queryKey: ["salary-workers"] 
+            });
+          }}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

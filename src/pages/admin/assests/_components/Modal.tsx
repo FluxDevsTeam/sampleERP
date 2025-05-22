@@ -33,14 +33,14 @@ const Modals = ({
 }: ModalsProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-  const handleEditClick = () => {
+ const handleEditClick = () => {
     setIsModalOpen(false) // Close the details modal
     setIsEditModalOpen(true) // Open the edit modal
   }
 
   const handleEditModalClose = () => {
     setIsEditModalOpen(false)
-    setIsModalOpen(true) // Reopen details modal after edit closes
+    // Don't reopen details modal here
   }
 
   return (
@@ -71,7 +71,7 @@ const Modals = ({
                 <span className="font-medium">Status:</span>
                 <span className="col-span-2">
                   {selectedAsset.is_still_available ? (
-                    <span className="text-green-600">Available</span>
+                    <span className="text-black">Available</span>
                   ) : (
                     <span className="text-red-600">Not Available</span>
                   )}

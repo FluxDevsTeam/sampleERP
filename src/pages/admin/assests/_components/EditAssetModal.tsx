@@ -127,7 +127,7 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
       })
     }
     setIsSubmitting(false)
-    onClose()
+    onClose() // This will close the modal without reopening details
   }
 
   return (

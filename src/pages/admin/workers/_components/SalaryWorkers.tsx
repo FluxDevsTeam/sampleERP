@@ -6,6 +6,8 @@ import PaginationComponent from "./Pagination";
 import Modals from "./Modal";
 import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
+import AddSalaryWorkerModal from "../_pages/_salaryWorkers/AddSalaryWorkersModal";
+
 
 const BASE_URL = "https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/";
 
@@ -13,7 +15,7 @@ interface SalaryWorker {
   id: number;
   first_name: string;
   last_name: string;
-  email: string;
+  email: string
   phone_number: string;
   address: string;
   craft_specialty: string;
@@ -59,6 +61,7 @@ const SalaryWorkers = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
+const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["salary-workers", currentPage],
@@ -89,12 +92,7 @@ const SalaryWorkers = () => {
     setIsModalOpen(true);
   };
 
-  const handleEdit = () => {
-    if (selectedWorker?.id) {
-      navigate(`/admin/edit-worker/${selectedWorker.id}`);
-    }
-  };
-
+ 
   const handleDelete = () => {
     setIsDeleteDialogOpen(true);
   };
@@ -129,12 +127,12 @@ const SalaryWorkers = () => {
   return (
     <div className="p-6 flex flex-col h-full bg-white">
       <div className="flex justify-between items-center mb-6">
-        <Link
-          to="/admin/add-worker"
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400  transition duration-300"
+        <div
+          onClick={() => setIsAddModalOpen(true)}
+          className="cursor-pointer bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400  transition duration-300"
         >
           Add Worker
-        </Link>
+        </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-700">
             Showing page {currentPage} of {totalPages}
@@ -190,12 +188,15 @@ const SalaryWorkers = () => {
           handlePageChange={handlePageChange}
         />
       </div>
+<AddSalaryWorkerModal
+  open={isAddModalOpen}
+  onOpenChange={setIsAddModalOpen}
+/>
 
       <Modals
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         selectedWorker={selectedWorker}
-        handleEdit={handleEdit}
         handleDelete={handleDelete}
         isDeleteDialogOpen={isDeleteDialogOpen}
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
