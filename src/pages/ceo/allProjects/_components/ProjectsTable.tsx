@@ -213,7 +213,7 @@ const ProjectsTable = () => {
       <div className="flex justify-between items-center mb-6">
         <Link
           to="/ceo/add-project"
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
         >
           Add Project
         </Link>

@@ -1,30 +1,48 @@
-
-
-// Modals.tsx
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { useState } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import EditAssetModal from "./EditAssetModal"
 
 interface Asset {
-  id: number;
-  name: string;
-  value: number;
-  expected_lifespan: string;
-  is_still_available: boolean;
+  id: number
+  name: string
+  value: number
+  expected_lifespan: string
+  is_still_available: boolean
 }
 
 interface ModalsProps {
-  selectedAsset: Asset | null;
-  isModalOpen: boolean;
-  setIsModalOpen: (open: boolean) => void;
-  isDeleteDialogOpen: boolean;
-  setIsDeleteDialogOpen: (open: boolean) => void;
-  handleEdit: () => void;
-  handleDelete: () => void;
-  confirmDelete: () => void;
+  selectedAsset: Asset | null
+  isModalOpen: boolean
+  setIsModalOpen: (open: boolean) => void
+  isDeleteDialogOpen: boolean
+  setIsDeleteDialogOpen: (open: boolean) => void
+  handleDelete: () => void
+  confirmDelete: () => void
 }
 
-const Modals = ({ selectedAsset, isModalOpen, setIsModalOpen, isDeleteDialogOpen, setIsDeleteDialogOpen, handleEdit, handleDelete, confirmDelete }: ModalsProps) => {
+const Modals = ({ 
+  selectedAsset, 
+  isModalOpen, 
+  setIsModalOpen, 
+  isDeleteDialogOpen, 
+  setIsDeleteDialogOpen, 
+  handleDelete, 
+  confirmDelete 
+}: ModalsProps) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+
+  const handleEditClick = () => {
+    setIsModalOpen(false) // Close the details modal
+    setIsEditModalOpen(true) // Open the edit modal
+  }
+
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false)
+    setIsModalOpen(true) // Reopen details modal after edit closes
+  }
+
   return (
     <>
       {/* Asset Details Modal */}
@@ -46,31 +64,46 @@ const Modals = ({ selectedAsset, isModalOpen, setIsModalOpen, isDeleteDialogOpen
                 <span className="col-span-2">NGN{selectedAsset.value}</span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Expected Lifespan :</span>
+                <span className="font-medium">Expected Lifespan:</span>
                 <span className="col-span-2">{selectedAsset.expected_lifespan}</span>
               </div>
-             
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">Status:</span>
+                <span className="col-span-2">
+                  {selectedAsset.is_still_available ? (
+                    <span className="text-green-600">Available</span>
+                  ) : (
+                    <span className="text-red-600">Not Available</span>
+                  )}
+                </span>
+              </div>
             </div>
           )}
 
-<DialogFooter >
-
-  <div className="flex justify-around items-center w-full ">
-  <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-    Close
-  </Button>
-
-    <Button variant="outline" onClick={handleEdit}>
-      Edit
-    </Button>
-    <Button variant="destructive" onClick={handleDelete}>
-      Delete
-    </Button>
-    </div>
-</DialogFooter>
-
+          <DialogFooter>
+            <div className="flex justify-around items-center w-full">
+              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+                Close
+              </Button>
+              <Button variant="outline" onClick={handleEditClick}>
+                Edit
+              </Button>
+              <Button variant="destructive" onClick={handleDelete}>
+                Delete
+              </Button>
+            </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Asset Modal */}
+      {selectedAsset && (
+        <EditAssetModal 
+          asset={selectedAsset}
+          isOpen={isEditModalOpen}
+          onClose={handleEditModalClose}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
@@ -88,7 +121,7 @@ const Modals = ({ selectedAsset, isModalOpen, setIsModalOpen, isDeleteDialogOpen
         </AlertDialogContent>
       </AlertDialog>
     </>
-  );
-};
+  )
+}
 
-export default Modals;
+export default Modals

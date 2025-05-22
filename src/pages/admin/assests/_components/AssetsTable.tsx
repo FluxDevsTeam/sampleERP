@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState ,  useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {  useSearchParams } from "react-router-dom";
 import axios from "axios";
 import PaginationComponent from "./Pagination";
 import Modals from "./Modal";
 import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
+import AddAssetModal from "./AddAssetsModal";
 
 const BASE_URL = "https://kidsdesigncompany.pythonanywhere.com/api/assets/";
 
@@ -32,7 +33,7 @@ const fetchAssets = async (page = 1): Promise<PaginatedAssetsResponse> => {
 };
 
 const AssetsTable = () => {
-  const navigate = useNavigate();
+
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -41,6 +42,7 @@ const AssetsTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["assets", currentPage],
@@ -69,12 +71,6 @@ const AssetsTable = () => {
   const handleRowClick = (asset: Asset) => {
     setSelectedAsset(asset);
     setIsModalOpen(true);
-  };
-
-  const handleEdit = () => {
-    if (selectedAsset?.id) {
-      navigate(`/admin/edit-asset/${selectedAsset.id}`);
-    }
   };
 
   const handleDelete = () => {
@@ -111,12 +107,12 @@ const AssetsTable = () => {
   return (
     <div className="p-6 flex flex-col h-full bg-white">
       <div className="flex justify-between items-center mb-6">
-        <Link
-          to="/admin/add-asset"
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+        <div
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
         >
           Add Asset
-        </Link>
+        </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-700">
             Showing page {currentPage} of {totalPages}
@@ -124,7 +120,7 @@ const AssetsTable = () => {
         </div>
       </div>
 
-     <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
+      <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
         <table className="min-w-full bg-white divide-y divide-gray-200">
           <thead className="bg-gray-100">
             <tr>
@@ -132,36 +128,36 @@ const AssetsTable = () => {
               <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Value</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Lifespan</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Available</th>
-             
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {assets.map((project) => (
+            {assets.map((asset) => (
               <tr 
-                key={project.id} 
+                key={asset.id} 
                 className="hover:bg-gray-50 transition duration-150 ease-in-out cursor-pointer"
-                onClick={() => handleRowClick(project)}
+                onClick={() => handleRowClick(asset)}
               >
                 <td className="px-6 py-4">
-                  <p className="text-sm font-medium text-neutral-900">{project.name}</p>
+                  <p className="text-sm font-medium text-neutral-900">{asset.name}</p>
                 </td>
                 <td className="px-6 py-4">
-                   <p className="text-sm font-medium text-neutral-900">NGN {project.value}</p>
+                  <p className="text-sm font-medium text-neutral-900">NGN {asset.value}</p>
                 </td>
                 <td className="px-6 py-4">
-                 <p className="text-sm font-medium text-neutral-900">{project.expected_lifespan}</p>
-             
+                  <p className="text-sm font-medium text-neutral-900">{asset.expected_lifespan}</p>
                 </td>
                 <td className="px-6 py-4 text-sm text-neutral-700">
-                 <p className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{project.is_still_available ? " Yes" : " No"}</p>
+                  <p className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    asset.is_still_available ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                  }`}>
+                    {asset.is_still_available ? "Yes" : "No"}
+                  </p>
                 </td>
-              
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
 
       <div className="mt-6">
         <PaginationComponent
@@ -173,11 +169,15 @@ const AssetsTable = () => {
         />
       </div>
 
+      <AddAssetModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
+
       <Modals
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         selectedAsset={selectedAsset}
-        handleEdit={handleEdit}
         handleDelete={handleDelete}
         isDeleteDialogOpen={isDeleteDialogOpen}
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}

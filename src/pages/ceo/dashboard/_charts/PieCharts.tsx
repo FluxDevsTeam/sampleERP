@@ -224,7 +224,7 @@ const PieCharts = () => {
           </p>
         </div>
         
-        <div className="p-4 bg-[#f5f7fa]">
+        <div className="p-4 bg-[#f5f7fa] h-full">
           <ResponsiveContainer width="100%" height={400}>
             <PieChart>
               <Pie
