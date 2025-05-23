@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import ProjectModals from './Modal';
 import PaginationComponent from './Pagination';
 import AddProjectModal from './AddProjectModal';
+
 // Define the type for a single product
 interface Product {
   id: number;
@@ -61,7 +62,7 @@ interface Project {
   deadline: string | null;
   timeframe: string | null;
   date_delivered: string | null;
-  all_items: Record<string, unknown>; // Use a more specific type if needed
+  all_items: Record<string, unknown>;
   is_delivered: boolean;
   archived: boolean;
   customer_detail: CustomerDetail;
@@ -83,12 +84,12 @@ interface Project {
   };
   expenses: {
     total_expenses: number;
-    expenses: unknown[]; // Use a more specific type if needed
+    expenses: unknown[];
   };
   other_productions: {
     total_cost: number;
     total_budget: number;
-    other_productions: unknown[]; // Use a more specific type if needed
+    other_productions: unknown[];
   };
   selling_price: string;
   logistics: string;
@@ -120,7 +121,6 @@ const fetchProjects = async (page = 1): Promise<PaginatedProjectsResponse> => {
 };
 
 const ProjectsTable = () => {
-
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -131,11 +131,14 @@ const ProjectsTable = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   // Use React Query to fetch data with pagination
-  const { data, error, isLoading } = useQuery({
+  const { data, error, isLoading, refetch } = useQuery({
     queryKey: ['projects', currentPage],
     queryFn: () => fetchProjects(currentPage),
+    staleTime: 0, // Always consider data stale so it refetches when invalidated
+    refetchOnWindowFocus: false, // Prevent unnecessary refetches
   });
 
   // Update total pages when data is loaded
@@ -163,20 +166,40 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
       await axios.delete(`${BASE_URL}/project/${projectId}/`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'], exact: false });
       setIsDeleteDialogOpen(false);
       setIsModalOpen(false);
       toast.success("Project deleted successfully!");
     },
+    onError: (error) => {
+      console.error('Error deleting project:', error);
+      toast.error("Failed to delete project. Please try again.");
+    }
   });
+
+  // Handle successful project addition
+  const handleProjectAdded = async () => {
+    console.log('Project added callback triggered');
+    
+    // Option 1: Navigate to first page where new project likely appears
+    if (currentPage !== 1) {
+      console.log('Navigating to first page');
+      setSearchParams({ page: "1" });
+    } else {
+      // If already on first page, force refetch
+      console.log('Already on first page, refetching...');
+      await refetch();
+    }
+    
+    // Option 2: Alternative - just refetch current page
+    // await refetch();
+  };
 
   // Handle row click to show modal
   const handleRowClick = (project: Project) => {
     setSelectedProject(project);
     setIsModalOpen(true);
   };
-
- 
 
   // Handle delete button click
   const handleDelete = () => {
@@ -195,8 +218,8 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     setSearchParams({ page: newPage.toString() });
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {(error as Error).message}</div>;
+  if (isLoading) return <div className="p-6 flex justify-center">Loading...</div>;
+  if (error) return <div className="p-6 text-red-500">Error: {(error as Error).message}</div>;
 
   // Extract the projects from the data
   const projects = data?.all_projects || [];
@@ -226,7 +249,7 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
               <th className="px-4 py-2 text-left">Name</th>
               <th className="px-4 py-2 text-center">Progress</th>
               <th className="px-4 py-2 text-center">Status</th>
-              <th className="px-4 py-2 text-center">Total Selling Price</th>
+              <th className="px-4 py-2 text-center">Total Product Selling Price</th>
               <th className="px-4 py-2 text-center">Start Date</th>
               <th className="px-4 py-2 text-center">End Date</th>
             </tr>
@@ -242,9 +265,9 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
                   <p className="text-md font-bold">{project.name}</p>
                 </td>
                 <td className="px-4 py-2 text-sm text-center">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div className="w-full bg-gray-200 rounded-full h-1">
                     <div
-                      className="bg-lime-600 h-2.5 rounded-full"
+                      className="bg-lime-400 h-1 rounded-full"
                       style={{ width: `${project.products.progress}%` }}
                     ></div>
                   </div>
@@ -253,12 +276,12 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
                 <td className="px-4 py-2 flex items-center justify-center space-x-2">
                   <div className="flex items-center space-x-2">
                     {project.status === 'completed' || project.status === 'in progress' || project.status === 'delivered' ? (
-                      <div className="w-3 h-3 bg-gray-300 border rounded-full flex items-center justify-start overflow-hidden">
+                      <div className="w-3 h-1 bg-gray-300 border rounded-full flex items-center justify-start overflow-hidden">
                         <div
                           className={`h-full rounded-full ${
-                            project.status === 'completed' ? 'bg-lime-600' :
-                            project.status === 'in progress' ? 'bg-yellow-500' :
-                            project.status === 'delivered' ? 'bg-blue-500' : ''
+                            project.status === 'completed' ? 'bg-blue-700' :
+                            project.status === 'in progress' ? 'bg-neutral-700' :
+                            project.status === 'delivered' ? 'bg-lime-700' : ''
                           }`}
                           style={{
                             width: project.status === 'completed' || project.status === 'delivered' ? '100%' : '50%',
@@ -266,27 +289,27 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
                         ></div>
                       </div>
                     ) : (
-                      <span className="w-3 h-3 bg-red-500 border rounded-full"></span>
+                      <span className="w-3 h-1 bg-red-400 border rounded-full"></span>
                     )}
                     <p className={`text-sm ${
-                      project.status === 'completed' ? 'text-lime-600' :
-                      project.status === 'in progress' ? 'text-yellow-500' :
-                      project.status === 'delivered' ? 'text-blue-500' : 'text-red-500'
+                      project.status === 'completed' ? 'text-blue-700' :
+                      project.status === 'in progress' ? 'text-neutral-700' :
+                      project.status === 'delivered' ? 'text-lime-400' : 'text-red-400'
                     }`}>
                       {project.status}
                     </p>
                   </div>
 
                   {project.status === 'completed' || project.status === 'delivered' ? (
-                    <span className={`w-10 h-2 ${
-                      project.status === 'completed' ? 'bg-lime-600' : 'bg-blue-500'
+                    <span className={`w-10 h-1 ${
+                      project.status === 'completed' ? 'bg-blue-700' : 'bg-lime-400'
                     } border rounded-full`}></span>
                   ) : project.status === 'in progress' ? (
-                    <div className="w-10 h-2 bg-gray-300 rounded-full overflow-hidden">
-                      <div className="bg-yellow-500 h-full rounded-full" style={{ width: '50%' }}></div>
+                    <div className="w-10 h-1 bg-gray-300 rounded-full overflow-hidden">
+                      <div className="bg-neutral-700 h-full rounded-full" style={{ width: '50%' }}></div>
                     </div>
                   ) : (
-                    <div className="text-red-500 flex space-x-1">
+                    <div className="text-red-400 flex space-x-1">
                       <MdCancel />
                       <MdCancel />
                       <MdCancel />
@@ -313,18 +336,21 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
           handlePageChange={handlePageChange}
         />
       </div>
-  < AddProjectModal 
-     open={isAddModalOpen}
-  onOpenChange={setIsAddModalOpen}
-        />
+
+      <AddProjectModal 
+        open={isAddModalOpen}
+        onOpenChange={setIsAddModalOpen}
+        onSuccess={handleProjectAdded}
+      />
+
       <ProjectModals
-       isModalOpen={isModalOpen}
-  setIsModalOpen={setIsModalOpen}
-  selectedProject={selectedProject}
-  handleDelete={handleDelete}
-  isDeleteDialogOpen={isDeleteDialogOpen}
-  setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-  confirmDelete={confirmDelete}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        selectedProject={selectedProject}
+        handleDelete={handleDelete}
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        confirmDelete={confirmDelete}
       />
     </div>
   );

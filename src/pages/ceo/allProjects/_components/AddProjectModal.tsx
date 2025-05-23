@@ -104,6 +104,27 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
     }
   }, [open]);
 
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      status: "in progress",
+      start_date: new Date().toISOString().split("T")[0],
+      deadline: "",
+      date_delivered: "",
+      is_delivered: false,
+      archived: false,
+      customer_detail: "placeholder", 
+      selling_price: "",
+      logistics: "0",
+      service_charge: "0",
+      note: "",
+    });
+    setInvoiceImage(null);
+    setImagePreview(null);
+    setFormError("");
+    setErrorDetails({});
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -183,10 +204,21 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
 
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      // More comprehensive query invalidation
+      console.log('Project added, invalidating queries...');
+      await queryClient.invalidateQueries({ 
+        queryKey: ["projects"],
+        exact: false // This ensures all queries starting with "projects" are invalidated
+      });
+      console.log('Queries invalidated');
+
       toast.success("Project added successfully!");
       onOpenChange(false);
       onSuccess?.();
+      
+      // Reset form data
+      resetForm();
+      
     } catch (error: any) {
       console.error("Error adding project:", error);
       
@@ -209,6 +241,13 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
       setIsPending(false);
     }
   };
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!open) {
+      resetForm();
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -278,7 +317,6 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
                 )}
               </div>
 
-              {/* Rest of the form fields (same as in your original component) */}
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
                 <Select 

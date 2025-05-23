@@ -4,13 +4,11 @@ import {
   CEOProjects,
   CEOCustomers,
   CEOStore,
-  CEOWorkers,
   CEOProducts,
   CEOShop,
   CEOExpenses,
   CEOOverhead,
   CEOSharedLayout,
-  CEOAssets,
 } from "./pages/ceo";
 
 import {
@@ -34,12 +32,9 @@ import Signin from "./pages/AuthPages/signin/Signin";
 import {
   FactoryManagerCustomers,
   FactoryManagerSharedLayout,
-  FactoryManagerAssets,
-  FactoryManagerExpenses,
   FactoryManagerDashboard,
   FactoryManagerProducts,
-  FactoryManagerProjects,
-  FactoryManagerWorkers,
+
 } from "./pages/factory-manager-page";
 
 //  Project Manager Route
@@ -129,11 +124,11 @@ const router = createBrowserRouter([
       },
       {
         path: "workers",
-        element: <CEOWorkers />,
+        element: <Workers />,
       },
       {
         path: "assets",
-        element: <CEOAssets />,
+        element: <Assets />,
       },
       {
         path: "products",
@@ -181,7 +176,7 @@ const router = createBrowserRouter([
       },
       {
         path: "projects",
-        element: <FactoryManagerProjects />,
+        element: <CEOProjects />,
       },
       {
         path: "customers",
@@ -189,11 +184,11 @@ const router = createBrowserRouter([
       },
       {
         path: "workers",
-        element: <FactoryManagerWorkers />,
+        element: <Workers />,
       },
       {
         path: "assets",
-        element: <FactoryManagerAssets />,
+        element: <Assets />,
       },
       {
         path: "products",
@@ -201,7 +196,7 @@ const router = createBrowserRouter([
       },
       {
         path: "expenses",
-        element: <FactoryManagerExpenses />,
+        element: <Expenses />,
       },
     ],
   },

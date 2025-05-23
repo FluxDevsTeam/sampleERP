@@ -1,4 +1,4 @@
-// components/AddAssetModal.tsx
+
 import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCreateAsset, type AssetData } from "../_api/apiService";
@@ -44,7 +44,7 @@ const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["assets"] });
         toast.success("Asset added successfully!");
-        onClose(); // close the modal
+        onClose(); 
       },
       onError: () => {
         toast.error("Failed to add asset. Please try again.");
