@@ -15,29 +15,41 @@ const PaginationComponent: React.FC<PaginationProps> = ({
   hasPreviousPage,
   handlePageChange,
 }) => {
-  // Generate an array of page numbers to display
   const getPageNumbers = () => {
-    const pages = [];
-    
-    // Always show first page
-    if (currentPage > 2) {
-      pages.push(1);
-    }
-    
-    // Show current page and adjacent pages
-    for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) {
-      if (!pages.includes(i)) {
+    const pages: (number | string)[] = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
-    }
-    
-    // Always show last page
-    if (currentPage < totalPages - 1 && totalPages > 1) {
-      if (!pages.includes(totalPages)) {
-        pages.push(totalPages);
+    } else {
+      pages.push(1);
+
+      let start = Math.max(2, currentPage - 1);
+      let end = Math.min(totalPages - 1, currentPage + 1);
+
+      if (currentPage <= 3) {
+        end = 4;
+      } else if (currentPage >= totalPages - 2) {
+        start = totalPages - 3;
       }
+
+      if (start > 2) {
+        pages.push("...");
+      }
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (end < totalPages - 1) {
+        pages.push("...");
+      }
+
+      pages.push(totalPages);
     }
-    
+
     return pages;
   };
 
@@ -50,38 +62,23 @@ const PaginationComponent: React.FC<PaginationProps> = ({
         <button
           onClick={() => hasPreviousPage && handlePageChange(currentPage - 1)}
           disabled={!hasPreviousPage}
-          className="px-3 py-1 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 py-1 border rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Previous
         </button>
-        
+
         {/* Page numbers */}
         <div className="flex items-center">
-          {pageNumbers.map((page, index) => {
-            // Show ellipsis when there's a gap
-            if (index > 0 && pageNumbers[index - 1] !== page - 1) {
-              return (
-                <React.Fragment key={`ellipsis-${page}`}>
-                  <span className="px-2">...</span>
-                  <button
-                    onClick={() => handlePageChange(page)}
-                    className={`w-8 h-8 mx-1 flex items-center justify-center rounded-md ${
-                      currentPage === page
-                        ? "bg-neutral-900 text-white"
-                        : "border hover:bg-gray-100"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                </React.Fragment>
-              );
-            }
-            
-            return (
+          {pageNumbers.map((page, index) =>
+            page === "..." ? (
+              <span key={`ellipsis-${index}`} className="px-2 text-sm">
+                ...
+              </span>
+            ) : (
               <button
                 key={page}
-                onClick={() => handlePageChange(page)}
-                className={`w-8 h-8 mx-1 flex items-center justify-center rounded-md ${
+                onClick={() => handlePageChange(page as number)}
+                className={`w-8 h-8 mx-1 flex items-center justify-center rounded-md text-sm ${
                   currentPage === page
                     ? "bg-neutral-900 text-white"
                     : "border hover:bg-gray-100"
@@ -89,15 +86,15 @@ const PaginationComponent: React.FC<PaginationProps> = ({
               >
                 {page}
               </button>
-            );
-          })}
+            )
+          )}
         </div>
-        
+
         {/* Next button */}
         <button
           onClick={() => hasNextPage && handlePageChange(currentPage + 1)}
           disabled={!hasNextPage}
-          className="px-3 py-1 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 py-1 border rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Next
         </button>

@@ -8,7 +8,6 @@ import ProjectModals from './Modal';
 import PaginationComponent from './Pagination';
 import AddProjectModal from './AddProjectModal';
 
-// Define the type for a single product
 interface Product {
   id: number;
   name: string;
@@ -16,22 +15,20 @@ interface Product {
   progress: number;
 }
 
-// Define the type for sold items
 interface SoldItem {
   id: number;
   quantity: string;
   cost_price: string;
   selling_price: string;
   total_price: number;
+  name?: string;
 }
 
-// Define the type for customer details
 interface CustomerDetail {
   id: number;
   name: string;
 }
 
-// Define the type for calculations
 interface Calculations {
   total_raw_material_cost: number;
   total_artisan_cost: number;
@@ -52,7 +49,6 @@ interface Calculations {
   final_profit: number;
 }
 
-// Define the type for a single project
 interface Project {
   id: number;
   name: string;
@@ -60,14 +56,14 @@ interface Project {
   status: string;
   start_date: string;
   deadline: string | null;
-  timeframe: string | null;
+  timeframe: number | null;
   date_delivered: string | null;
-  all_items: Record<string, unknown>;
+  all_items: Record<string, unknown> | null;
   is_delivered: boolean;
   archived: boolean;
   customer_detail: CustomerDetail;
   products: {
-    progress: number;
+    progress: number | null;
     total_project_selling_price: number;
     total_production_cost: number;
     total_artisan_cost: number;
@@ -84,12 +80,12 @@ interface Project {
   };
   expenses: {
     total_expenses: number;
-    expenses: unknown[];
+    expenses: Array<{ name: string; amount: string }>;
   };
   other_productions: {
     total_cost: number;
     total_budget: number;
-    other_productions: unknown[];
+    other_productions: Array<{ id: number; name: string; cost: string | null }>;
   };
   selling_price: string;
   logistics: string;
@@ -98,11 +94,7 @@ interface Project {
   calculations: Calculations;
 }
 
-// Define the type for the API response
 interface PaginatedProjectsResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
   all_time_projects_count: number;
   all_projects_count: number;
   completed_projects_count: number;
@@ -111,12 +103,20 @@ interface PaginatedProjectsResponse {
   all_projects: Project[];
 }
 
-// Base URL for API requests
 const BASE_URL = 'https://kidsdesigncompany.pythonanywhere.com/api';
 
-// Fetch projects from the API with pagination
-const fetchProjects = async (page = 1): Promise<PaginatedProjectsResponse> => {
-  const response = await axios.get(`${BASE_URL}/project/?page=${page}`);
+const fetchProjects = async (page = 1, searchParams: URLSearchParams): Promise<PaginatedProjectsResponse> => {
+  const params = {
+    page,
+    archived: searchParams.get('archived'),
+    is_delivered: searchParams.get('is_delivered'),
+    deadline: searchParams.get('deadline'),
+    upcoming_deadline: searchParams.get('upcoming_deadline'),
+    search: searchParams.get('search'),
+    ordering: searchParams.get('ordering'),
+  };
+
+  const response = await axios.get(`${BASE_URL}/project/`, { params });
   return response.data;
 };
 
@@ -127,46 +127,30 @@ const ProjectsTable = () => {
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const [totalPages, setTotalPages] = useState(1);
   
-  // State for modal and selected project
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  // Use React Query to fetch data with pagination
   const { data, error, isLoading, refetch } = useQuery({
-    queryKey: ['projects', currentPage],
-    queryFn: () => fetchProjects(currentPage),
-    staleTime: 0, // Always consider data stale so it refetches when invalidated
-    refetchOnWindowFocus: false, // Prevent unnecessary refetches
+    queryKey: ['projects', currentPage, searchParams.toString()],
+    queryFn: () => fetchProjects(currentPage, searchParams),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    keepPreviousData: true,
   });
 
-  // Update total pages when data is loaded
   useEffect(() => {
-    if (data?.count) {
-      const itemsPerPage = 10; // Adjust based on your API's pagination setup
-      setTotalPages(Math.ceil(data.count / itemsPerPage));
+    if (data?.all_time_projects_count) {
+      setTotalPages(Math.ceil(data.all_time_projects_count / 10));
     }
-  }, [data]);
+  }, [data?.all_time_projects_count]);
 
-  // Prefetch next page
-  useEffect(() => {
-    if (currentPage < totalPages) {
-      const nextPage = currentPage + 1;
-      queryClient.prefetchQuery({
-        queryKey: ['projects', nextPage],
-        queryFn: () => fetchProjects(nextPage),
-      });
-    }
-  }, [currentPage, queryClient, totalPages]);
-
-  // Delete project mutation
   const deleteProjectMutation = useMutation({
     mutationFn: async (projectId: number) => {
       await axios.delete(`${BASE_URL}/project/${projectId}/`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       setIsDeleteDialogOpen(false);
       setIsModalOpen(false);
       toast.success("Project deleted successfully!");
@@ -177,72 +161,74 @@ const ProjectsTable = () => {
     }
   });
 
-  // Handle successful project addition
   const handleProjectAdded = async () => {
-    console.log('Project added callback triggered');
-    
-    // Option 1: Navigate to first page where new project likely appears
     if (currentPage !== 1) {
-      console.log('Navigating to first page');
       setSearchParams({ page: "1" });
     } else {
-      // If already on first page, force refetch
-      console.log('Already on first page, refetching...');
       await refetch();
     }
-    
-    // Option 2: Alternative - just refetch current page
-    // await refetch();
   };
 
-  // Handle row click to show modal
   const handleRowClick = (project: Project) => {
     setSelectedProject(project);
     setIsModalOpen(true);
   };
 
-  // Handle delete button click
   const handleDelete = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  // Confirm delete action
   const confirmDelete = () => {
     if (selectedProject?.id) {
       deleteProjectMutation.mutate(selectedProject.id);
     }
   };
 
-  // Handle page change
   const handlePageChange = (newPage: number) => {
-    setSearchParams({ page: newPage.toString() });
+    const params = new URLSearchParams(searchParams);
+    params.set('page', newPage.toString());
+    setSearchParams(params);
   };
 
-  if (isLoading) return <div className="p-6 flex justify-center">Loading...</div>;
-  if (error) return <div className="p-6 text-red-500">Error: {(error as Error).message}</div>;
+  if (isLoading) return (
+    <div className="p-6 flex justify-center items-center h-full">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+    </div>
+  );
 
-  // Extract the projects from the data
+  if (error) return (
+    <div className="p-6 text-red-500">
+      Error: {(error as Error).message}
+      <button 
+        onClick={() => refetch()}
+        className="ml-4 px-4 py-2 bg-gray-100 rounded-md hover:bg-gray-200"
+      >
+        Retry
+      </button>
+    </div>
+  );
+
   const projects = data?.all_projects || [];
-  const hasNextPage = !!data?.next;
-  const hasPreviousPage = !!data?.previous;
+  const hasNextPage = currentPage < totalPages;
+  const hasPreviousPage = currentPage > 1;
 
   return (
     <div className="p-6 flex flex-col h-full bg-white">
       <div className="flex justify-between items-center mb-6">
-        <div
+        <button
           onClick={() => setIsAddModalOpen(true)}
-          className="cursor-pointer bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
+          className="cursor-pointer bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
         >
           Add Project
-        </div>
+        </button>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-700">
-            Showing page {currentPage} of {totalPages}
+            Showing {(currentPage - 1) * 10 + 1}-{Math.min(currentPage * 10, data?.all_time_projects_count || 0)} of {data?. all_time_projects_count|| 0} projects
           </span>
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
+     <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
         <table className="min-w-full bg-white">
           <thead className="bg-gray-100">
             <tr>
