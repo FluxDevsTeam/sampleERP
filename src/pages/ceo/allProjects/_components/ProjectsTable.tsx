@@ -106,8 +106,8 @@ interface PaginatedProjectsResponse {
 const BASE_URL = 'https://kidsdesigncompany.pythonanywhere.com/api';
 
 const fetchProjects = async (page = 1, searchParams: URLSearchParams): Promise<PaginatedProjectsResponse> => {
-  const params = {
-    page,
+  const params: Record<string, string | null> = {
+    page: page.toString(),
     archived: searchParams.get('archived'),
     is_delivered: searchParams.get('is_delivered'),
     deadline: searchParams.get('deadline'),
@@ -116,7 +116,15 @@ const fetchProjects = async (page = 1, searchParams: URLSearchParams): Promise<P
     ordering: searchParams.get('ordering'),
   };
 
-  const response = await axios.get(`${BASE_URL}/project/`, { params });
+  // Filter out null values
+  const filteredParams = Object.entries(params).reduce((acc, [key, value]) => {
+    if (value !== null) {
+      acc[key] = value;
+    }
+    return acc;
+  }, {} as Record<string, string>);
+
+  const response = await axios.get(`${BASE_URL}/project/`, { params: filteredParams });
   return response.data;
 };
 
@@ -132,11 +140,11 @@ const ProjectsTable = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const { data, error, isLoading, refetch } = useQuery({
+  const { data, error, isLoading, refetch } = useQuery<PaginatedProjectsResponse>({
     queryKey: ['projects', currentPage, searchParams.toString()],
     queryFn: () => fetchProjects(currentPage, searchParams),
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    keepPreviousData: true,
+    staleTime: 1000 * 60 * 5, 
+    placeholderData: (previousData) => previousData,
   });
 
   useEffect(() => {
@@ -145,7 +153,7 @@ const ProjectsTable = () => {
     }
   }, [data?.all_time_projects_count]);
 
-  const deleteProjectMutation = useMutation({
+  const deleteProjectMutation = useMutation<void, Error, number>({
     mutationFn: async (projectId: number) => {
       await axios.delete(`${BASE_URL}/project/${projectId}/`);
     },
@@ -155,7 +163,7 @@ const ProjectsTable = () => {
       setIsModalOpen(false);
       toast.success("Project deleted successfully!");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Error deleting project:', error);
       toast.error("Failed to delete project. Please try again.");
     }
@@ -209,6 +217,7 @@ const ProjectsTable = () => {
   );
 
   const projects = data?.all_projects || [];
+  const totalProjectsCount = data?.all_time_projects_count || 0;
   const hasNextPage = currentPage < totalPages;
   const hasPreviousPage = currentPage > 1;
 
@@ -223,7 +232,7 @@ const ProjectsTable = () => {
         </button>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-700">
-            Showing {(currentPage - 1) * 10 + 1}-{Math.min(currentPage * 10, data?.all_time_projects_count || 0)} of {data?. all_time_projects_count|| 0} projects
+            Showing {(currentPage - 1) * 10 + 1}-{Math.min(currentPage * 10, totalProjectsCount)} of {totalProjectsCount} projects
           </span>
         </div>
       </div>
@@ -254,10 +263,10 @@ const ProjectsTable = () => {
                   <div className="w-full bg-gray-200 rounded-full h-1">
                     <div
                       className="bg-lime-400 h-1 rounded-full"
-                      style={{ width: `${project.products.progress}%` }}
+                      style={{ width: `${project.products.progress || 0}%` }}
                     ></div>
                   </div>
-                  <p className="text-sm mt-1">{project.products.progress}%</p>
+                  <p className="text-sm mt-1">{project.products.progress || 0}%</p>
                 </td>
                 <td className="px-4 py-2 flex items-center justify-center space-x-2">
                   <div className="flex items-center space-x-2">

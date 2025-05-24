@@ -21,25 +21,93 @@ import {
 import { useNavigate } from "react-router-dom";
 import EditProjectModal from "./EditProjectModal"; 
 
+
+interface Product {
+  id: number;
+  name: string;
+  selling_price: string;
+  progress: number;
+}
+
+interface SoldItem {
+  id: number;
+  quantity: string;
+  cost_price: string;
+  selling_price: string;
+  total_price: number;
+  name?: string;
+}
+
+interface CustomerDetail {
+  id: number;
+  name: string;
+}
+
+interface Calculations {
+  total_raw_material_cost: number;
+  total_artisan_cost: number;
+  total_overhead_cost: number;
+  total_products_cost: number;
+  total_product_selling_price: number;
+  product_profit: number;
+  total_cost_price_sold_items: number;
+  total_selling_price_sold_items: number;
+  shop_items_profit: number;
+  money_left_for_expensis: number;
+  money_left_for_expensis_with_logistics_and_service_charge: number;
+  total_other_productions_budget: number;
+  total_other_productions_cost: number;
+  total_expensis: number;
+  total_money_spent: number;
+  total_paid: number;
+  final_profit: number;
+}
+
 interface Project {
   id: number;
   name: string;
+  invoice_image: string | null;
   status: string;
   start_date: string;
   deadline: string | null;
+  timeframe: number | null;
+  date_delivered: string | null;
+  all_items: Record<string, unknown> | null;
+  is_delivered: boolean;
+  archived: boolean;
+  customer_detail: CustomerDetail;
+  products: {
+    progress: number | null;
+    total_project_selling_price: number;
+    total_production_cost: number;
+    total_artisan_cost: number;
+    total_overhead_cost: number;
+    total_raw_material_cost: number;
+    total_grand_total: number;
+    total_profit: number;
+    products: Product[];
+  };
+  sold_items: {
+    total_cost_price_sold_items: number;
+    total_selling_price_sold_items: number;
+    sold_items: SoldItem[];
+  };
+  expenses: {
+    total_expenses: number;
+    expenses: Array<{ name: string; amount: string }>;
+  };
+  other_productions: {
+    total_cost: number;
+    total_budget: number;
+    other_productions: Array<{ id: number; name: string; cost: string | null }>;
+  };
   selling_price: string;
   logistics: string;
   service_charge: string;
-  products: {
-    progress: number;
-    total_project_selling_price: number;
-    total_production_cost: number;
-  };
-  customer_detail: {
-    id: number;
-    name: string;
-  };
+  note: string | null;
+  calculations: Calculations;
 }
+
 
 interface ProjectModalsProps {
   isModalOpen: boolean;
