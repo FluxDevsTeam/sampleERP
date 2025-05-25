@@ -83,7 +83,7 @@ const EditContractorModal: React.FC<EditContractorModalProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 transform overflow-y-auto max-h-[90vh]">
-        <DialogHeader className="sticky top-0 bg-background z-10">
+        <DialogHeader className="">
           <DialogTitle>Edit Contractor</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>

@@ -11,6 +11,14 @@ interface SidebarProp {
 }
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
+  // Function to handle link clicks
+  const handleLinkClick = () => {
+    // Close sidebar on mobile (less than 1024px width)
+    if (window.innerWidth < 1024) {
+      toggleSidebar();
+    }
+  };
+
   return (
     <aside
       className={clsx(
@@ -26,7 +34,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
           <Logo isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
         </div>
 
-        {/* DASHBOARD LINKS - Now with flex-1 to take available space */}
+        {/* DASHBOARD LINKS */}
         <ul className="flex flex-col flex-1 w-full px-2 justify-evenly">
           {data.map((item) => {
             const { id, text, href: url, icon: img } = item;
@@ -35,6 +43,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
               <li key={id} className="w-full">
                 <NavLink
                   to={url}
+                  onClick={handleLinkClick}
                   className={({ isActive }) =>
                     clsx(
                       "flex gap-2 items-center w-full hover:bg-gray-200 rounded-md relative font-medium text-sm transition-all h-[40px] duration-500 text-gray-700",
@@ -66,6 +75,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
           <div className="w-full">
             <Link
               to="settings"
+              onClick={handleLinkClick}
               className={clsx(
                 "flex gap-2 items-center w-full hover:bg-gray-200 rounded-md relative font-medium text-sm transition-all h-[40px] duration-500 text-gray-700",
                 !isSidebarOpen ? "lg:justify-center justify-start pl-4 lg:pl-0" : "pl-4",
@@ -82,6 +92,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
           <div className="w-full">
             <Link
               to="logout"
+              onClick={handleLinkClick}
               className={clsx(
                 "flex gap-2 items-center w-full hover:bg-gray-200 rounded-md relative font-medium text-sm transition-all h-[40px] duration-500 text-gray-700",
                 !isSidebarOpen ? "lg:justify-center justify-start pl-4 lg:pl-0" : "pl-4",

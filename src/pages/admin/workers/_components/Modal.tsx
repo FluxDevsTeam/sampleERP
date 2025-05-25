@@ -100,7 +100,7 @@ const Modals: React.FC<ModalsProps> = ({
               {workerType === "salary-worker" && (
                 <div className="grid grid-cols-3 items-center gap-4">
                   <span className="font-medium">Salary:</span>
-                  <span className="col-span-2">${selectedWorker.salary}</span>
+                  <span className="col-span-2">NGN {selectedWorker.salary}</span>
                 </div>
               )}
               <div className="grid grid-cols-3 items-center gap-4">
