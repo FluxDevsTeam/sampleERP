@@ -30,12 +30,14 @@ import SignUp from "./pages/AuthPages/signup/SignUp";
 import Signin from "./pages/AuthPages/signin/Signin";
 
 import {
-  FactoryManagerCustomers,
   FactoryManagerSharedLayout,
   FactoryManagerDashboard,
   FactoryManagerProducts,
 
 } from "./pages/factory-manager-page";
+
+import FactoryManagerCustomers from './pages/factory-manager-page/customers/FactoryManagerCustomers.tsx'
+import CustomerProfile from "./pages/factory-manager-page/customers/CustomerProfile.tsx";
 
 //  Project Manager Route
 import { ProjectManagerLayout } from "./pages/project-manager-page";
@@ -181,6 +183,10 @@ const router = createBrowserRouter([
       {
         path: "customers",
         element: <FactoryManagerCustomers />,
+      },
+      {
+        path: "customers/:id",
+        element: <CustomerProfile />,
       },
       {
         path: "workers",
