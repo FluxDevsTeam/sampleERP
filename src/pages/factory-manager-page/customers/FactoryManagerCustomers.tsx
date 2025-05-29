@@ -169,7 +169,7 @@ const FactoryManagerCustomers = () => {
         </thead>
         <tbody>
           {customers.map((customer: any) => (
-            <tr key={customer.id} onClick={() => navigate(`/dashboard/customers/${customer.id}`)} className="cursor-pointer hover:bg-gray-100">
+            <tr key={customer.id} onClick={() => navigate(`/factory-manager/customers/${customer.id}`)} className="cursor-pointer hover:bg-gray-100">
               <td className="py-4 px-2 border border-gray-300 capitalize">{customer.name}</td>
               <td className="py-4 px-2 border border-gray-300">{customer.email}</td>
               <td className="py-4 px-2 border border-gray-300">{customer.phone_number}</td>

@@ -61,7 +61,7 @@ const CustomerProfile = () => {
 
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/customer/${customer.customer_details.id}/`,
+        `https://kidsdesigncompany.pythonanywhere.com/api/customer/${customer.customer_details.id}`,
         {
           method: "PATCH",
           headers: {
@@ -77,8 +77,10 @@ const CustomerProfile = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to update customer details.");
-      }
+        const errorData = await response.json();
+        console.error("Update failed:", errorData);
+        throw new Error(errorData?.detail || "Failed to update customer details.");
+        }
 
       const updatedData = await response.json();
       setCustomer((prev) => prev ? { ...prev, customer_details: { ...prev.customer_details, ...updatedData } } : null);
@@ -153,14 +155,14 @@ const CustomerProfile = () => {
                   onChange={(e) => setEditedPhone(e.target.value)}
                 />
                 <input
-                  type="email"
+                  type="text"
                   className="border p-2 rounded w-full"
                   value={editedAddress}
                   onChange={(e) => setEditedAddress(e.target.value)}
                 />
                 <div className="flex gap-3 mt-2">
                   <button
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center"
+                    className="bg-green-200 text-white px-4 py-2 rounded-lg flex items-center"
                     onClick={handleUpdate}
                     disabled={updateLoading}
                   >
