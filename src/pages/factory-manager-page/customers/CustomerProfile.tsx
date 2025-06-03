@@ -23,7 +23,7 @@ const CustomerProfile = () => {
     const fetchCustomer = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`https://kidsdesigncompany.pythonanywhere.com/api/customer/${id}/?format=json`);
+        const response = await fetch(`https://kidsdesigncompany.pythonanywhere.com/api/customer/${id}/`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch customer data.");
@@ -61,7 +61,7 @@ const CustomerProfile = () => {
 
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/customer/${customer.customer_details.id}`,
+        `https://kidsdesigncompany.pythonanywhere.com/api/customer/${customer.customer_details.id}/`,
         {
           method: "PATCH",
           headers: {
@@ -183,7 +183,7 @@ const CustomerProfile = () => {
                 <p>{customer.customer_details.phone_number}</p>
                 <p>Address: {customer.customer_details.address || "N/A"}</p>
                 <button
-                  className="bg-[#FF3B30] text-white px-4 py-2 rounded-lg flex justify-center items-center mt-2"
+                  className="bg-[#ff3a30e3] hover:bg-[#97251f] text-white px-4 py-2 rounded-lg flex justify-center items-center mt-2"
                   onClick={() => setIsEditing(true)}
                 >
                   <FaEdit className="mr-2" /> Edit
@@ -198,7 +198,7 @@ const CustomerProfile = () => {
       </div>
 
       <div className="flex justify-center">
-        <Link to="/dashboard/customers" className="bg-blue-200 text-white px-4 py-2 rounded-lg">
+        <Link to="/factory-manager/customers" className="bg-blue-200 text-white hover:text-white hover:no-underline hover:bg-gray-20 px-4 py-2 rounded-lg">
           Back to Customers
         </Link>
       </div>
