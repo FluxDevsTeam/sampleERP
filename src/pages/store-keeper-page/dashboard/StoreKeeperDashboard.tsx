@@ -31,11 +31,19 @@ const StoreKeeperDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchTermTwo, setSearchTermTwo] = useState<string>("");
   const itemsPerPage = 10;
+  const accessToken = localStorage.getItem("accessToken");
 
   const fetchDashboardData = async () => {
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/storekeeper-dashboard/`
+        `https://kidsdesigncompany.pythonanywhere.com/api/storekeeper-dashboard/`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `JWT ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
 
       if (!response.ok) {
@@ -58,7 +66,13 @@ const StoreKeeperDashboard: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials-category/`
+        `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials-category/`,{
+          method: "GET",
+          headers: {
+            Authorization: `JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU3ODQ4MDYxLCJpYXQiOjE3NDkyMDgwNjEsImp0aSI6IjA3ODRiZTk3MmYzYzRmYmNhMjljZGIxNzRjZGQ3MmY3IiwidXNlcl9pZCI6MX0.3I3bXVLzuVjZNmMiFagYuMxFmWCunKsWESKykFK757M`,
+            "Content-Type": "application/json",
+          },
+        }
       );
 
       if (!response.ok) {
@@ -67,7 +81,7 @@ const StoreKeeperDashboard: React.FC = () => {
 
       const data = await response.json();
       console.log(data);
-      setTableData(data)
+      setTableData(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -86,7 +100,7 @@ const StoreKeeperDashboard: React.FC = () => {
       );
 
       if (!response.ok) {
-        throw new Error("error iyegs, error")
+        throw new Error("error iyegs, error");
       }
       const logData = await response.json();
       // console.log(logData);
@@ -98,13 +112,15 @@ const StoreKeeperDashboard: React.FC = () => {
     }
   };
 
-  useEffect(()=> {
+  useEffect(() => {
     fetchShopCategoryData();
-  }, [])
+  }, []);
 
   // Filter data for both tables
-  const filteredTableData = tableData.filter((item) =>
-    typeof item.name === 'string' && item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTableData = tableData.filter(
+    (item) =>
+      typeof item.name === "string" &&
+      item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredTableDataTwo = tableDataTwo.filter((item) =>
@@ -114,7 +130,10 @@ const StoreKeeperDashboard: React.FC = () => {
   // Calculate pagination values
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredTableData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredTableData.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredTableData.length / itemsPerPage);
 
   const handlePageChange = (pageNumber: number) => {
@@ -224,49 +243,49 @@ const StoreKeeperDashboard: React.FC = () => {
               })}
             </tbody>
           </table>
-            <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-6 py-4 border-t gap-4">
-              <span className="text-sm text-blue-400 text-center sm:text-left">
-                Showing {indexOfFirstItem + 1} to{" "}
-                {Math.min(indexOfLastItem, tableData.length)} of{" "}
-                {tableData.length} entries
+          <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-6 py-4 border-t gap-4">
+            <span className="text-sm text-blue-400 text-center sm:text-left">
+              Showing {indexOfFirstItem + 1} to{" "}
+              {Math.min(indexOfLastItem, tableData.length)} of{" "}
+              {tableData.length} entries
+            </span>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1}
+                className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
+              >
+                <FontAwesomeIcon icon={faAnglesLeft} />
+              </button>
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
+              >
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </button>
+
+              <span className="mx-4">
+                Page {currentPage} of {totalPages}
               </span>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handlePageChange(1)}
-                  disabled={currentPage === 1}
-                  className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
-                >
-                  <FontAwesomeIcon icon={faAnglesLeft} />
-                </button>
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
-                >
-                  <FontAwesomeIcon icon={faArrowLeft} />
-                </button>
-
-                <span className="mx-4">
-                  Page {currentPage} of {totalPages}
-                </span>
-
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
-                >
-                  <FontAwesomeIcon icon={faArrowRight} />
-                </button>
-                <button
-                  onClick={() => handlePageChange(totalPages)}
-                  disabled={currentPage === totalPages}
-                  className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
-                >
-                  <FontAwesomeIcon icon={faAnglesRight} />
-                </button>
-              </div>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
+              >
+                <FontAwesomeIcon icon={faArrowRight} />
+              </button>
+              <button
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages}
+                className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
+              >
+                <FontAwesomeIcon icon={faAnglesRight} />
+              </button>
             </div>
+          </div>
         </div>
       )}
 
@@ -321,8 +340,7 @@ const StoreKeeperDashboard: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((useful)=> {
-
+              {currentItems.map((useful) => {
                 return (
                   <tr key={useful.id}>
                     <td className="py-4 px-6 text-sm font-medium text-gray-700 border-b">

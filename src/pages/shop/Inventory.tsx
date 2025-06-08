@@ -7,10 +7,10 @@ export const Inventory = () => {
 
   document.title = "Inventory - KDC Admin"
   const tableHeaders = ["Product", "Category", "Stock Status", "Details"];
-  const [totalCostValue, setTotalCostValue] = useState(419);
-  const [totalProfit, setTotalProfit] = useState(419);
-  const [totalStockCount, setTotalStockCount] = useState(419);
-  const [totalStockValue, setTotalStockValue] = useState(419);
+  const [totalCostValue, setTotalCostValue] = useState(0);
+  const [totalProfit, setTotalProfit] = useState(0);
+  const [totalStockCount, setTotalStockCount] = useState(0);
+  const [totalStockValue, setTotalStockValue] = useState(0);
 
   // const navigate = useNavigate();
 

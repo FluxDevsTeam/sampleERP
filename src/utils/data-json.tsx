@@ -19,6 +19,7 @@ import {
   faTableCells,
   faMinusCircle,
   faPlusMinus,
+  faFaceSmile,
 } from "@fortawesome/free-solid-svg-icons";
 
 export interface SidebarProps {
@@ -104,7 +105,14 @@ export const projectManagerSidebarLink: SidebarProps[] = [
     href: "/project-manager/main",
     icon: <FontAwesomeIcon className="text-[22px]" icon={faTableCells} />,
   },
+  {
+    id: nanoid(),
+    text: "Customers",
+    href: "/project-manager/customers",
+    icon: <FontAwesomeIcon className="text-[22px]" icon={faFaceSmile} />,
+  },
 ];
+
 export const FactoryManagerSidebarLink: SidebarProps[] = [
   {
     id: nanoid(),
