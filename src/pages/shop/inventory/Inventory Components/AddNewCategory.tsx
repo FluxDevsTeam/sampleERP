@@ -30,6 +30,9 @@ const AddCategoryPage: React.FC = () => {
         "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item-category/",
         {
           method: "POST",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
           body: formDataToSend,
         }
       );

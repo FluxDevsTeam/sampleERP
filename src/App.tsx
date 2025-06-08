@@ -244,6 +244,14 @@ const router = createBrowserRouter([
         path: "edit-quotation/:productId/:quotationId",
         element: <EditQuotation />,
       },
+      {
+        path: "customers",
+        element: <FactoryManagerCustomers />,
+      },
+      {
+        path: "projects",
+        element: <CEOProjects />,
+      },
     ],
   },
 

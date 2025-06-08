@@ -27,8 +27,8 @@ interface TableData {
 
 export const RawMaterials: React.FC = () => {
   document.title = "RM - KDC Admin";
-  const [totalStockValue, setTotalStockValue] = useState(419);
-  const [totalStoreCount, setTotalStoreCount] = useState(419);
+  const [totalStockValue, setTotalStockValue] = useState(0);
+  const [totalStoreCount, setTotalStoreCount] = useState(0);
 
   const tableHeaders = ["Name", "Category", "Quantity", "Details"];
   const [tableData, setTableData] = useState<TableData[]>([]);

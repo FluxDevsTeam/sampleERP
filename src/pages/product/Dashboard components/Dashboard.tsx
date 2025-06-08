@@ -482,7 +482,7 @@ const Dashboard = () => {
           <Accordion className="border-gray-20 border-2">
             <Accordion.Panel
             // bodyFill
-              header="Expense breakuyi;k.nljn"
+              header="Expense breakdown"
               defaultExpanded
 
               style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
@@ -500,7 +500,7 @@ const Dashboard = () => {
                   <span className="font-semibold">
                     Other production expenses:{" "}
                   </span>
-                  {expenseBreakdownMonth?.other_production_expensis || 0}
+                  {expenseBreakdownMonth?.other_production_expenses || 0}
                 </p>
                 <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
                   <span className="font-semibold">Overhead:</span>{" "}

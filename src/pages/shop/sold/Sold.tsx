@@ -5,11 +5,11 @@ import {useState, useEffect} from "react";
 
 export const Sold = () => {
 
-  const [thisMonthNonProjectSales, setThisMonthNonProjectSales] = useState(419);
-  const [thisMonthProfit, setThisMonthProfit] = useState(419);
-  const [thisMonthProjectSales, setThisMonthProjectSales] = useState(419);
-  const [thisMonthSales, setThisMonthSales] = useState(419);
-  const [thisMonthSalesCount, setThisMonthSalesCount] = useState(419);
+  const [thisMonthNonProjectSales, setThisMonthNonProjectSales] = useState(0);
+  const [thisMonthProfit, setThisMonthProfit] = useState(0);
+  const [thisMonthProjectSales, setThisMonthProjectSales] = useState(0);
+  const [thisMonthSales, setThisMonthSales] = useState(0);
+  const [thisMonthSalesCount, setThisMonthSalesCount] = useState(0);
 
 
   useEffect(() => {
