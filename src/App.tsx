@@ -248,6 +248,10 @@ const router = createBrowserRouter([
         path: "customers",
         element: <FactoryManagerCustomers />,
       },
+      {
+        path: "projects",
+        element: <CEOProjects />,
+      },
     ],
   },
 
