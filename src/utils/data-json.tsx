@@ -102,7 +102,7 @@ export const projectManagerSidebarLink: SidebarProps[] = [
   },
   {
     id: "2",
-    text: "Projects",
+    text: "Product",
     href: "/project-manager/main",
     icon: <FontAwesomeIcon className="text-[22px]" icon={faTableCells} />,
   },
