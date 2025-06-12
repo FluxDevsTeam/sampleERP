@@ -14,9 +14,16 @@ const Stock = () => {
           // INVENTORY ITEM
           try {
             const response = await fetch(
-              "https://kidsdesigncompany.pythonanywhere.com/api/add-stock/"
+              "https://kidsdesigncompany.pythonanywhere.com/api/add-stock/",
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+                },
+              }
             );
-    
+
             if (!response.ok) {
               throw new Error("iyegs failed");
             }

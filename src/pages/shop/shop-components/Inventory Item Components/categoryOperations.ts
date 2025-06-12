@@ -27,6 +27,10 @@ export const deleteCategory = async (
       `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item-category/${categoryId}/`,
       {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `JWT ${localStorage.getItem("accessToken")}`
+        }
       }
     );
 

@@ -72,7 +72,13 @@ const StockTable: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/add-stock/"
+        "https://kidsdesigncompany.pythonanywhere.com/api/add-stock/",{
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        }
       );
 
       if (!response.ok) {
@@ -123,6 +129,10 @@ const StockTable: React.FC = () => {
         `https://kidsdesigncompany.pythonanywhere.com/api/add-stock/${stockId}/`,
         {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
         }
       );
 

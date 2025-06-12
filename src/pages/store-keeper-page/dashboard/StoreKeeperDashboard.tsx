@@ -69,8 +69,8 @@ const StoreKeeperDashboard: React.FC = () => {
         `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials-category/`,{
           method: "GET",
           headers: {
-            Authorization: `JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU3ODQ4MDYxLCJpYXQiOjE3NDkyMDgwNjEsImp0aSI6IjA3ODRiZTk3MmYzYzRmYmNhMjljZGIxNzRjZGQ3MmY3IiwidXNlcl9pZCI6MX0.3I3bXVLzuVjZNmMiFagYuMxFmWCunKsWESKykFK757M`,
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
         }
       );
@@ -96,7 +96,13 @@ const StoreKeeperDashboard: React.FC = () => {
   const fetchShopCategoryData = async () => {
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/storekeeper-dashboard/`
+        `https://kidsdesigncompany.pythonanywhere.com/api/storekeeper-dashboard/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        }
       );
 
       if (!response.ok) {

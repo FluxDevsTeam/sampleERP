@@ -83,10 +83,16 @@ const ProductsTable: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/`
+        `https://kidsdesigncompany.pythonanywhere.com/api/product/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        }
       );
 
-      https: if (!response.ok) {
+      if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
 
@@ -220,7 +226,14 @@ const ProductsTable: React.FC = () => {
 
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct?.id}/quotation/`
+          `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct?.id}/quotation/`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
 
         if (!response.ok) {
@@ -245,7 +258,13 @@ const ProductsTable: React.FC = () => {
 
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/raw-materials-used/`
+          `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/raw-materials-used/`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
 
         if (!response.ok) {
@@ -266,7 +285,13 @@ const ProductsTable: React.FC = () => {
     const url = `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct?.id}/quotation/${id}/`;
 
     try {
-      const response = await fetch(url, { method: "DELETE" });
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to delete quotation");
@@ -307,6 +332,10 @@ const ProductsTable: React.FC = () => {
           `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/`,
           {
             method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
           }
         );
 
@@ -344,6 +373,10 @@ const ProductsTable: React.FC = () => {
         `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/contractor/${contractorId}/`,
         {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
         }
       );
 
@@ -392,6 +425,7 @@ const ProductsTable: React.FC = () => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify(editingContractor),
         }
@@ -439,6 +473,10 @@ const ProductsTable: React.FC = () => {
         `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/salary/${workerId}/`,
         {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
         }
       );
 
@@ -487,6 +525,7 @@ const ProductsTable: React.FC = () => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify(editingWorker),
         }

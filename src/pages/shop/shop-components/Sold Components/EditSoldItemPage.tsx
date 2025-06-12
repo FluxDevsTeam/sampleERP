@@ -54,7 +54,13 @@ const EditSoldItemPage: React.FC = () => {
     const fetchSoldItem = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/sold/${id}/`
+          `https://kidsdesigncompany.pythonanywhere.com/api/sold/${id}/`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
         const data = await response.json();
         setFormData({
@@ -79,7 +85,12 @@ const EditSoldItemPage: React.FC = () => {
     const fetchCustomers = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/customer/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/customer/", {
+            method: "GET",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
         const data = await response.json();
         setCustomers(data.results.all_customers);
@@ -94,7 +105,12 @@ const EditSoldItemPage: React.FC = () => {
     const fetchProjects = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/project/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/project/", {
+            method: "GET",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
         const data = await response.json();
         setProjects(data.all_projects);
@@ -109,7 +125,12 @@ const EditSoldItemPage: React.FC = () => {
     const fetchInventoryItems = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/", {
+            method: "GET",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            }
+          }
         );
         const data = await response.json();
         console.log(data);
@@ -143,6 +164,7 @@ const EditSoldItemPage: React.FC = () => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify(requestBody),
         }

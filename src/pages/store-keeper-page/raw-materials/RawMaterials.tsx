@@ -55,7 +55,13 @@ export const RawMaterials: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/"
+        "https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        }
       );
 
       if (!response.ok) {
@@ -100,7 +106,13 @@ export const RawMaterials: React.FC = () => {
       if (openProductId) {
         try {
           const response = await fetch(
-            `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/${openProductId}/`
+            `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/${openProductId}/`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              },
+            }
           );
           if (response.ok) {
             const product = await response.json();
@@ -151,6 +163,9 @@ export const RawMaterials: React.FC = () => {
           `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/${selectedProduct.id}/`,
           {
             method: "DELETE",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
           }
         );
 

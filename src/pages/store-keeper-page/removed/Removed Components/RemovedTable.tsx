@@ -34,7 +34,12 @@ const RemovedTable: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/removed/"
+        "https://kidsdesigncompany.pythonanywhere.com/api/removed/", {
+          method: "GET",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        }
       );
 
       const logData = await response.json();
@@ -91,6 +96,9 @@ const RemovedTable: React.FC = () => {
         `https://kidsdesigncompany.pythonanywhere.com/api/removed/${selectedItemId}/`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
         }
       );
 
