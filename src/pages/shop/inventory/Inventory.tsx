@@ -19,7 +19,13 @@ export const Inventory = () => {
       // INVENTORY ITEM
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            }
+          }
         );
 
         if (!response.ok) {
@@ -40,7 +46,13 @@ export const Inventory = () => {
       // INVENTORY DASHBOARD
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            }
+          }
         );
 
         if (!response.ok) {

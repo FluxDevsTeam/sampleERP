@@ -19,6 +19,7 @@ const AddRMCategory: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify({ name }),
         }

@@ -80,7 +80,13 @@ const AddNewStockPage = () => {
       try {
         const [itemResponse] = await Promise.all([
           fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/"
+            "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              },
+            }
           ),
         ]);
 
@@ -120,6 +126,7 @@ const AddNewStockPage = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify(submitData),
         }

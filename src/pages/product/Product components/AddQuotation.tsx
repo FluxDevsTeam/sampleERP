@@ -57,8 +57,13 @@ const AddQuotation: React.FC = () => {
     const fetchProduct = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/product/${productId}/`
-        );
+          `https://kidsdesigncompany.pythonanywhere.com/api/product/${productId}/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        });
         if (!response.ok) throw new Error("Failed to fetch product");
         const data = await response.json();
         setProduct(data);
@@ -75,10 +80,22 @@ const AddQuotation: React.FC = () => {
       try {
         const [contractorsRes, workersRes] = await Promise.all([
           fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/contractors/"
+            "https://kidsdesigncompany.pythonanywhere.com/api/contractors/", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              },
+            }
           ),
           fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/"
+            "https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              },
+            }
           ),
         ]);
 
@@ -130,6 +147,7 @@ const AddQuotation: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify(quotationData),
         }

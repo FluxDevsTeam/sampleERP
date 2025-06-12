@@ -39,7 +39,14 @@ const EditItemPage: React.FC = () => {
       const fetchUpdatedProduct = async () => {
         try {
           const response = await fetch(
-            `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${id}/`
+            `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${id}/`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              },
+            }
           );
           if (!response.ok) {
             throw new Error("Iyegs... Failed to fetch updated product data");
@@ -49,11 +56,11 @@ const EditItemPage: React.FC = () => {
           navigate("/shop/inventory", {
             state: {
               from: "editItem",
-              productData: updatedData
+              productData: updatedData,
             },
           });
         } catch (error) {
-          navigate("/shop/inventory")
+          navigate("/shop/inventory");
         }
       };
       fetchUpdatedProduct();
@@ -64,7 +71,14 @@ const EditItemPage: React.FC = () => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item-category/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item-category/",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
         const data = await response.json();
         setCategories(data);
@@ -80,7 +94,14 @@ const EditItemPage: React.FC = () => {
     const fetchItemData = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${id}/`
+          `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${id}/`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
         const itemData = await response.json();
 
@@ -128,6 +149,9 @@ const EditItemPage: React.FC = () => {
         `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${id}/`,
         {
           method: "PATCH",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
           body: formDataToSend,
         }
       );

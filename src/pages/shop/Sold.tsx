@@ -17,9 +17,16 @@ export const Sold = () => {
         // INVENTORY ITEM
         try {
           const response = await fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/sold/"
+            "https://kidsdesigncompany.pythonanywhere.com/api/sold/",
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              },
+            }
           );
-  
+
           if (!response.ok) {
             throw new Error("iyegs failed");
           }
@@ -40,9 +47,16 @@ export const Sold = () => {
         // INVENTORY DASHBOARD
         try {
           const response = await fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/"
+            "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/",
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              },
+            }
           );
-  
+
           if (!response.ok) {
             throw new Error("Authentication failed");
           }

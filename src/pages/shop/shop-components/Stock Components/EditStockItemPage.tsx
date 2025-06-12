@@ -5,7 +5,6 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ThreeDots } from "react-loader-spinner";
 import Modal from "../Modal";
 
-
 const EditStockItemPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -33,7 +32,14 @@ const EditStockItemPage: React.FC = () => {
     const fetchSoldItem = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/add-stock/${id}/`
+          `https://kidsdesigncompany.pythonanywhere.com/api/add-stock/${id}/`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
         const data = await response.json();
         setFormData({
@@ -50,7 +56,6 @@ const EditStockItemPage: React.FC = () => {
     if (id) fetchSoldItem();
   }, [id]);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -66,6 +71,7 @@ const EditStockItemPage: React.FC = () => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify(requestBody),
         }
@@ -125,8 +131,6 @@ const EditStockItemPage: React.FC = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          
-
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Quantity

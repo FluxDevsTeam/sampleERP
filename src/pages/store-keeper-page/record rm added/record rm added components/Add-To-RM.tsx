@@ -26,7 +26,12 @@ const AddToRM: React.FC = () => {
     const fetchMaterials = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/", {
+            method: "GET",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            }
+          }
         );
         if (!response.ok) throw new Error("Failed to fetch materials");
         const data = await response.json();
@@ -65,6 +70,7 @@ const AddToRM: React.FC = () => {
         {
           method: "POST",
           headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(payload),

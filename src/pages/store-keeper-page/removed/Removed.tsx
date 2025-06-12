@@ -1,61 +1,72 @@
 import InventoryData from "@/pages/shop/inventory/Inventory Components/InventoryData";
 import RemovedTable from "./Removed Components/RemovedTable";
 
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 
 export const Removed = () => {
-
   const [thisMonthNonProjectSales, setThisMonthNonProjectSales] = useState(0);
   const [thisMonthProfit, setThisMonthProfit] = useState(0);
   const [thisMonthProjectSales, setThisMonthProjectSales] = useState(0);
   const [thisMonthSales, setThisMonthSales] = useState(0);
   const [thisMonthSalesCount, setThisMonthSalesCount] = useState(0);
 
-
   useEffect(() => {
-      async function fetchStockInfo() {
-        // INVENTORY ITEM
-        try {
-          const response = await fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/sold/"
-          );
-  
-          if (!response.ok) {
-            throw new Error("iyegs failed");
+    async function fetchStockInfo() {
+      // INVENTORY ITEM
+      try {
+        const response = await fetch(
+          "https://kidsdesigncompany.pythonanywhere.com/api/sold/",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              "Content-Type": "application/json",
+            },
           }
-  
-          const logData = await response.json();
-          console.log(logData);
-  
-          setThisMonthNonProjectSales(logData.this_month_non_project_sales);
-          setThisMonthProfit(logData.this_month_profit);
-          setThisMonthProjectSales(logData.this_month_project_sales);
-          setThisMonthSales(logData.this_month_sales);
-          setThisMonthSalesCount(logData.this_month_sales_count);
+        );
 
-        } catch (error) {
-          console.error("Error fetching items:", error);
+        if (!response.ok) {
+          throw new Error("iyegs failed");
         }
-  
-        // INVENTORY DASHBOARD
-        try {
-          const response = await fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/"
-          );
-  
-          if (!response.ok) {
-            throw new Error("Authentication failed");
-          }
-  
-          const logData = await response.json();
-          console.log(logData);
-        } catch (error) {
-          console.error("Error fetching dashboard:", error);
-        }
+
+        const logData = await response.json();
+        console.log(logData);
+
+        setThisMonthNonProjectSales(logData.this_month_non_project_sales);
+        setThisMonthProfit(logData.this_month_profit);
+        setThisMonthProjectSales(logData.this_month_project_sales);
+        setThisMonthSales(logData.this_month_sales);
+        setThisMonthSalesCount(logData.this_month_sales_count);
+      } catch (error) {
+        console.error("Error fetching items:", error);
       }
-  
-      fetchStockInfo();
-    }, []);
+
+      // INVENTORY DASHBOARD
+      try {
+        const response = await fetch(
+          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Authentication failed");
+        }
+
+        const logData = await response.json();
+        console.log(logData);
+      } catch (error) {
+        console.error("Error fetching dashboard:", error);
+      }
+    }
+
+    fetchStockInfo();
+  }, []);
 
   return (
     <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
@@ -66,11 +77,31 @@ export const Removed = () => {
         Sold Summary
       </h1>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-11">
-        <InventoryData info="Non project sales for this month" digits={thisMonthNonProjectSales} trend="up"></InventoryData>
-        <InventoryData info="This month profit" digits={thisMonthProfit} trend="up"></InventoryData>
-        <InventoryData info="Project sales for this month" digits={thisMonthProjectSales} trend="up"></InventoryData>
-        <InventoryData info="This month sales" digits={thisMonthSales} trend="up"></InventoryData>
-        <InventoryData info="Count of this month sales" digits={thisMonthSalesCount} trend="up"></InventoryData>
+        <InventoryData
+          info="Non project sales for this month"
+          digits={thisMonthNonProjectSales}
+          trend="up"
+        ></InventoryData>
+        <InventoryData
+          info="This month profit"
+          digits={thisMonthProfit}
+          trend="up"
+        ></InventoryData>
+        <InventoryData
+          info="Project sales for this month"
+          digits={thisMonthProjectSales}
+          trend="up"
+        ></InventoryData>
+        <InventoryData
+          info="This month sales"
+          digits={thisMonthSales}
+          trend="up"
+        ></InventoryData>
+        <InventoryData
+          info="Count of this month sales"
+          digits={thisMonthSalesCount}
+          trend="up"
+        ></InventoryData>
       </div>
 
       <div>
@@ -87,4 +118,3 @@ export const Removed = () => {
 };
 
 export default Removed;
-

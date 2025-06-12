@@ -13,7 +13,12 @@ const RecordOfRMAdded: React.FC = () => {
       // INVENTORY ITEM
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/add-raw-materials/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/add-raw-materials/", {
+            method: "GET",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
 
         if (!response.ok) {

@@ -50,7 +50,13 @@ const Dashboard = () => {
     async function fetchInfo() {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/project-manager-dashboard/"
+          "https://kidsdesigncompany.pythonanywhere.com/api/project-manager-dashboard/", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
 
         if (!response.ok) {

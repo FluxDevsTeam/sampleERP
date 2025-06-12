@@ -36,7 +36,13 @@ const AddRemovedItem: React.FC = () => {
   const fetchRM = async () => {
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/`
+        `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/`,{
+          method: "GET",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
       if (!response.ok) throw new Error("Failed to fetch raw materials");
       const data = await response.json();
@@ -49,7 +55,13 @@ const AddRemovedItem: React.FC = () => {
   const fetchProducts = async () => {
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/`
+        `https://kidsdesigncompany.pythonanywhere.com/api/product/`,{
+          method: "GET",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
       if (!response.ok) throw new Error("Failed to fetch products");
       const data = await response.json();
@@ -82,6 +94,7 @@ const AddRemovedItem: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify(requestBody),
         }

@@ -34,8 +34,13 @@ const AddContractorPage: React.FC = () => {
     const fetchContractors = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/contractors/"
-        );
+          "https://kidsdesigncompany.pythonanywhere.com/api/contractors/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+       } );
         if (!response.ok) throw new Error("Failed to fetch contractors");
         const data = await response.json();
         console.log(data);
@@ -60,6 +65,7 @@ const AddContractorPage: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify({
             contractor: selectedContractor,
@@ -97,7 +103,14 @@ const AddContractorPage: React.FC = () => {
       const fetchUpdatedProduct = async () => {
         try {
           const response = await fetch(
-            `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`
+            `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              },
+            }
           );
           if (!response.ok) throw new Error("Failed to fetch updated product");
           const updatedProduct = await response.json();
@@ -147,7 +160,13 @@ const AddContractorPage: React.FC = () => {
             onClick={async () => {
               try {
                 const response = await fetch(
-                  `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`
+                  `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`, {
+                    method: "GET",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+                    },
+                  }
                 );
                 if (!response.ok) throw new Error("Failed to fetch product");
                 const productData = await response.json();
