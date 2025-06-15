@@ -47,7 +47,7 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({ id, open, onOpenCha
     queryKey: ["paid", id],
     queryFn: async () => {
       const response = await axios.get<PaymentData>(
-        `https://kidsdesigncompany.pythonanywhere.com/api/paid/${id}/`
+        `https://backend.kidsdesigncompany.com/api/paid/${id}/`
       );
       return response.data;
     },
@@ -61,8 +61,8 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({ id, open, onOpenCha
     const fetchData = async () => {
       try {
         const [contractorRes, salaryRes] = await Promise.all([
-          axios.get("https://kidsdesigncompany.pythonanywhere.com/api/contractors/"),
-          axios.get("https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/")
+          axios.get("https://backend.kidsdesigncompany.com/api/contractors/"),
+          axios.get("https://backend.kidsdesigncompany.com/api/salary-workers/")
         ]);
 
         setContractors(contractorRes.data.results.contractor);
@@ -98,7 +98,7 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({ id, open, onOpenCha
         : { amount: paymentData.amount, salary: paymentData.recipientId };
 
       const response = await axios.put(
-        `https://kidsdesigncompany.pythonanywhere.com/api/paid/${id}/`,
+        `https://backend.kidsdesigncompany.com/api/paid/${id}/`,
         formattedData
       );
       return response.data;

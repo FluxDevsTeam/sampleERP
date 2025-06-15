@@ -32,7 +32,7 @@ const AddRecordPopup: React.FC<AddRecordPopupProps> = ({
   const addRecordMutation = useMutation({
     mutationFn: async (record: { report: string }) => {
       await axios.post(
-        `https://kidsdesigncompany.pythonanywhere.com/api/contractors/${contractorId}/record/`,
+        `https://backend.kidsdesigncompany.com/api/contractors/${contractorId}/record/`,
         record
       );
     },

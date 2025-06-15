@@ -24,7 +24,7 @@ const AddNewRawMaterial = () => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials-category/`,
+          `https://backend.kidsdesigncompany.com/api/raw-materials-category/`,
           {
             method: "GET",
             headers: {
@@ -76,7 +76,7 @@ const AddNewRawMaterial = () => {
 
     try {
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/",
+        "https://backend.kidsdesigncompany.com/api/raw-materials/",
         {
           method: "POST",
           headers: {

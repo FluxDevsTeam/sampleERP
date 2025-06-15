@@ -48,7 +48,7 @@ const ProjectManagerDashboard = () => {
     async function fetchInfo() {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/project-manager-dashboard/", {
+          "https://backend.kidsdesigncompany.com/api/project-manager-dashboard/", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",

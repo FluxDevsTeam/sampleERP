@@ -104,7 +104,7 @@ const EditProject = () => {
   const { data: project, isLoading, error } = useQuery<Project>({
     queryKey: ["project", id],
     queryFn: async () => {
-      const response = await axios.get(`https://kidsdesigncompany.pythonanywhere.com/api/project/${id}/`)
+      const response = await axios.get(`https://backend.kidsdesigncompany.com/api/project/${id}/`)
       return response.data
     },
     enabled: !!id,
@@ -115,7 +115,7 @@ const EditProject = () => {
     const fetchCustomers = async () => {
       setIsLoadingCustomers(true)
       try {
-        const response = await axios.get('https://kidsdesigncompany.pythonanywhere.com/api/customer/')
+        const response = await axios.get('https://backend.kidsdesigncompany.com/api/customer/')
         
         // Extract customers from the nested structure (similar to AddProject)
         if (response.data && response.data.results && response.data.results.all_customers) {
@@ -207,7 +207,7 @@ const EditProject = () => {
   const updateProjectMutation = useMutation({
     mutationFn: async (updatedProject: FormData) => {
       return axios.put(
-        `https://kidsdesigncompany.pythonanywhere.com/api/project/${id}/`,
+        `https://backend.kidsdesigncompany.com/api/project/${id}/`,
         updatedProject,
         {
           headers: {

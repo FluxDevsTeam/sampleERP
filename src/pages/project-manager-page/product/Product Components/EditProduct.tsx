@@ -39,7 +39,7 @@ const EditProduct: React.FC = () => {
     const fetchProductDetails = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`,
+          `https://backend.kidsdesigncompany.com/api/product/${id}/`,
           {
             method: "GET",
             headers: {
@@ -79,7 +79,7 @@ const EditProduct: React.FC = () => {
     const fetchProjects = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/project/",
+          "https://backend.kidsdesigncompany.com/api/project/",
           {
             method: "GET",
             headers: {
@@ -146,7 +146,7 @@ const EditProduct: React.FC = () => {
       }
 
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`,
+        `https://backend.kidsdesigncompany.com/api/product/${id}/`,
         {
           method: "PATCH",
           headers: {
@@ -184,7 +184,7 @@ const EditProduct: React.FC = () => {
       const fetchUpdatedProduct = async () => {
         try {
           const response = await fetch(
-            `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`,
+            `https://backend.kidsdesigncompany.com/api/product/${id}/`,
             {
               method: "GET",
               headers: {

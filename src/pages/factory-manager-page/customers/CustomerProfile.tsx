@@ -23,7 +23,7 @@ const CustomerProfile = () => {
     const fetchCustomer = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`https://kidsdesigncompany.pythonanywhere.com/api/customer/${id}/?format=json`);
+        const response = await fetch(`https://backend.kidsdesigncompany.com/api/customer/${id}/?format=json`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch customer data.");
@@ -61,7 +61,7 @@ const CustomerProfile = () => {
 
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/customer/${customer.customer_details.id}`,
+        `https://backend.kidsdesigncompany.com/api/customer/${customer.customer_details.id}`,
         {
           method: "PATCH",
           headers: {

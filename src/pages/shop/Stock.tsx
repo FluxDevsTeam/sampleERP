@@ -14,7 +14,7 @@ const Stock = () => {
           // INVENTORY ITEM
           try {
             const response = await fetch(
-              "https://kidsdesigncompany.pythonanywhere.com/api/add-stock/",
+              "https://backend.kidsdesigncompany.com/api/add-stock/",
               {
                 method: "GET",
                 headers: {

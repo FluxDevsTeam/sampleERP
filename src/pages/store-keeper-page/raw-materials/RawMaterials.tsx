@@ -55,7 +55,7 @@ export const RawMaterials: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/",
+        "https://backend.kidsdesigncompany.com/api/raw-materials/",
         {
           method: "GET",
           headers: {
@@ -106,7 +106,7 @@ export const RawMaterials: React.FC = () => {
       if (openProductId) {
         try {
           const response = await fetch(
-            `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/${openProductId}/`,
+            `https://backend.kidsdesigncompany.com/api/raw-materials/${openProductId}/`,
             {
               method: "GET",
               headers: {
@@ -160,7 +160,7 @@ export const RawMaterials: React.FC = () => {
     if (selectedProduct) {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/${selectedProduct.id}/`,
+          `https://backend.kidsdesigncompany.com/api/raw-materials/${selectedProduct.id}/`,
           {
             method: "DELETE",
             headers: {

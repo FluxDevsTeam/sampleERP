@@ -89,13 +89,13 @@ interface ExpenseFormData {
 }
 
 const fetchProjects = async (): Promise<Project[]> => {
-  const response = await axios.get("https://kidsdesigncompany.pythonanywhere.com/api/project/");
+  const response = await axios.get("https://backend.kidsdesigncompany.com/api/project/");
   return response.data.all_projects || [];
 };
 
 const fetchShopItems = async (): Promise<ShopItem[]> => {
   try {
-    const response = await axios.get("https://kidsdesigncompany.pythonanywhere.com/api/sold/");
+    const response = await axios.get("https://backend.kidsdesigncompany.com/api/sold/");
     console.log("Fetched Sold API response:", response.data); 
   
     const items: ShopItem[] = [];
@@ -126,7 +126,7 @@ const fetchShopItems = async (): Promise<ShopItem[]> => {
 
 const fetchCategories = async (): Promise<Category[]> => {
   const { data } = await axios.get<Category[]>(
-    "https://kidsdesigncompany.pythonanywhere.com/api/expense-category/"
+    "https://backend.kidsdesigncompany.com/api/expense-category/"
   );
   return data; 
 };
@@ -170,7 +170,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
   const addCategoryMutation = useMutation({
     mutationFn: async (categoryData: NewCategoryData) => {
       const response = await axios.post<Category>(
-        "https://kidsdesigncompany.pythonanywhere.com/api/expense-category/",
+        "https://backend.kidsdesigncompany.com/api/expense-category/",
         categoryData
       );
       return response.data;
@@ -303,7 +303,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange,
 
       try {
         const response = await axios.post(
-          "https://kidsdesigncompany.pythonanywhere.com/api/expense/",
+          "https://backend.kidsdesigncompany.com/api/expense/",
           formattedData
         );
         return response.data;

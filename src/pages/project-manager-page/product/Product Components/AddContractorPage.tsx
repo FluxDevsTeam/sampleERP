@@ -34,7 +34,7 @@ const AddContractorPage: React.FC = () => {
     const fetchContractors = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/contractors/", {
+          "https://backend.kidsdesigncompany.com/api/contractors/", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -60,7 +60,7 @@ const AddContractorPage: React.FC = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/contractor/`,
+        `https://backend.kidsdesigncompany.com/api/product/${id}/contractor/`,
         {
           method: "POST",
           headers: {
@@ -103,7 +103,7 @@ const AddContractorPage: React.FC = () => {
       const fetchUpdatedProduct = async () => {
         try {
           const response = await fetch(
-            `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`,
+            `https://backend.kidsdesigncompany.com/api/product/${id}/`,
             {
               method: "GET",
               headers: {
@@ -160,7 +160,7 @@ const AddContractorPage: React.FC = () => {
             onClick={async () => {
               try {
                 const response = await fetch(
-                  `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`, {
+                  `https://backend.kidsdesigncompany.com/api/product/${id}/`, {
                     method: "GET",
                     headers: {
                       "Content-Type": "application/json",

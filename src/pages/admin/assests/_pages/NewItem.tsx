@@ -20,7 +20,7 @@ const CreateAsset = () => {
       is_still_available: available,
     };
 
-    await axios.post("https://kidsdesigncompany.pythonanywhere.com/api/assets/crud", newAsset);
+    await axios.post("https://backend.kidsdesigncompany.com/api/assets/crud", newAsset);
     queryClient.invalidateQueries(["assets"]); // Refresh assets data
     navigate("/admin/dashboard/assets");
   };

@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
 import AddContractorModal from "../_pages/_contractors/AddContractorModal";
 
-const BASE_URL = "https://kidsdesigncompany.pythonanywhere.com/api/contractors/";
+const BASE_URL = "https://backend.kidsdesigncompany.com/api/contractors/";
 
 interface Contractor {
   id: number;

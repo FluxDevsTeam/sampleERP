@@ -45,7 +45,7 @@ const EditAsset = () => {
   const { data: asset, isLoading, error } = useQuery<Asset>({
     queryKey: ["asset", id],
     queryFn: async () => {
-      const response = await axios.get(`https://kidsdesigncompany.pythonanywhere.com/api/assets/${id}/`)
+      const response = await axios.get(`https://backend.kidsdesigncompany.com/api/assets/${id}/`)
       return response.data
     },
     enabled: !!id,
@@ -66,7 +66,7 @@ const EditAsset = () => {
   // Update asset mutation
   const updateAssetMutation = useMutation({
     mutationFn: async (updatedAsset: Partial<Asset>) => {
-      return axios.put(`https://kidsdesigncompany.pythonanywhere.com/api/assets/${id}/`, updatedAsset)
+      return axios.put(`https://backend.kidsdesigncompany.com/api/assets/${id}/`, updatedAsset)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["assets"] })

@@ -3,7 +3,7 @@ import axios, { AxiosError } from "axios";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-const API_URL = "https://kidsdesigncompany.pythonanywhere.com/api/overhead-cost/";
+const API_URL = "https://backend.kidsdesigncompany.com/api/overhead-cost/";
 
 // Define types for API response
 interface OverheadCostData {

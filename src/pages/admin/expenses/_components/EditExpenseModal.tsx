@@ -82,13 +82,13 @@ interface EditExpenseModalProps {
 }
 
 const fetchProjects = async (): Promise<Project[]> => {
-  const response = await axios.get("https://kidsdesigncompany.pythonanywhere.com/api/project/");
+  const response = await axios.get("https://backend.kidsdesigncompany.com/api/project/");
   return response.data.all_projects || [];
 };
 
 const fetchShopItems = async (): Promise<ShopItem[]> => {
   try {
-    const response = await axios.get("https://kidsdesigncompany.pythonanywhere.com/api/sold/");
+    const response = await axios.get("https://backend.kidsdesigncompany.com/api/sold/");
     console.log("Fetched Sold API response:", response.data);
     
     const items: ShopItem[] = [];
@@ -119,7 +119,7 @@ const fetchShopItems = async (): Promise<ShopItem[]> => {
 
 const fetchCategories = async (): Promise<Category[]> => {
   const { data } = await axios.get<Category[]>(
-    "https://kidsdesigncompany.pythonanywhere.com/api/expense-category/"
+    "https://backend.kidsdesigncompany.com/api/expense-category/"
   );
   return data;
 };
@@ -246,7 +246,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
       };
 
       console.log("Sending update data to API:", formattedData);
-      await axios.put(`https://kidsdesigncompany.pythonanywhere.com/api/expense/${expenseId}/`, formattedData);
+      await axios.put(`https://backend.kidsdesigncompany.com/api/expense/${expenseId}/`, formattedData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["expenses"] });

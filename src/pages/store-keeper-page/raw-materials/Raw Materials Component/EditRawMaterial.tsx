@@ -29,7 +29,7 @@ const EditRawMaterial = () => {
     const fetchRawMaterial = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/${id}/`,
+          `https://backend.kidsdesigncompany.com/api/raw-materials/${id}/`,
           {
             method: "GET",
             headers: {
@@ -57,7 +57,7 @@ const EditRawMaterial = () => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials-category/`,
+          `https://backend.kidsdesigncompany.com/api/raw-materials-category/`,
           {
             method: "GET",
             headers: {
@@ -111,7 +111,7 @@ const EditRawMaterial = () => {
 
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/${id}/`,
+        `https://backend.kidsdesigncompany.com/api/raw-materials/${id}/`,
         {
           method: "PATCH",
           headers: {

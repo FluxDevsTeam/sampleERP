@@ -64,7 +64,7 @@ const StockTable: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/add-stock/", {
+        "https://backend.kidsdesigncompany.com/api/add-stock/", {
           method: "GET",
           headers: {
             Authorization: `JWT ${localStorage.getItem("accessToken")}`,
@@ -117,7 +117,7 @@ const StockTable: React.FC = () => {
   const handleDelete = async (stockId: number) => {
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/add-stock/${stockId}/`,
+        `https://backend.kidsdesigncompany.com/api/add-stock/${stockId}/`,
         {
           method: "DELETE",
           headers: {

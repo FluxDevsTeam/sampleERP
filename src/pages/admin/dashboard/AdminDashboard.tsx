@@ -8,7 +8,7 @@ import Header from "./_components/Header";
 import SkeletonLoader from "./_components/SkeletonLoader";
 
 const fetchFinancialData = async () => {
-  const { data } = await axios.get("https://kidsdesigncompany.pythonanywhere.com/api/admin-dashboard/");
+  const { data } = await axios.get("https://backend.kidsdesigncompany.com/api/admin-dashboard/");
   return data;
 };
 

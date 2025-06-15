@@ -56,7 +56,7 @@ const AddSalaryWorkerModal: React.FC<Props> = ({ open, onOpenChange }) => {
     e.preventDefault();
     setIsPending(true);
     try {
-      await axios.post("https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/", formData);
+      await axios.post("https://backend.kidsdesigncompany.com/api/salary-workers/", formData);
       queryClient.invalidateQueries({ queryKey: ["salary-workers"] });
       toast.success("Salary worker added!");
       setFormData(initialFormData); // Reset form after success

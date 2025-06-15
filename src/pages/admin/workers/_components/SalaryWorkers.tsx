@@ -9,7 +9,7 @@ import SkeletonLoader from "./SkeletonLoader";
 import AddSalaryWorkerModal from "../_pages/_salaryWorkers/AddSalaryWorkersModal";
 
 
-const BASE_URL = "https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/";
+const BASE_URL = "https://backend.kidsdesigncompany.com/api/salary-workers/";
 
 interface SalaryWorker {
   id: number;

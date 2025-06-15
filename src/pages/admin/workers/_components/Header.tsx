@@ -28,7 +28,7 @@ interface ContractorsSummary {
 
 // Fetch salary workers data
 const fetchSalaryWorkersData = async (): Promise<SalaryWorkersSummary> => {
-  const response = await fetch("https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/");
+  const response = await fetch("https://backend.kidsdesigncompany.com/api/salary-workers/");
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -37,7 +37,7 @@ const fetchSalaryWorkersData = async (): Promise<SalaryWorkersSummary> => {
 
 // Fetch contractors data
 const fetchContractorsData = async (): Promise<ContractorsSummary> => {
-  const response = await fetch("https://kidsdesigncompany.pythonanywhere.com/api/contractors/");
+  const response = await fetch("https://backend.kidsdesigncompany.com/api/contractors/");
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }

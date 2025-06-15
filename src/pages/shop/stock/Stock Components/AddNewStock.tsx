@@ -80,7 +80,7 @@ const AddNewStockPage = () => {
       try {
         const [itemResponse] = await Promise.all([
           fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/",{
+            "https://backend.kidsdesigncompany.com/api/inventory-item/",{
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
@@ -121,7 +121,7 @@ const AddNewStockPage = () => {
       };
 
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/add-stock/",
+        "https://backend.kidsdesigncompany.com/api/add-stock/",
         {
           method: "POST",
           headers: {

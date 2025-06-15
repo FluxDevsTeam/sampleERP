@@ -57,7 +57,7 @@ const EditQuotation: React.FC = () => {
     const fetchProduct = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/product/${productId}/`,
+          `https://backend.kidsdesigncompany.com/api/product/${productId}/`,
           {
             method: "GET",
             headers: {
@@ -82,7 +82,7 @@ const EditQuotation: React.FC = () => {
       try {
         const [contractorsRes, workersRes] = await Promise.all([
           fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/contractors/",
+            "https://backend.kidsdesigncompany.com/api/contractors/",
             {
               method: "GET",
               headers: {
@@ -92,7 +92,7 @@ const EditQuotation: React.FC = () => {
             }
           ),
           fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/",
+            "https://backend.kidsdesigncompany.com/api/salary-workers/",
             {
               method: "GET",
               headers: {
@@ -127,7 +127,7 @@ const EditQuotation: React.FC = () => {
       const fetchQuotation = async () => {
         try {
           const response = await fetch(
-            `https://kidsdesigncompany.pythonanywhere.com/api/product/${productId}/quotation/${quotationId}/`,
+            `https://backend.kidsdesigncompany.com/api/product/${productId}/quotation/${quotationId}/`,
             {
               method: "GET",
               headers: {
@@ -172,7 +172,7 @@ const EditQuotation: React.FC = () => {
     };
 
     try {
-      const url = `https://kidsdesigncompany.pythonanywhere.com/api/product/${productId}/quotation/${
+      const url = `https://backend.kidsdesigncompany.com/api/product/${productId}/quotation/${
         quotationId ? `${quotationId}/` : ""
       }`;
       const method = quotationId ? "PATCH" : "POST";
@@ -193,7 +193,7 @@ const EditQuotation: React.FC = () => {
 
       // Fetch updated product data
       const productResponse = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/${productId}/`,
+        `https://backend.kidsdesigncompany.com/api/product/${productId}/`,
         {
           method: "GET",
           headers: {

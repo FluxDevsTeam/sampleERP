@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
 import AddAssetModal from "./AddAssetsModal";
 
-const BASE_URL = "https://kidsdesigncompany.pythonanywhere.com/api/assets/";
+const BASE_URL = "https://backend.kidsdesigncompany.com/api/assets/";
 
 interface Asset {
   id: number;

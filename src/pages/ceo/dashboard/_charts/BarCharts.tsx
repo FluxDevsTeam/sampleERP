@@ -32,7 +32,7 @@ const MonthlyTrendsCharts = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://kidsdesigncompany.pythonanywhere.com/api/ceo-dashboard/');
+        const response = await fetch('https://backend.kidsdesigncompany.com/api/ceo-dashboard/');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

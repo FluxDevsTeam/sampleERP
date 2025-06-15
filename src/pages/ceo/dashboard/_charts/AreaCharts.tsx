@@ -27,7 +27,7 @@ const AreaChartComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<DashboardData>("https://kidsdesigncompany.pythonanywhere.com/api/ceo-dashboard/");
+        const response = await axios.get<DashboardData>("https://backend.kidsdesigncompany.com/api/ceo-dashboard/");
         const data = response.data;
 
         if (data?.monthly_trends) {

@@ -13,7 +13,7 @@ interface ExpensesData {
 
 const fetchExpenses = async (): Promise<ExpensesData> => {
   const { data } = await axios.get<ExpensesData>(
-    "https://kidsdesigncompany.pythonanywhere.com/api/expense/"
+    "https://backend.kidsdesigncompany.com/api/expense/"
   );
   return data;
 };

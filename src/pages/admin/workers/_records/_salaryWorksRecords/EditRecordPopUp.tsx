@@ -36,7 +36,7 @@ const EditRecordPopup: React.FC<EditRecordPopupProps> = ({
   const editRecordMutation = useMutation({
     mutationFn: async (updatedData: { report: string; }) => {
       await axios.put(
-        `https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/${salaryWorkerId}/record/${record.id}/`,
+        `https://backend.kidsdesigncompany.com/api/salary-workers/${salaryWorkerId}/record/${record.id}/`,
         updatedData
       );
     },

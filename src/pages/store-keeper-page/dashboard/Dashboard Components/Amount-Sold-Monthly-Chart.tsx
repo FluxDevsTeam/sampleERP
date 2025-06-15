@@ -90,7 +90,7 @@ const AmountSoldMonthlyBarChart = () => {
       // INVENTORY DASHBOARD
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/storekeeper-dashboard/",
+          "https://backend.kidsdesigncompany.com/api/storekeeper-dashboard/",
           {
             method: "GET",
             headers: {

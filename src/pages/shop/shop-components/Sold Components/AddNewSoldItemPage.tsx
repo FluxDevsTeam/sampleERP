@@ -94,18 +94,18 @@ const AddNewSoldItemPage = () => {
       try {
         const [customerResponse, projectResponse, itemResponse] =
           await Promise.all([
-            fetch("https://kidsdesigncompany.pythonanywhere.com/api/customer/", {
+            fetch("https://backend.kidsdesigncompany.com/api/customer/", {
               headers: {
                 Authorization: `JWT ${localStorage.getItem("accessToken")}`,
               },
             }),
-            fetch("https://kidsdesigncompany.pythonanywhere.com/api/project/", {
+            fetch("https://backend.kidsdesigncompany.com/api/project/", {
               headers: {
                 Authorization: `JWT ${localStorage.getItem("accessToken")}`,
               },
             }),
             fetch(
-              "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/", {
+              "https://backend.kidsdesigncompany.com/api/inventory-item/", {
                 headers: {
                   Authorization: `JWT ${localStorage.getItem("accessToken")}`,
                 },
@@ -162,7 +162,7 @@ const AddNewSoldItemPage = () => {
 
     try {
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/sold/",
+        "https://backend.kidsdesigncompany.com/api/sold/",
         {
           method: "POST",
           headers: {

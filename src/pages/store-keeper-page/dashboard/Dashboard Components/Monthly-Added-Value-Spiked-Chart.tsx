@@ -103,7 +103,7 @@ const MonthlyAddedValueSpikedChart = () => {
       // INVENTORY DASHBOARD
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/storekeeper-dashboard/",
+          "https://backend.kidsdesigncompany.com/api/storekeeper-dashboard/",
           {
             headers: {
               Authorization: `JWT ${localStorage.getItem("accessToken")}`,

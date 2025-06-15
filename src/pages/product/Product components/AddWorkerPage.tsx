@@ -34,7 +34,7 @@ const AddWorkerPage: React.FC = () => {
     const fetchworkers = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/", {
+          "https://backend.kidsdesigncompany.com/api/salary-workers/", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -60,7 +60,7 @@ const AddWorkerPage: React.FC = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/salary/`,
+        `https://backend.kidsdesigncompany.com/api/product/${id}/salary/`,
         {
           method: "POST",
           headers: {
@@ -102,7 +102,7 @@ const AddWorkerPage: React.FC = () => {
       const fetchUpdatedProduct = async () => {
         try {
           const response = await fetch(
-            `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`, {
+            `https://backend.kidsdesigncompany.com/api/product/${id}/`, {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",

@@ -59,7 +59,7 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
   // Update asset mutation
   const updateAssetMutation = useMutation({
     mutationFn: async (updatedAsset: Partial<Asset>) => {
-      return axios.put(`https://kidsdesigncompany.pythonanywhere.com/api/assets/${asset.id}/`, updatedAsset)
+      return axios.put(`https://backend.kidsdesigncompany.com/api/assets/${asset.id}/`, updatedAsset)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["assets"] })

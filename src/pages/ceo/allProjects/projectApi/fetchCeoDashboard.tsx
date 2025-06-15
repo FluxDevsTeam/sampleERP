@@ -12,21 +12,21 @@ interface Project {
 
 export const fetchCeoDashboard = async () => {
   const { data } = await axios.get(
-    "https://kidsdesigncompany.pythonanywhere.com/api/ceo-dashboard/"
+    "https://backend.kidsdesigncompany.com/api/ceo-dashboard/"
   );
   return data;
 };
 
 export const fetchCeoProjects = async () => {
   const { data } = await axios.get(
-    "https://kidsdesigncompany.pythonanywhere.com/api/project/"
+    "https://backend.kidsdesigncompany.com/api/project/"
   );
   return data;
 };
 
 
 
-const API_URL = "https://kidsdesigncompany.pythonanywhere.com/api/project"; 
+const API_URL = "https://backend.kidsdesigncompany.com/api/project"; 
 
 // **Update Project (PATCH)**
 export const useUpdateProject = () => {

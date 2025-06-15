@@ -49,7 +49,7 @@ const Table: React.FC<TableProps> = ({ headers }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/`,
+        `https://backend.kidsdesigncompany.com/api/inventory-item/`,
         {
           method: "GET",
           headers: {
@@ -130,7 +130,7 @@ const Table: React.FC<TableProps> = ({ headers }) => {
     if (selectedProduct) {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${selectedProduct.id}/`,
+          `https://backend.kidsdesigncompany.com/api/inventory-item/${selectedProduct.id}/`,
           {
             method: "DELETE",
             headers: {

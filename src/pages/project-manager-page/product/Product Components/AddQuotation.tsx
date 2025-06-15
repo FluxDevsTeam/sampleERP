@@ -57,7 +57,7 @@ const AddQuotation: React.FC = () => {
     const fetchProduct = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/product/${productId}/`,
+          `https://backend.kidsdesigncompany.com/api/product/${productId}/`,
           {
             method: "GET",
             headers: {
@@ -82,7 +82,7 @@ const AddQuotation: React.FC = () => {
       try {
         const [contractorsRes, workersRes] = await Promise.all([
           fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/contractors/", {
+            "https://backend.kidsdesigncompany.com/api/contractors/", {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
@@ -91,7 +91,7 @@ const AddQuotation: React.FC = () => {
             }
           ),
           fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/", {
+            "https://backend.kidsdesigncompany.com/api/salary-workers/", {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
@@ -144,7 +144,7 @@ const AddQuotation: React.FC = () => {
 
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/${productId}/quotation/`,
+        `https://backend.kidsdesigncompany.com/api/product/${productId}/quotation/`,
         {
           method: "POST",
           headers: {

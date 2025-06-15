@@ -43,7 +43,7 @@ const EditItemPage: React.FC = () => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item-category/", {
+          "https://backend.kidsdesigncompany.com/api/inventory-item-category/", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -96,7 +96,7 @@ const EditItemPage: React.FC = () => {
       }
 
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${id}/`,
+        `https://backend.kidsdesigncompany.com/api/inventory-item/${id}/`,
         {
           method: "PATCH",
           headers: {

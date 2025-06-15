@@ -36,7 +36,7 @@ const AddRemovedItem: React.FC = () => {
   const fetchRM = async () => {
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/`,{
+        `https://backend.kidsdesigncompany.com/api/raw-materials/`,{
           method: "GET",
           headers: {
             Authorization: `JWT ${localStorage.getItem("accessToken")}`,
@@ -55,7 +55,7 @@ const AddRemovedItem: React.FC = () => {
   const fetchProducts = async () => {
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/`,{
+        `https://backend.kidsdesigncompany.com/api/product/`,{
           method: "GET",
           headers: {
             Authorization: `JWT ${localStorage.getItem("accessToken")}`,
@@ -89,7 +89,7 @@ const AddRemovedItem: React.FC = () => {
       };
 
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/removed/",
+        "https://backend.kidsdesigncompany.com/api/removed/",
         {
           method: "POST",
           headers: {

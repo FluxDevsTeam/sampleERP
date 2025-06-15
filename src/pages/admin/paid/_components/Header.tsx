@@ -10,7 +10,7 @@ interface PaidData {
 
 const fetchPaidData = async (): Promise<PaidData> => {
   const { data } = await axios.get<PaidData>(
-    "https://kidsdesigncompany.pythonanywhere.com/api/paid/"
+    "https://backend.kidsdesigncompany.com/api/paid/"
   );
   return data;
 };

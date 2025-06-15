@@ -12,7 +12,7 @@ interface ProjectsSummary {
 
 const Header = () => {
   const fetchProjectsData = async (): Promise<ProjectsSummary> => {
-    const response = await fetch("https://kidsdesigncompany.pythonanywhere.com/api/project/");
+    const response = await fetch("https://backend.kidsdesigncompany.com/api/project/");
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }

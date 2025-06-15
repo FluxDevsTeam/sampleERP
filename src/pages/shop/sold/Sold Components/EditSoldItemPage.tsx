@@ -54,7 +54,7 @@ const EditSoldItemPage: React.FC = () => {
     const fetchSoldItem = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/sold/${id}/`,{
+          `https://backend.kidsdesigncompany.com/api/sold/${id}/`,{
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -85,7 +85,7 @@ const EditSoldItemPage: React.FC = () => {
     const fetchCustomers = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/customer/", {
+          "https://backend.kidsdesigncompany.com/api/customer/", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -106,7 +106,7 @@ const EditSoldItemPage: React.FC = () => {
     const fetchProjects = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/project/", {
+          "https://backend.kidsdesigncompany.com/api/project/", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -127,7 +127,7 @@ const EditSoldItemPage: React.FC = () => {
     const fetchInventoryItems = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/",{
+          "https://backend.kidsdesigncompany.com/api/inventory-item/",{
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -162,7 +162,7 @@ const EditSoldItemPage: React.FC = () => {
       };
 
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/sold/${id}/`,
+        `https://backend.kidsdesigncompany.com/api/sold/${id}/`,
         {
           method: "PATCH",
           headers: {

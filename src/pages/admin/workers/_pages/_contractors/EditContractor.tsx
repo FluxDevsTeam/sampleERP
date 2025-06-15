@@ -35,7 +35,7 @@ const EditContractor = () => {
   useEffect(() => {
     const fetchContractor = async () => {
       try {
-        const response = await axios.get(`https://kidsdesigncompany.pythonanywhere.com/api/contractors/${id}/`);
+        const response = await axios.get(`https://backend.kidsdesigncompany.com/api/contractors/${id}/`);
         setFormData(response.data);
       } catch (error) {
         toast.error("Failed to fetch contractor data.");
@@ -58,7 +58,7 @@ const EditContractor = () => {
     setIsPending(true);
 
     try {
-      await axios.put(`https://kidsdesigncompany.pythonanywhere.com/api/contractors/${id}/`, formData);
+      await axios.put(`https://backend.kidsdesigncompany.com/api/contractors/${id}/`, formData);
       queryClient.invalidateQueries({ queryKey: ["contractors"], refetchType: "active" });
       toast.success("Contractor updated successfully!");
       navigate("/admin/workers");

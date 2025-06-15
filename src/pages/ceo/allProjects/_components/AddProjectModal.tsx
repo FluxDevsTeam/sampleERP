@@ -85,7 +85,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
     const fetchCustomers = async () => {
       setIsLoadingCustomers(true);
       try {
-        const response = await axios.get<CustomerApiResponse>('https://kidsdesigncompany.pythonanywhere.com/api/customer/');
+        const response = await axios.get<CustomerApiResponse>('https://backend.kidsdesigncompany.com/api/customer/');
         if (response.data?.results?.all_customers) {
           setCustomers(response.data.results.all_customers);
         } else {
@@ -199,7 +199,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
 
     try {
       await axios.post(
-        "https://kidsdesigncompany.pythonanywhere.com/api/project/",
+        "https://backend.kidsdesigncompany.com/api/project/",
         formDataToSubmit,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );

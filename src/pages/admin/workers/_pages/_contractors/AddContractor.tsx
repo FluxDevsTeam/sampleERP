@@ -43,7 +43,7 @@ const AddContractor = () => {
     setIsPending(true);
 
     try {
-      await axios.post("https://kidsdesigncompany.pythonanywhere.com/api/contractors/", formData);
+      await axios.post("https://backend.kidsdesigncompany.com/api/contractors/", formData);
       queryClient.invalidateQueries({ queryKey: ["contractors"], refetchType: "active" });
       toast.success("Contractor added successfully!");
       navigate("/admin/workers");

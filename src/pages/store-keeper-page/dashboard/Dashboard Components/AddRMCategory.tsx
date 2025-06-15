@@ -14,7 +14,7 @@ const AddRMCategory: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/raw-materials-category/",
+        "https://backend.kidsdesigncompany.com/api/raw-materials-category/",
         {
           method: "POST",
           headers: {

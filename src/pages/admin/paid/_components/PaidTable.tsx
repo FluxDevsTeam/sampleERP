@@ -46,7 +46,7 @@ interface PaidData {
 }
 
 const fetchPaid = async (): Promise<PaidData> => {
-  const { data } = await axios.get<PaidData>("https://kidsdesigncompany.pythonanywhere.com/api/paid/");
+  const { data } = await axios.get<PaidData>("https://backend.kidsdesigncompany.com/api/paid/");
   return data;
 };
 
@@ -64,7 +64,7 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const deletePaidMutation = useMutation({
     mutationFn: async (entryId: number) => {
-      await axios.delete(`https://kidsdesigncompany.pythonanywhere.com/api/paid/${entryId}/`);
+      await axios.delete(`https://backend.kidsdesigncompany.com/api/paid/${entryId}/`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paid"] });

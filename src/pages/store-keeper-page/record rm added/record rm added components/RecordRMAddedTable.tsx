@@ -62,7 +62,7 @@ const RecordRemovedTable: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/add-raw-materials/", {
+        "https://backend.kidsdesigncompany.com/api/add-raw-materials/", {
           method: "GET",
           headers: {
             Authorization: `JWT ${localStorage.getItem("accessToken")}`,
@@ -106,7 +106,7 @@ const RecordRemovedTable: React.FC = () => {
 
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/add-raw-materials/${selectedItem}/`,
+        `https://backend.kidsdesigncompany.com/api/add-raw-materials/${selectedItem}/`,
         {
           method: "DELETE",
           headers: {

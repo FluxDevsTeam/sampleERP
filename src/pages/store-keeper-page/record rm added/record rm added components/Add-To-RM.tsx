@@ -26,7 +26,7 @@ const AddToRM: React.FC = () => {
     const fetchMaterials = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/", {
+          "https://backend.kidsdesigncompany.com/api/raw-materials/", {
             method: "GET",
             headers: {
               Authorization: `JWT ${localStorage.getItem("accessToken")}`,
@@ -66,7 +66,7 @@ const AddToRM: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/add-raw-materials/",
+        "https://backend.kidsdesigncompany.com/api/add-raw-materials/",
         {
           method: "POST",
           headers: {

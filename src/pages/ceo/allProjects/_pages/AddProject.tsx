@@ -76,7 +76,7 @@ const AddProject = () => {
     const fetchCustomers = async () => {
       setIsLoadingCustomers(true);
       try {
-        const response = await axios.get<CustomerApiResponse>('https://kidsdesigncompany.pythonanywhere.com/api/customer/');
+        const response = await axios.get<CustomerApiResponse>('https://backend.kidsdesigncompany.com/api/customer/');
         
         // Extract customers from the nested structure
         if (response.data && response.data.results && response.data.results.all_customers) {
@@ -210,7 +210,7 @@ const AddProject = () => {
 
     try {
       const response = await axios.post(
-        "https://kidsdesigncompany.pythonanywhere.com/api/project/",
+        "https://backend.kidsdesigncompany.com/api/project/",
         formDataToSubmit,
         {
           headers: {

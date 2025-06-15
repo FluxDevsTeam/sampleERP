@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 
-const BASE_URL = "https://kidsdesigncompany.pythonanywhere.com/api/assets/";
+const BASE_URL = "https://backend.kidsdesigncompany.com/api/assets/";
 
 
 // Type definitions

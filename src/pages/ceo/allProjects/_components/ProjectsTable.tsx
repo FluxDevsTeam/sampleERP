@@ -103,7 +103,7 @@ interface PaginatedProjectsResponse {
   all_projects: Project[];
 }
 
-const BASE_URL = 'https://kidsdesigncompany.pythonanywhere.com/api';
+const BASE_URL = 'https://backend.kidsdesigncompany.com/api';
 
 const fetchProjects = async (page = 1, searchParams: URLSearchParams): Promise<PaginatedProjectsResponse> => {
   const params: Record<string, string | null> = {

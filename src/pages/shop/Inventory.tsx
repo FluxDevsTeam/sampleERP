@@ -19,7 +19,7 @@ export const Inventory = () => {
       // INVENTORY ITEM
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/",
+          "https://backend.kidsdesigncompany.com/api/inventory-item/",
           {
             method: "GET",
             headers: {
@@ -47,7 +47,7 @@ export const Inventory = () => {
       // INVENTORY DASHBOARD
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/",
+          "https://backend.kidsdesigncompany.com/api/inventory-dashboard/",
           {
             method: "GET",
             headers: {

@@ -121,7 +121,7 @@ const DataCard = ({ label, value }: { label: string; value: number | string }) =
 // Fetch CEO dashboard data
 const fetchCEODashboard = async (): Promise<CEODashboardData> => {
   const { data } = await axios.get<CEODashboardData>(
-    "https://kidsdesigncompany.pythonanywhere.com/api/ceo-dashboard/"
+    "https://backend.kidsdesigncompany.com/api/ceo-dashboard/"
   );
   return data;
 };

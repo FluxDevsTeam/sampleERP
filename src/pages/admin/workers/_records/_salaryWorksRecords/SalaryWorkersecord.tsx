@@ -40,7 +40,7 @@ const SalaryWorkerRecords = () => {
 
   const fetchRecords = async () => {
     const response = await axios.get(
-      `https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/${id}/record/`
+      `https://backend.kidsdesigncompany.com/api/salary-workers/${id}/record/`
     );
     return response.data.results;
   };
@@ -53,7 +53,7 @@ const SalaryWorkerRecords = () => {
   const deleteRecordMutation = useMutation({
     mutationFn: async (recordId: number) => {
       await axios.delete(
-        `https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/${id}/record/${recordId}/`
+        `https://backend.kidsdesigncompany.com/api/salary-workers/${id}/record/${recordId}/`
       );
     },
     onSuccess: () => {

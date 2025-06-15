@@ -70,7 +70,7 @@ interface ExpensesData {
 }
 
 const fetchExpenses = async (): Promise<ExpensesData> => {
-  const { data } = await axios.get<ExpensesData>("https://kidsdesigncompany.pythonanywhere.com/api/expense/");
+  const { data } = await axios.get<ExpensesData>("https://backend.kidsdesigncompany.com/api/expense/");
   return data;
 };
 
@@ -87,7 +87,7 @@ const ExpensesTable: React.FC = () => {
 
   const deleteExpenseMutation = useMutation({
     mutationFn: async (entryId: number) => {
-      await axios.delete(`https://kidsdesigncompany.pythonanywhere.com/api/expense/${entryId}/`);
+      await axios.delete(`https://backend.kidsdesigncompany.com/api/expense/${entryId}/`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["expenses"] });

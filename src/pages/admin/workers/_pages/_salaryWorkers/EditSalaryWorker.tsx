@@ -36,7 +36,7 @@ const EditSalaryWorker = () => {
   useEffect(() => {
     const fetchSalaryWorker = async () => {
       try {
-        const response = await axios.get(`https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/${id}/`);
+        const response = await axios.get(`https://backend.kidsdesigncompany.com/api/salary-workers/${id}/`);
         setFormData(response.data);
       } catch (error) {
         toast.error("Failed to fetch salary worker data.");
@@ -59,7 +59,7 @@ const EditSalaryWorker = () => {
     setIsPending(true);
 
     try {
-      await axios.put(`https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/${id}/`, formData);
+      await axios.put(`https://backend.kidsdesigncompany.com/api/salary-workers/${id}/`, formData);
       queryClient.invalidateQueries({ queryKey: ["salary-workers"], refetchType: "active" });
       toast.success("Salary worker updated successfully!");
       navigate("/admin/workers");

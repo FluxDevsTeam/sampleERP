@@ -36,7 +36,7 @@ const StoreKeeperDashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/storekeeper-dashboard/`,
+        `https://backend.kidsdesigncompany.com/api/storekeeper-dashboard/`,
         {
           method: "GET",
           headers: {
@@ -66,7 +66,7 @@ const StoreKeeperDashboard: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials-category/`,{
+        `https://backend.kidsdesigncompany.com/api/raw-materials-category/`,{
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -96,7 +96,7 @@ const StoreKeeperDashboard: React.FC = () => {
   const fetchShopCategoryData = async () => {
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/storekeeper-dashboard/`, {
+        `https://backend.kidsdesigncompany.com/api/storekeeper-dashboard/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
