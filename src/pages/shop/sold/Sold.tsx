@@ -46,7 +46,7 @@ export const Sold = () => {
         // INVENTORY DASHBOARD
         try {
           const response = await fetch(
-            "https://backend.kidsdesigncompany.com/api/inventory-dashboard/", {
+            "https://backend.kidsdesigncompany.com/api/shopkeeper-dashboard/", {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
