@@ -7,7 +7,7 @@ import {
   StaffIcon,
   TransferIcon,
   OrdersIcon,
-  RawMaterialIcon,
+  RawMaterialIcon,LogoutIcon, SettingsIcon
 } from "./SvgIcons";
 import { ReactElement } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -90,6 +90,18 @@ export const sidebarLink: SidebarProps[] = [
     text: "Shop",
     href: "/ceo/shop", // Removed "dashboard"
     icon: <FinancesIcon className="currentColor" />,
+  },
+   {
+    id: nanoid(),
+    text: "Settings",
+    href: "/ceo/settings", 
+    icon: <SettingsIcon className="currentColor" />,
+  },
+  {
+    id: nanoid(),
+    text: "Sign Up",
+    href: "/ceo/signup", 
+    icon: <LogoutIcon className="currentColor" />,
   },
 ];
 

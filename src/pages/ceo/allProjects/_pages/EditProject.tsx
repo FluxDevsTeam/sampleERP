@@ -104,7 +104,17 @@ const EditProject = () => {
   const { data: project, isLoading, error } = useQuery<Project>({
     queryKey: ["project", id],
     queryFn: async () => {
-      const response = await axios.get(`https://backend.kidsdesigncompany.com/api/project/${id}/`)
+        const accessToken = localStorage.getItem("access_token");
+    if (!accessToken) {
+      throw new Error("Please login to access this data");
+    }
+      const response = await axios.get(`https://backend.kidsdesigncompany.com/api/project/${id}/` ,
+        {
+      headers: {
+        Authorization: `JWT ${accessToken}`,
+      },
+    }
+      )
       return response.data
     },
     enabled: !!id,
@@ -115,7 +125,17 @@ const EditProject = () => {
     const fetchCustomers = async () => {
       setIsLoadingCustomers(true)
       try {
-        const response = await axios.get('https://backend.kidsdesigncompany.com/api/customer/')
+         const accessToken = localStorage.getItem("access_token");
+      if (!accessToken) {
+        throw new Error("Please login to access this data");
+      }
+        const response = await axios.get('https://backend.kidsdesigncompany.com/api/customer/',
+           {
+        headers: {
+          Authorization: `JWT ${accessToken}`,
+        },
+      }
+        )
         
         // Extract customers from the nested structure (similar to AddProject)
         if (response.data && response.data.results && response.data.results.all_customers) {
@@ -137,7 +157,7 @@ const EditProject = () => {
         }
       } catch (error) {
         console.error("Error fetching customers:", error)
-        // Use mock data if API fails
+       
         setCustomers([
           { id: 1, name: "Adebayo Jubreel" },
           { id: 2, name: "Julius Caesar" },

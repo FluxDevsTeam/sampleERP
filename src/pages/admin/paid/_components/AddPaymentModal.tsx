@@ -53,10 +53,18 @@ const AddPaymentModal = ({ children, onSuccess, open, onOpenChange }: AddPayment
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [contractorRes, salaryRes] = await Promise.all([
-          axios.get("https://backend.kidsdesigncompany.com/api/contractors/"),
-          axios.get("https://backend.kidsdesigncompany.com/api/salary-workers/")
-        ]);
+      const token = localStorage.getItem("access_token");
+const config = {
+  headers: {
+    Authorization: `JWT ${token}`,
+  },
+};
+
+const [contractorRes, salaryRes] = await Promise.all([
+  axios.get("https://backend.kidsdesigncompany.com/api/contractors/", config),
+  axios.get("https://backend.kidsdesigncompany.com/api/salary-workers/", config),
+]);
+
 
         setContractors(contractorRes.data.results.contractor);
         setSalaryWorkers(salaryRes.data.results.workers);
@@ -79,10 +87,18 @@ const AddPaymentModal = ({ children, onSuccess, open, onOpenChange }: AddPayment
           : { amount: paymentData.amount, salary: paymentData.recipientId };
 
       try {
-        const response = await axios.post(
-          "https://backend.kidsdesigncompany.com/api/paid/",
-          formattedData
-        );
+       const token = localStorage.getItem("access_token");
+
+const response = await axios.post(
+  "https://backend.kidsdesigncompany.com/api/paid/",
+  formattedData,
+  {
+    headers: {
+      Authorization: `JWT ${token}`,
+    },
+  }
+);
+
         return response.data;
       } catch (error: any) {
         throw error.response?.data || "Failed to process payment";

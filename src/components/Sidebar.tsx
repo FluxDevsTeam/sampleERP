@@ -1,8 +1,9 @@
 import { SidebarProps } from "../utils/data-json";
 import clsx from "clsx";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import Logo from "./Logo";
-import { LogoutIcon, SettingsIcon } from "../utils/SvgIcons";
+import Logout from "@/pages/AuthPages/logout/Logout";
+
 
 interface SidebarProp {
   isSidebarOpen: boolean;
@@ -35,7 +36,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
         </div>
 
         {/* DASHBOARD LINKS */}
-        <ul className="flex flex-col flex-1 w-full px-2 justify-evenly">
+        <ul className="flex flex-col flex-1 w-full px-2 ">
           {data.map((item) => {
             const { id, text, href: url, icon: img } = item;
 
@@ -69,43 +70,11 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
             );
           })}
         </ul>
-        
-        {/* Settings and Logout section */}
-        <div className={clsx("flex flex-col w-full mt-6 px-2 space-y-1")}>
-          <div className="w-full">
-            <Link
-              to="settings"
-              onClick={handleLinkClick}
-              className={clsx(
-                "flex gap-2 items-center w-full hover:bg-gray-200 rounded-md relative font-medium text-sm transition-all h-[40px] duration-500 text-gray-700",
-                !isSidebarOpen ? "lg:justify-center justify-start pl-4 lg:pl-0" : "pl-4",
-                "hover:text-blue-400"
-              )}
-            >
-              <SettingsIcon className="currentColor" />
-              <span className={clsx("currentColor", isSidebarOpen ? "block" : "block lg:hidden")}>
-                Settings
-              </span>
-            </Link>
-          </div>
-          
-          <div className="w-full">
-            <Link
-              to="logout"
-              onClick={handleLinkClick}
-              className={clsx(
-                "flex gap-2 items-center w-full hover:bg-gray-200 rounded-md relative font-medium text-sm transition-all h-[40px] duration-500 text-gray-700",
-                !isSidebarOpen ? "lg:justify-center justify-start pl-4 lg:pl-0" : "pl-4",
-                "hover:text-blue-400"
-              )}
-            >
-              <LogoutIcon className="currentColor" />
-              <span className={clsx("currentColor", isSidebarOpen ? "block" : "block lg:hidden")}>
-                Sign out
-              </span>
-            </Link>
-          </div>
+        <div className="mx-auto text-center w-2/3 ">
+           <Logout />
         </div>
+       
+      
       </div>
     </aside>
   );

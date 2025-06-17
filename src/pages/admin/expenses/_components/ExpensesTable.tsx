@@ -70,7 +70,15 @@ interface ExpensesData {
 }
 
 const fetchExpenses = async (): Promise<ExpensesData> => {
-  const { data } = await axios.get<ExpensesData>("https://backend.kidsdesigncompany.com/api/expense/");
+  const access_token = localStorage.getItem("access_token");
+  const { data } = await axios.get<ExpensesData>(
+    "https://backend.kidsdesigncompany.com/api/expense/",
+    {
+      headers: {
+        Authorization: `JWT ${access_token}`
+      }
+    }
+  );
   return data;
 };
 
@@ -87,7 +95,15 @@ const ExpensesTable: React.FC = () => {
 
   const deleteExpenseMutation = useMutation({
     mutationFn: async (entryId: number) => {
-      await axios.delete(`https://backend.kidsdesigncompany.com/api/expense/${entryId}/`);
+      const access_token = localStorage.getItem("access_token");
+      await axios.delete(
+        `https://backend.kidsdesigncompany.com/api/expense/${entryId}/`,
+        {
+          headers: {
+            Authorization: `JWT ${access_token}`
+          }
+        }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["expenses"] });

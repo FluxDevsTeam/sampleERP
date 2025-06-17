@@ -80,7 +80,19 @@ const PieCharts = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get<DashboardData>("https://backend.kidsdesigncompany.com/api/ceo-dashboard/");
+         const accessToken = localStorage.getItem("access_token");
+        
+        if (!accessToken) {
+          throw new Error("Please login to access this data");
+        }
+        const response = await axios.get<DashboardData>("https://backend.kidsdesigncompany.com/api/ceo-dashboard/" , 
+           {
+            headers: {
+              Authorization: `JWT ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const data = response.data;
 
         if (data?.categorical_data_year?.expense_categories && data?.categorical_data_month?.expense_categories) {

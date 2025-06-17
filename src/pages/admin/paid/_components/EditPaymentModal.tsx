@@ -46,8 +46,14 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({ id, open, onOpenCha
   const { data, isLoading, error } = useQuery({
     queryKey: ["paid", id],
     queryFn: async () => {
+      const token = localStorage.getItem("access_token");
       const response = await axios.get<PaymentData>(
-        `https://backend.kidsdesigncompany.com/api/paid/${id}/`
+        `https://backend.kidsdesigncompany.com/api/paid/${id}/`,
+         {
+    headers: {
+      Authorization: `JWT ${token}`,
+    },
+  }
       );
       return response.data;
     },
@@ -60,9 +66,15 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({ id, open, onOpenCha
 
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem("access_token");
+const config = {
+  headers: {
+    Authorization: `JWT ${token}`,
+  },
+};
         const [contractorRes, salaryRes] = await Promise.all([
-          axios.get("https://backend.kidsdesigncompany.com/api/contractors/"),
-          axios.get("https://backend.kidsdesigncompany.com/api/salary-workers/")
+          axios.get("https://backend.kidsdesigncompany.com/api/contractors/",config ),
+          axios.get("https://backend.kidsdesigncompany.com/api/salary-workers/", config)
         ]);
 
         setContractors(contractorRes.data.results.contractor);
@@ -90,32 +102,44 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({ id, open, onOpenCha
   }, [data]);
 
   // Update Payment Mutation
-  const updatePaymentMutation = useMutation({
-    mutationFn: async (paymentData: PaymentData) => {
-      // Format the data based on recipient type
-      const formattedData = paymentData.recipientType === "contractor"
+ const updatePaymentMutation = useMutation({
+  mutationFn: async (paymentData: PaymentData) => {
+    // Format the data based on recipient type
+    const formattedData =
+      paymentData.recipientType === "contractor"
         ? { amount: paymentData.amount, contract: paymentData.recipientId }
         : { amount: paymentData.amount, salary: paymentData.recipientId };
 
-      const response = await axios.put(
-        `https://backend.kidsdesigncompany.com/api/paid/${id}/`,
-        formattedData
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["paid"] });
-      toast.success("Payment updated successfully!");
-      onOpenChange(false);
-      onSuccess?.();
-    },
-    onError: (error: any) => {
-      console.error("Error updating payment:", error.response?.data || error.message);
-      toast.error(
-        error.response?.data?.error?.[0] || "Failed to update payment. Try again."
-      );
-    },
-  });
+    // Get the token from localStorage
+    const token = localStorage.getItem("access_token");
+
+    // Make the PUT request with Authorization header
+    const response = await axios.put(
+      `https://backend.kidsdesigncompany.com/api/paid/${id}/`,
+      formattedData,
+      {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["paid"] });
+    toast.success("Payment updated successfully!");
+    onOpenChange(false);
+    onSuccess?.();
+  },
+  onError: (error: any) => {
+    console.error("Error updating payment:", error.response?.data || error.message);
+    toast.error(
+      error.response?.data?.error?.[0] || "Failed to update payment. Try again."
+    );
+  },
+});
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

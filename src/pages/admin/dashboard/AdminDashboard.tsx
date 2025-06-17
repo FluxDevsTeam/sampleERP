@@ -8,7 +8,12 @@ import Header from "./_components/Header";
 import SkeletonLoader from "./_components/SkeletonLoader";
 
 const fetchFinancialData = async () => {
-  const { data } = await axios.get("https://backend.kidsdesigncompany.com/api/admin-dashboard/");
+  const access_token = localStorage.getItem("access_token");
+  const { data } = await axios.get("https://backend.kidsdesigncompany.com/api/admin-dashboard/", {
+    headers: {
+      Authorization: `JWT ${access_token}`
+    }
+  });
   return data;
 };
 
@@ -36,7 +41,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-6 space-y-6">
-   <Header />
+      <Header />
     
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Workers Data */}
