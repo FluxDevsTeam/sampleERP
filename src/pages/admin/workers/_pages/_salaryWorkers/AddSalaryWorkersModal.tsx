@@ -52,22 +52,32 @@ const AddSalaryWorkerModal: React.FC<Props> = ({ open, onOpenChange }) => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsPending(true);
-    try {
-      await axios.post("https://backend.kidsdesigncompany.com/api/salary-workers/", formData);
-      queryClient.invalidateQueries({ queryKey: ["salary-workers"] });
-      toast.success("Salary worker added!");
-      setFormData(initialFormData); // Reset form after success
-      onOpenChange(false);
-      navigate("/admin/workers");
-    } catch (err) {
-      toast.error("Failed to add salary worker.");
-    } finally {
-      setIsPending(false);
-    }
-  };
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsPending(true);
+  try {
+    const token = localStorage.getItem("access_token");
+    await axios.post(
+      "https://backend.kidsdesigncompany.com/api/salary-workers/", 
+      formData,
+      {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
+    );
+    queryClient.invalidateQueries({ queryKey: ["salary-workers"] });
+    toast.success("Salary worker added!");
+    setFormData(initialFormData);
+    onOpenChange(false);
+    navigate("/admin/workers");
+  } catch (err) {
+    toast.error("Failed to add salary worker.");
+    console.error("Submission error:", err);
+  } finally {
+    setIsPending(false);
+  }
+};
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

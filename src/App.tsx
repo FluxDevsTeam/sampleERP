@@ -154,7 +154,7 @@ const router = createBrowserRouter([
       },
       {
         path: "expenses",
-        element: <CEOExpenses />,
+        element: <Expenses />,
       },
       {
         path: "shop",

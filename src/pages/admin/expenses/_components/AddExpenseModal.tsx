@@ -88,14 +88,33 @@ interface ExpenseFormData {
   description: string;
 }
 
+interface AddPaymentModalProps {
+  onSuccess?: () => void;
+  children: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
 const fetchProjects = async (): Promise<Project[]> => {
-  const response = await axios.get("https://backend.kidsdesigncompany.com/api/project/");
+  const token = localStorage.getItem("access_token");
+  const response = await axios.get("https://backend.kidsdesigncompany.com/api/project/" ,
+    {
+  headers: {
+    Authorization: `JWT ${token}`,
+    }},
+  );
   return response.data.all_projects || [];
 };
 
 const fetchShopItems = async (): Promise<ShopItem[]> => {
   try {
-    const response = await axios.get("https://backend.kidsdesigncompany.com/api/sold/");
+    const token = localStorage.getItem("access_token");
+    const response = await axios.get("https://backend.kidsdesigncompany.com/api/sold/" ,
+       {
+  headers: {
+    Authorization: `JWT ${token}`,
+    }},
+    );
     console.log("Fetched Sold API response:", response.data); 
   
     const items: ShopItem[] = [];
@@ -125,8 +144,13 @@ const fetchShopItems = async (): Promise<ShopItem[]> => {
 };
 
 const fetchCategories = async (): Promise<Category[]> => {
+  const token = localStorage.getItem("access_token");
   const { data } = await axios.get<Category[]>(
-    "https://backend.kidsdesigncompany.com/api/expense-category/"
+    "https://backend.kidsdesigncompany.com/api/expense-category/" ,
+     {
+  headers: {
+    Authorization: `JWT ${token}`,
+    }},
   );
   return data; 
 };
@@ -169,9 +193,14 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
 
   const addCategoryMutation = useMutation({
     mutationFn: async (categoryData: NewCategoryData) => {
+      const token = localStorage.getItem("access_token");
       const response = await axios.post<Category>(
         "https://backend.kidsdesigncompany.com/api/expense-category/",
-        categoryData
+        categoryData ,
+          {
+  headers: {
+    Authorization: `JWT ${token}`,
+    }},
       );
       return response.data;
     },
@@ -302,9 +331,14 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange,
       console.log("Sending data to API:", formattedData);
 
       try {
+        const token = localStorage.getItem("access_token");
         const response = await axios.post(
           "https://backend.kidsdesigncompany.com/api/expense/",
-          formattedData
+          formattedData ,
+             {
+  headers: {
+    Authorization: `JWT ${token}`,
+    }},
         );
         return response.data;
       } catch (error: any) {

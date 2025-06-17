@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import SkeletonLoader from "../_components/SkeletonLoader";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -82,13 +82,25 @@ interface EditExpenseModalProps {
 }
 
 const fetchProjects = async (): Promise<Project[]> => {
-  const response = await axios.get("https://backend.kidsdesigncompany.com/api/project/");
+  const token = localStorage.getItem("access_token");
+  const response = await axios.get("https://backend.kidsdesigncompany.com/api/project/" ,
+     {
+  headers: {
+    Authorization: `JWT ${token}`,
+    }},
+  );
   return response.data.all_projects || [];
 };
 
 const fetchShopItems = async (): Promise<ShopItem[]> => {
   try {
-    const response = await axios.get("https://backend.kidsdesigncompany.com/api/sold/");
+    const token = localStorage.getItem("access_token");
+    const response = await axios.get("https://backend.kidsdesigncompany.com/api/sold/" , 
+        {
+  headers: {
+    Authorization: `JWT ${token}`,
+    }},
+    );
     console.log("Fetched Sold API response:", response.data);
     
     const items: ShopItem[] = [];
@@ -118,8 +130,13 @@ const fetchShopItems = async (): Promise<ShopItem[]> => {
 };
 
 const fetchCategories = async (): Promise<Category[]> => {
+  const token = localStorage.getItem("access_token");
   const { data } = await axios.get<Category[]>(
-    "https://backend.kidsdesigncompany.com/api/expense-category/"
+    "https://backend.kidsdesigncompany.com/api/expense-category/",
+      {
+  headers: {
+    Authorization: `JWT ${token}`,
+    }},
   );
   return data;
 };
@@ -235,6 +252,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
   // Update mutation
   const updateExpenseMutation = useMutation({
     mutationFn: async (data: ExpenseFormData) => {
+      const token = localStorage.getItem("access_token");
       const formattedData = {
         name: data.name,
         description: data.description || "",
@@ -246,7 +264,13 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
       };
 
       console.log("Sending update data to API:", formattedData);
-      await axios.put(`https://backend.kidsdesigncompany.com/api/expense/${expenseId}/`, formattedData);
+      await axios.put(`https://backend.kidsdesigncompany.com/api/expense/${expenseId}/`, formattedData ,
+         {
+  headers: {
+    Authorization: `JWT ${token}`,
+    }},
+      )
+      ;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["expenses"] });

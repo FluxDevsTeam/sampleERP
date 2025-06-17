@@ -85,7 +85,14 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
     const fetchCustomers = async () => {
       setIsLoadingCustomers(true);
       try {
-        const response = await axios.get<CustomerApiResponse>('https://backend.kidsdesigncompany.com/api/customer/');
+        const token = localStorage.getItem("access_token");
+        const response = await axios.get<CustomerApiResponse>('https://backend.kidsdesigncompany.com/api/customer/' ,
+            {
+           headers: {
+      Authorization: `JWT ${token}`,
+    },
+  }
+        );
         if (response.data?.results?.all_customers) {
           setCustomers(response.data.results.all_customers);
         } else {
@@ -198,10 +205,11 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
     if (invoiceImage) formDataToSubmit.append('invoice_image', invoiceImage);
 
     try {
+      const token = localStorage.getItem("access_token");
       await axios.post(
         "https://backend.kidsdesigncompany.com/api/project/",
         formDataToSubmit,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        { headers: { 'Content-Type': 'multipart/form-data' , Authorization: `JWT ${token}`, } }
       );
 
       // More comprehensive query invalidation

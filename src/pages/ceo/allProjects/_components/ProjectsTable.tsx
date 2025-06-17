@@ -106,6 +106,7 @@ interface PaginatedProjectsResponse {
 const BASE_URL = 'https://backend.kidsdesigncompany.com/api';
 
 const fetchProjects = async (page = 1, searchParams: URLSearchParams): Promise<PaginatedProjectsResponse> => {
+  const token = localStorage.getItem("access_token");
   const params: Record<string, string | null> = {
     page: page.toString(),
     archived: searchParams.get('archived'),
@@ -124,7 +125,12 @@ const fetchProjects = async (page = 1, searchParams: URLSearchParams): Promise<P
     return acc;
   }, {} as Record<string, string>);
 
-  const response = await axios.get(`${BASE_URL}/project/`, { params: filteredParams });
+  const response = await axios.get(`${BASE_URL}/project/`, {
+    params: filteredParams,
+    headers: {
+      Authorization: `JWT ${token}`,
+    },
+  });
   return response.data;
 };
 
@@ -154,8 +160,16 @@ const ProjectsTable = () => {
   }, [data?.all_time_projects_count]);
 
   const deleteProjectMutation = useMutation<void, Error, number>({
+    
     mutationFn: async (projectId: number) => {
-      await axios.delete(`${BASE_URL}/project/${projectId}/`);
+      const token = localStorage.getItem("access_token");
+      await axios.delete(`${BASE_URL}/project/${projectId}/` ,
+        {
+           headers: {
+      Authorization: `JWT ${token}`,
+    },
+  }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });

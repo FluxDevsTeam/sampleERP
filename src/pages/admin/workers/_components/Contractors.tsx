@@ -45,7 +45,14 @@ interface ContractorsResponse {
 }
 
 const fetchContractors = async (page = 1): Promise<ContractorsResponse> => {
-  const response = await axios.get(`${BASE_URL}?page=${page}`);
+  const token = localStorage.getItem("access_token");
+  const response = await axios.get(`${BASE_URL}?page=${page}` , 
+    {
+    headers: {
+      Authorization: `JWT ${token}`,
+    },
+  }
+  );
   return response.data;
 };
 
@@ -75,7 +82,14 @@ const Contractors = () => {
 
   const deleteContractorMutation = useMutation({
     mutationFn: async (contractorId: number) => {
-      await axios.delete(`${BASE_URL}${contractorId}/`);
+      const token = localStorage.getItem("access_token");
+      await axios.delete(`${BASE_URL}${contractorId}/`,
+          {
+    headers: {
+      Authorization: `JWT ${token}`,
+    },
+  }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contractors"] });

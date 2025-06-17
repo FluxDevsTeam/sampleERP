@@ -105,7 +105,14 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   const { data: project, isLoading, error } = useQuery<Project>({
     queryKey: ["project", projectId],
     queryFn: async () => {
-      const response = await axios.get(`https://backend.kidsdesigncompany.com/api/project/${projectId}/`);
+      const token = localStorage.getItem("access_token");
+      const response = await axios.get(`https://backend.kidsdesigncompany.com/api/project/${projectId}/`,
+          {
+           headers: {
+      Authorization: `JWT ${token}`,
+    },
+  }
+      );
       return response.data;
     },
     enabled: !!projectId && open,
@@ -196,10 +203,11 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
 
   const updateProjectMutation = useMutation({
     mutationFn: async (updatedProject: FormData) => {
+      const token = localStorage.getItem("access_token");
       return axios.put(
         `https://backend.kidsdesigncompany.com/api/project/${projectId}/`,
         updatedProject,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        { headers: { 'Content-Type': 'multipart/form-data' , Authorization: `JWT ${token}` } }
       );
     },
     onSuccess: () => {

@@ -55,7 +55,14 @@ const AddContractorModal: React.FC<Props> = ({ open, onOpenChange }) => {
     e.preventDefault();
     setIsPending(true);
     try {
-      await axios.post("https://backend.kidsdesigncompany.com/api/contractors/", formData);
+      const token = localStorage.getItem("access_token");
+      await axios.post("https://backend.kidsdesigncompany.com/api/contractors/", formData , 
+         {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
+      );
       queryClient.invalidateQueries({ queryKey: ["contractors"] });
       toast.success("Contractor added!");
       setFormData(initialFormData); // Reset form after success
