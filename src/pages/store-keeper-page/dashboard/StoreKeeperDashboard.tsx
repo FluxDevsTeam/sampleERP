@@ -357,6 +357,7 @@ const StoreKeeperDashboard: React.FC = () => {
               })}
             </tbody>
 
+          </table>
             {/* pagination stuff */}
             <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-6 py-4 border-t gap-4">
               <span className="text-sm text-blue-400 text-center sm:text-left">
@@ -401,7 +402,6 @@ const StoreKeeperDashboard: React.FC = () => {
                 </button>
               </div>
             </div>
-          </table>
         </div>
       )}
     </div>
