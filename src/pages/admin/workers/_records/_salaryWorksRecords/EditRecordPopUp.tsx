@@ -35,9 +35,15 @@ const EditRecordPopup: React.FC<EditRecordPopupProps> = ({
 
   const editRecordMutation = useMutation({
     mutationFn: async (updatedData: { report: string; }) => {
+      const token = localStorage.getItem("access_token");
       await axios.put(
         `https://backend.kidsdesigncompany.com/api/salary-workers/${salaryWorkerId}/record/${record.id}/`,
-        updatedData
+        updatedData,
+         {
+                headers: {
+                  Authorization: `JWT ${token}`,
+                },
+              }
       );
     },
     onSuccess: () => {

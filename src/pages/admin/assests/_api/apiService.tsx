@@ -3,6 +3,19 @@ import { useMutation } from "@tanstack/react-query";
 
 const BASE_URL = "https://backend.kidsdesigncompany.com/api/assets/";
 
+// Create an axios instance with default headers
+const api = axios.create({
+  baseURL: BASE_URL,
+});
+
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    config.headers.Authorization = `JWT ${token}`;
+  }
+  return config;
+});
 
 // Type definitions
 export interface Asset {
@@ -27,7 +40,7 @@ export interface AssetData {
 
 // Fetch all assets
 export const AssetsData = async (): Promise<AssetsResponse> => {
-  const { data } = await axios.get(BASE_URL);
+  const { data } = await api.get("");
   return data;
 };
 
@@ -35,7 +48,7 @@ export const AssetsData = async (): Promise<AssetsResponse> => {
 export const useCreateAsset = () => {
   return useMutation({
     mutationFn: async (newAsset: AssetData) => {
-      const { data } = await axios.post(BASE_URL, newAsset);
+      const { data } = await api.post("", newAsset);
       return data;
     },
   });
@@ -45,7 +58,7 @@ export const useCreateAsset = () => {
 export const useUpdateAsset = () => {
   return useMutation({
     mutationFn: async ({ id, updatedData }: { id: number; updatedData: AssetData }) => {
-      const { data } = await axios.put(`${BASE_URL}${id}/`, updatedData);
+      const { data } = await api.put(`${id}/`, updatedData);
       return data;
     },
   });

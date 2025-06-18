@@ -31,9 +31,15 @@ const AddRecordPopup: React.FC<AddRecordPopupProps> = ({
 
   const addRecordMutation = useMutation({
     mutationFn: async (record: { report: string }) => {
+      const token = localStorage.getItem("access_token");
       await axios.post(
         `https://backend.kidsdesigncompany.com/api/contractors/${contractorId}/record/`,
-        record
+        record ,
+         {
+                        headers: {
+                          Authorization: `JWT ${token}`,
+                        },
+                      }
       );
     },
     onSuccess: () => {

@@ -23,6 +23,19 @@ import {
 } from "@/components/ui/alert"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 
+// Create an axios instance with JWT token interceptor
+const api = axios.create({
+  baseURL: "https://backend.kidsdesigncompany.com/api/assets/",
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    config.headers.Authorization = `JWT ${token}`;
+  }
+  return config;
+});
+
 interface EditAssetModalProps {
   asset: Asset
   isOpen: boolean
@@ -59,7 +72,7 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
   // Update asset mutation
   const updateAssetMutation = useMutation({
     mutationFn: async (updatedAsset: Partial<Asset>) => {
-      return axios.put(`https://backend.kidsdesigncompany.com/api/assets/${asset.id}/`, updatedAsset)
+      return api.put(`${asset.id}/`, updatedAsset)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["assets"] })
