@@ -9,6 +9,7 @@ import {
   faXmark,
   faAnglesLeft,
   faAnglesRight,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 // import { Accordion } from "rsuite";
@@ -36,6 +37,10 @@ const ProductsTable: React.FC = () => {
 
   // LOADING
   const [loading, setLoading] = useState<boolean>(true);
+
+  // SEARCH
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // MODAL STATES
   const [showProductDetailsModal, setShowProductDetailsModal] =
@@ -78,12 +83,15 @@ const ProductsTable: React.FC = () => {
 
   // RAW MATERIALS Usdc
   const [rawMaterials, setRawMaterials] = useState<any[]>([]);
+  const [productProgress, setProductProgress] = useState<{ [key: number]: number }>({});
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/product/`, {
+      const url = searchQuery
+        ? `https://backend.kidsdesigncompany.com/api/product/?search=${searchQuery}`
+        : `https://backend.kidsdesigncompany.com/api/product/`;
+      const response = await fetch(url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -99,7 +107,14 @@ const ProductsTable: React.FC = () => {
       // console.log("API Response:", data);
       console.log(data);
 
+      const initialProgress: { [key: number]: number } = {};
+      data.results.forEach((item: any) => {
+        initialProgress[item.id] = item.progress;
+      });
+      setProductProgress(initialProgress);
+
       const updatedTableData: TableData[] = data.results.map((item: any) => {
+
         return {
           Product: (
             <div className="items-center">
@@ -155,13 +170,28 @@ const ProductsTable: React.FC = () => {
             </button>
           ),
           Progress: (
-            <div className="w-full bg-gray-200 rounded-full h-3 relative">
-              <div
-                className="bg-blue-400 h-3 rounded-full flex items-center justify-center text-white text-xs font-semibold"
-                style={{ width: `${item.progress}%` }}
+            <div className="flex items-center space-x-2">
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={productProgress[item.id] !== undefined ? productProgress[item.id] : 0}
+                onChange={(e) => {
+                  const newProgress = parseInt(e.target.value);
+                  setProductProgress((prevProgress) => ({
+                    ...prevProgress,
+                    [item.id]: newProgress,
+                  }));
+                }}
+                className="w-24"
+              />
+              <span>{productProgress[item.id] || 0}%</span>
+              <button
+                onClick={() => handleUpdateProgress(item.id, productProgress[item.id])}
+                className="px-2 py-1 bg-green-500 text-white rounded text-xs"
               >
-                <span className="text-[10px]">{item.progress}%</span>
-              </div>
+                Save
+              </button>
             </div>
           ),
         };
@@ -177,7 +207,7 @@ const ProductsTable: React.FC = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [searchQuery]);
 
   // Calculate pagination values
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -563,6 +593,42 @@ const ProductsTable: React.FC = () => {
     }
   };
 
+  const handleUpdateProgress = async (productId: number, progress: number) => {
+    try {
+      const response = await fetch(
+        `https://backend.kidsdesigncompany.com/api/product/${productId}/`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+          body: JSON.stringify({ progress: progress }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update product progress");
+      }
+
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Product progress updated successfully!",
+        type: "success",
+      });
+      fetchProducts(); // Re-fetch products to update the table
+    } catch (error) {
+      console.error("Error updating product progress:", error);
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to update product progress",
+        type: "error",
+      });
+    }
+  };
+
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
   };
@@ -612,13 +678,30 @@ const ProductsTable: React.FC = () => {
           </div>
         ) : (
           <div>
-            <button
-              onClick={() => navigate("/project-manager/add-product")}
-              className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
-            >
-              <FontAwesomeIcon className="pr-2" icon={faPlus} />
-              Add Product
-            </button>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <button
+                  onClick={() => setSearchQuery(searchTerm)}
+                  className="ml-2 px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
+                >
+                  <FontAwesomeIcon icon={faSearch} />
+                </button>
+              </div>
+              <button
+                onClick={() => navigate("/project-manager/add-product")}
+                className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
+              >
+                <FontAwesomeIcon className="pr-2" icon={faPlus} />
+                Add Product
+              </button>
+            </div>
             <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
               <thead>
                 <tr className="bg-blue-400 text-white">
@@ -1033,7 +1116,7 @@ const ProductsTable: React.FC = () => {
                           onClick={() => handleEditContractor(contractor)}
                           className="text-blue-400 hover:text-blue-600 p-2"
                         >
-                          <FontAwesomeIcon icon={faPencil} />
+                          <FontAwesomeIcon icon={faSearch} />
                         </button>
                       </div>
                     </div>
@@ -1108,7 +1191,7 @@ const ProductsTable: React.FC = () => {
                           onClick={() => handleEditWorker(worker)}
                           className="text-blue-400 hover:text-blue-600 p-2"
                         >
-                          <FontAwesomeIcon icon={faPencil} />
+                          <FontAwesomeIcon icon={faSearch} />
                         </button>
                       </div>
                     </div>

@@ -34,9 +34,19 @@ const Signin = () => {
       const result = await login(email, password);
       
       if (result.success) {
-        toast.success("Login successful!");
-        // Redirect based on role
-        const role = localStorage.getItem("user_role");
+          toast.success("Login successful!");
+          // Store the role from the API response
+          if (result.role) {
+            localStorage.setItem("user_role", result.role);
+          } else {
+            // Fallback if role is not directly in result, though it should be now
+            const roleFromStorage = localStorage.getItem("user_role");
+            if (!roleFromStorage) {
+              console.warn("User role not found in login result or localStorage.");
+            }
+          }
+          // Redirect based on role
+          const role = result.role || localStorage.getItem("user_role");
         switch (role) {
           case "ceo":
             navigate("/ceo/dashboard");

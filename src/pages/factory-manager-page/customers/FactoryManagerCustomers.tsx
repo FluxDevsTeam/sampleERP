@@ -20,12 +20,18 @@ const FactoryManagerCustomers = () => {
   });
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isFormValid, setIsFormValid] = useState(false);
 
   const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewCustomer({ ...newCustomer, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    const { name, email, phone_number, address } = newCustomer;
+    setIsFormValid(name.trim() !== '' && email.trim() !== '' && phone_number.trim() !== '' && address.trim() !== '');
+  }, [newCustomer]);
 
   const addCustomer = async () => {
     setSaving(true);
@@ -34,7 +40,10 @@ const FactoryManagerCustomers = () => {
     try {
       const response = await fetch("https://backend.kidsdesigncompany.com/api/customer/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `JWT ${localStorage.getItem('accessToken')}`
+        },
         body: JSON.stringify(newCustomer),
       });
 
@@ -148,7 +157,7 @@ const FactoryManagerCustomers = () => {
             {saveError && <p className="text-red-500">{saveError}</p>}
 
             <div className="flex justify-between mt-4">
-              <button onClick={addCustomer} disabled={saving} className="bg-green-600 text-white px-4 py-2 rounded-lg">
+              <button onClick={addCustomer} disabled={saving || !isFormValid} className={`${isFormValid ? 'bg-blue-600' : 'bg-gray-400'} text-white px-4 py-2 rounded-lg`}>
                 {saving ? "Saving..." : "Save"}
               </button>
               <button onClick={() => setShowModal(false)} className="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancel</button>

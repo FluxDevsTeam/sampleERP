@@ -5,7 +5,7 @@
 
 const FactoryManagerExpenses = () => {
   return (
-    <div>FactoryMnagerExpenses</div>
+    <div>FactoryManagerExpenses</div>
   )
 }
 

@@ -1,4 +1,4 @@
-import SearchBar from "./SearchBar";
+// import SearchBar from "./SearchBar";
 import { IoMenu } from "react-icons/io5";
 export interface NavBarProps {
   toggleSidebar: () => void;
@@ -6,7 +6,17 @@ export interface NavBarProps {
   title: string; // Add title prop
 }
 
-const NavBar = ({ toggleSidebar, isSidebarOpen, title='Welcome Admin' }: NavBarProps) => {
+const NavBar = ({ toggleSidebar, isSidebarOpen, title }: NavBarProps) => {
+  const userRole = localStorage.getItem('user_role');
+
+  const formatRole = (role: string | null) => {
+    if (!role) return '';
+    if (role === 'ceo') return 'CEO';
+    return role.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  const formattedRole = formatRole(userRole);
+  const displayTitle = title === 'Welcome' ? `Welcome ${formattedRole}` : title;
   return (
     <nav className="h-[77px] bg-blue-400 flex items-center px-2.5 w-full ">
       <div className="flex justify-between items-center w-full">
@@ -26,10 +36,10 @@ const NavBar = ({ toggleSidebar, isSidebarOpen, title='Welcome Admin' }: NavBarP
             rounded
           /> */}
           <h4 className="text-white font-semibold text-lg md:text-2xl whitespace-nowrap">
-            {title}
+            {displayTitle}
           </h4>
         </div>
-        <SearchBar />
+        {/* <SearchBar /> */}
       </div>
     </nav>
   );

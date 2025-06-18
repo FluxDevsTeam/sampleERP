@@ -23,7 +23,12 @@ const CustomerProfile = () => {
     const fetchCustomer = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`https://backend.kidsdesigncompany.com/api/customer/${id}/?format=json`);
+        const JWT_TOKEN = localStorage.getItem('accessToken');
+        const response = await fetch(`https://backend.kidsdesigncompany.com/api/customer/${id}/?format=json`, {
+          headers: {
+            'Authorization': `JWT ${JWT_TOKEN}`
+          }
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch customer data.");
@@ -67,6 +72,7 @@ const CustomerProfile = () => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            'Authorization': `JWT ${localStorage.getItem('accessToken')}`
           },
           body: JSON.stringify({
             name: editedName,

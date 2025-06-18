@@ -48,7 +48,8 @@ const ProjectManagerDashboard = () => {
     async function fetchInfo() {
       try {
         const response = await fetch(
-          "https://backend.kidsdesigncompany.com/api/project-manager-dashboard/", {
+          "https://backend.kidsdesigncompany.com/api/project-manager-dashboard/",
+          {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -83,150 +84,102 @@ const ProjectManagerDashboard = () => {
   const incomeData = [
     {
       month: income[0]?.month || "Jan",
-      value:
-        income[0]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: income[0]?.total || 0,
     },
     {
       month: income[1]?.month || "Feb",
-      value:
-        income[1]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: income[1]?.total || 0,
     },
     {
       month: income[2]?.month || "Mar",
-      value:
-        income[2]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: income[2]?.total || 0,
     },
     {
       month: income[3]?.month || "Apr",
-      value:
-        income[3]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: income[3]?.total || 0,
     },
     {
       month: income[4]?.month || "May",
-      value:
-        income[4]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: income[4]?.total || 0,
     },
     {
       month: income[5]?.month || "Jun",
-      value:
-        income[5]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: income[5]?.total || 0,
     },
     {
       month: income[6]?.month || "Jul",
-      value:
-        income[6]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: income[6]?.total || 0,
     },
     {
       month: income[7]?.month || "Aug",
-      value:
-        income[7]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: income[7]?.total || 0,
     },
     {
       month: income[8]?.month || "Sept",
-      value:
-        income[8]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: income[8]?.total || 0,
     },
     {
       month: income[9]?.month || "Oct",
-      value:
-        income[9]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: income[9]?.total || 0,
     },
     {
       month: income[10]?.month || "Nov",
-      value:
-        income[10]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: income[10]?.total || 0,
     },
     {
       month: income[11]?.month || "Dec",
-      value:
-        income[11]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: income[11]?.total || 0,
     },
   ];
 
   const expensesData = [
     {
       month: expenses[0]?.month || "Jan",
-      value:
-        expenses[0]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: expenses[0]?.total || 0,
     },
     {
       month: expenses[1]?.month || "Feb",
-      value:
-        expenses[1]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: expenses[1]?.total || 0,
     },
     {
       month: expenses[2]?.month || "Mar",
-      value:
-        expenses[2]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: expenses[2]?.total || 0,
     },
     {
       month: expenses[3]?.month || "Apr",
-      value:
-        expenses[3]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: expenses[3]?.total || 0,
     },
     {
       month: expenses[4]?.month || "May",
-      value:
-        expenses[4]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: expenses[4]?.total || 0,
     },
     {
       month: expenses[5]?.month || "Jun",
-      value:
-        expenses[5]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: expenses[5]?.total || 0,
     },
     {
       month: expenses[6]?.month || "Jul",
-      value:
-        expenses[6]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: expenses[6]?.total || 0,
     },
     {
       month: expenses[7]?.month || "Aug",
-      value:
-        expenses[7]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: expenses[7]?.total || 0,
     },
     {
       month: expenses[8]?.month || "Sept",
-      value:
-        expenses[8]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: expenses[8]?.total || 0,
     },
     {
       month: expenses[9]?.month || "Oct",
-      value:
-        expenses[9]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: expenses[9]?.total || 0,
     },
     {
       month: expenses[10]?.month || "Nov",
-      value:
-        expenses[10]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: expenses[10]?.total || 0,
     },
     {
       month: expenses[11]?.month || "Dec",
-      value:
-        expenses[11]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: expenses[11]?.total || 0,
     },
   ];
 
@@ -258,75 +211,51 @@ const ProjectManagerDashboard = () => {
   const profitData = [
     {
       month: profit[0]?.month || "Jan",
-      value:
-        profit[0]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: profit[0]?.total || 0,
     },
     {
       month: profit[1]?.month || "Feb",
-      value:
-        profit[1]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: profit[1]?.total || 0,
     },
     {
       month: profit[2]?.month || "Mar",
-      value:
-        profit[2]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: profit[2]?.total || 0,
     },
     {
       month: profit[3]?.month || "Apr",
-      value:
-        profit[3]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: profit[3]?.total || 0,
     },
     {
       month: profit[4]?.month || "May",
-      value:
-        profit[4]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: profit[4]?.total || 0,
     },
     {
       month: profit[5]?.month || "Jun",
-      value:
-        profit[5]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: profit[5]?.total || 0,
     },
     {
       month: profit[6]?.month || "Jul",
-      value:
-        profit[6]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: profit[6]?.total || 0,
     },
     {
       month: profit[7]?.month || "Aug",
-      value:
-        profit[7]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: profit[7]?.total || 0,
     },
     {
       month: profit[8]?.month || "Sept",
-      value:
-        profit[8]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: profit[8]?.total || 0,
     },
     {
       month: profit[9]?.month || "Oct",
-      value:
-        profit[9]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: profit[9]?.total || 0,
     },
     {
       month: profit[10]?.month || "Nov",
-      value:
-        profit[10]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: profit[10]?.total || 0,
     },
     {
       month: profit[11]?.month || "Dec",
-      value:
-        profit[11]?.total ||
-        Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000,
+      value: profit[11]?.total || 0,
     },
   ];
 
@@ -385,7 +314,6 @@ const ProjectManagerDashboard = () => {
             <Accordion.Panel
               header="Breakdown month"
               defaultExpanded
-
               style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
             >
               <div className="text-gray-500 space-y-2">
@@ -437,7 +365,6 @@ const ProjectManagerDashboard = () => {
             <Accordion.Panel
               header="Expense breakdown year"
               defaultExpanded
-
               style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
             >
               <div className="text-gray-500 space-y-2">
@@ -485,10 +412,9 @@ const ProjectManagerDashboard = () => {
 
           <Accordion className="border-gray-20 border-2">
             <Accordion.Panel
-            // bodyFill
+              // bodyFill
               header="Expense breakdown month"
               defaultExpanded
-
               style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
             >
               <div className="text-gray-500 space-y-2">
@@ -547,7 +473,7 @@ const ProjectManagerDashboard = () => {
             <ResponsiveContainer width="100%" height={447}>
               <BarChart
                 data={incomeData}
-                // margin={{left:30}}
+                margin={{left:10}}
                 className="bg-white max-md:ml-[-7%]"
               >
                 <defs>
@@ -559,7 +485,7 @@ const ProjectManagerDashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
 
-                <YAxis dataKey="value" className="max-md:hidden max-md:w-0" />
+                <YAxis dataKey="value" className="max-md:hidden max-md:w-0 md:mx-10" />
                 <Tooltip />
                 <Bar
                   // type="monotone"

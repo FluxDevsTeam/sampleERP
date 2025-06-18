@@ -6,7 +6,7 @@ type User = {
 
 type AuthContextType = {
   user: User;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: string }>;
   signup: (userData: SignupData) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   loading: boolean;
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       localStorage.setItem('user_role', data.role);
       
       setUser({ role: data.role });
-      return { success: true };
+      return { success: true, role: data.role };
     } catch (error) {
       return { 
         success: false, 
