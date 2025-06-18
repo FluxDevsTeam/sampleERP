@@ -5,7 +5,13 @@ import PieChartComponent from "./PieChart";
 import BarChartComponent from "./Barchart";
 
 // Reusable Dropdown Component
-const Dropdown = ({ title, data, }: {title: string; data: Record<string, number>; }) => {
+const Dropdown = ({
+  title,
+  data,
+}: {
+  title: string;
+  data: Record<string, number>;
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -39,7 +45,7 @@ const Dropdown = ({ title, data, }: {title: string; data: Record<string, number>
   );
 };
 
-const FactoryManagerDashboard = () => {
+const Finances = () => {
   const [financialHealth, setFinancialHealth] = useState<Record<string, number>>({});
   const [yearlyData, setYearlyData] = useState<Record<string, number>>({});
   const [customerData, setCustomerData] = useState<Record<string, number>>({});
@@ -165,4 +171,4 @@ const FactoryManagerDashboard = () => {
   );
 };
 
-export default FactoryManagerDashboard;
+export default Finances;
