@@ -1,15 +1,12 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCreateAsset, type AssetData } from "../_api/apiService";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-
   CardContent,
   CardFooter,
-
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -19,16 +16,25 @@ interface AddAssetModalProps {
   onClose: () => void;
 }
 
+const initialFormData: AssetData = {
+  name: "",
+  value: 0,
+  expected_lifespan: "",
+  is_still_available: true,
+};
+
 const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useCreateAsset();
 
-  const [formData, setFormData] = useState<AssetData>({
-    name: "",
-    value: 0,
-    expected_lifespan: "",
-    is_still_available: true,
-  });
+  const [formData, setFormData] = useState<AssetData>(initialFormData);
+
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (!isOpen) {
+      setFormData(initialFormData);
+    }
+  }, [isOpen]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -62,11 +68,24 @@ const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
+              <Input 
+                id="name" 
+                name="name" 
+                value={formData.name} 
+                onChange={handleChange} 
+                required 
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="value">Value</Label>
-              <Input id="value" name="value" type="number" value={formData.value} onChange={handleChange} required />
+              <Input 
+                id="value" 
+                name="value" 
+                type="number" 
+                value={formData.value || ""} 
+                onChange={handleChange} 
+                required 
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="expected_lifespan">Expected Lifespan</Label>

@@ -1,12 +1,76 @@
-import { Link } from "react-router-dom";
+// Signin.tsx
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Logo } from "../../../assets";
 import Button from "../../../components/Button";
 import { ChromeIcon } from "../../../utils/SvgIcons";
 import FormInput from "../_components/FormInput";
 import AuthLayout from "../AuthLayout";
 import FormHeader from "../signup/_components/FormHeader";
+import { useAuth } from "../AuthContext";
+import { toast } from "sonner";
 
 const Signin = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    // Basic validation
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const result = await login(email, password);
+      
+      if (result.success) {
+        toast.success("Login successful!");
+        // Redirect based on role
+        const role = localStorage.getItem("user_role");
+        switch (role) {
+          case "ceo":
+            navigate("/ceo/dashboard");
+            break;
+          case "admin":
+            navigate("/admin/dashboard");
+            break;
+          case "factory_manager":
+            navigate("/factory-manager/dashboard");
+            break;
+          case "project_manager":
+            navigate("/project-manager/dashboard");
+            break;
+          case "storekeeper":
+            navigate("/store-keeper/dashboard");
+            break;
+          case "shopkeeper":
+            navigate("/shop/dashboard");
+            break;
+          default:
+            navigate("/");
+        }
+      } else {
+        setError(result.error || "Login failed");
+        toast.error(result.error || "Login failed");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AuthLayout>
       <section className="w-full h-fit overflow-auto px-4 py-6 space-y-4 bg-green-900 shadow-xl rounded-2xl">
@@ -19,45 +83,41 @@ const Signin = () => {
           <FormHeader header="Login" />
         </div>
 
-        <form action="" className="max-w-[408px] w-full mx-auto space-y-4">
-          <FormInput name="email" type="email" label="Email" />
-          <h2 className="text-sm font-medium text-black-400 ">ROLE</h2>
-          <div className=" w-full">
-            <FormInput name="password" type="password" label="Password" />
-            <div className="flex justify-end w-full">
-              <Link
-                to={"/forgot-password"}
-                className="text-blue-40 text-sm  font-semibold hover:underline duration-500 "
-              >
-                Forgot password?
-              </Link>
-            </div>
+        {error && (
+          <div className="text-red-500 text-center font-medium">{error}</div>
+        )}
+
+        <form onSubmit={handleSubmit} className="max-w-[408px] w-full mx-auto space-y-4">
+          <FormInput
+            name="email"
+            type="email"
+            label="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <div className="w-full">
+            <FormInput
+              name="password"
+              type="password"
+              label="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
 
           <div className="flex flex-col items-center w-full space-y-4">
-            <Button className="bg-blue-400 text-white w-[278px] font-semibold text-sm py-2">
-              Login
+            <Button
+              type="submit"
+              className="bg-blue-400 text-white w-[278px] font-semibold text-sm py-2"
+              disabled={loading}
+            >
+              {loading ? "Logging in..." : "Login"}
             </Button>
 
-            <div className="max-w-[278px] gap-4 w-full flex items-center">
-              <div className="w-full h-[1px] bg-gray_2-200" />
-              <p className="text-black-400 text-base font-medium">or</p>
-              <div className="w-full h-[1px] bg-gray_2-200" />
-            </div>
 
-            <Button className="bg-white flex justify-center items-center gap-2 border border-gray_2-200 text-black-400 w-[278px] font-semibold text-sm py-2">
-              <ChromeIcon />
-              <p className="">Sign in with Google</p>
-            </Button>
-            <h2 className="text-sm font-medium text-black-400 ">
-              Don&apos;t have an account?{" "}
-              <Link
-                to={"/signup"}
-                className="text-blue-40 hover:underline duration-500"
-              >
-                Sign up
-              </Link>
-            </h2>
+          
           </div>
         </form>
       </section>

@@ -32,7 +32,20 @@ const MonthlyTrendsCharts = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://kidsdesigncompany.pythonanywhere.com/api/ceo-dashboard/');
+        const accessToken = localStorage.getItem("access_token");
+        
+        if (!accessToken) {
+          throw new Error("Please login to access this data");
+        }
+
+        const response = await fetch('https://backend.kidsdesigncompany.com/api/ceo-dashboard/' , 
+           {
+            headers: {
+              Authorization: `JWT ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

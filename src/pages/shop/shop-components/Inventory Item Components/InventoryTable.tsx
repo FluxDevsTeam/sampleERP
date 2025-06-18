@@ -49,7 +49,14 @@ const Table: React.FC<TableProps> = ({ headers }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/`
+        `https://backend.kidsdesigncompany.com/api/inventory-item/`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        }
       );
 
       if (!response.ok) {
@@ -68,7 +75,8 @@ const Table: React.FC<TableProps> = ({ headers }) => {
             Details: (
               <button
                 onClick={() => handleViewDetails(item)}
-                className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded">
+                className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+              >
                 View
               </button>
             ),
@@ -122,9 +130,12 @@ const Table: React.FC<TableProps> = ({ headers }) => {
     if (selectedProduct) {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${selectedProduct.id}/`,
+          `https://backend.kidsdesigncompany.com/api/inventory-item/${selectedProduct.id}/`,
           {
             method: "DELETE",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            }
           }
         );
 

@@ -44,7 +44,7 @@ const AddSalaryWorker = () => {
     setIsPending(true);
 
     try {
-      await axios.post("https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/", formData);
+      await axios.post("https://backend.kidsdesigncompany.com/api/salary-workers/", formData);
       queryClient.invalidateQueries({ queryKey: ["salary-workers"], refetchType: "active" });
       toast.success("Salary worker added successfully!");
       navigate("/admin/workers");

@@ -23,7 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import EditPaymentModal from "./EditPaymentModal"; // Import the modal component
+import EditPaymentModal from "./EditPaymentModal";
 
 interface Entry {
   id: number;
@@ -46,7 +46,15 @@ interface PaidData {
 }
 
 const fetchPaid = async (): Promise<PaidData> => {
-  const { data } = await axios.get<PaidData>("https://kidsdesigncompany.pythonanywhere.com/api/paid/");
+  const access_token = localStorage.getItem("access_token");
+  const { data } = await axios.get<PaidData>(
+    "https://backend.kidsdesigncompany.com/api/paid/",
+    {
+      headers: {
+        Authorization: `JWT ${access_token}`
+      }
+    }
+  );
   return data;
 };
 
@@ -60,11 +68,19 @@ const PaidTable: React.FC = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const deletePaidMutation = useMutation({
     mutationFn: async (entryId: number) => {
-      await axios.delete(`https://kidsdesigncompany.pythonanywhere.com/api/paid/${entryId}/`);
+      const access_token = localStorage.getItem("access_token");
+      await axios.delete(
+        `https://backend.kidsdesigncompany.com/api/paid/${entryId}/`,
+        {
+          headers: {
+            Authorization: `JWT ${access_token}`
+          }
+        }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paid"] });
@@ -115,7 +131,7 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     <div className="p-6 flex flex-col h-full bg-white">
       <div className="flex justify-between items-center mb-6">
         <div
-        onClick={() => setIsAddModalOpen(true)}
+          onClick={() => setIsAddModalOpen(true)}
           className="cursor-pointer bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
         >
           Add Payment
@@ -165,11 +181,11 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
           </tbody>
         </table>
       </div>
-<AddPaymentModal
-  open={isAddModalOpen}
-  onOpenChange={setIsAddModalOpen}
 
-/>
+      <AddPaymentModal
+        open={isAddModalOpen}
+        onOpenChange={setIsAddModalOpen}
+      />
 
       {/* Details Modal */}
       <Dialog open={isDetailsModalOpen} onOpenChange={setIsDetailsModalOpen}>

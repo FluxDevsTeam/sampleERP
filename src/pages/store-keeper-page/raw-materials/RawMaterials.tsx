@@ -27,8 +27,8 @@ interface TableData {
 
 export const RawMaterials: React.FC = () => {
   document.title = "RM - KDC Admin";
-  const [totalStockValue, setTotalStockValue] = useState(419);
-  const [totalStoreCount, setTotalStoreCount] = useState(419);
+  const [totalStockValue, setTotalStockValue] = useState(0);
+  const [totalStoreCount, setTotalStoreCount] = useState(0);
 
   const tableHeaders = ["Name", "Category", "Quantity", "Details"];
   const [tableData, setTableData] = useState<TableData[]>([]);
@@ -55,7 +55,13 @@ export const RawMaterials: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/"
+        "https://backend.kidsdesigncompany.com/api/raw-materials/",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        }
       );
 
       if (!response.ok) {
@@ -100,7 +106,13 @@ export const RawMaterials: React.FC = () => {
       if (openProductId) {
         try {
           const response = await fetch(
-            `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/${openProductId}/`
+            `https://backend.kidsdesigncompany.com/api/raw-materials/${openProductId}/`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              },
+            }
           );
           if (response.ok) {
             const product = await response.json();
@@ -148,9 +160,12 @@ export const RawMaterials: React.FC = () => {
     if (selectedProduct) {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/${selectedProduct.id}/`,
+          `https://backend.kidsdesigncompany.com/api/raw-materials/${selectedProduct.id}/`,
           {
             method: "DELETE",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
           }
         );
 

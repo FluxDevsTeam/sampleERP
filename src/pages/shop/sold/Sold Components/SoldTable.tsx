@@ -70,7 +70,13 @@ const SoldTable: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/sold/"
+        "https://backend.kidsdesigncompany.com/api/sold/",{
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        }
       );
 
       if (!response.ok) {
@@ -118,9 +124,13 @@ const SoldTable: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/sold/${id}/`,
+        `https://backend.kidsdesigncompany.com/api/sold/${id}/`,
         {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
         }
       );
 

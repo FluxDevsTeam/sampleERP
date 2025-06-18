@@ -24,9 +24,12 @@ export const deleteCategory = async (
   try {
     setLoading(true);
     const response = await fetch(
-      `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item-category/${categoryId}/`,
+      `https://backend.kidsdesigncompany.com/api/inventory-item-category/${categoryId}/`,
       {
         method: "DELETE",
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("accessToken")}`
+        }
       }
     );
 

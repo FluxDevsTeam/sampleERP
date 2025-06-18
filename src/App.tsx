@@ -6,10 +6,15 @@ import {
   CEOStore,
   CEOProducts,
   CEOShop,
-  CEOExpenses,
   CEOOverhead,
   CEOSharedLayout,
 } from "./pages/ceo";
+import Settings from "./pages/ceo/settingss/settings.tsx";
+import NotFoundPage from "./components/NotFound.tsx";
+
+import ProtectedRoute from "./pages/AuthPages/ProtectedRoute.tsx";
+import Unauthorized from "./pages/AuthPages/Unauthorized.tsx";
+import Logout from "./pages/AuthPages/logout/Logout.tsx";
 
 import {
   Workers,
@@ -33,13 +38,11 @@ import {
   FactoryManagerSharedLayout,
   FactoryManagerDashboard,
   FactoryManagerProducts,
-
 } from "./pages/factory-manager-page";
 
 import FactoryManagerCustomers from './pages/factory-manager-page/customers/FactoryManagerCustomers.tsx'
 import CustomerProfile from "./pages/factory-manager-page/customers/CustomerProfile.tsx";
 
-//  Project Manager Route
 import { ProjectManagerLayout } from "./pages/project-manager-page";
 import ProjectManagerDashboard from "./pages/project-manager-page/dashboard/ProjectManagerDashboard";
 import ProductsTable from "./pages/project-manager-page/product/ProductsTable";
@@ -50,7 +53,6 @@ import EditProduct from "./pages/project-manager-page/product/Product Components
 import AddQuotation from "./pages/project-manager-page/product/Product Components/AddQuotation";
 import EditQuotation from "./pages/project-manager-page/product/Product Components/EditQuotation";
 
-// STORE KEEPER IMPORT ROUTE
 import { StoreKeeperLayout } from "./pages/store-keeper-page";
 import StoreKeeperDashboard from "./pages/store-keeper-page/dashboard/StoreKeeperDashboard";
 import AddRMCategory from "./pages/store-keeper-page/dashboard/Dashboard Components/AddRMCategory";
@@ -63,7 +65,6 @@ import AddRemovedItem from "./pages/store-keeper-page/removed/Removed Components
 import RecordRemoved from "./pages/store-keeper-page/record rm added/Record-Of-Added-RM-Quantity";
 import AddToRM from "./pages/store-keeper-page/record rm added/record rm added components/Add-To-RM";
 
-// shop import route
 import { ShopSharedLayout } from "./pages/shop";
 import ShopDashboard from "./pages/shop/dashboard/ShopDashboard";
 import Inventory from "./pages/shop/inventory/Inventory";
@@ -85,7 +86,6 @@ import EditSalaryWorker from "./pages/admin/workers/_pages/_salaryWorkers/EditSa
 import EditContractor from "./pages/admin/workers/_pages/_contractors/EditContractor";
 import SalaryWorkerRecords from "./pages/admin/workers/_records/_salaryWorksRecords/SalaryWorkersecord";
 import ContractorRecords from "./pages/admin/workers/_records/_contractorsRecords/ContractorRecords";
-import ForgotPassword from "./pages/AuthPages/forgotPassword/ForgotPassword";
 import AddProject from "./pages/ceo/allProjects/_pages/AddProject";
 import EditProject from "./pages/ceo/allProjects/_pages/EditProject";
 import OtherProductionRecords from "./pages/ceo/allProjects/_pages/OtherProductionRecords";
@@ -99,19 +99,31 @@ const router = createBrowserRouter([
     element: <Signin />,
   },
   {
-    path: "/signup",
-    element: <SignUp />,
+    path: "/logout",
+    element: <Logout />,
   },
   {
-    path: "/forgot-password",
-    element: <ForgotPassword />,
+    path: "/unauthorized",
+    element: <Unauthorized />,
+  },
+   {
+    path: "*",
+    element: <NotFoundPage />,
   },
 
-  // CEO DASHBOARD ROUTE
+  // CEO ROUTES
   {
     path: "/ceo",
-    element: <CEOSharedLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={['ceo']}>
+        <CEOSharedLayout />
+      </ProtectedRoute>
+    ),
     children: [
+      {
+        index: true,
+        element: <CEODashboard />,
+      },
       {
         path: "dashboard",
         element: <CEODashboard />,
@@ -146,7 +158,7 @@ const router = createBrowserRouter([
       },
       {
         path: "expenses",
-        element: <CEOExpenses />,
+        element: <Expenses />,
       },
       {
         path: "shop",
@@ -164,14 +176,30 @@ const router = createBrowserRouter([
         path: "projects/:projectId/records",
         element: <OtherProductionRecords />,
       },
+      {
+        path: "signup",
+        element: <SignUp />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
+      },
     ],
   },
 
-  // FACTORY MANAGER ROUTE
+  // FACTORY MANAGER ROUTES
   {
     path: "/factory-manager",
-    element: <FactoryManagerSharedLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={['factory_manager']}>
+        <FactoryManagerSharedLayout />
+      </ProtectedRoute>
+    ),
     children: [
+      {
+        index: true,
+        element: <FactoryManagerDashboard />,
+      },
       {
         path: "dashboard",
         element: <FactoryManagerDashboard />,
@@ -207,11 +235,19 @@ const router = createBrowserRouter([
     ],
   },
 
-  // PROJECT MANAGER ROUTE
+  // PROJECT MANAGER ROUTES
   {
     path: "/project-manager",
-    element: <ProjectManagerLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={['project_manager']}>
+        <ProjectManagerLayout />
+      </ProtectedRoute>
+    ),
     children: [
+      {
+        index: true,
+        element: <ProjectManagerDashboard />,
+      },
       {
         path: "dashboard",
         element: <ProjectManagerDashboard />,
@@ -244,14 +280,30 @@ const router = createBrowserRouter([
         path: "edit-quotation/:productId/:quotationId",
         element: <EditQuotation />,
       },
+      {
+        path: "customers",
+        element: <FactoryManagerCustomers />,
+      },
+      {
+        path: "projects",
+        element: <CEOProjects />,
+      },
     ],
   },
 
-  // STORE KEEPER ROUTE
+  // STORE KEEPER ROUTES
   {
     path: "/store-keeper",
-    element: <StoreKeeperLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={['storekeeper']}>
+        <StoreKeeperLayout />
+      </ProtectedRoute>
+    ),
     children: [
+      {
+        index: true,
+        element: <StoreKeeperDashboard />,
+      },
       {
         path: "dashboard",
         element: <StoreKeeperDashboard />,
@@ -295,11 +347,19 @@ const router = createBrowserRouter([
     ],
   },
 
-  // SHOP ROUTE
+  // SHOP ROUTES
   {
     path: "/shop",
-    element: <ShopSharedLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={['shopkeeper']}>
+        <ShopSharedLayout />
+      </ProtectedRoute>
+    ),
     children: [
+      {
+        index: true,
+        element: <ShopDashboard />,
+      },
       {
         path: "dashboard",
         element: <ShopDashboard />,
@@ -347,11 +407,19 @@ const router = createBrowserRouter([
     ],
   },
 
-  //admin dashboard
+  // ADMIN ROUTES
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
     children: [
+      {
+        index: true,
+        element: <AdminDashboard />,
+      },
       {
         path: "dashboard",
         element: <AdminDashboard />,
@@ -422,13 +490,14 @@ const router = createBrowserRouter([
       },
     ],
   },
-  // SHOP ROUTE
+  
+  // PUBLIC SHOP ROUTE
   {
     path: "/shop/*",
     element: <Shop />,
   },
 
-  // product route
+  // PUBLIC PRODUCT ROUTE
   {
     path: "/product/*",
     element: <Product />
@@ -437,9 +506,9 @@ const router = createBrowserRouter([
 
 const App = () => {
   return (
-    <>
+
       <RouterProvider router={router} />
-    </>
+
   );
 };
 

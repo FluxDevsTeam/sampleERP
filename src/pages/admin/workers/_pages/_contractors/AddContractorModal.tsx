@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
 import {
   Dialog,
   DialogContent,
@@ -20,27 +19,35 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
+const initialFormData = {
+  first_name: "",
+  last_name: "",
+  email: "",
+  phone_number: "",
+  address: "",
+  craft_specialty: "",
+  years_of_experience: 0,
+  is_still_active: true,
+};
+
 const AddContractorModal: React.FC<Props> = ({ open, onOpenChange }) => {
   const [isPending, setIsPending] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [formData, setFormData] = useState(initialFormData);
 
-  const [formData, setFormData] = useState({
-    first_name: "",
-    last_name: "",
-    email: "",
-    phone_number: "",
-    address: "",
-    craft_specialty: "",
-    years_of_experience: 0,
-    is_still_active: true,
-  });
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!open) {
+      setFormData(initialFormData);
+    }
+  }, [open]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : type === "number" ? Number(value) : value,
     }));
   };
 
@@ -48,9 +55,17 @@ const AddContractorModal: React.FC<Props> = ({ open, onOpenChange }) => {
     e.preventDefault();
     setIsPending(true);
     try {
-      await axios.post("https://kidsdesigncompany.pythonanywhere.com/api/contractors/", formData);
+      const token = localStorage.getItem("access_token");
+      await axios.post("https://backend.kidsdesigncompany.com/api/contractors/", formData , 
+         {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
+      );
       queryClient.invalidateQueries({ queryKey: ["contractors"] });
       toast.success("Contractor added!");
+      setFormData(initialFormData); // Reset form after success
       onOpenChange(false);
       navigate("/admin/workers");
     } catch (err) {
@@ -63,7 +78,7 @@ const AddContractorModal: React.FC<Props> = ({ open, onOpenChange }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 transform overflow-y-auto max-h-[90vh]">
-        <DialogHeader className="sticky top-0 bg-background z-10">
+        <DialogHeader className=" ">
           <DialogTitle>Add New Contractor</DialogTitle>
           <DialogDescription>Fill in the details to add a contractor.</DialogDescription>
         </DialogHeader>
@@ -83,7 +98,7 @@ const AddContractorModal: React.FC<Props> = ({ open, onOpenChange }) => {
                 id={id}
                 name={id}
                 type={type || "text"}
-                value={formData[id as keyof typeof formData] as string | number}
+                value={formData[id as keyof typeof formData] || ""}
                 onChange={handleChange}
                 required
               />

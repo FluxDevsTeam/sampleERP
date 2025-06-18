@@ -18,7 +18,7 @@ interface EditRecordPopupProps {
   isOpen: boolean;
   onClose: () => void;
   contractorId: string;
-  record: { id: number; report: string }; // Removed date field
+  record: { id: number; report: string }; 
 }
 
 const EditRecordPopup: React.FC<EditRecordPopupProps> = ({
@@ -35,9 +35,15 @@ const EditRecordPopup: React.FC<EditRecordPopupProps> = ({
 
   const editRecordMutation = useMutation({
     mutationFn: async (updatedData: { report: string }) => {
+       const token = localStorage.getItem("access_token");
       const response = await axios.put(
-        `https://kidsdesigncompany.pythonanywhere.com/api/contractors/${contractorId}/record/${record.id}/`,
-        updatedData
+        `https://backend.kidsdesigncompany.com/api/contractors/${contractorId}/record/${record.id}/`,
+        updatedData ,
+         {
+                        headers: {
+                          Authorization: `JWT ${token}`,
+                        },
+                      }
       );
       return response.data;
     },

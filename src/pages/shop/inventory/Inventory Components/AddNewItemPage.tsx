@@ -37,7 +37,13 @@ const AddItemPage: React.FC = () => {
   async function skFn() {
     try {
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item-category/"
+        "https://backend.kidsdesigncompany.com/api/inventory-item-category/",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        }
       );
 
       if (!response.ok) {
@@ -76,9 +82,12 @@ const AddItemPage: React.FC = () => {
       }
 
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/",
+        "https://backend.kidsdesigncompany.com/api/inventory-item/",
         {
           method: "POST",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
           body: formDataToSend,
         }
       );

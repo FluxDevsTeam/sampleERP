@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 export const Inventory = () => {
   document.title = "Inventory - KDC Admin";
   const tableHeaders = ["Product", "Category", "Stock Status", "Details"];
-  const [totalCostValue, setTotalCostValue] = useState(419);
-  const [totalProfit, setTotalProfit] = useState(419);
-  const [totalStockCount, setTotalStockCount] = useState(419);
-  const [totalStockValue, setTotalStockValue] = useState(419);
+  const [totalCostValue, setTotalCostValue] = useState(0);
+  const [totalProfit, setTotalProfit] = useState(0);
+  const [totalStockCount, setTotalStockCount] = useState(0);
+  const [totalStockValue, setTotalStockValue] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // const navigate = useNavigate();
@@ -19,7 +19,13 @@ export const Inventory = () => {
       // INVENTORY ITEM
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/"
+          "https://backend.kidsdesigncompany.com/api/inventory-item/", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            }
+          }
         );
 
         if (!response.ok) {
@@ -40,7 +46,13 @@ export const Inventory = () => {
       // INVENTORY DASHBOARD
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/"
+          "https://backend.kidsdesigncompany.com/api/shopkeeper-dashboard/", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            }
+          }
         );
 
         if (!response.ok) {

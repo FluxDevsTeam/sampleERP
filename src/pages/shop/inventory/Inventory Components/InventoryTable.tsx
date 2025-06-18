@@ -51,7 +51,14 @@ const Table: React.FC<TableProps> = ({ headers, onModalChange }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/`
+        `https://backend.kidsdesigncompany.com/api/inventory-item/`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        }
       );
 
       if (!response.ok) {
@@ -143,9 +150,12 @@ const Table: React.FC<TableProps> = ({ headers, onModalChange }) => {
     if (selectedProduct) {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/inventory-item/${selectedProduct.id}/`,
+          `https://backend.kidsdesigncompany.com/api/inventory-item/${selectedProduct.id}/`,
           {
             method: "DELETE",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
           }
         );
 

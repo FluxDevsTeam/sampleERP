@@ -83,8 +83,13 @@ const ProductsTable: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/`
-      );
+        `https://backend.kidsdesigncompany.com/api/product/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch data");
@@ -223,7 +228,13 @@ const ProductsTable: React.FC = () => {
 
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct?.id}/quotation/`
+          `https://backend.kidsdesigncompany.com/api/product/${selectedProduct?.id}/quotation/`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
 
         if (!response.ok) {
@@ -248,7 +259,13 @@ const ProductsTable: React.FC = () => {
 
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/raw-materials-used/`
+          `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/raw-materials-used/`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
 
         if (!response.ok) {
@@ -266,10 +283,16 @@ const ProductsTable: React.FC = () => {
   }, [selectedProduct?.id]);
 
   const deleteQuotation = async (id: number) => {
-    const url = `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct?.id}/quotation/${id}/`;
+    const url = `https://backend.kidsdesigncompany.com/api/product/${selectedProduct?.id}/quotation/${id}/`;
 
     try {
-      const response = await fetch(url, { method: "DELETE" });
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to delete quotation");
@@ -307,9 +330,13 @@ const ProductsTable: React.FC = () => {
     if (selectedProduct) {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/`,
+          `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/`,
           {
             method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
           }
         );
 
@@ -344,9 +371,13 @@ const ProductsTable: React.FC = () => {
 
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/contractor/${contractorId}/`,
+        `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/contractor/${contractorId}/`,
         {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
         }
       );
 
@@ -390,11 +421,12 @@ const ProductsTable: React.FC = () => {
 
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/contractor/${editingContractor.id}/`,
+        `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/contractor/${editingContractor.id}/`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify(editingContractor),
         }
@@ -439,9 +471,13 @@ const ProductsTable: React.FC = () => {
 
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/salary/${workerId}/`,
+        `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/salary/${workerId}/`,
         {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
         }
       );
 
@@ -485,11 +521,12 @@ const ProductsTable: React.FC = () => {
 
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/${selectedProduct.id}/salary/${editingWorker.id}/`,
+        `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/salary/${editingWorker.id}/`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify(editingWorker),
         }

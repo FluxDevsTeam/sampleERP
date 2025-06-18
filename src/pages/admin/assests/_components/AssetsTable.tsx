@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
 import AddAssetModal from "./AddAssetsModal";
 
-const BASE_URL = "https://kidsdesigncompany.pythonanywhere.com/api/assets/";
+const BASE_URL = "https://backend.kidsdesigncompany.com/api/assets/";
 
 interface Asset {
   id: number;
@@ -28,7 +28,14 @@ interface PaginatedAssetsResponse {
 }
 
 const fetchAssets = async (page = 1): Promise<PaginatedAssetsResponse> => {
-  const response = await axios.get(`${BASE_URL}?page=${page}`);
+    const token = localStorage.getItem("access_token");
+  const response = await axios.get(`${BASE_URL}?page=${page}`,
+    {
+            headers: {
+              Authorization: `JWT ${token}`,
+            },
+          }
+  );
   return response.data;
 };
 
@@ -58,7 +65,14 @@ const AssetsTable = () => {
 
   const deleteAssetMutation = useMutation({
     mutationFn: async (assetId: number) => {
-      await axios.delete(`${BASE_URL}${assetId}/`);
+       const token = localStorage.getItem("access_token");
+      await axios.delete(`${BASE_URL}${assetId}/` ,
+          {
+            headers: {
+              Authorization: `JWT ${token}`,
+            },
+          }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["assets"] });

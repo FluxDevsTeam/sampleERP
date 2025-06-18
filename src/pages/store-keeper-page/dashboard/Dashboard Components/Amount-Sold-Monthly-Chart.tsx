@@ -90,7 +90,14 @@ const AmountSoldMonthlyBarChart = () => {
       // INVENTORY DASHBOARD
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/storekeeper-dashboard/"
+          "https://backend.kidsdesigncompany.com/api/storekeeper-dashboard/",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
 
         if (!response.ok) {
@@ -151,10 +158,7 @@ const AmountSoldMonthlyBarChart = () => {
       >
         Added Amount Monthly
       </h1>
-      <ResponsiveContainer
-        width="100%"
-        height={447}
-      >
+      <ResponsiveContainer width="100%" height={447}>
         <BarChart data={data}>
           <defs>
             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">

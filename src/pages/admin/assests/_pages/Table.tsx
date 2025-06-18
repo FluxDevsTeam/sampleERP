@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 
 const fetchAssets = async () => {
-  const { data } = await axios.get("https://kidsdesigncompany.pythonanywhere.com/api/assets/");
+  const { data } = await axios.get("https://backend.kidsdesigncompany.com/api/assets/");
   return data;
 };
 

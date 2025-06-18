@@ -27,9 +27,12 @@ const AddCategoryPage: React.FC = () => {
       formDataToSend.append("name", formData.name);
 
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/inventory-item-category/",
+        "https://backend.kidsdesigncompany.com/api/inventory-item-category/",
         {
           method: "POST",
+          headers: {
+            "Authorization": `JWT ${localStorage.getItem("accessToken")}`,
+          },
           body: formDataToSend,
         }
       );

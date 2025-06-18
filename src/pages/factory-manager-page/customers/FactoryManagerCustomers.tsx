@@ -32,7 +32,7 @@ const FactoryManagerCustomers = () => {
     setSaveError(null);
 
     try {
-      const response = await fetch("https://kidsdesigncompany.pythonanywhere.com/api/customer/", {
+      const response = await fetch("https://backend.kidsdesigncompany.com/api/customer/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newCustomer),

@@ -31,7 +31,14 @@ const CategoryTable: React.FC<TableProps> = ({ headers }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/shopkeeper-dashboard/`
+        `https://backend.kidsdesigncompany.com/api/shopkeeper-dashboard/`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        }
       );
 
       if (!response.ok) {

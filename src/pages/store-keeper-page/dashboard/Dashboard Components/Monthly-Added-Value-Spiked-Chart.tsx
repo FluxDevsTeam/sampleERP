@@ -8,7 +8,19 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', 'red', 'pink', 'brown', 'cyan', 'green', 'indigo', 'violet'];
+const colors = [
+  "#0088FE",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042",
+  "red",
+  "pink",
+  "brown",
+  "cyan",
+  "green",
+  "indigo",
+  "violet",
+];
 
 const MonthlyAddedValueSpikedChart = () => {
   const [month1, setMonth1] = useState("Jan");
@@ -91,7 +103,13 @@ const MonthlyAddedValueSpikedChart = () => {
       // INVENTORY DASHBOARD
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/storekeeper-dashboard/"
+          "https://backend.kidsdesigncompany.com/api/storekeeper-dashboard/",
+          {
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              "Content-Type": "application/json",
+            },
+          }
         );
 
         if (!response.ok) {
@@ -171,16 +189,11 @@ const MonthlyAddedValueSpikedChart = () => {
 
   return (
     <div>
-      <h1
-        style={{ fontSize: "clamp(16.5px, 3vw, 23px)" }}
-      >
+      <h1 style={{ fontSize: "clamp(16.5px, 3vw, 23px)" }}>
         Removed Amount Monthly
       </h1>
       <ResponsiveContainer width="100%" height={460}>
-        <BarChart
-          data={data}
-          margin={{ top: 17, bottom: 9 }}
-        >
+        <BarChart data={data} margin={{ top: 17, bottom: 9 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
           <YAxis />

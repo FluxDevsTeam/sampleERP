@@ -39,8 +39,14 @@ const SalaryWorkerRecords = () => {
   const [recordToDelete, setRecordToDelete] = useState<number | null>(null);
 
   const fetchRecords = async () => {
+     const token = localStorage.getItem("access_token");
     const response = await axios.get(
-      `https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/${id}/record/`
+      `https://backend.kidsdesigncompany.com/api/salary-workers/${id}/record/`,
+        {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
     );
     return response.data.results;
   };
@@ -52,8 +58,14 @@ const SalaryWorkerRecords = () => {
 
   const deleteRecordMutation = useMutation({
     mutationFn: async (recordId: number) => {
+       const token = localStorage.getItem("access_token");
       await axios.delete(
-        `https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/${id}/record/${recordId}/`
+        `https://backend.kidsdesigncompany.com/api/salary-workers/${id}/record/${recordId}/`,
+          {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
       );
     },
     onSuccess: () => {

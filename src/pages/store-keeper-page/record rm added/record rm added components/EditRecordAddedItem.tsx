@@ -33,7 +33,13 @@ const EditRecordRemovedItem: React.FC = () => {
     const fetchItem = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/add-raw-materials/${id}/`
+          `https://backend.kidsdesigncompany.com/api/add-raw-materials/${id}/`, {
+            method: "GET",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              "Content-Type": "application/json",
+            }
+          }
         );
         if (!response.ok) throw new Error("Failed to fetch item");
         const data = await response.json();
@@ -54,7 +60,13 @@ const EditRecordRemovedItem: React.FC = () => {
   const fetchRawMaterials = async () => {
     try {
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/"
+        "https://backend.kidsdesigncompany.com/api/raw-materials/", {
+          method: "GET",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
       if (!response.ok) throw new Error("Failed to fetch raw materials");
       const data = await response.json();
@@ -74,10 +86,11 @@ const EditRecordRemovedItem: React.FC = () => {
 
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/add-raw-materials/${id}/`,
+        `https://backend.kidsdesigncompany.com/api/add-raw-materials/${id}/`,
         {
           method: "PATCH",
           headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

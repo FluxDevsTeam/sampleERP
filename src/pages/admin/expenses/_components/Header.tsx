@@ -12,8 +12,14 @@ interface ExpensesData {
 }
 
 const fetchExpenses = async (): Promise<ExpensesData> => {
+  const access_token = localStorage.getItem("access_token");
   const { data } = await axios.get<ExpensesData>(
-    "https://kidsdesigncompany.pythonanywhere.com/api/expense/"
+    "https://backend.kidsdesigncompany.com/api/expense/",
+    {
+      headers: {
+        Authorization: `JWT ${access_token}`
+      }
+    }
   );
   return data;
 };

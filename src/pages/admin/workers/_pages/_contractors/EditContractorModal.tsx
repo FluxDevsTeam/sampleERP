@@ -45,7 +45,14 @@ const EditContractorModal: React.FC<EditContractorModalProps> = ({
 
     const fetchContractor = async () => {
       try {
-        const response = await axios.get(`https://kidsdesigncompany.pythonanywhere.com/api/contractors/${id}/`);
+         const token = localStorage.getItem("access_token");
+        const response = await axios.get(`https://backend.kidsdesigncompany.com/api/contractors/${id}/` ,
+           {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
+        );
         setFormData(response.data);
       } catch (error) {
         toast.error("Failed to fetch contractor data.");
@@ -68,7 +75,14 @@ const EditContractorModal: React.FC<EditContractorModalProps> = ({
     setIsPending(true);
 
     try {
-      await axios.put(`https://kidsdesigncompany.pythonanywhere.com/api/contractors/${id}/`, formData);
+       const token = localStorage.getItem("access_token");
+      await axios.put(`https://backend.kidsdesigncompany.com/api/contractors/${id}/`, formData , 
+         {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
+      );
       queryClient.invalidateQueries({ queryKey: ["contractors"], refetchType: "active" });
       toast.success("Contractor updated successfully!");
       onOpenChange(false);
@@ -83,7 +97,7 @@ const EditContractorModal: React.FC<EditContractorModalProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 transform overflow-y-auto max-h-[90vh]">
-        <DialogHeader className="sticky top-0 bg-background z-10">
+        <DialogHeader className="">
           <DialogTitle>Edit Contractor</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>

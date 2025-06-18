@@ -34,7 +34,13 @@ const AddWorkerPage: React.FC = () => {
     const fetchworkers = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/"
+          "https://backend.kidsdesigncompany.com/api/salary-workers/", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
         if (!response.ok) throw new Error("Failed to fetch workers");
         const data = await response.json();
@@ -55,11 +61,12 @@ const AddWorkerPage: React.FC = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/salary/`,
+        `https://backend.kidsdesigncompany.com/api/product/${id}/salary/`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify({
             salary_worker: selectedWorker,
@@ -96,7 +103,14 @@ const AddWorkerPage: React.FC = () => {
       const fetchUpdatedProduct = async () => {
         try {
           const response = await fetch(
-            `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`
+            `https://backend.kidsdesigncompany.com/api/product/${id}/`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              },
+            }
           );
           if (!response.ok) throw new Error("Failed to fetch updated product");
           const updatedProduct = await response.json();
@@ -146,7 +160,14 @@ const AddWorkerPage: React.FC = () => {
             onClick={async () => {
               try {
                 const response = await fetch(
-                  `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`
+                  `https://backend.kidsdesigncompany.com/api/product/${id}/`,
+                  {
+                    method: "GET",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+                    },
+                  }
                 );
                 if (!response.ok) throw new Error("Failed to fetch product");
                 const productData = await response.json();

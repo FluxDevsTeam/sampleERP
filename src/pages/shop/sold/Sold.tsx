@@ -5,11 +5,11 @@ import {useState, useEffect} from "react";
 
 export const Sold = () => {
 
-  const [thisMonthNonProjectSales, setThisMonthNonProjectSales] = useState(419);
-  const [thisMonthProfit, setThisMonthProfit] = useState(419);
-  const [thisMonthProjectSales, setThisMonthProjectSales] = useState(419);
-  const [thisMonthSales, setThisMonthSales] = useState(419);
-  const [thisMonthSalesCount, setThisMonthSalesCount] = useState(419);
+  const [thisMonthNonProjectSales, setThisMonthNonProjectSales] = useState(0);
+  const [thisMonthProfit, setThisMonthProfit] = useState(0);
+  const [thisMonthProjectSales, setThisMonthProjectSales] = useState(0);
+  const [thisMonthSales, setThisMonthSales] = useState(0);
+  const [thisMonthSalesCount, setThisMonthSalesCount] = useState(0);
 
 
   useEffect(() => {
@@ -17,9 +17,15 @@ export const Sold = () => {
         // INVENTORY ITEM
         try {
           const response = await fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/sold/"
+            "https://backend.kidsdesigncompany.com/api/sold/", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            }
+          }
           );
-  
+
           if (!response.ok) {
             throw new Error("iyegs failed");
           }
@@ -40,9 +46,15 @@ export const Sold = () => {
         // INVENTORY DASHBOARD
         try {
           const response = await fetch(
-            "https://kidsdesigncompany.pythonanywhere.com/api/inventory-dashboard/"
+            "https://backend.kidsdesigncompany.com/api/shopkeeper-dashboard/", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              },
+            }
           );
-  
+
           if (!response.ok) {
             throw new Error("Authentication failed");
           }

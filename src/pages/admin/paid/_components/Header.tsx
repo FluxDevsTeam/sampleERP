@@ -9,8 +9,14 @@ interface PaidData {
 }
 
 const fetchPaidData = async (): Promise<PaidData> => {
+  const access_token = localStorage.getItem("access_token");
   const { data } = await axios.get<PaidData>(
-    "https://kidsdesigncompany.pythonanywhere.com/api/paid/"
+    "https://backend.kidsdesigncompany.com/api/paid/",
+    {
+      headers: {
+        Authorization: `JWT ${access_token}`
+      }
+    }
   );
   return data;
 };

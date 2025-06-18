@@ -41,7 +41,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 // Base URL for API requests
-const BASE_URL = 'https://kidsdesigncompany.pythonanywhere.com/api';
+const BASE_URL = 'https://backend.kidsdesigncompany.com/api';
 
 // Define the type for a production record
 interface ProductionRecord {

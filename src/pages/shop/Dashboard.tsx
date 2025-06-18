@@ -16,21 +16,28 @@ const Dashboard = () => {
     "Total Stock Value",
   ];
 
-  const [totalCostValue, setTotalCostValue] = useState(419);
-  const [monthlyStock, setMonthlyStock] = useState(419);
-  const [totalProfitPotential, setTotalProfitPotential] = useState(419);
-  const [profitThisMonth, setProfitThisMonth] = useState(419);
-  const [totalShopValue, setTotalShopValue] = useState(419);
-  const [totalSoldThisMonth, setTotalSoldThisMonth] = useState(419);
-  const [yearlyAddedValue, setYearlyAddedValue] = useState(419);
-  const [yearlyProfit, setYearlyProfit] = useState(419);
+  const [totalCostValue, setTotalCostValue] = useState(0);
+  const [monthlyStock, setMonthlyStock] = useState(0);
+  const [totalProfitPotential, setTotalProfitPotential] = useState(0);
+  const [profitThisMonth, setProfitThisMonth] = useState(0);
+  const [totalShopValue, setTotalShopValue] = useState(0);
+  const [totalSoldThisMonth, setTotalSoldThisMonth] = useState(0);
+  const [yearlyAddedValue, setYearlyAddedValue] = useState(0);
+  const [yearlyProfit, setYearlyProfit] = useState(0);
 
   useEffect(() => {
     async function fetchStockInfo() {
       // INVENTORY DASHBOARD
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/shopkeeper-dashboard/"
+          "https://backend.kidsdesigncompany.com/api/shopkeeper-dashboard/",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
 
         if (!response.ok) {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import PaginationComponent from "./Pagination";
 import Modals from "./Modal";
@@ -9,7 +9,7 @@ import SkeletonLoader from "./SkeletonLoader";
 import AddSalaryWorkerModal from "../_pages/_salaryWorkers/AddSalaryWorkersModal";
 
 
-const BASE_URL = "https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/";
+const BASE_URL = "https://backend.kidsdesigncompany.com/api/salary-workers/";
 
 interface SalaryWorker {
   id: number;
@@ -47,12 +47,17 @@ interface SalaryWorkersResponse {
 }
 
 const fetchSalaryWorkers = async (page = 1): Promise<SalaryWorkersResponse> => {
-  const response = await axios.get(`${BASE_URL}?page=${page}`);
+  const token = localStorage.getItem("access_token");
+  const response = await axios.get(`${BASE_URL}?page=${page}`, {
+    headers: {
+      Authorization: `JWT ${token}`,
+    },
+  });
   return response.data;
 };
 
 const SalaryWorkers = () => {
-  const navigate = useNavigate();
+
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -76,16 +81,21 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   }, [data]);
 
   const deleteWorkerMutation = useMutation({
-    mutationFn: async (workerId: number) => {
-      await axios.delete(`${BASE_URL}${workerId}/`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["salary-workers"] });
-      setIsDeleteDialogOpen(false);
-      setIsModalOpen(false);
-      toast.success("Worker deleted successfully!");
-    },
-  });
+  mutationFn: async (workerId: number) => {
+    const token = localStorage.getItem("access_token");
+    await axios.delete(`${BASE_URL}${workerId}/`, {
+      headers: {
+        Authorization: `JWT ${token}`,
+      },
+    });
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["salary-workers"] });
+    setIsDeleteDialogOpen(false);
+    setIsModalOpen(false);
+    toast.success("Worker deleted successfully!");
+  },
+});
 
   const handleRowClick = (worker: SalaryWorker) => {
     setSelectedWorker(worker);

@@ -30,7 +30,7 @@ interface CategoryDropdownProps {
 
 const fetchCategories = async (): Promise<Category[]> => {
   const { data } = await axios.get<{ results: Category[] }>(
-    "https://kidsdesigncompany.pythonanywhere.com/api/expense-category/"
+    "https://backend.kidsdesigncompany.com/api/expense-category/"
   );
   return data.results;
 };
@@ -51,7 +51,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
   const addCategoryMutation = useMutation({
     mutationFn: async (categoryData: NewCategoryData) => {
       const response = await axios.post<Category>(
-        "https://kidsdesigncompany.pythonanywhere.com/api/expense-category/",
+        "https://backend.kidsdesigncompany.com/api/expense-category/",
         categoryData
       );
       return response.data; // Ensure the response includes id and name

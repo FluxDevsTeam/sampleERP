@@ -62,7 +62,13 @@ const RecordRemovedTable: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/add-raw-materials/"
+        "https://backend.kidsdesigncompany.com/api/add-raw-materials/", {
+          method: "GET",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
       if (!response.ok) throw new Error("Failed to fetch data");
       const data = await response.json();
@@ -100,9 +106,12 @@ const RecordRemovedTable: React.FC = () => {
 
     try {
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/add-raw-materials/${selectedItem}/`,
+        `https://backend.kidsdesigncompany.com/api/add-raw-materials/${selectedItem}/`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
         }
       );
 

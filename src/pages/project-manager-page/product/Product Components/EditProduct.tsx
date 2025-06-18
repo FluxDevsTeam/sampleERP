@@ -39,7 +39,14 @@ const EditProduct: React.FC = () => {
     const fetchProductDetails = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`
+          `https://backend.kidsdesigncompany.com/api/product/${id}/`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
         if (!response.ok) {
           throw new Error("Failed to fetch product details");
@@ -72,7 +79,14 @@ const EditProduct: React.FC = () => {
     const fetchProjects = async () => {
       try {
         const response = await fetch(
-          "https://kidsdesigncompany.pythonanywhere.com/api/project/"
+          "https://backend.kidsdesigncompany.com/api/project/",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
         if (!response.ok) {
           throw new Error("Failed to fetch projects");
@@ -132,9 +146,12 @@ const EditProduct: React.FC = () => {
       }
 
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`,
+        `https://backend.kidsdesigncompany.com/api/product/${id}/`,
         {
           method: "PATCH",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
           body: formDataToSubmit,
         }
       );
@@ -167,7 +184,14 @@ const EditProduct: React.FC = () => {
       const fetchUpdatedProduct = async () => {
         try {
           const response = await fetch(
-            `https://kidsdesigncompany.pythonanywhere.com/api/product/${id}/`
+            `https://backend.kidsdesigncompany.com/api/product/${id}/`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              },
+            }
           );
           if (!response.ok) throw new Error("Failed to fetch updated product");
           const updatedProduct = await response.json();

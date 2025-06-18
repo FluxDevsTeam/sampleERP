@@ -37,8 +37,8 @@ const AddPayment = () => {
     const fetchData = async () => {
       try {
         const [contractorRes, salaryRes] = await Promise.all([
-          axios.get("https://kidsdesigncompany.pythonanywhere.com/api/contractors/"),
-          axios.get("https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/")
+          axios.get("https://backend.kidsdesigncompany.com/api/contractors/"),
+          axios.get("https://backend.kidsdesigncompany.com/api/salary-workers/")
         ]);
 
         setContractors(contractorRes.data.results.contractor);
@@ -61,7 +61,7 @@ const AddPayment = () => {
 
       try {
         const response = await axios.post(
-          "https://kidsdesigncompany.pythonanywhere.com/api/paid/",
+          "https://backend.kidsdesigncompany.com/api/paid/",
           formattedData
         );
         return response.data;

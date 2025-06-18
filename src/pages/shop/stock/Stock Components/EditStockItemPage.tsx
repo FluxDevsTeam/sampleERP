@@ -33,7 +33,12 @@ const EditStockItemPage: React.FC = () => {
     const fetchSoldItem = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/add-stock/${id}/`
+          `https://backend.kidsdesigncompany.com/api/add-stock/${id}/`,{
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,}
+          }
         );
         const data = await response.json();
         setFormData({
@@ -61,11 +66,12 @@ const EditStockItemPage: React.FC = () => {
       };
 
       const response = await fetch(
-        `https://kidsdesigncompany.pythonanywhere.com/api/add-stock/${id}/`,
+        `https://backend.kidsdesigncompany.com/api/add-stock/${id}/`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify(requestBody),
         }

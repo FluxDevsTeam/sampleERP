@@ -26,22 +26,27 @@ interface ContractorsSummary {
   };
 }
 
-// Fetch salary workers data
-const fetchSalaryWorkersData = async (): Promise<SalaryWorkersSummary> => {
-  const response = await fetch("https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/");
+const fetchWithAuth = async (url: string) => {
+  const token = localStorage.getItem("access_token");
+  const response = await fetch(url, {
+    headers: {
+      "Authorization": `JWT ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
   return response.json();
 };
 
+const fetchSalaryWorkersData = async (): Promise<SalaryWorkersSummary> => {
+  return fetchWithAuth("https://backend.kidsdesigncompany.com/api/salary-workers/");
+};
+
 // Fetch contractors data
 const fetchContractorsData = async (): Promise<ContractorsSummary> => {
-  const response = await fetch("https://kidsdesigncompany.pythonanywhere.com/api/contractors/");
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  return response.json();
+  return fetchWithAuth("https://backend.kidsdesigncompany.com/api/contractors/");
 };
 
 const Header = () => {

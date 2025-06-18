@@ -69,13 +69,13 @@ interface Expense {
 }
 
 const fetchProjects = async (): Promise<Project[]> => {
-  const response = await axios.get("https://kidsdesigncompany.pythonanywhere.com/api/project/");
+  const response = await axios.get("https://backend.kidsdesigncompany.com/api/project/");
   return response.data.all_projects || [];
 };
 
 const fetchShopItems = async (): Promise<ShopItem[]> => {
   try {
-    const response = await axios.get("https://kidsdesigncompany.pythonanywhere.com/api/sold/");
+    const response = await axios.get("https://backend.kidsdesigncompany.com/api/sold/");
     console.log("Fetched Sold API response:", response.data);
     
     // Extract items from daily_data entries
@@ -110,7 +110,7 @@ const fetchShopItems = async (): Promise<ShopItem[]> => {
 
 const fetchCategories = async (): Promise<Category[]> => {
   const { data } = await axios.get<Category[]>(
-    "https://kidsdesigncompany.pythonanywhere.com/api/expense-category/"
+    "https://backend.kidsdesigncompany.com/api/expense-category/"
   );
   return data;
 };
@@ -184,7 +184,7 @@ const EditExpense: React.FC = () => {
   const { data: expense, isLoading } = useQuery<Expense>({
     queryKey: ["expense", id],
     queryFn: async () => {
-      const { data } = await axios.get(`https://kidsdesigncompany.pythonanywhere.com/api/expense/${id}/`);
+      const { data } = await axios.get(`https://backend.kidsdesigncompany.com/api/expense/${id}/`);
       return data;
     },
     enabled: !!id,
@@ -215,7 +215,7 @@ const EditExpense: React.FC = () => {
       };
 
       console.log("Sending update data to API:", formattedData);
-      await axios.put(`https://kidsdesigncompany.pythonanywhere.com/api/expense/${id}/`, formattedData);
+      await axios.put(`https://backend.kidsdesigncompany.com/api/expense/${id}/`, formattedData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["expenses"] });

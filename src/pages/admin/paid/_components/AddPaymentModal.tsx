@@ -4,7 +4,6 @@ import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -23,34 +22,49 @@ interface PaymentData {
 interface AddPaymentModalProps {
   onSuccess?: () => void;
   children: React.ReactNode;
-   open?: boolean;
+  open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
-const AddPaymentModal = ({ children, onSuccess, open, 
-  onOpenChange  }: AddPaymentModalProps) => {
+const initialFormData: PaymentData = {
+  amount: 0,
+  recipientId: 0,
+  recipientType: "contractor",
+};
+
+const AddPaymentModal = ({ children, onSuccess, open, onOpenChange }: AddPaymentModalProps) => {
   const queryClient = useQueryClient();
   const [isInternalOpen, setIsInternalOpen] = useState(false);
   const isControlled = open !== undefined && onOpenChange !== undefined;
   const isOpen = isControlled ? open : isInternalOpen;
   const setIsOpen = isControlled ? onOpenChange : setIsInternalOpen;
 
-  const [formData, setFormData] = useState<PaymentData>({
-    amount: 0,
-    recipientId: 0,
-    recipientType: "contractor",
-  });
-
+  const [formData, setFormData] = useState<PaymentData>(initialFormData);
   const [contractors, setContractors] = useState([]);
   const [salaryWorkers, setSalaryWorkers] = useState([]);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setFormData(initialFormData);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [contractorRes, salaryRes] = await Promise.all([
-          axios.get("https://kidsdesigncompany.pythonanywhere.com/api/contractors/"),
-          axios.get("https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/")
-        ]);
+      const token = localStorage.getItem("access_token");
+const config = {
+  headers: {
+    Authorization: `JWT ${token}`,
+  },
+};
+
+const [contractorRes, salaryRes] = await Promise.all([
+  axios.get("https://backend.kidsdesigncompany.com/api/contractors/", config),
+  axios.get("https://backend.kidsdesigncompany.com/api/salary-workers/", config),
+]);
+
 
         setContractors(contractorRes.data.results.contractor);
         setSalaryWorkers(salaryRes.data.results.workers);
@@ -73,10 +87,18 @@ const AddPaymentModal = ({ children, onSuccess, open,
           : { amount: paymentData.amount, salary: paymentData.recipientId };
 
       try {
-        const response = await axios.post(
-          "https://kidsdesigncompany.pythonanywhere.com/api/paid/",
-          formattedData
-        );
+       const token = localStorage.getItem("access_token");
+
+const response = await axios.post(
+  "https://backend.kidsdesigncompany.com/api/paid/",
+  formattedData,
+  {
+    headers: {
+      Authorization: `JWT ${token}`,
+    },
+  }
+);
+
         return response.data;
       } catch (error: any) {
         throw error.response?.data || "Failed to process payment";
@@ -85,6 +107,7 @@ const AddPaymentModal = ({ children, onSuccess, open,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paid"] });
       toast.success("Payment added successfully!");
+      setFormData(initialFormData); // Reset form after success
       setIsOpen(false);
       onSuccess?.();
     },
@@ -111,6 +134,10 @@ const AddPaymentModal = ({ children, onSuccess, open,
     createPaymentMutation.mutate(formData);
   };
 
+  const handleCancel = () => {
+    setIsOpen(false);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -129,7 +156,7 @@ const AddPaymentModal = ({ children, onSuccess, open,
                 name="amount"
                 type="number"
                 min="1"
-                value={formData.amount}
+                value={formData.amount || ""}
                 onChange={handleChange}
                 required
               />
@@ -154,7 +181,7 @@ const AddPaymentModal = ({ children, onSuccess, open,
               <select
                 id="recipientId"
                 name="recipientId"
-                value={formData.recipientId}
+                value={formData.recipientId || ""}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
                 required
@@ -180,7 +207,7 @@ const AddPaymentModal = ({ children, onSuccess, open,
             <Button 
               type="button" 
               variant="outline" 
-              onClick={() => setIsOpen(false)}
+              onClick={handleCancel}
             >
               Cancel
             </Button>

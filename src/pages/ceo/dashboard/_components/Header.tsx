@@ -4,6 +4,22 @@ import { useQuery } from '@tanstack/react-query';
 import { MdArrowOutward, MdExpandMore, MdExpandLess } from 'react-icons/md';
 import Frame180 from "../../../../assets/images/Frame180.png";
 
+// Create an Axios instance with default headers
+const api = axios.create({
+  baseURL: "https://backend.kidsdesigncompany.com/api/",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Add a request interceptor to include the token
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    config.headers.Authorization = `JWT ${token}`;
+  }
+  return config;
+});
 
 interface CEODashboardData {
   income_breakdown_year: {
@@ -120,9 +136,7 @@ const DataCard = ({ label, value }: { label: string; value: number | string }) =
 
 // Fetch CEO dashboard data
 const fetchCEODashboard = async (): Promise<CEODashboardData> => {
-  const { data } = await axios.get<CEODashboardData>(
-    "https://kidsdesigncompany.pythonanywhere.com/api/ceo-dashboard/"
-  );
+  const { data } = await api.get<CEODashboardData>("ceo-dashboard/");
   return data;
 };
 
@@ -274,10 +288,8 @@ const Header = () => {
   if (!data) return <p className="p-6">No dashboard data available</p>;
 
   return (
-    <div className="p-6  ">
-
-   <p className="md:text-2xl text-black font-bold py-6">Dashboard Headers</p>
-  
+    <div className="p-6">
+      <p className="md:text-2xl text-black font-bold py-6">Dashboard Headers</p>
       
       <KeyMetrics data={data} />
       <IncomeBreakdown data={data} />

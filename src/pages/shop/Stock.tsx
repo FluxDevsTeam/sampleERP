@@ -3,20 +3,27 @@ import {useState, useEffect} from "react";
 import StockTable from "./shop-components/Stock Components/StockTable";
 
 const Stock = () => {
-  const [yearlyAddedStockCount, setyearlyAddedStockCount] = useState(419);
-  const [yearlyAddedTotalCostPrice, setyearlyAddedTotalCostPrice] = useState(419);
-  const [monthlyAddedStockCount, setmonthlyAddedStockCount] = useState(419);
-  const [monthlyAddedTotalCostPrice, setmonthlyAddedTotalCostPrice] = useState(419);
-  const [dailyAddedCostTotal, setdailyAddedCostTotal] = useState(419);
+  const [yearlyAddedStockCount, setyearlyAddedStockCount] = useState(0);
+  const [yearlyAddedTotalCostPrice, setyearlyAddedTotalCostPrice] = useState(0);
+  const [monthlyAddedStockCount, setmonthlyAddedStockCount] = useState(0);
+  const [monthlyAddedTotalCostPrice, setmonthlyAddedTotalCostPrice] = useState(0);
+  const [dailyAddedCostTotal, setdailyAddedCostTotal] = useState(0);
 
     useEffect(() => {
         async function fetchStockInfo() {
           // INVENTORY ITEM
           try {
             const response = await fetch(
-              "https://kidsdesigncompany.pythonanywhere.com/api/add-stock/"
+              "https://backend.kidsdesigncompany.com/api/add-stock/",
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+                },
+              }
             );
-    
+
             if (!response.ok) {
               throw new Error("iyegs failed");
             }

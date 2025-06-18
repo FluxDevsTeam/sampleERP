@@ -46,7 +46,14 @@ const EditSalaryWorkerModal: React.FC<EditSalaryWorkerModalProps> = ({
 
     const fetchSalaryWorker = async () => {
       try {
-        const response = await axios.get(`https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/${id}/`);
+        const token = localStorage.getItem("access_token");
+        const response = await axios.get(`https://backend.kidsdesigncompany.com/api/salary-workers/${id}/` ,
+           {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
+        );
         setFormData(response.data);
       } catch (error) {
         toast.error("Failed to fetch salary worker data.");
@@ -65,26 +72,38 @@ const EditSalaryWorkerModal: React.FC<EditSalaryWorkerModalProps> = ({
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsPending(true);
+  e.preventDefault();
+  setIsPending(true);
 
-    try {
-      await axios.put(`https://kidsdesigncompany.pythonanywhere.com/api/salary-workers/${id}/`, formData);
-      queryClient.invalidateQueries({ queryKey: ["salary-workers"], refetchType: "active" });
-      toast.success("Salary worker updated successfully!");
-      onOpenChange(false);
-      onSuccess?.();
-    } catch (error) {
-      toast.error("Failed to update salary worker. Please try again.");
-    } finally {
-      setIsPending(false);
-    }
-  };
-
+  try {
+    const token = localStorage.getItem("access_token");
+    await axios.put(
+      `https://backend.kidsdesigncompany.com/api/salary-workers/${id}/`,
+      formData,
+      {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
+    );
+    queryClient.invalidateQueries({ 
+      queryKey: ["salary-workers"], 
+      refetchType: "active" 
+    });
+    toast.success("Salary worker updated successfully!");
+    onOpenChange(false);
+    onSuccess?.();
+  } catch (error) {
+    toast.error("Failed to update salary worker. Please try again.");
+    console.error("Update error:", error);
+  } finally {
+    setIsPending(false);
+  }
+};
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 transform overflow-y-auto max-h-[90vh]">
-        <DialogHeader className="sticky top-0 bg-background z-10">
+        <DialogHeader className="">
           <DialogTitle>Edit Salary Worker</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>

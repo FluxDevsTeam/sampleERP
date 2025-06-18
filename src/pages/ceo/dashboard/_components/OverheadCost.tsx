@@ -3,12 +3,29 @@ import axios, { AxiosError } from "axios";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-const API_URL = "https://kidsdesigncompany.pythonanywhere.com/api/overhead-cost/";
+const API_URL = "https://backend.kidsdesigncompany.com/api/overhead-cost/";
 
 // Define types for API response
 interface OverheadCostData {
     overhead_cost_base: string;
 }
+
+// Create an Axios instance with default headers
+const api = axios.create({
+    baseURL: API_URL,
+    headers: {
+        "Content-Type": "application/json",
+    },
+});
+
+// Add a request interceptor to include the token
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+        config.headers.Authorization = `JWT ${token}`;
+    }
+    return config;
+});
 
 export default function OverheadCost() {
     const queryClient = useQueryClient();
@@ -18,7 +35,7 @@ export default function OverheadCost() {
     const { data, isLoading, error } = useQuery<OverheadCostData>({
         queryKey: ["overheadCost"],
         queryFn: async () => {
-            const response = await axios.get<OverheadCostData>(API_URL);
+            const response = await api.get<OverheadCostData>("");
             return response.data;
         }
     });
@@ -26,15 +43,16 @@ export default function OverheadCost() {
     // Update overhead cost
     const mutation = useMutation({
         mutationFn: async (updatedData: { overhead_cost_base: string }) => {
-            const response = await axios.patch<OverheadCostData>(API_URL, updatedData, {
-                headers: { "Content-Type": "application/json" }
-            });
+            const response = await api.patch<OverheadCostData>("", updatedData);
             return response.data;
         },
         onSuccess: () => {
             toast.success("Overhead Cost updated successfully!");
             queryClient.invalidateQueries({ queryKey: ["overheadCost"] });
             reset(); // Reset form after successful update
+        },
+        onError: (error: AxiosError) => {
+            toast.error(`Error updating overhead cost: ${error.message}`);
         }
     });
 

@@ -7,7 +7,7 @@ import {
   StaffIcon,
   TransferIcon,
   OrdersIcon,
-  RawMaterialIcon,
+  RawMaterialIcon,LogoutIcon, SettingsIcon
 } from "./SvgIcons";
 import { ReactElement } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,6 +19,8 @@ import {
   faTableCells,
   faMinusCircle,
   faPlusMinus,
+  faFaceSmile,
+  faScrewdriverWrench,
 } from "@fortawesome/free-solid-svg-icons";
 
 export interface SidebarProps {
@@ -89,6 +91,18 @@ export const sidebarLink: SidebarProps[] = [
     href: "/ceo/shop", // Removed "dashboard"
     icon: <FinancesIcon className="currentColor" />,
   },
+   {
+    id: nanoid(),
+    text: "Settings",
+    href: "/ceo/settings", 
+    icon: <SettingsIcon className="currentColor" />,
+  },
+  {
+    id: nanoid(),
+    text: "Sign Up",
+    href: "/ceo/signup", 
+    icon: <LogoutIcon className="currentColor" />,
+  },
 ];
 
 export const projectManagerSidebarLink: SidebarProps[] = [
@@ -100,11 +114,24 @@ export const projectManagerSidebarLink: SidebarProps[] = [
   },
   {
     id: "2",
-    text: "Projects",
+    text: "Product",
     href: "/project-manager/main",
     icon: <FontAwesomeIcon className="text-[22px]" icon={faTableCells} />,
   },
+  {
+    id: nanoid(),
+    text: "Customers",
+    href: "/project-manager/customers",
+    icon: <FontAwesomeIcon className="text-[22px]" icon={faFaceSmile} />,
+  },
+  {
+    id: nanoid(),
+    text: "Projects",
+    href: "/project-manager/projects",
+    icon: <FontAwesomeIcon className="text-[22px]" icon={faScrewdriverWrench} />,
+  },
 ];
+
 export const FactoryManagerSidebarLink: SidebarProps[] = [
   {
     id: nanoid(),

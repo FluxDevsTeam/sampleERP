@@ -24,7 +24,13 @@ const AddNewRawMaterial = () => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          `https://kidsdesigncompany.pythonanywhere.com/api/raw-materials-category/`
+          `https://backend.kidsdesigncompany.com/api/raw-materials-category/`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
         );
         if (!response.ok) throw new Error("Failed to fetch categories");
         const data = await response.json();
@@ -70,9 +76,12 @@ const AddNewRawMaterial = () => {
 
     try {
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/raw-materials/",
+        "https://backend.kidsdesigncompany.com/api/raw-materials/",
         {
           method: "POST",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
           body: formDataToSend,
         }
       );
@@ -90,7 +99,11 @@ const AddNewRawMaterial = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className={`max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 ${showSuccessModal || showErrorModal ? "hidden" : ""}`}>
+      <div
+        className={`max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 ${
+          showSuccessModal || showErrorModal ? "hidden" : ""
+        }`}
+      >
         <div className="flex items-center mb-6">
           <button
             onClick={() => navigate("/store-keeper/raw-materials")}

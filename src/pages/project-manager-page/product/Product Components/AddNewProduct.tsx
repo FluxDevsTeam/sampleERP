@@ -72,7 +72,13 @@ const AddNewProductPage = () => {
     const fetchData = async () => {
       try {
         const [projectResponse] = await Promise.all([
-          fetch("https://kidsdesigncompany.pythonanywhere.com/api/project/"),
+          fetch("https://backend.kidsdesigncompany.com/api/project/", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }),
         ]);
 
         if (!projectResponse.ok) throw new Error("Failed to fetch data");
@@ -147,9 +153,12 @@ const AddNewProductPage = () => {
       console.log("Submitting data:", formDataToSubmit);
 
       const response = await fetch(
-        "https://kidsdesigncompany.pythonanywhere.com/api/product/",
+        "https://backend.kidsdesigncompany.com/api/product/",
         {
           method: "POST",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
           body: formDataToSubmit,
         }
       );
@@ -357,7 +366,7 @@ const AddNewProductPage = () => {
           </div>
         </form>
       </div>
-      
+
       <Modal
         isOpen={showSuccessModal}
         onClose={() => {

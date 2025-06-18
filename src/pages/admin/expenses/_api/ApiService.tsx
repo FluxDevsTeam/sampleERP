@@ -1,5 +1,5 @@
 import axios from "axios";
-const BASE_URL = "https://kidsdesigncompany.pythonanywhere.com/api/expense/";
+const BASE_URL = "https://backend.kidsdesigncompany.com/api/expense/";
 
 
 export interface Asset {
