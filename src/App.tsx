@@ -6,11 +6,11 @@ import {
   CEOStore,
   CEOProducts,
   CEOShop,
-  CEOExpenses,
   CEOOverhead,
   CEOSharedLayout,
 } from "./pages/ceo";
 import Settings from "./pages/ceo/settingss/settings.tsx";
+import NotFoundPage from "./components/NotFound.tsx";
 
 import ProtectedRoute from "./pages/AuthPages/ProtectedRoute.tsx";
 import Unauthorized from "./pages/AuthPages/Unauthorized.tsx";
@@ -105,6 +105,10 @@ const router = createBrowserRouter([
   {
     path: "/unauthorized",
     element: <Unauthorized />,
+  },
+   {
+    path: "*",
+    element: <NotFoundPage />,
   },
 
   // CEO ROUTES
