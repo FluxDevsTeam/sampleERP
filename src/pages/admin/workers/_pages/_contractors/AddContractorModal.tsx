@@ -47,7 +47,12 @@ const AddContractorModal: React.FC<Props> = ({ open, onOpenChange }) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : type === "number" ? Number(value) : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : type === "number"
+          ? Number(value)
+          : value,
     }));
   };
 
@@ -55,13 +60,15 @@ const AddContractorModal: React.FC<Props> = ({ open, onOpenChange }) => {
     e.preventDefault();
     setIsPending(true);
     try {
-      const token = localStorage.getItem("access_token");
-      await axios.post("https://backend.kidsdesigncompany.com/api/contractors/", formData , 
-         {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      }
+      const token = localStorage.getItem("accessToken");
+      await axios.post(
+        "https://backend.kidsdesigncompany.com/api/contractors/",
+        formData,
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
       queryClient.invalidateQueries({ queryKey: ["contractors"] });
       toast.success("Contractor added!");
@@ -80,7 +87,9 @@ const AddContractorModal: React.FC<Props> = ({ open, onOpenChange }) => {
       <DialogContent className="fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 transform overflow-y-auto max-h-[90vh]">
         <DialogHeader className=" ">
           <DialogTitle>Add New Contractor</DialogTitle>
-          <DialogDescription>Fill in the details to add a contractor.</DialogDescription>
+          <DialogDescription>
+            Fill in the details to add a contractor.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           {[
@@ -90,7 +99,11 @@ const AddContractorModal: React.FC<Props> = ({ open, onOpenChange }) => {
             { id: "phone_number", label: "Phone Number" },
             { id: "address", label: "Address" },
             { id: "craft_specialty", label: "Craft Specialty" },
-            { id: "years_of_experience", label: "Years of Experience", type: "number" },
+            {
+              id: "years_of_experience",
+              label: "Years of Experience",
+              type: "number",
+            },
           ].map(({ id, label, type }) => (
             <div key={id} className="space-y-1">
               <Label htmlFor={id}>{label}</Label>
@@ -118,7 +131,11 @@ const AddContractorModal: React.FC<Props> = ({ open, onOpenChange }) => {
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={isPending}>

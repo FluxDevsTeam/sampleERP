@@ -12,14 +12,15 @@ interface ProjectsSummary {
 
 const Header = () => {
   const fetchProjectsData = async (): Promise<ProjectsSummary> => {
-      const accessToken = localStorage.getItem("access_token");
-    const response = await fetch("https://backend.kidsdesigncompany.com/api/project/" ,
-       {
-            headers: {
-              Authorization: `JWT ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-          }
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await fetch(
+      "https://backend.kidsdesigncompany.com/api/project/",
+      {
+        headers: {
+          Authorization: `JWT ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      }
     );
     if (!response.ok) {
       throw new Error("Network response was not ok");

@@ -9,13 +9,13 @@ interface PaidData {
 }
 
 const fetchPaidData = async (): Promise<PaidData> => {
-  const access_token = localStorage.getItem("access_token");
+  const accessToken = localStorage.getItem("accessToken");
   const { data } = await axios.get<PaidData>(
     "https://backend.kidsdesigncompany.com/api/paid/",
     {
       headers: {
-        Authorization: `JWT ${access_token}`
-      }
+        Authorization: `JWT ${accessToken}`,
+      },
     }
   );
   return data;
@@ -28,7 +28,8 @@ const Header = () => {
   });
 
   if (isLoading) return <p className="text-center text-gray-500">Loading...</p>;
-  if (error) return <p className="text-red-500">Error: {(error as Error).message}</p>;
+  if (error)
+    return <p className="text-red-500">Error: {(error as Error).message}</p>;
 
   return (
     <div className="p-6">
@@ -42,7 +43,11 @@ const Header = () => {
           <div key={index} className="p-4 border rounded-lg shadow-md">
             <div className="flex justify-between items-center text-2xl">
               <p>{item.label}</p>
-              <img src={Frame180 || "/placeholder.svg"} alt="icon" className="w-12 h-12" />
+              <img
+                src={Frame180 || "/placeholder.svg"}
+                alt="icon"
+                className="w-12 h-12"
+              />
             </div>
             <div className="flex space-x-8 text-sm">
               <span className="text-green-200">

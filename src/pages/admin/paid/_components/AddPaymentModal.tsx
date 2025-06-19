@@ -32,7 +32,12 @@ const initialFormData: PaymentData = {
   recipientType: "contractor",
 };
 
-const AddPaymentModal = ({ children, onSuccess, open, onOpenChange }: AddPaymentModalProps) => {
+const AddPaymentModal = ({
+  children,
+  onSuccess,
+  open,
+  onOpenChange,
+}: AddPaymentModalProps) => {
   const queryClient = useQueryClient();
   const [isInternalOpen, setIsInternalOpen] = useState(false);
   const isControlled = open !== undefined && onOpenChange !== undefined;
@@ -53,18 +58,23 @@ const AddPaymentModal = ({ children, onSuccess, open, onOpenChange }: AddPayment
   useEffect(() => {
     const fetchData = async () => {
       try {
-      const token = localStorage.getItem("access_token");
-const config = {
-  headers: {
-    Authorization: `JWT ${token}`,
-  },
-};
+        const token = localStorage.getItem("accessToken");
+        const config = {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        };
 
-const [contractorRes, salaryRes] = await Promise.all([
-  axios.get("https://backend.kidsdesigncompany.com/api/contractors/", config),
-  axios.get("https://backend.kidsdesigncompany.com/api/salary-workers/", config),
-]);
-
+        const [contractorRes, salaryRes] = await Promise.all([
+          axios.get(
+            "https://backend.kidsdesigncompany.com/api/contractors/",
+            config
+          ),
+          axios.get(
+            "https://backend.kidsdesigncompany.com/api/salary-workers/",
+            config
+          ),
+        ]);
 
         setContractors(contractorRes.data.results.contractor);
         setSalaryWorkers(salaryRes.data.results.workers);
@@ -87,17 +97,17 @@ const [contractorRes, salaryRes] = await Promise.all([
           : { amount: paymentData.amount, salary: paymentData.recipientId };
 
       try {
-       const token = localStorage.getItem("access_token");
+        const token = localStorage.getItem("accessToken");
 
-const response = await axios.post(
-  "https://backend.kidsdesigncompany.com/api/paid/",
-  formattedData,
-  {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  }
-);
+        const response = await axios.post(
+          "https://backend.kidsdesigncompany.com/api/paid/",
+          formattedData,
+          {
+            headers: {
+              Authorization: `JWT ${token}`,
+            },
+          }
+        );
 
         return response.data;
       } catch (error: any) {
@@ -113,15 +123,20 @@ const response = await axios.post(
     },
     onError: (error: any) => {
       console.error("Error adding payment:", error);
-      toast.error(error.error?.[0] || "Failed to add payment. Please try again.");
+      toast.error(
+        error.error?.[0] || "Failed to add payment. Please try again."
+      );
     },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "amount" || name === "recipientId" ? Number(value) : value,
+      [name]:
+        name === "amount" || name === "recipientId" ? Number(value) : value,
     }));
   };
 
@@ -140,9 +155,7 @@ const response = await axios.post(
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Payment</DialogTitle>
@@ -187,28 +200,22 @@ const response = await axios.post(
                 required
               >
                 <option value="">-- Select --</option>
-                {formData.recipientType === "contractor" ? (
-                  contractors.map((contractor: any) => (
-                    <option key={contractor.id} value={contractor.id}>
-                      {contractor.first_name} {contractor.last_name}
-                    </option>
-                  ))
-                ) : (
-                  salaryWorkers.map((worker: any) => (
-                    <option key={worker.id} value={worker.id}>
-                      {worker.first_name} {worker.last_name}
-                    </option>
-                  ))
-                )}
+                {formData.recipientType === "contractor"
+                  ? contractors.map((contractor: any) => (
+                      <option key={contractor.id} value={contractor.id}>
+                        {contractor.first_name} {contractor.last_name}
+                      </option>
+                    ))
+                  : salaryWorkers.map((worker: any) => (
+                      <option key={worker.id} value={worker.id}>
+                        {worker.first_name} {worker.last_name}
+                      </option>
+                    ))}
               </select>
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-6">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={handleCancel}
-            >
+            <Button type="button" variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
             <Button type="submit" disabled={createPaymentMutation.isPending}>

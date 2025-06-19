@@ -1,26 +1,43 @@
 import { useQuery } from "@tanstack/react-query";
-import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, 
-  LineChart, Line, CartesianGrid, Legend, ResponsiveContainer 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
 } from "recharts";
 import axios from "axios";
 import Header from "./_components/Header";
 import SkeletonLoader from "./_components/SkeletonLoader";
 
 const fetchFinancialData = async () => {
-  const access_token = localStorage.getItem("access_token");
-  const { data } = await axios.get("https://backend.kidsdesigncompany.com/api/admin-dashboard/", {
-    headers: {
-      Authorization: `JWT ${access_token}`
+  const accessToken = localStorage.getItem("accessToken");
+  const { data } = await axios.get(
+    "https://backend.kidsdesigncompany.com/api/admin-dashboard/",
+    {
+      headers: {
+        Authorization: `JWT ${accessToken}`,
+      },
     }
-  });
+  );
   return data;
 };
 
 const AdminDashboard = () => {
-  const { data, isLoading, error } = useQuery({ queryKey: ["financialData"], queryFn: fetchFinancialData });
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["financialData"],
+    queryFn: fetchFinancialData,
+  });
 
-  if (isLoading) return <SkeletonLoader/>;
+  if (isLoading) return <SkeletonLoader />;
   if (error) return <p>Error loading data</p>;
 
   const workersData = Object.keys(data?.workers || {}).map((key) => ({
@@ -42,19 +59,21 @@ const AdminDashboard = () => {
   return (
     <div className="p-6 space-y-6">
       <Header />
-    
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Workers Data */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Workers Data</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={workersData} barSize={20}>
-              <XAxis 
-                dataKey="name" 
-                angle={-45} 
-                textAnchor="end" 
-                height={90}  
-                tickFormatter={(name) => name.length > 10 ? `${name.substring(0, 10)}...` : name}
+              <XAxis
+                dataKey="name"
+                angle={-45}
+                textAnchor="end"
+                height={90}
+                tickFormatter={(name) =>
+                  name.length > 10 ? `${name.substring(0, 10)}...` : name
+                }
               />
               <YAxis />
               <Tooltip />
@@ -68,12 +87,14 @@ const AdminDashboard = () => {
           <h2 className="text-xl font-semibold mb-4">Paid Data</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={paidData} barSize={20}>
-              <XAxis 
-                dataKey="name" 
-                angle={-45} 
-                textAnchor="end" 
-                height={90}  
-                tickFormatter={(name) => name.length > 10 ? `${name.substring(0, 10)}...` : name}
+              <XAxis
+                dataKey="name"
+                angle={-45}
+                textAnchor="end"
+                height={90}
+                tickFormatter={(name) =>
+                  name.length > 10 ? `${name.substring(0, 10)}...` : name
+                }
               />
               <YAxis />
               <Tooltip />
@@ -87,28 +108,33 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Expense Category Breakdown */}
         <div>
-        <h2 className="text-xl font-semibold mb-4">Expense Category Breakdown</h2>
-        <ResponsiveContainer width="100%" height={350}>
-          <PieChart>
-            <Pie
-              data={expenseCategoryBreakdown}
-              dataKey="percentage"
-              nameKey="category"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              innerRadius={50} 
-              label={({ name, value }) => `${name} (${value}%)`} 
-            >
-              {expenseCategoryBreakdown.map((_entry, index) => (
-                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+          <h2 className="text-xl font-semibold mb-4">
+            Expense Category Breakdown
+          </h2>
+          <ResponsiveContainer width="100%" height={350}>
+            <PieChart>
+              <Pie
+                data={expenseCategoryBreakdown}
+                dataKey="percentage"
+                nameKey="category"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                innerRadius={50}
+                label={({ name, value }) => `${name} (${value}%)`}
+              >
+                {expenseCategoryBreakdown.map((_entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={colors[index % colors.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
 
         {/* Top Categories */}
         <div>

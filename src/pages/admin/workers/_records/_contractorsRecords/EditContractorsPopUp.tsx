@@ -18,7 +18,7 @@ interface EditRecordPopupProps {
   isOpen: boolean;
   onClose: () => void;
   contractorId: string;
-  record: { id: number; report: string }; 
+  record: { id: number; report: string };
 }
 
 const EditRecordPopup: React.FC<EditRecordPopupProps> = ({
@@ -35,20 +35,22 @@ const EditRecordPopup: React.FC<EditRecordPopupProps> = ({
 
   const editRecordMutation = useMutation({
     mutationFn: async (updatedData: { report: string }) => {
-       const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("accessToken");
       const response = await axios.put(
         `https://backend.kidsdesigncompany.com/api/contractors/${contractorId}/record/${record.id}/`,
-        updatedData ,
-         {
-                        headers: {
-                          Authorization: `JWT ${token}`,
-                        },
-                      }
+        updatedData,
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contractor-records", contractorId] });
+      queryClient.invalidateQueries({
+        queryKey: ["contractor-records", contractorId],
+      });
       toast.success("Record updated successfully!");
       onClose();
     },

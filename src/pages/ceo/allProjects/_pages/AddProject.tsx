@@ -1,36 +1,31 @@
-import React, { useState, useEffect } from "react"
-import { useQueryClient } from "@tanstack/react-query"
-import { useNavigate } from "react-router-dom"
-import axios from "axios"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
+import React, { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { AlertCircle } from "lucide-react"
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
+} from "@/components/ui/select";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Define the types for the project data
-
 
 // Interface for customers
 interface Customer {
@@ -61,7 +56,9 @@ const AddProject = () => {
   const queryClient = useQueryClient();
   const [isPending, setIsPending] = useState(false);
   const [formError, setFormError] = useState("");
-  const [errorDetails, setErrorDetails] = useState<Record<string, string[]>>({});
+  const [errorDetails, setErrorDetails] = useState<Record<string, string[]>>(
+    {}
+  );
 
   // Invoice image states
   const [invoiceImage, setInvoiceImage] = useState<File | null>(null);
@@ -76,12 +73,13 @@ const AddProject = () => {
     const fetchCustomers = async () => {
       setIsLoadingCustomers(true);
       try {
-         const accessToken = localStorage.getItem("access_token");
-        
+        const accessToken = localStorage.getItem("accessToken");
+
         if (!accessToken) {
           throw new Error("Please login to access this data");
         }
-        const response = await axios.get<CustomerApiResponse>('https://backend.kidsdesigncompany.com/api/customer/' ,
+        const response = await axios.get<CustomerApiResponse>(
+          "https://backend.kidsdesigncompany.com/api/customer/",
           {
             headers: {
               Authorization: `JWT ${accessToken}`,
@@ -89,9 +87,13 @@ const AddProject = () => {
             },
           }
         );
-        
+
         // Extract customers from the nested structure
-        if (response.data && response.data.results && response.data.results.all_customers) {
+        if (
+          response.data &&
+          response.data.results &&
+          response.data.results.all_customers
+        ) {
           setCustomers(response.data.results.all_customers);
         } else {
           console.error("Unexpected API response structure:", response.data);
@@ -117,7 +119,7 @@ const AddProject = () => {
     date_delivered: "",
     is_delivered: false,
     archived: false,
-    customer_detail: "placeholder", 
+    customer_detail: "placeholder",
     selling_price: "",
     logistics: "0",
     service_charge: "0",
@@ -129,11 +131,18 @@ const AddProject = () => {
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type and size
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "application/pdf",
+      ];
       const maxSize = 5 * 1024 * 1024; // 5MB
 
       if (!allowedTypes.includes(file.type)) {
-        toast.error("Invalid file type. Please upload a JPEG, PNG, GIF, or PDF.");
+        toast.error(
+          "Invalid file type. Please upload a JPEG, PNG, GIF, or PDF."
+        );
         return;
       }
 
@@ -147,7 +156,9 @@ const AddProject = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -181,7 +192,7 @@ const AddProject = () => {
     setFormError("");
     setErrorDetails({});
     setIsPending(true);
-    
+
     // Validate form data
     if (!formData.name || formData.customer_detail === "placeholder") {
       setFormError("Please fill all required fields");
@@ -191,7 +202,7 @@ const AddProject = () => {
 
     // Create FormData for multipart/form-data upload
     const formDataToSubmit = new FormData();
-    
+
     // Append all text fields
     const projectData = {
       name: formData.name,
@@ -217,22 +228,22 @@ const AddProject = () => {
 
     // Append invoice image if present
     if (invoiceImage) {
-      formDataToSubmit.append('invoice_image', invoiceImage);
+      formDataToSubmit.append("invoice_image", invoiceImage);
     }
 
     try {
-        const accessToken = localStorage.getItem("access_token");
-        
-        if (!accessToken) {
-          throw new Error("Please login to access this data");
-        }
+      const accessToken = localStorage.getItem("accessToken");
+
+      if (!accessToken) {
+        throw new Error("Please login to access this data");
+      }
       const response = await axios.post(
         "https://backend.kidsdesigncompany.com/api/project/",
         formDataToSubmit,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `JWT ${accessToken}`
+            "Content-Type": "multipart/form-data",
+            Authorization: `JWT ${accessToken}`,
           },
         }
       );
@@ -242,25 +253,30 @@ const AddProject = () => {
       navigate("/ceo/projects");
     } catch (error: any) {
       console.error("Error adding project:", error);
-      
+
       // Handle specific API error responses
       if (error.response && error.response.data) {
-        if (typeof error.response.data === 'object') {
+        if (typeof error.response.data === "object") {
           setErrorDetails(error.response.data);
-          
+
           // Create a readable error message
           const errorMessages = Object.entries(error.response.data)
-            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
-            .join('; ');
-          
+            .map(
+              ([key, value]) =>
+                `${key}: ${Array.isArray(value) ? value.join(", ") : value}`
+            )
+            .join("; ");
+
           setFormError(`Validation error: ${errorMessages}`);
         } else {
-          setFormError("Failed to add project. Please check your data and try again.");
+          setFormError(
+            "Failed to add project. Please check your data and try again."
+          );
         }
       } else {
         setFormError("Failed to add project. Please try again.");
       }
-      
+
       toast.error("Failed to add project. Please check the form for errors.");
     } finally {
       setIsPending(false);
@@ -273,7 +289,7 @@ const AddProject = () => {
         <CardHeader>
           <CardTitle>Add New Project</CardTitle>
         </CardHeader>
-        <form onSubmit={handleSubmit} >
+        <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {formError && (
               <Alert variant="destructive">
@@ -282,7 +298,7 @@ const AddProject = () => {
                 <AlertDescription>{formError}</AlertDescription>
               </Alert>
             )}
-            
+
             <div className="space-y-2">
               <Label htmlFor="name">Project Name*</Label>
               <Input
@@ -294,48 +310,66 @@ const AddProject = () => {
                 className={errorDetails.name ? "border-red-500" : ""}
               />
               {errorDetails.name && (
-                <p className="text-sm text-red-500">{errorDetails.name.join(', ')}</p>
+                <p className="text-sm text-red-500">
+                  {errorDetails.name.join(", ")}
+                </p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="customer_detail">Customer*</Label>
-              <Select 
-                value={formData.customer_detail} 
+              <Select
+                value={formData.customer_detail}
                 onValueChange={handleCustomerChange}
                 disabled={isLoadingCustomers}
               >
-                <SelectTrigger className={errorDetails.customer_detail ? "border-red-500" : ""}>
+                <SelectTrigger
+                  className={
+                    errorDetails.customer_detail ? "border-red-500" : ""
+                  }
+                >
                   <SelectValue placeholder="Select a customer" />
                 </SelectTrigger>
                 <SelectContent>
                   {isLoadingCustomers ? (
-                    <SelectItem value="placeholder" disabled>Loading customers...</SelectItem>
+                    <SelectItem value="placeholder" disabled>
+                      Loading customers...
+                    </SelectItem>
                   ) : customers.length > 0 ? (
                     customers.map((customer) => (
-                      <SelectItem key={customer.id} value={customer.id.toString()}>
+                      <SelectItem
+                        key={customer.id}
+                        value={customer.id.toString()}
+                      >
                         {customer.name}
                       </SelectItem>
                     ))
                   ) : (
-                    <SelectItem value="placeholder" disabled>No customers found</SelectItem>
+                    <SelectItem value="placeholder" disabled>
+                      No customers found
+                    </SelectItem>
                   )}
                 </SelectContent>
               </Select>
               {errorDetails.customer_detail && (
-                <p className="text-sm text-red-500">{Array.isArray(errorDetails.customer_detail) 
-                  ? errorDetails.customer_detail.join(', ') 
-                  : "Invalid customer selection"}</p>
+                <p className="text-sm text-red-500">
+                  {Array.isArray(errorDetails.customer_detail)
+                    ? errorDetails.customer_detail.join(", ")
+                    : "Invalid customer selection"}
+                </p>
               )}
               {customers.length === 0 && !isLoadingCustomers && (
-                <p className="text-sm text-amber-500">Failed to load customers from API. Please try refreshing the page.</p>
+                <p className="text-sm text-amber-500">
+                  Failed to load customers from API. Please try refreshing the
+                  page.
+                </p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select 
-                value={formData.status} 
+              <Select
+                value={formData.status}
                 onValueChange={(value) => handleSelectChange("status", value)}
               >
                 <SelectTrigger>
@@ -363,7 +397,9 @@ const AddProject = () => {
                   className={errorDetails.start_date ? "border-red-500" : ""}
                 />
                 {errorDetails.start_date && (
-                  <p className="text-sm text-red-500">{errorDetails.start_date.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.start_date.join(", ")}
+                  </p>
                 )}
               </div>
 
@@ -392,7 +428,9 @@ const AddProject = () => {
                   className={errorDetails.selling_price ? "border-red-500" : ""}
                 />
                 {errorDetails.selling_price && (
-                  <p className="text-sm text-red-500">{errorDetails.selling_price.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.selling_price.join(", ")}
+                  </p>
                 )}
               </div>
 
@@ -444,8 +482,6 @@ const AddProject = () => {
               />
             </div>
 
-       
- 
             {/* Invoice Image Upload */}
             <div className="space-y-2">
               <Label htmlFor="invoice_image">Invoice Image</Label>
@@ -471,7 +507,7 @@ const AddProject = () => {
                 <Checkbox
                   id="is_delivered"
                   checked={formData.is_delivered}
-                  onCheckedChange={(checked) => 
+                  onCheckedChange={(checked) =>
                     handleCheckboxChange("is_delivered", checked as boolean)
                   }
                 />
@@ -482,7 +518,7 @@ const AddProject = () => {
                 <Checkbox
                   id="archived"
                   checked={formData.archived}
-                  onCheckedChange={(checked) => 
+                  onCheckedChange={(checked) =>
                     handleCheckboxChange("archived", checked as boolean)
                   }
                 />

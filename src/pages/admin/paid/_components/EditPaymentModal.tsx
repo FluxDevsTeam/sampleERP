@@ -5,8 +5,19 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface PaymentData {
   amount: number;
@@ -23,7 +34,12 @@ interface EditPaymentModalProps {
   onSuccess?: () => void;
 }
 
-const EditPaymentModal: React.FC<EditPaymentModalProps> = ({ id, open, onOpenChange, onSuccess }) => {
+const EditPaymentModal: React.FC<EditPaymentModalProps> = ({
+  id,
+  open,
+  onOpenChange,
+  onSuccess,
+}) => {
   const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState<PaymentData>({
@@ -39,14 +55,14 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({ id, open, onOpenCha
   const { data, isLoading, error } = useQuery({
     queryKey: ["paid", id],
     queryFn: async () => {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("accessToken");
       const response = await axios.get<PaymentData>(
         `https://backend.kidsdesigncompany.com/api/paid/${id}/`,
-         {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  }
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
       return response.data;
     },
@@ -59,15 +75,21 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({ id, open, onOpenCha
 
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("access_token");
-const config = {
-  headers: {
-    Authorization: `JWT ${token}`,
-  },
-};
+        const token = localStorage.getItem("accessToken");
+        const config = {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        };
         const [contractorRes, salaryRes] = await Promise.all([
-          axios.get("https://backend.kidsdesigncompany.com/api/contractors/",config ),
-          axios.get("https://backend.kidsdesigncompany.com/api/salary-workers/", config)
+          axios.get(
+            "https://backend.kidsdesigncompany.com/api/contractors/",
+            config
+          ),
+          axios.get(
+            "https://backend.kidsdesigncompany.com/api/salary-workers/",
+            config
+          ),
         ]);
 
         setContractors(contractorRes.data.results.contractor);
@@ -89,56 +111,62 @@ const config = {
         recipientType: data.salary ? "salary-worker" : "contractor",
         recipientId: data.salary || data.contract || 0,
         salary: data.salary,
-        contract: data.contract
+        contract: data.contract,
       });
     }
   }, [data]);
 
   // Update Payment Mutation
- const updatePaymentMutation = useMutation({
-  mutationFn: async (paymentData: PaymentData) => {
-    // Format the data based on recipient type
-    const formattedData =
-      paymentData.recipientType === "contractor"
-        ? { amount: paymentData.amount, contract: paymentData.recipientId }
-        : { amount: paymentData.amount, salary: paymentData.recipientId };
+  const updatePaymentMutation = useMutation({
+    mutationFn: async (paymentData: PaymentData) => {
+      // Format the data based on recipient type
+      const formattedData =
+        paymentData.recipientType === "contractor"
+          ? { amount: paymentData.amount, contract: paymentData.recipientId }
+          : { amount: paymentData.amount, salary: paymentData.recipientId };
 
-    // Get the token from localStorage
-    const token = localStorage.getItem("access_token");
+      // Get the token from localStorage
+      const token = localStorage.getItem("accessToken");
 
-    // Make the PUT request with Authorization header
-    const response = await axios.put(
-      `https://backend.kidsdesigncompany.com/api/paid/${id}/`,
-      formattedData,
-      {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      }
-    );
+      // Make the PUT request with Authorization header
+      const response = await axios.put(
+        `https://backend.kidsdesigncompany.com/api/paid/${id}/`,
+        formattedData,
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
+      );
 
-    return response.data;
-  },
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ["paid"] });
-    toast.success("Payment updated successfully!");
-    onOpenChange(false);
-    onSuccess?.();
-  },
-  onError: (error: any) => {
-    console.error("Error updating payment:", error.response?.data || error.message);
-    toast.error(
-      error.response?.data?.error?.[0] || "Failed to update payment. Try again."
-    );
-  },
-});
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["paid"] });
+      toast.success("Payment updated successfully!");
+      onOpenChange(false);
+      onSuccess?.();
+    },
+    onError: (error: any) => {
+      console.error(
+        "Error updating payment:",
+        error.response?.data || error.message
+      );
+      toast.error(
+        error.response?.data?.error?.[0] ||
+          "Failed to update payment. Try again."
+      );
+    },
+  });
 
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "amount" || name === "recipientId" ? Number(value) : value,
+      [name]:
+        name === "amount" || name === "recipientId" ? Number(value) : value,
     }));
   };
 
@@ -186,9 +214,11 @@ const config = {
 
               <div className="space-y-2">
                 <Label htmlFor="recipientType">Recipient Type</Label>
-                <Select 
-                  value={formData.recipientType} 
-                  onValueChange={(value) => handleSelectChange("recipientType", value)}
+                <Select
+                  value={formData.recipientType}
+                  onValueChange={(value) =>
+                    handleSelectChange("recipientType", value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select Recipient Type" />
@@ -202,37 +232,49 @@ const config = {
 
               <div className="space-y-2">
                 <Label htmlFor="recipientId">Select Recipient</Label>
-                <Select 
-                  value={formData.recipientId.toString()} 
-                  onValueChange={(value) => handleSelectChange("recipientId", value)}
+                <Select
+                  value={formData.recipientId.toString()}
+                  onValueChange={(value) =>
+                    handleSelectChange("recipientId", value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select Recipient" />
                   </SelectTrigger>
                   <SelectContent>
-                    {formData.recipientType === "contractor" ? (
-                      contractors.map((contractor) => (
-                        <SelectItem key={contractor.id} value={contractor.id.toString()}>
-                          {contractor.first_name} {contractor.last_name}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      salaryWorkers.map((worker) => (
-                        <SelectItem key={worker.id} value={worker.id.toString()}>
-                          {worker.first_name} {worker.last_name}
-                        </SelectItem>
-                      ))
-                    )}
+                    {formData.recipientType === "contractor"
+                      ? contractors.map((contractor) => (
+                          <SelectItem
+                            key={contractor.id}
+                            value={contractor.id.toString()}
+                          >
+                            {contractor.first_name} {contractor.last_name}
+                          </SelectItem>
+                        ))
+                      : salaryWorkers.map((worker) => (
+                          <SelectItem
+                            key={worker.id}
+                            value={worker.id.toString()}
+                          >
+                            {worker.first_name} {worker.last_name}
+                          </SelectItem>
+                        ))}
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div className="flex justify-between mt-6">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={updatePaymentMutation.isPending}>
-                {updatePaymentMutation.isPending ? "Updating..." : "Update Payment"}
+                {updatePaymentMutation.isPending
+                  ? "Updating..."
+                  : "Update Payment"}
               </Button>
             </div>
           </form>

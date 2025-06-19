@@ -6,10 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Card,
-  CardContent,
-  CardFooter} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -19,11 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AlertCircle } from "lucide-react";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -56,11 +49,17 @@ interface AddProjectModalProps {
   onSuccess?: () => void;
 }
 
-const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, onSuccess }) => {
+const AddProjectModal: React.FC<AddProjectModalProps> = ({
+  open,
+  onOpenChange,
+  onSuccess,
+}) => {
   const queryClient = useQueryClient();
   const [isPending, setIsPending] = useState(false);
   const [formError, setFormError] = useState("");
-  const [errorDetails, setErrorDetails] = useState<Record<string, string[]>>({});
+  const [errorDetails, setErrorDetails] = useState<Record<string, string[]>>(
+    {}
+  );
   const [invoiceImage, setInvoiceImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -74,7 +73,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
     date_delivered: "",
     is_delivered: false,
     archived: false,
-    customer_detail: "placeholder", 
+    customer_detail: "placeholder",
     selling_price: "",
     logistics: "0",
     service_charge: "0",
@@ -85,13 +84,14 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
     const fetchCustomers = async () => {
       setIsLoadingCustomers(true);
       try {
-        const token = localStorage.getItem("access_token");
-        const response = await axios.get<CustomerApiResponse>('https://backend.kidsdesigncompany.com/api/customer/' ,
-            {
-           headers: {
-      Authorization: `JWT ${token}`,
-    },
-  }
+        const token = localStorage.getItem("accessToken");
+        const response = await axios.get<CustomerApiResponse>(
+          "https://backend.kidsdesigncompany.com/api/customer/",
+          {
+            headers: {
+              Authorization: `JWT ${token}`,
+            },
+          }
         );
         if (response.data?.results?.all_customers) {
           setCustomers(response.data.results.all_customers);
@@ -120,7 +120,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
       date_delivered: "",
       is_delivered: false,
       archived: false,
-      customer_detail: "placeholder", 
+      customer_detail: "placeholder",
       selling_price: "",
       logistics: "0",
       service_charge: "0",
@@ -135,11 +135,18 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "application/pdf",
+      ];
       const maxSize = 5 * 1024 * 1024;
 
       if (!allowedTypes.includes(file.type)) {
-        toast.error("Invalid file type. Please upload a JPEG, PNG, GIF, or PDF.");
+        toast.error(
+          "Invalid file type. Please upload a JPEG, PNG, GIF, or PDF."
+        );
         return;
       }
 
@@ -153,21 +160,23 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCheckboxChange = (name: string, checked: boolean) => {
-    setFormData(prev => ({ ...prev, [name]: checked }));
+    setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
   const handleCustomerChange = (value: string) => {
-    setFormData(prev => ({ ...prev, customer_detail: value }));
+    setFormData((prev) => ({ ...prev, customer_detail: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -175,7 +184,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
     setFormError("");
     setErrorDetails({});
     setIsPending(true);
-    
+
     if (!formData.name || formData.customer_detail === "placeholder") {
       setFormError("Please fill all required fields");
       setIsPending(false);
@@ -202,48 +211,57 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
       if (value !== null) formDataToSubmit.append(key, value.toString());
     });
 
-    if (invoiceImage) formDataToSubmit.append('invoice_image', invoiceImage);
+    if (invoiceImage) formDataToSubmit.append("invoice_image", invoiceImage);
 
     try {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("accessToken");
       await axios.post(
         "https://backend.kidsdesigncompany.com/api/project/",
         formDataToSubmit,
-        { headers: { 'Content-Type': 'multipart/form-data' , Authorization: `JWT ${token}`, } }
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
 
       // More comprehensive query invalidation
-      console.log('Project added, invalidating queries...');
-      await queryClient.invalidateQueries({ 
+      console.log("Project added, invalidating queries...");
+      await queryClient.invalidateQueries({
         queryKey: ["projects"],
-        exact: false // This ensures all queries starting with "projects" are invalidated
+        exact: false, // This ensures all queries starting with "projects" are invalidated
       });
-      console.log('Queries invalidated');
+      console.log("Queries invalidated");
 
       toast.success("Project added successfully!");
       onOpenChange(false);
       onSuccess?.();
-      
+
       // Reset form data
       resetForm();
-      
     } catch (error: any) {
       console.error("Error adding project:", error);
-      
+
       if (error.response?.data) {
-        if (typeof error.response.data === 'object') {
+        if (typeof error.response.data === "object") {
           setErrorDetails(error.response.data);
           const errorMessages = Object.entries(error.response.data)
-            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
-            .join('; ');
+            .map(
+              ([key, value]) =>
+                `${key}: ${Array.isArray(value) ? value.join(", ") : value}`
+            )
+            .join("; ");
           setFormError(`Validation error: ${errorMessages}`);
         } else {
-          setFormError("Failed to add project. Please check your data and try again.");
+          setFormError(
+            "Failed to add project. Please check your data and try again."
+          );
         }
       } else {
         setFormError("Failed to add project. Please try again.");
       }
-      
+
       toast.error("Failed to add project. Please check the form for errors.");
     } finally {
       setIsPending(false);
@@ -273,7 +291,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
                   <AlertDescription>{formError}</AlertDescription>
                 </Alert>
               )}
-              
+
               <div className="space-y-2">
                 <Label htmlFor="name">Project Name*</Label>
                 <Input
@@ -285,50 +303,65 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
                   className={errorDetails.name ? "border-red-500" : ""}
                 />
                 {errorDetails.name && (
-                  <p className="text-sm text-red-500">{errorDetails.name.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.name.join(", ")}
+                  </p>
                 )}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="customer_detail">Customer*</Label>
-                <Select 
-                  value={formData.customer_detail} 
+                <Select
+                  value={formData.customer_detail}
                   onValueChange={handleCustomerChange}
                   disabled={isLoadingCustomers}
                 >
-                  <SelectTrigger className={errorDetails.customer_detail ? "border-red-500" : ""}>
+                  <SelectTrigger
+                    className={
+                      errorDetails.customer_detail ? "border-red-500" : ""
+                    }
+                  >
                     <SelectValue placeholder="Select a customer" />
                   </SelectTrigger>
                   <SelectContent>
                     {isLoadingCustomers ? (
-                      <SelectItem value="placeholder" disabled>Loading customers...</SelectItem>
+                      <SelectItem value="placeholder" disabled>
+                        Loading customers...
+                      </SelectItem>
                     ) : customers.length > 0 ? (
                       customers.map((customer) => (
-                        <SelectItem key={customer.id} value={customer.id.toString()}>
+                        <SelectItem
+                          key={customer.id}
+                          value={customer.id.toString()}
+                        >
                           {customer.name}
                         </SelectItem>
                       ))
                     ) : (
-                      <SelectItem value="placeholder" disabled>No customers found</SelectItem>
+                      <SelectItem value="placeholder" disabled>
+                        No customers found
+                      </SelectItem>
                     )}
                   </SelectContent>
                 </Select>
                 {errorDetails.customer_detail && (
                   <p className="text-sm text-red-500">
-                    {Array.isArray(errorDetails.customer_detail) 
-                      ? errorDetails.customer_detail.join(', ') 
+                    {Array.isArray(errorDetails.customer_detail)
+                      ? errorDetails.customer_detail.join(", ")
                       : "Invalid customer selection"}
                   </p>
                 )}
                 {customers.length === 0 && !isLoadingCustomers && (
-                  <p className="text-sm text-amber-500">Failed to load customers from API.</p>
+                  <p className="text-sm text-amber-500">
+                    Failed to load customers from API.
+                  </p>
                 )}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
-                <Select 
-                  value={formData.status} 
+                <Select
+                  value={formData.status}
                   onValueChange={(value) => handleSelectChange("status", value)}
                 >
                   <SelectTrigger>
@@ -356,7 +389,9 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
                     className={errorDetails.start_date ? "border-red-500" : ""}
                   />
                   {errorDetails.start_date && (
-                    <p className="text-sm text-red-500">{errorDetails.start_date.join(', ')}</p>
+                    <p className="text-sm text-red-500">
+                      {errorDetails.start_date.join(", ")}
+                    </p>
                   )}
                 </div>
 
@@ -382,10 +417,14 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
                     value={formData.selling_price}
                     onChange={handleChange}
                     required
-                    className={errorDetails.selling_price ? "border-red-500" : ""}
+                    className={
+                      errorDetails.selling_price ? "border-red-500" : ""
+                    }
                   />
                   {errorDetails.selling_price && (
-                    <p className="text-sm text-red-500">{errorDetails.selling_price.join(', ')}</p>
+                    <p className="text-sm text-red-500">
+                      {errorDetails.selling_price.join(", ")}
+                    </p>
                   )}
                 </div>
 
@@ -461,7 +500,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
                   <Checkbox
                     id="is_delivered"
                     checked={formData.is_delivered}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       handleCheckboxChange("is_delivered", checked as boolean)
                     }
                   />
@@ -472,7 +511,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({ open, onOpenChange, o
                   <Checkbox
                     id="archived"
                     checked={formData.archived}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       handleCheckboxChange("archived", checked as boolean)
                     }
                   />

@@ -7,18 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { 
-  Card,
-  CardContent, 
-  CardFooter, 
- 
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Select,
   SelectContent,
@@ -71,11 +62,11 @@ interface EditProjectModalProps {
   onSuccess?: () => void;
 }
 
-const EditProjectModal: React.FC<EditProjectModalProps> = ({ 
-  open, 
-  onOpenChange, 
+const EditProjectModal: React.FC<EditProjectModalProps> = ({
+  open,
+  onOpenChange,
   projectId,
-  onSuccess
+  onSuccess,
 }) => {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
@@ -95,23 +86,30 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
 
   const [invoiceImage, setInvoiceImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [currentInvoiceImage, setCurrentInvoiceImage] = useState<string | null>(null);
+  const [currentInvoiceImage, setCurrentInvoiceImage] = useState<string | null>(
+    null
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
   const [errorDetails, setErrorDetails] = useState<ApiErrorResponse>({});
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
 
-  const { data: project, isLoading, error } = useQuery<Project>({
+  const {
+    data: project,
+    isLoading,
+    error,
+  } = useQuery<Project>({
     queryKey: ["project", projectId],
     queryFn: async () => {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get(`https://backend.kidsdesigncompany.com/api/project/${projectId}/`,
-          {
-           headers: {
-      Authorization: `JWT ${token}`,
-    },
-  }
+      const token = localStorage.getItem("accessToken");
+      const response = await axios.get(
+        `https://backend.kidsdesigncompany.com/api/project/${projectId}/`,
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
       return response.data;
     },
@@ -122,7 +120,9 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
     const fetchCustomers = async () => {
       setIsLoadingCustomers(true);
       try {
-        const response = await axios.get('https://backend.kidsdesigncompany.com/api/customer/');
+        const response = await axios.get(
+          "https://backend.kidsdesigncompany.com/api/customer/"
+        );
         if (response.data?.results?.all_customers) {
           setCustomers(response.data.results.all_customers);
         } else {
@@ -173,7 +173,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
         service_charge: project.service_charge || "",
         note: project.note || "",
       });
-      
+
       if (project.invoice_image) {
         setCurrentInvoiceImage(project.invoice_image);
       }
@@ -183,11 +183,18 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "application/pdf",
+      ];
       const maxSize = 5 * 1024 * 1024;
 
       if (!allowedTypes.includes(file.type)) {
-        toast.error("Invalid file type. Please upload a JPEG, PNG, GIF, or PDF.");
+        toast.error(
+          "Invalid file type. Please upload a JPEG, PNG, GIF, or PDF."
+        );
         return;
       }
 
@@ -203,11 +210,16 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
 
   const updateProjectMutation = useMutation({
     mutationFn: async (updatedProject: FormData) => {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("accessToken");
       return axios.put(
         `https://backend.kidsdesigncompany.com/api/project/${projectId}/`,
         updatedProject,
-        { headers: { 'Content-Type': 'multipart/form-data' , Authorization: `JWT ${token}` } }
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
     },
     onSuccess: () => {
@@ -220,38 +232,47 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
     onError: (error: any) => {
       console.error("Update error:", error);
       if (error.response?.data) {
-        if (typeof error.response.data === 'object') {
+        if (typeof error.response.data === "object") {
           setErrorDetails(error.response.data);
           const errorMessages = Object.entries(error.response.data)
-            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
-            .join('; ');
+            .map(
+              ([key, value]) =>
+                `${key}: ${Array.isArray(value) ? value.join(", ") : value}`
+            )
+            .join("; ");
           setFormError(`Validation error: ${errorMessages}`);
         } else {
-          setFormError("Failed to update project. Please check your data and try again.");
+          setFormError(
+            "Failed to update project. Please check your data and try again."
+          );
         }
       } else {
         setFormError("Failed to update project. Please try again.");
       }
-      toast.error("Failed to update project. Please check the form for errors.");
+      toast.error(
+        "Failed to update project. Please check the form for errors."
+      );
       setIsSubmitting(false);
-    }
+    },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCheckboxChange = (name: string, checked: boolean) => {
-    setFormData(prev => ({ ...prev, [name]: checked }));
+    setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCustomerChange = (value: string) => {
-    setFormData(prev => ({ ...prev, customer_detail: value }));
+    setFormData((prev) => ({ ...prev, customer_detail: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -286,32 +307,34 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
       if (value !== null) formDataToSubmit.append(key, value.toString());
     });
 
-    if (invoiceImage) formDataToSubmit.append('invoice_image', invoiceImage);
+    if (invoiceImage) formDataToSubmit.append("invoice_image", invoiceImage);
 
     updateProjectMutation.mutate(formDataToSubmit);
   };
 
-  if (isLoading) return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit Project</DialogTitle>
-        </DialogHeader>
-        <div className="p-4">Loading project data...</div>
-      </DialogContent>
-    </Dialog>
-  );
+  if (isLoading)
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Project</DialogTitle>
+          </DialogHeader>
+          <div className="p-4">Loading project data...</div>
+        </DialogContent>
+      </Dialog>
+    );
 
-  if (error) return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit Project</DialogTitle>
-        </DialogHeader>
-        <div className="p-4">Error: {(error as Error).message}</div>
-      </DialogContent>
-    </Dialog>
-  );
+  if (error)
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Project</DialogTitle>
+          </DialogHeader>
+          <div className="p-4">Error: {(error as Error).message}</div>
+        </DialogContent>
+      </Dialog>
+    );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -329,7 +352,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                   <AlertDescription>{formError}</AlertDescription>
                 </Alert>
               )}
-              
+
               <div className="space-y-2">
                 <Label htmlFor="name">Project Name*</Label>
                 <Input
@@ -342,18 +365,22 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                   className={errorDetails.name ? "border-red-500" : ""}
                 />
                 {errorDetails.name && (
-                  <p className="text-sm text-red-500">{errorDetails.name.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.name.join(", ")}
+                  </p>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="customer_detail">Customer*</Label>
-                <Select 
+                <Select
                   value={formData.customer_detail}
                   onValueChange={handleCustomerChange}
                   disabled={isLoadingCustomers}
                 >
-                  <SelectTrigger className={errorDetails.customer ? "border-red-500" : ""}>
+                  <SelectTrigger
+                    className={errorDetails.customer ? "border-red-500" : ""}
+                  >
                     <SelectValue placeholder="Select a customer" />
                   </SelectTrigger>
                   <SelectContent>
@@ -363,7 +390,10 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                       </SelectItem>
                     ) : customers.length > 0 ? (
                       customers.map((customer) => (
-                        <SelectItem key={customer.id} value={customer.id.toString()}>
+                        <SelectItem
+                          key={customer.id}
+                          value={customer.id.toString()}
+                        >
                           {customer.name}
                         </SelectItem>
                       ))
@@ -375,17 +405,21 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                   </SelectContent>
                 </Select>
                 {errorDetails.customer && (
-                  <p className="text-sm text-red-500">{errorDetails.customer.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.customer.join(", ")}
+                  </p>
                 )}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
-                <Select 
-                  value={formData.status} 
+                <Select
+                  value={formData.status}
                   onValueChange={(value) => handleSelectChange("status", value)}
                 >
-                  <SelectTrigger className={errorDetails.status ? "border-red-500" : ""}>
+                  <SelectTrigger
+                    className={errorDetails.status ? "border-red-500" : ""}
+                  >
                     <SelectValue placeholder="Select a status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -396,10 +430,12 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                   </SelectContent>
                 </Select>
                 {errorDetails.status && (
-                  <p className="text-sm text-red-500">{errorDetails.status.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.status.join(", ")}
+                  </p>
                 )}
               </div>
-              
+
               {/* Rest of the form fields (same as in your original component) */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -414,10 +450,12 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     className={errorDetails.start_date ? "border-red-500" : ""}
                   />
                   {errorDetails.start_date && (
-                    <p className="text-sm text-red-500">{errorDetails.start_date.join(', ')}</p>
+                    <p className="text-sm text-red-500">
+                      {errorDetails.start_date.join(", ")}
+                    </p>
                   )}
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="deadline">Deadline</Label>
                   <Input
@@ -429,11 +467,13 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     className={errorDetails.deadline ? "border-red-500" : ""}
                   />
                   {errorDetails.deadline && (
-                    <p className="text-sm text-red-500">{errorDetails.deadline.join(', ')}</p>
+                    <p className="text-sm text-red-500">
+                      {errorDetails.deadline.join(", ")}
+                    </p>
                   )}
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="selling_price">Selling Price (₦)*</Label>
@@ -444,13 +484,17 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     value={formData.selling_price}
                     onChange={handleChange}
                     required
-                    className={errorDetails.selling_price ? "border-red-500" : ""}
+                    className={
+                      errorDetails.selling_price ? "border-red-500" : ""
+                    }
                   />
                   {errorDetails.selling_price && (
-                    <p className="text-sm text-red-500">{errorDetails.selling_price.join(', ')}</p>
+                    <p className="text-sm text-red-500">
+                      {errorDetails.selling_price.join(", ")}
+                    </p>
                   )}
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="date_delivered">Date Delivered</Label>
                   <Input
@@ -460,14 +504,18 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     value={formData.date_delivered}
                     onChange={handleChange}
                     disabled={!formData.is_delivered}
-                    className={errorDetails.date_delivered ? "border-red-500" : ""}
+                    className={
+                      errorDetails.date_delivered ? "border-red-500" : ""
+                    }
                   />
                   {errorDetails.date_delivered && (
-                    <p className="text-sm text-red-500">{errorDetails.date_delivered.join(', ')}</p>
+                    <p className="text-sm text-red-500">
+                      {errorDetails.date_delivered.join(", ")}
+                    </p>
                   )}
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="logistics">Logistics Cost (₦)</Label>
@@ -480,10 +528,12 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     className={errorDetails.logistics ? "border-red-500" : ""}
                   />
                   {errorDetails.logistics && (
-                    <p className="text-sm text-red-500">{errorDetails.logistics.join(', ')}</p>
+                    <p className="text-sm text-red-500">
+                      {errorDetails.logistics.join(", ")}
+                    </p>
                   )}
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="service_charge">Service Charge (₦)</Label>
                   <Input
@@ -492,14 +542,18 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     type="number"
                     value={formData.service_charge}
                     onChange={handleChange}
-                    className={errorDetails.service_charge ? "border-red-500" : ""}
+                    className={
+                      errorDetails.service_charge ? "border-red-500" : ""
+                    }
                   />
                   {errorDetails.service_charge && (
-                    <p className="text-sm text-red-500">{errorDetails.service_charge.join(', ')}</p>
+                    <p className="text-sm text-red-500">
+                      {errorDetails.service_charge.join(", ")}
+                    </p>
                   )}
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="note">Note</Label>
                 <Textarea
@@ -512,7 +566,9 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                   className={errorDetails.note ? "border-red-500" : ""}
                 />
                 {errorDetails.note && (
-                  <p className="text-sm text-red-500">{errorDetails.note.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.note.join(", ")}
+                  </p>
                 )}
               </div>
 
@@ -534,24 +590,24 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                   Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB
                 </p>
               </div>
-              
+
               <div className="flex flex-col space-y-2">
                 <div className="flex items-center space-x-2 pt-2">
                   <Checkbox
                     id="is_delivered"
                     checked={formData.is_delivered}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       handleCheckboxChange("is_delivered", checked as boolean)
                     }
                   />
                   <Label htmlFor="is_delivered">Project is delivered</Label>
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="archived"
                     checked={formData.archived}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       handleCheckboxChange("archived", checked as boolean)
                     }
                   />
@@ -567,11 +623,13 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 type="submit"
                 disabled={isSubmitting || updateProjectMutation.isPending}
               >
-                {isSubmitting || updateProjectMutation.isPending ? "Saving..." : "Save Changes"}
+                {isSubmitting || updateProjectMutation.isPending
+                  ? "Saving..."
+                  : "Save Changes"}
               </Button>
             </CardFooter>
           </Card>

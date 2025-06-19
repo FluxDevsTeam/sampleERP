@@ -1,4 +1,4 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
@@ -34,20 +34,22 @@ const EditRecordPopup: React.FC<EditRecordPopupProps> = ({
   });
 
   const editRecordMutation = useMutation({
-    mutationFn: async (updatedData: { report: string; }) => {
-      const token = localStorage.getItem("access_token");
+    mutationFn: async (updatedData: { report: string }) => {
+      const token = localStorage.getItem("accessToken");
       await axios.put(
         `https://backend.kidsdesigncompany.com/api/salary-workers/${salaryWorkerId}/record/${record.id}/`,
         updatedData,
-         {
-                headers: {
-                  Authorization: `JWT ${token}`,
-                },
-              }
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["salary-worker-records", salaryWorkerId] });
+      queryClient.invalidateQueries({
+        queryKey: ["salary-worker-records", salaryWorkerId],
+      });
       toast.success("Record updated successfully!");
       onClose();
     },
@@ -85,7 +87,7 @@ const EditRecordPopup: React.FC<EditRecordPopupProps> = ({
               required
             />
           </div>
-          
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel

@@ -34,15 +34,16 @@ const SalaryWorkerRecords = () => {
   const queryClient = useQueryClient();
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<SalaryWorkerRecord | null>(null);
+  const [selectedRecord, setSelectedRecord] =
+    useState<SalaryWorkerRecord | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState<number | null>(null);
 
   const fetchRecords = async () => {
-     const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("accessToken");
     const response = await axios.get(
       `https://backend.kidsdesigncompany.com/api/salary-workers/${id}/record/`,
-        {
+      {
         headers: {
           Authorization: `JWT ${token}`,
         },
@@ -51,25 +52,31 @@ const SalaryWorkerRecords = () => {
     return response.data.results;
   };
 
-  const { data: records, isLoading, error } = useQuery({
+  const {
+    data: records,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["salary-worker-records", id],
     queryFn: fetchRecords,
   });
 
   const deleteRecordMutation = useMutation({
     mutationFn: async (recordId: number) => {
-       const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("accessToken");
       await axios.delete(
         `https://backend.kidsdesigncompany.com/api/salary-workers/${id}/record/${recordId}/`,
-          {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      }
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["salary-worker-records", id] });
+      queryClient.invalidateQueries({
+        queryKey: ["salary-worker-records", id],
+      });
       toast.success("Record deleted successfully!");
       setIsDeleteDialogOpen(false);
     },
@@ -99,13 +106,18 @@ const SalaryWorkerRecords = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="max-w-md mx-auto font-bold text-2xl p-4">Salary Workers Records</div>
+      <div className="max-w-md mx-auto font-bold text-2xl p-4">
+        Salary Workers Records
+      </div>
       <Button onClick={() => setIsAddPopupOpen(true)} className="mt-4">
         Add Record
       </Button>
       <div className="mt-4">
         {records?.map((record: SalaryWorkerRecord) => (
-          <Card key={record.id} className="mb-4 shadow-md hover:shadow-lg transition-shadow duration-200">
+          <Card
+            key={record.id}
+            className="mb-4 shadow-md hover:shadow-lg transition-shadow duration-200"
+          >
             <CardContent className="p-4 space-y-5">
               <p className="text-sm text-gray-500">
                 Name: {`${record.worker.first_name} ${record.worker.last_name}`}
@@ -114,10 +126,16 @@ const SalaryWorkerRecords = () => {
               <p className="text-sm text-gray-500">Date: {record.date}</p>
             </CardContent>
             <CardFooter className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => handleEditRecord(record)}>
+              <Button
+                variant="outline"
+                onClick={() => handleEditRecord(record)}
+              >
                 Edit
               </Button>
-              <Button variant="destructive" onClick={() => handleDeleteRecord(record.id)}>
+              <Button
+                variant="destructive"
+                onClick={() => handleDeleteRecord(record.id)}
+              >
                 Delete
               </Button>
             </CardFooter>
@@ -125,7 +143,11 @@ const SalaryWorkerRecords = () => {
         ))}
       </div>
 
-      <AddRecordPopup isOpen={isAddPopupOpen} onClose={() => setIsAddPopupOpen(false)} salaryWorkerId={id!} />
+      <AddRecordPopup
+        isOpen={isAddPopupOpen}
+        onClose={() => setIsAddPopupOpen(false)}
+        salaryWorkerId={id!}
+      />
       {selectedRecord && (
         <EditRecordPopup
           isOpen={isEditPopupOpen}
@@ -134,19 +156,25 @@ const SalaryWorkerRecords = () => {
           record={selectedRecord}
         />
       )}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. It will permanently delete the record.
+              This action cannot be undone. It will permanently delete the
+              record.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
+            <AlertDialogAction onClick={confirmDelete}>
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

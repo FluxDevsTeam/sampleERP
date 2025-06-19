@@ -20,11 +20,11 @@ interface EditContractorModalProps {
   onSuccess?: () => void;
 }
 
-const EditContractorModal: React.FC<EditContractorModalProps> = ({ 
-  id, 
-  open, 
+const EditContractorModal: React.FC<EditContractorModalProps> = ({
+  id,
+  open,
   onOpenChange,
-  onSuccess 
+  onSuccess,
 }) => {
   const queryClient = useQueryClient();
   const [isPending, setIsPending] = useState(false);
@@ -45,13 +45,14 @@ const EditContractorModal: React.FC<EditContractorModalProps> = ({
 
     const fetchContractor = async () => {
       try {
-         const token = localStorage.getItem("access_token");
-        const response = await axios.get(`https://backend.kidsdesigncompany.com/api/contractors/${id}/` ,
-           {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      }
+        const token = localStorage.getItem("accessToken");
+        const response = await axios.get(
+          `https://backend.kidsdesigncompany.com/api/contractors/${id}/`,
+          {
+            headers: {
+              Authorization: `JWT ${token}`,
+            },
+          }
         );
         setFormData(response.data);
       } catch (error) {
@@ -75,15 +76,20 @@ const EditContractorModal: React.FC<EditContractorModalProps> = ({
     setIsPending(true);
 
     try {
-       const token = localStorage.getItem("access_token");
-      await axios.put(`https://backend.kidsdesigncompany.com/api/contractors/${id}/`, formData , 
-         {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      }
+      const token = localStorage.getItem("accessToken");
+      await axios.put(
+        `https://backend.kidsdesigncompany.com/api/contractors/${id}/`,
+        formData,
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
-      queryClient.invalidateQueries({ queryKey: ["contractors"], refetchType: "active" });
+      queryClient.invalidateQueries({
+        queryKey: ["contractors"],
+        refetchType: "active",
+      });
       toast.success("Contractor updated successfully!");
       onOpenChange(false);
       onSuccess?.();

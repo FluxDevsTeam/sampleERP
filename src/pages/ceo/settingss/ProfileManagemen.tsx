@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -9,13 +9,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,28 +24,27 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Loader2} from 'lucide-react';
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
 
 // Role options constant
 const roleOptions = [
   "shopkeeper",
-  "project_manager", 
+  "project_manager",
   "factory_manager",
   "ceo",
   "admin",
-  "storekeeper"
+  "storekeeper",
 ];
 
 interface User {
@@ -70,36 +69,32 @@ interface ApiResponse {
 }
 
 const ProfileManagement = () => {
-  const API_URL = 'https://backend.kidsdesigncompany.com/auth/signup/';
+  const API_URL = "https://backend.kidsdesigncompany.com/auth/signup/";
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deleteUserId, setDeleteUserId] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState<UserFormData>({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone_number: '',
-    roles: []
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone_number: "",
+    roles: [],
   });
-  
-
 
   const { data, isLoading, error, refetch } = useQuery<ApiResponse>({
-    queryKey: ['users'],
+    queryKey: ["users"],
     queryFn: async () => {
-      const accessToken = localStorage.getItem('access_token');
+      const accessToken = localStorage.getItem("accessToken");
       const response = await axios.get<ApiResponse>(API_URL, {
         headers: {
-          'Authorization': `JWT ${accessToken}`,
-          'Content-Type': 'application/json',
-        }
+          Authorization: `JWT ${accessToken}`,
+          "Content-Type": "application/json",
+        },
       });
       return response.data;
     },
     retry: 3,
   });
-
- 
 
   const handleEditClick = (user: User) => {
     setEditingUser(user);
@@ -108,103 +103,118 @@ const ProfileManagement = () => {
       last_name: user.last_name,
       email: user.email,
       phone_number: user.phone_number,
-      roles: user.roles && user.roles.length > 0 ? user.roles : [""]
+      roles: user.roles && user.roles.length > 0 ? user.roles : [""],
     });
   };
 
   const handleUpdate = async () => {
     if (!editingUser) {
-      console.error('No user selected for editing');
+      console.error("No user selected for editing");
       return;
     }
-setIsSaving(true);
+    setIsSaving(true);
     try {
-      const accessToken = localStorage.getItem('access_token');
+      const accessToken = localStorage.getItem("accessToken");
       await axios.put(`${API_URL}${editingUser.id}/`, formData, {
         headers: {
-          'Authorization': `JWT ${accessToken}`,
-          'Content-Type': 'application/json',
-        }
+          Authorization: `JWT ${accessToken}`,
+          "Content-Type": "application/json",
+        },
       });
       setEditingUser(null);
       refetch();
       toast.success("Profile updated successfully!");
     } catch (error) {
-      console.error('Update error:', error);
+      console.error("Update error:", error);
       toast.error("Failed to update profile!");
+    } finally {
+      setIsSaving(false);
     }
-    finally {
-    setIsSaving(false); 
-  }
   };
 
   const handleDelete = async () => {
     if (!deleteUserId) {
-      console.error('No user ID selected for deletion');
+      console.error("No user ID selected for deletion");
       return;
     }
 
     try {
-      const accessToken = localStorage.getItem('access_token');
+      const accessToken = localStorage.getItem("accessToken");
       await axios.delete(`${API_URL}${deleteUserId}/`, {
         headers: {
-          'Authorization': `JWT ${accessToken}`,
-        }
+          Authorization: `JWT ${accessToken}`,
+        },
       });
       setDeleteUserId(null);
       refetch();
       toast.success("Profile deleted successfully!");
     } catch (error) {
-      console.error('Delete error:', error);
+      console.error("Delete error:", error);
       toast.error("Failed to delete profile!");
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleRoleChange = (value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      roles: [value]
+      roles: [value],
     }));
   };
 
-  if (isLoading) return (
-    <div className="flex justify-center items-center h-screen">
-      <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+      </div>
+    );
 
-  if (error) return (
-    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
-      <p>Error fetching users: {error instanceof Error ? error.message : 'Unknown error'}</p>
-    </div>
-  );
+  if (error)
+    return (
+      <div
+        className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4"
+        role="alert"
+      >
+        <p>
+          Error fetching users:{" "}
+          {error instanceof Error ? error.message : "Unknown error"}
+        </p>
+      </div>
+    );
 
-  const getRoleBadgeColor = (role: string) : string => {
+  const getRoleBadgeColor = (role: string): string => {
     switch (role) {
-      case 'ceo': return 'bg-purple-100 text-purple-800';
-      case 'admin': return 'bg-blue-100 text-blue-800';
-      case 'project_manager': return 'bg-green-100 text-green-800';
-      case 'storekeeper': return 'bg-yellow-100 text-yellow-800';
-      case 'factory_manager': return 'bg-orange-100 text-orange-800';
-      case 'shopkeeper': return 'bg-pink-100 text-pink-800';
-      default: return 'bg-gray-100 text-gray-800';
-     
+      case "ceo":
+        return "bg-purple-100 text-purple-800";
+      case "admin":
+        return "bg-blue-100 text-blue-800";
+      case "project_manager":
+        return "bg-green-100 text-green-800";
+      case "storekeeper":
+        return "bg-yellow-100 text-yellow-800";
+      case "factory_manager":
+        return "bg-orange-100 text-orange-800";
+      case "shopkeeper":
+        return "bg-pink-100 text-pink-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const formatRoleName = (role: string): string => {
-    return role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-neutral-800 mb-8">Profile Management</h1>
-      
+      <h1 className="text-3xl font-bold text-neutral-800 mb-8">
+        Profile Management
+      </h1>
+
       <div className="rounded-md border my-5">
         <Table>
           <TableHeader>
@@ -225,12 +235,14 @@ setIsSaving(true);
                   {user.first_name} {user.last_name}
                 </TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{user.phone_number || '-'}</TableCell>
+                <TableCell>{user.phone_number || "-"}</TableCell>
                 <TableCell>
-                  <div className="flex gap-2 text-center flex-wrap  truncate text-ellipsis overflow-hidden
-            max-w-full px-2 py-0.5 text-xs">
+                  <div
+                    className="flex gap-2 text-center flex-wrap  truncate text-ellipsis overflow-hidden
+            max-w-full px-2 py-0.5 text-xs"
+                  >
                     {user.roles?.map((role, index) => (
-                      <Badge key={index} className={getRoleBadgeColor(role)} >
+                      <Badge key={index} className={getRoleBadgeColor(role)}>
                         {formatRoleName(role)}
                       </Badge>
                     ))}
@@ -238,16 +250,16 @@ setIsSaving(true);
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleEditClick(user)}
                     >
                       Edit
                     </Button>
-                    <Button 
-                      variant="destructive" 
-                      size="sm" 
+                    <Button
+                      variant="destructive"
+                      size="sm"
                       onClick={() => setDeleteUserId(user.id)}
                     >
                       Delete
@@ -269,7 +281,10 @@ setIsSaving(true);
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="first_name" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="first_name"
+                  className="block text-sm font-medium mb-1"
+                >
                   First Name
                 </label>
                 <Input
@@ -280,7 +295,10 @@ setIsSaving(true);
                 />
               </div>
               <div>
-                <label htmlFor="last_name" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="last_name"
+                  className="block text-sm font-medium mb-1"
+                >
                   Last Name
                 </label>
                 <Input
@@ -304,7 +322,10 @@ setIsSaving(true);
               />
             </div>
             <div>
-              <label htmlFor="phone_number" className="block text-sm font-medium mb-1">
+              <label
+                htmlFor="phone_number"
+                className="block text-sm font-medium mb-1"
+              >
                 Phone Number
               </label>
               <Input
@@ -314,16 +335,12 @@ setIsSaving(true);
                 onChange={handleChange}
               />
             </div>
-          
-          
-            
+
             {/* Roles Section */}
             <div>
-              <label className="block text-sm font-medium mb-2">
-                Role
-              </label>
-              <Select 
-                value={formData.roles[0] || ""} 
+              <label className="block text-sm font-medium mb-2">Role</label>
+              <Select
+                value={formData.roles[0] || ""}
                 onValueChange={handleRoleChange}
               >
                 <SelectTrigger>
@@ -340,40 +357,44 @@ setIsSaving(true);
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setEditingUser(null)}
-            >
+            <Button variant="outline" onClick={() => setEditingUser(null)}>
               Cancel
             </Button>
-           <Button onClick={handleUpdate} disabled={isSaving}>
-  {isSaving ? (
-    <>
-      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      Saving...
-    </>
-  ) : (
-    "Save Changes"
-  )}
-</Button>
+            <Button onClick={handleUpdate} disabled={isSaving}>
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteUserId} onOpenChange={() => setDeleteUserId(null)}>
+      <AlertDialog
+        open={!!deleteUserId}
+        onOpenChange={() => setDeleteUserId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete?</AlertDialogTitle>
+            <AlertDialogTitle>
+              Are you sure you want to delete?
+            </AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeleteUserId(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Confirm</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setDeleteUserId(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>
+              Confirm
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-     
     </div>
   );
 };

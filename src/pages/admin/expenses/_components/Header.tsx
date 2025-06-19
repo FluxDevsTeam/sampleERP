@@ -12,13 +12,13 @@ interface ExpensesData {
 }
 
 const fetchExpenses = async (): Promise<ExpensesData> => {
-  const access_token = localStorage.getItem("access_token");
+  const accessToken = localStorage.getItem("accessToken");
   const { data } = await axios.get<ExpensesData>(
     "https://backend.kidsdesigncompany.com/api/expense/",
     {
       headers: {
-        Authorization: `JWT ${access_token}`
-      }
+        Authorization: `JWT ${accessToken}`,
+      },
     }
   );
   return data;
@@ -42,7 +42,10 @@ const Header = () => {
           { label: "Monthly Total", value: data?.monthly_total },
           { label: "Weekly Total", value: data?.weekly_total },
           { label: "Shop Expenses", value: data?.monthly_shop_expenses_total },
-          { label: "Project Expenses", value: data?.monthly_project_expenses_total },
+          {
+            label: "Project Expenses",
+            value: data?.monthly_project_expenses_total,
+          },
         ].map((item, index) => (
           <div key={index} className="p-4 border rounded-lg shadow-md">
             <div className="flex justify-between items-center text-xl">

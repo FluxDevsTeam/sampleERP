@@ -31,19 +31,21 @@ const AddRecordPopup: React.FC<AddRecordPopupProps> = ({
 
   const addRecordMutation = useMutation({
     mutationFn: async (record: { report: string }) => {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("accessToken");
       await axios.post(
         `https://backend.kidsdesigncompany.com/api/contractors/${contractorId}/record/`,
-        record ,
-         {
-                        headers: {
-                          Authorization: `JWT ${token}`,
-                        },
-                      }
+        record,
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contractor-records", contractorId] });
+      queryClient.invalidateQueries({
+        queryKey: ["contractor-records", contractorId],
+      });
       toast.success("Record added successfully!");
       setNewRecord({ report: "" });
       onClose();
@@ -76,7 +78,9 @@ const AddRecordPopup: React.FC<AddRecordPopupProps> = ({
               id="report"
               name="report"
               value={newRecord.report}
-              onChange={(e) => setNewRecord({ ...newRecord, report: e.target.value })}
+              onChange={(e) =>
+                setNewRecord({ ...newRecord, report: e.target.value })
+              }
               required
             />
           </div>

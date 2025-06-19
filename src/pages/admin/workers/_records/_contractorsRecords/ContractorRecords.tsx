@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import AddRecordPopup from "./AddContractorsPopUp";
 import EditRecordPopup from "./EditContractorsPopUp";
 import {
@@ -34,38 +34,44 @@ const ContractorRecords = () => {
   const queryClient = useQueryClient();
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<ContractorRecord | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<ContractorRecord | null>(
+    null
+  );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState<number | null>(null);
 
   const fetchRecords = async () => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("accessToken");
     const response = await axios.get(
-      `https://backend.kidsdesigncompany.com/api/contractors/${id}/record/` ,
-       {
-                      headers: {
-                        Authorization: `JWT ${token}`,
-                      },
-                    }
+      `https://backend.kidsdesigncompany.com/api/contractors/${id}/record/`,
+      {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
     );
     return response.data.results;
   };
 
-  const { data: records, isLoading, error } = useQuery({
+  const {
+    data: records,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["contractor-records", id],
     queryFn: fetchRecords,
   });
 
   const deleteRecordMutation = useMutation({
     mutationFn: async (recordId: number) => {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("accessToken");
       await axios.delete(
-        `https://backend.kidsdesigncompany.com/api/contractors/${id}/record/${recordId}/` ,
-         {
-                        headers: {
-                          Authorization: `JWT ${token}`,
-                        },
-                      }
+        `https://backend.kidsdesigncompany.com/api/contractors/${id}/record/${recordId}/`,
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
     },
     onSuccess: () => {
@@ -99,24 +105,36 @@ const ContractorRecords = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="max-w-md mx-auto font-bold md:text-3xl p-4">Contractor Records</div>
+      <div className="max-w-md mx-auto font-bold md:text-3xl p-4">
+        Contractor Records
+      </div>
       <Button onClick={() => setIsAddPopupOpen(true)}>Add Record</Button>
 
       <div className="mt-4">
         {records?.map((record: ContractorRecord) => (
-          <Card key={record.id} className="mb-4 mb-4 shadow-md hover:shadow-lg transition-shadow duration-200">
+          <Card
+            key={record.id}
+            className="mb-4 mb-4 shadow-md hover:shadow-lg transition-shadow duration-200"
+          >
             <CardContent className="p-4 space-y-5">
               <p className="text-sm text-gray-500">
-                Contractor: {`${record.worker.first_name} ${record.worker.last_name}`}
+                Contractor:{" "}
+                {`${record.worker.first_name} ${record.worker.last_name}`}
               </p>
               <p className="font-medium">Report: {record.report}</p>
               <p className="text-sm text-gray-500">Date: {record.date}</p>
             </CardContent>
             <CardFooter className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => handleEditRecord(record)}>
+              <Button
+                variant="outline"
+                onClick={() => handleEditRecord(record)}
+              >
                 Edit
               </Button>
-              <Button variant="destructive" onClick={() => handleDeleteRecord(record.id)}>
+              <Button
+                variant="destructive"
+                onClick={() => handleDeleteRecord(record.id)}
+              >
                 Delete
               </Button>
             </CardFooter>
@@ -146,12 +164,16 @@ const ContractorRecords = () => {
       )}
 
       {/* Delete Confirmation Popup */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. It will permanently delete the record.
+              This action cannot be undone. It will permanently delete the
+              record.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

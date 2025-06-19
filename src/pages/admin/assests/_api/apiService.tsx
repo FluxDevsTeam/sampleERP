@@ -8,9 +8,8 @@ const api = axios.create({
   baseURL: BASE_URL,
 });
 
-
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("accessToken");
   if (token) {
     config.headers.Authorization = `JWT ${token}`;
   }
@@ -57,7 +56,13 @@ export const useCreateAsset = () => {
 // Update asset mutation
 export const useUpdateAsset = () => {
   return useMutation({
-    mutationFn: async ({ id, updatedData }: { id: number; updatedData: AssetData }) => {
+    mutationFn: async ({
+      id,
+      updatedData,
+    }: {
+      id: number;
+      updatedData: AssetData;
+    }) => {
       const { data } = await api.put(`${id}/`, updatedData);
       return data;
     },

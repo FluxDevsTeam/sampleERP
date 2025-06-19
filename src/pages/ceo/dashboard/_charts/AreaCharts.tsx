@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 // Define interfaces for the data structure
 interface ProfitData {
@@ -27,14 +35,15 @@ const AreaChartComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-       const accessToken = localStorage.getItem("access_token");
-        
+        const accessToken = localStorage.getItem("accessToken");
+
         if (!accessToken) {
           throw new Error("Please login to access this data");
         }
 
-        const response = await axios.get<DashboardData>("https://backend.kidsdesigncompany.com/api/ceo-dashboard/" ,
-           {
+        const response = await axios.get<DashboardData>(
+          "https://backend.kidsdesigncompany.com/api/ceo-dashboard/",
+          {
             headers: {
               Authorization: `JWT ${accessToken}`,
               "Content-Type": "application/json",
@@ -55,22 +64,26 @@ const AreaChartComponent = () => {
   }, []);
 
   const renderChart = ({ data, title, color, id }: ChartProps) => (
-    <div style={{
-      backgroundColor: "#f5f7fa",
-      borderRadius: "12px",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-      padding: "25px",
-      width: "100%",
-      marginBottom: "30px",
-      transition: "transform 0.3s ease",
-    }}>
-      <h3 style={{
-        fontSize: "1.25rem",
-        fontWeight: "600",
-        marginBottom: "20px",
-        color: "#2c3e50",
-        textAlign: "center"
-      }}>
+    <div
+      style={{
+        backgroundColor: "#f5f7fa",
+        borderRadius: "12px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        padding: "25px",
+        width: "100%",
+        marginBottom: "30px",
+        transition: "transform 0.3s ease",
+      }}
+    >
+      <h3
+        style={{
+          fontSize: "1.25rem",
+          fontWeight: "600",
+          marginBottom: "20px",
+          color: "#2c3e50",
+          textAlign: "center",
+        }}
+      >
         {title}
       </h3>
       <div style={{ height: "300px" }}>
@@ -98,13 +111,16 @@ const AreaChartComponent = () => {
             />
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <Tooltip
-              formatter={(value: number) => [`$${value}`, title.replace("Monthly ", "")]}
+              formatter={(value: number) => [
+                `$${value}`,
+                title.replace("Monthly ", ""),
+              ]}
               contentStyle={{
                 backgroundColor: "#f5f7fa",
                 border: "none",
                 borderRadius: "8px",
                 boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-                padding: "12px"
+                padding: "12px",
               }}
             />
             <Area
@@ -122,19 +138,21 @@ const AreaChartComponent = () => {
   );
 
   return (
-    <div style={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "20px",
-      padding: "30px",
-      width: "100%"
-    }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "20px",
+        padding: "30px",
+        width: "100%",
+      }}
+    >
       {renderChart({
         data: profitData,
         title: "Monthly Profit Trend",
         color: "#0088FE",
-        id: "profitGradient"
+        id: "profitGradient",
       })}
     </div>
   );

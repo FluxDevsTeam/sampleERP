@@ -1,34 +1,30 @@
-import { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { 
-  Card,
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card"
-import { AlertCircle } from "lucide-react"
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 // Define types for Project data
 interface CustomerDetail {
@@ -68,9 +64,9 @@ interface ApiErrorResponse {
 }
 
 const EditProject = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // Project form state
   const [formData, setFormData] = useState({
@@ -86,64 +82,76 @@ const EditProject = () => {
     logistics: "",
     service_charge: "",
     note: "",
-  })
+  });
 
   // Image states
-  const [invoiceImage, setInvoiceImage] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [currentInvoiceImage, setCurrentInvoiceImage] = useState<string | null>(null)
+  const [invoiceImage, setInvoiceImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [currentInvoiceImage, setCurrentInvoiceImage] = useState<string | null>(
+    null
+  );
 
   // Loading, error, and validation states
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formError, setFormError] = useState("")
-  const [errorDetails, setErrorDetails] = useState<ApiErrorResponse>({})
-  const [customers, setCustomers] = useState<Customer[]>([])
-  const [isLoadingCustomers, setIsLoadingCustomers] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [errorDetails, setErrorDetails] = useState<ApiErrorResponse>({});
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
 
   // Fetch project data
-  const { data: project, isLoading, error } = useQuery<Project>({
+  const {
+    data: project,
+    isLoading,
+    error,
+  } = useQuery<Project>({
     queryKey: ["project", id],
     queryFn: async () => {
-        const accessToken = localStorage.getItem("access_token");
-    if (!accessToken) {
-      throw new Error("Please login to access this data");
-    }
-      const response = await axios.get(`https://backend.kidsdesigncompany.com/api/project/${id}/` ,
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) {
+        throw new Error("Please login to access this data");
+      }
+      const response = await axios.get(
+        `https://backend.kidsdesigncompany.com/api/project/${id}/`,
         {
-      headers: {
-        Authorization: `JWT ${accessToken}`,
-      },
-    }
-      )
-      return response.data
+          headers: {
+            Authorization: `JWT ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
     },
     enabled: !!id,
-  })
+  });
 
   // Fetch customers
   useEffect(() => {
     const fetchCustomers = async () => {
-      setIsLoadingCustomers(true)
+      setIsLoadingCustomers(true);
       try {
-         const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) {
-        throw new Error("Please login to access this data");
-      }
-        const response = await axios.get('https://backend.kidsdesigncompany.com/api/customer/',
-           {
-        headers: {
-          Authorization: `JWT ${accessToken}`,
-        },
-      }
-        )
-        
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) {
+          throw new Error("Please login to access this data");
+        }
+        const response = await axios.get(
+          "https://backend.kidsdesigncompany.com/api/customer/",
+          {
+            headers: {
+              Authorization: `JWT ${accessToken}`,
+            },
+          }
+        );
+
         // Extract customers from the nested structure (similar to AddProject)
-        if (response.data && response.data.results && response.data.results.all_customers) {
-          setCustomers(response.data.results.all_customers)
+        if (
+          response.data &&
+          response.data.results &&
+          response.data.results.all_customers
+        ) {
+          setCustomers(response.data.results.all_customers);
         } else {
           // Fallback to mock data if API structure is unexpected
-          console.error("Unexpected API response structure:", response.data)
-          
+          console.error("Unexpected API response structure:", response.data);
+
           // Use mock data as fallback (same as in the original component)
           setCustomers([
             { id: 1, name: "Adebayo Jubreel" },
@@ -153,11 +161,11 @@ const EditProject = () => {
             { id: 5, name: "iyegere" },
             { id: 6, name: "john cena" },
             { id: 7, name: "suskidee" },
-          ])
+          ]);
         }
       } catch (error) {
-        console.error("Error fetching customers:", error)
-       
+        console.error("Error fetching customers:", error);
+
         setCustomers([
           { id: 1, name: "Adebayo Jubreel" },
           { id: 2, name: "Julius Caesar" },
@@ -166,14 +174,14 @@ const EditProject = () => {
           { id: 5, name: "iyegere" },
           { id: 6, name: "john cena" },
           { id: 7, name: "suskidee" },
-        ])
+        ]);
       } finally {
-        setIsLoadingCustomers(false)
+        setIsLoadingCustomers(false);
       }
-    }
+    };
 
-    fetchCustomers()
-  }, [])
+    fetchCustomers();
+  }, []);
 
   // Update form when project data is loaded
   useEffect(() => {
@@ -191,37 +199,44 @@ const EditProject = () => {
         logistics: project.logistics || "",
         service_charge: project.service_charge || "",
         note: project.note || "",
-      })
-      
+      });
+
       // Set current invoice image if it exists
       if (project.invoice_image) {
-        setCurrentInvoiceImage(project.invoice_image)
+        setCurrentInvoiceImage(project.invoice_image);
       }
     }
-  }, [project])
+  }, [project]);
 
   // Handle image file change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
       // Validate file type and size
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf']
-      const maxSize = 5 * 1024 * 1024 // 5MB
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "application/pdf",
+      ];
+      const maxSize = 5 * 1024 * 1024; // 5MB
 
       if (!allowedTypes.includes(file.type)) {
-        toast.error("Invalid file type. Please upload a JPEG, PNG, GIF, or PDF.")
-        return
+        toast.error(
+          "Invalid file type. Please upload a JPEG, PNG, GIF, or PDF."
+        );
+        return;
       }
 
       if (file.size > maxSize) {
-        toast.error("File is too large. Maximum size is 5MB.")
-        return
+        toast.error("File is too large. Maximum size is 5MB.");
+        return;
       }
 
-      setInvoiceImage(file)
-      setImagePreview(URL.createObjectURL(file))
+      setInvoiceImage(file);
+      setImagePreview(URL.createObjectURL(file));
     }
-  }
+  };
 
   // Update project mutation
   const updateProjectMutation = useMutation({
@@ -231,93 +246,102 @@ const EditProject = () => {
         updatedProject,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         }
-      )
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] })
-      queryClient.invalidateQueries({ queryKey: ["project", id] })
-      navigate("/ceo/projects")
-      toast.success("Project updated successfully!")
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project", id] });
+      navigate("/ceo/projects");
+      toast.success("Project updated successfully!");
     },
     onError: (error: any) => {
-      console.error("Update error:", error)
-      
+      console.error("Update error:", error);
+
       // Handle specific API error responses
       if (error.response && error.response.data) {
-        if (typeof error.response.data === 'object') {
-          setErrorDetails(error.response.data)
-          
+        if (typeof error.response.data === "object") {
+          setErrorDetails(error.response.data);
+
           // Create a readable error message
           const errorMessages = Object.entries(error.response.data)
-            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
-            .join('; ')
-          
-          setFormError(`Validation error: ${errorMessages}`)
+            .map(
+              ([key, value]) =>
+                `${key}: ${Array.isArray(value) ? value.join(", ") : value}`
+            )
+            .join("; ");
+
+          setFormError(`Validation error: ${errorMessages}`);
         } else {
-          setFormError("Failed to update project. Please check your data and try again.")
+          setFormError(
+            "Failed to update project. Please check your data and try again."
+          );
         }
       } else {
-        setFormError("Failed to update project. Please try again.")
+        setFormError("Failed to update project. Please try again.");
       }
-      
-      toast.error("Failed to update project. Please check the form for errors.")
-      setIsSubmitting(false)
-    }
-  })
+
+      toast.error(
+        "Failed to update project. Please check the form for errors."
+      );
+      setIsSubmitting(false);
+    },
+  });
 
   // Handle form input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
-    })
-  }
+    });
+  };
 
   // Handle checkbox change
   const handleCheckboxChange = (name: string, checked: boolean) => {
     setFormData({
       ...formData,
       [name]: checked,
-    })
-  }
+    });
+  };
 
   // Handle select change
   const handleSelectChange = (name: string, value: string) => {
     setFormData({
       ...formData,
       [name]: value,
-    })
-  }
+    });
+  };
 
   // Handle customer change
   const handleCustomerChange = (value: string) => {
     setFormData({
       ...formData,
       customer_detail: value,
-    })
-  }
+    });
+  };
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setFormError("")
-    setErrorDetails({})
+    e.preventDefault();
+    setIsSubmitting(true);
+    setFormError("");
+    setErrorDetails({});
 
     // Validate form
     if (!formData.name || !formData.customer_detail) {
-      setFormError("Please fill out all required fields")
-      setIsSubmitting(false)
-      return
+      setFormError("Please fill out all required fields");
+      setIsSubmitting(false);
+      return;
     }
 
     // Create FormData for multipart/form-data upload
-    const formDataToSubmit = new FormData()
-    
+    const formDataToSubmit = new FormData();
+
     // Append all text fields
     const projectData = {
       name: formData.name,
@@ -332,34 +356,36 @@ const EditProject = () => {
       logistics: formData.logistics,
       service_charge: formData.service_charge,
       note: formData.note || null,
-    }
+    };
 
     // Append text fields
     Object.entries(projectData).forEach(([key, value]) => {
       if (value !== null) {
-        formDataToSubmit.append(key, value.toString())
+        formDataToSubmit.append(key, value.toString());
       }
-    })
+    });
 
     // Append invoice image if present
     if (invoiceImage) {
-      formDataToSubmit.append('invoice_image', invoiceImage)
+      formDataToSubmit.append("invoice_image", invoiceImage);
     }
 
-    updateProjectMutation.mutate(formDataToSubmit)
-  }
+    updateProjectMutation.mutate(formDataToSubmit);
+  };
 
-  if (isLoading) return <p className="p-4">Loading project data...</p>
-  if (error) return <p className="p-4">Error: {(error as Error).message}</p>
+  if (isLoading) return <p className="p-4">Loading project data...</p>;
+  if (error) return <p className="p-4">Error: {(error as Error).message}</p>;
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
       <Card>
         <CardHeader>
           <CardTitle>Edit Project</CardTitle>
-          <CardDescription>Update the details for the selected project.</CardDescription>
+          <CardDescription>
+            Update the details for the selected project.
+          </CardDescription>
         </CardHeader>
-        
+
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {formError && (
@@ -369,7 +395,7 @@ const EditProject = () => {
                 <AlertDescription>{formError}</AlertDescription>
               </Alert>
             )}
-            
+
             <div className="space-y-2">
               <Label htmlFor="name">Project Name*</Label>
               <Input
@@ -382,18 +408,22 @@ const EditProject = () => {
                 className={errorDetails.name ? "border-red-500" : ""}
               />
               {errorDetails.name && (
-                <p className="text-sm text-red-500">{errorDetails.name.join(', ')}</p>
+                <p className="text-sm text-red-500">
+                  {errorDetails.name.join(", ")}
+                </p>
               )}
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="customer_detail">Customer*</Label>
-              <Select 
+              <Select
                 value={formData.customer_detail}
                 onValueChange={handleCustomerChange}
                 disabled={isLoadingCustomers}
               >
-                <SelectTrigger className={errorDetails.customer ? "border-red-500" : ""}>
+                <SelectTrigger
+                  className={errorDetails.customer ? "border-red-500" : ""}
+                >
                   <SelectValue placeholder="Select a customer" />
                 </SelectTrigger>
                 <SelectContent>
@@ -403,7 +433,10 @@ const EditProject = () => {
                     </SelectItem>
                   ) : customers.length > 0 ? (
                     customers.map((customer) => (
-                      <SelectItem key={customer.id} value={customer.id.toString()}>
+                      <SelectItem
+                        key={customer.id}
+                        value={customer.id.toString()}
+                      >
                         {customer.name}
                       </SelectItem>
                     ))
@@ -415,17 +448,21 @@ const EditProject = () => {
                 </SelectContent>
               </Select>
               {errorDetails.customer && (
-                <p className="text-sm text-red-500">{errorDetails.customer.join(', ')}</p>
+                <p className="text-sm text-red-500">
+                  {errorDetails.customer.join(", ")}
+                </p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select 
-                value={formData.status} 
+              <Select
+                value={formData.status}
                 onValueChange={(value) => handleSelectChange("status", value)}
               >
-                <SelectTrigger className={errorDetails.status ? "border-red-500" : ""}>
+                <SelectTrigger
+                  className={errorDetails.status ? "border-red-500" : ""}
+                >
                   <SelectValue placeholder="Select a status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -436,10 +473,12 @@ const EditProject = () => {
                 </SelectContent>
               </Select>
               {errorDetails.status && (
-                <p className="text-sm text-red-500">{errorDetails.status.join(', ')}</p>
+                <p className="text-sm text-red-500">
+                  {errorDetails.status.join(", ")}
+                </p>
               )}
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="start_date">Start Date*</Label>
@@ -453,10 +492,12 @@ const EditProject = () => {
                   className={errorDetails.start_date ? "border-red-500" : ""}
                 />
                 {errorDetails.start_date && (
-                  <p className="text-sm text-red-500">{errorDetails.start_date.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.start_date.join(", ")}
+                  </p>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="deadline">Deadline</Label>
                 <Input
@@ -468,11 +509,13 @@ const EditProject = () => {
                   className={errorDetails.deadline ? "border-red-500" : ""}
                 />
                 {errorDetails.deadline && (
-                  <p className="text-sm text-red-500">{errorDetails.deadline.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.deadline.join(", ")}
+                  </p>
                 )}
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="selling_price">Selling Price (₦)*</Label>
@@ -486,10 +529,12 @@ const EditProject = () => {
                   className={errorDetails.selling_price ? "border-red-500" : ""}
                 />
                 {errorDetails.selling_price && (
-                  <p className="text-sm text-red-500">{errorDetails.selling_price.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.selling_price.join(", ")}
+                  </p>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="date_delivered">Date Delivered</Label>
                 <Input
@@ -499,14 +544,18 @@ const EditProject = () => {
                   value={formData.date_delivered}
                   onChange={handleChange}
                   disabled={!formData.is_delivered}
-                  className={errorDetails.date_delivered ? "border-red-500" : ""}
+                  className={
+                    errorDetails.date_delivered ? "border-red-500" : ""
+                  }
                 />
                 {errorDetails.date_delivered && (
-                  <p className="text-sm text-red-500">{errorDetails.date_delivered.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.date_delivered.join(", ")}
+                  </p>
                 )}
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="logistics">Logistics Cost (₦)</Label>
@@ -519,10 +568,12 @@ const EditProject = () => {
                   className={errorDetails.logistics ? "border-red-500" : ""}
                 />
                 {errorDetails.logistics && (
-                  <p className="text-sm text-red-500">{errorDetails.logistics.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.logistics.join(", ")}
+                  </p>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="service_charge">Service Charge (₦)</Label>
                 <Input
@@ -531,14 +582,18 @@ const EditProject = () => {
                   type="number"
                   value={formData.service_charge}
                   onChange={handleChange}
-                  className={errorDetails.service_charge ? "border-red-500" : ""}
+                  className={
+                    errorDetails.service_charge ? "border-red-500" : ""
+                  }
                 />
                 {errorDetails.service_charge && (
-                  <p className="text-sm text-red-500">{errorDetails.service_charge.join(', ')}</p>
+                  <p className="text-sm text-red-500">
+                    {errorDetails.service_charge.join(", ")}
+                  </p>
                 )}
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="note">Note</Label>
               <Textarea
@@ -551,11 +606,12 @@ const EditProject = () => {
                 className={errorDetails.note ? "border-red-500" : ""}
               />
               {errorDetails.note && (
-                <p className="text-sm text-red-500">{errorDetails.note.join(', ')}</p>
+                <p className="text-sm text-red-500">
+                  {errorDetails.note.join(", ")}
+                </p>
               )}
             </div>
 
-     
             {/* Invoice Image Upload */}
             <div className="space-y-2">
               <Label htmlFor="invoice_image">Invoice Image</Label>
@@ -575,24 +631,24 @@ const EditProject = () => {
                 Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB
               </p>
             </div>
-            
+
             <div className="flex flex-col space-y-2">
               <div className="flex items-center space-x-2 pt-2">
                 <Checkbox
                   id="is_delivered"
                   checked={formData.is_delivered}
-                  onCheckedChange={(checked) => 
+                  onCheckedChange={(checked) =>
                     handleCheckboxChange("is_delivered", checked as boolean)
                   }
                 />
                 <Label htmlFor="is_delivered">Project is delivered</Label>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="archived"
                   checked={formData.archived}
-                  onCheckedChange={(checked) => 
+                  onCheckedChange={(checked) =>
                     handleCheckboxChange("archived", checked as boolean)
                   }
                 />
@@ -600,7 +656,7 @@ const EditProject = () => {
               </div>
             </div>
           </CardContent>
-          
+
           <CardFooter className="flex justify-between">
             <Button
               type="button"
@@ -609,17 +665,19 @@ const EditProject = () => {
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               type="submit"
               disabled={isSubmitting || updateProjectMutation.isPending}
             >
-              {isSubmitting || updateProjectMutation.isPending ? "Saving..." : "Save Changes"}
+              {isSubmitting || updateProjectMutation.isPending
+                ? "Saving..."
+                : "Save Changes"}
             </Button>
           </CardFooter>
         </form>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default EditProject
+export default EditProject;

@@ -8,14 +8,13 @@ import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
 import AddSalaryWorkerModal from "../_pages/_salaryWorkers/AddSalaryWorkersModal";
 
-
 const BASE_URL = "https://backend.kidsdesigncompany.com/api/salary-workers/";
 
 interface SalaryWorker {
   id: number;
   first_name: string;
   last_name: string;
-  email: string
+  email: string;
   phone_number: string;
   address: string;
   craft_specialty: string;
@@ -47,7 +46,7 @@ interface SalaryWorkersResponse {
 }
 
 const fetchSalaryWorkers = async (page = 1): Promise<SalaryWorkersResponse> => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("accessToken");
   const response = await axios.get(`${BASE_URL}?page=${page}`, {
     headers: {
       Authorization: `JWT ${token}`,
@@ -57,16 +56,17 @@ const fetchSalaryWorkers = async (page = 1): Promise<SalaryWorkersResponse> => {
 };
 
 const SalaryWorkers = () => {
-
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
-  const [selectedWorker, setSelectedWorker] = useState<SalaryWorker | null>(null);
+  const [selectedWorker, setSelectedWorker] = useState<SalaryWorker | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
-const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["salary-workers", currentPage],
@@ -81,28 +81,27 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   }, [data]);
 
   const deleteWorkerMutation = useMutation({
-  mutationFn: async (workerId: number) => {
-    const token = localStorage.getItem("access_token");
-    await axios.delete(`${BASE_URL}${workerId}/`, {
-      headers: {
-        Authorization: `JWT ${token}`,
-      },
-    });
-  },
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ["salary-workers"] });
-    setIsDeleteDialogOpen(false);
-    setIsModalOpen(false);
-    toast.success("Worker deleted successfully!");
-  },
-});
+    mutationFn: async (workerId: number) => {
+      const token = localStorage.getItem("accessToken");
+      await axios.delete(`${BASE_URL}${workerId}/`, {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["salary-workers"] });
+      setIsDeleteDialogOpen(false);
+      setIsModalOpen(false);
+      toast.success("Worker deleted successfully!");
+    },
+  });
 
   const handleRowClick = (worker: SalaryWorker) => {
     setSelectedWorker(worker);
     setIsModalOpen(true);
   };
 
- 
   const handleDelete = () => {
     setIsDeleteDialogOpen(true);
   };
@@ -128,7 +127,8 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   }, [currentPage, queryClient, totalPages]);
 
   if (isLoading) return <SkeletonLoader />;
-  if (error) return <p className="text-red-600">Error: {(error as Error).message}</p>;
+  if (error)
+    return <p className="text-red-600">Error: {(error as Error).message}</p>;
 
   const workers = data?.results?.workers || [];
   const hasNextPage = !!data?.next;
@@ -154,11 +154,21 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
         <table className="min-w-full bg-white">
           <thead className="bg-gray-100">
             <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Name</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Email</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Craft Specialty</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Salary</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Active</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Name
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Email
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Craft Specialty
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Salary
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Active
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -169,9 +179,15 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
                 onClick={() => handleRowClick(worker)}
               >
                 <td className="px-6 py-4 text-sm text-neutral-700">{`${worker.first_name} ${worker.last_name}`}</td>
-                <td className="px-6 py-4 text-sm text-neutral-700">{worker.email}</td>
-                <td className="px-6 py-4 text-sm text-neutral-700">{worker.craft_specialty}</td>
-                <td className="px-6 py-4 text-sm text-neutral-700">NGN {worker.salary}</td>
+                <td className="px-6 py-4 text-sm text-neutral-700">
+                  {worker.email}
+                </td>
+                <td className="px-6 py-4 text-sm text-neutral-700">
+                  {worker.craft_specialty}
+                </td>
+                <td className="px-6 py-4 text-sm text-neutral-700">
+                  NGN {worker.salary}
+                </td>
                 <td className="px-6 py-4 text-sm text-neutral-700">
                   {worker.is_still_active ? (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -198,10 +214,10 @@ const [isAddModalOpen, setIsAddModalOpen] = useState(false);
           handlePageChange={handlePageChange}
         />
       </div>
-<AddSalaryWorkerModal
-  open={isAddModalOpen}
-  onOpenChange={setIsAddModalOpen}
-/>
+      <AddSalaryWorkerModal
+        open={isAddModalOpen}
+        onOpenChange={setIsAddModalOpen}
+      />
 
       <Modals
         isModalOpen={isModalOpen}

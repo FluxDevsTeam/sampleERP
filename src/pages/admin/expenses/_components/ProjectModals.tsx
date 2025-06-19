@@ -66,17 +66,22 @@ interface DeleteProjectModalProps {
 
 // API Functions
 const fetchProjects = async (): Promise<Project[]> => {
-  const token = localStorage.getItem("access_token");
-  const response = await axios.get("https://backend.kidsdesigncompany.com/api/project/", {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  });
+  const token = localStorage.getItem("accessToken");
+  const response = await axios.get(
+    "https://backend.kidsdesigncompany.com/api/project/",
+    {
+      headers: {
+        Authorization: `JWT ${token}`,
+      },
+    }
+  );
   return response.data.all_projects || [];
 };
 
-const createProject = async (projectData: ProjectFormData): Promise<Project> => {
-  const token = localStorage.getItem("access_token");
+const createProject = async (
+  projectData: ProjectFormData
+): Promise<Project> => {
+  const token = localStorage.getItem("accessToken");
   const formattedData = {
     name: projectData.name,
     description: projectData.description || "",
@@ -98,8 +103,11 @@ const createProject = async (projectData: ProjectFormData): Promise<Project> => 
   return response.data;
 };
 
-const updateProject = async (id: number, projectData: ProjectFormData): Promise<Project> => {
-  const token = localStorage.getItem("access_token");
+const updateProject = async (
+  id: number,
+  projectData: ProjectFormData
+): Promise<Project> => {
+  const token = localStorage.getItem("accessToken");
   const formattedData = {
     name: projectData.name,
     description: projectData.description || "",
@@ -122,12 +130,15 @@ const updateProject = async (id: number, projectData: ProjectFormData): Promise<
 };
 
 const deleteProject = async (id: number): Promise<void> => {
-  const token = localStorage.getItem("access_token");
-  await axios.delete(`https://backend.kidsdesigncompany.com/api/project/${id}/`, {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  });
+  const token = localStorage.getItem("accessToken");
+  await axios.delete(
+    `https://backend.kidsdesigncompany.com/api/project/${id}/`,
+    {
+      headers: {
+        Authorization: `JWT ${token}`,
+      },
+    }
+  );
 };
 
 // Add Project Modal
@@ -169,7 +180,8 @@ export const AddProjectModal: React.FC<AddProjectModalProps> = ({
     onError: (error: any) => {
       console.error("Error adding project:", error);
       toast.error(
-        error.response?.data?.message || "Failed to add project. Please try again."
+        error.response?.data?.message ||
+          "Failed to add project. Please try again."
       );
     },
   });
@@ -184,7 +196,9 @@ export const AddProjectModal: React.FC<AddProjectModalProps> = ({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -350,7 +364,8 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
     onError: (error: any) => {
       console.error("Error updating project:", error);
       toast.error(
-        error.response?.data?.message || "Failed to update project. Please try again."
+        error.response?.data?.message ||
+          "Failed to update project. Please try again."
       );
     },
   });
@@ -365,7 +380,9 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -476,9 +493,13 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
             </Button>
             <Button
               type="submit"
-              disabled={updateProjectMutation.isPending || !formData.name.trim()}
+              disabled={
+                updateProjectMutation.isPending || !formData.name.trim()
+              }
             >
-              {updateProjectMutation.isPending ? "Updating..." : "Update Project"}
+              {updateProjectMutation.isPending
+                ? "Updating..."
+                : "Update Project"}
             </Button>
           </DialogFooter>
         </form>
@@ -510,7 +531,8 @@ export const DeleteProjectModal: React.FC<DeleteProjectModalProps> = ({
     onError: (error: any) => {
       console.error("Error deleting project:", error);
       toast.error(
-        error.response?.data?.message || "Failed to delete project. Please try again."
+        error.response?.data?.message ||
+          "Failed to delete project. Please try again."
       );
     },
   });
@@ -527,8 +549,8 @@ export const DeleteProjectModal: React.FC<DeleteProjectModalProps> = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the project
-            "{project?.name}" and all associated data.
+            This action cannot be undone. This will permanently delete the
+            project "{project?.name}" and all associated data.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -548,7 +570,11 @@ export const DeleteProjectModal: React.FC<DeleteProjectModalProps> = ({
 
 // Projects Table Component (usage example)
 export const ProjectsTable: React.FC = () => {
-  const { data: projects = [], isLoading, error } = useQuery<Project[]>({
+  const {
+    data: projects = [],
+    isLoading,
+    error,
+  } = useQuery<Project[]>({
     queryKey: ["projects"],
     queryFn: fetchProjects,
   });
@@ -575,7 +601,10 @@ export const ProjectsTable: React.FC = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Projects</h1>
-        <Button onClick={() => setIsAddModalOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+        <Button
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
           Add Project
         </Button>
       </div>
@@ -632,7 +661,9 @@ export const ProjectsTable: React.FC = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {project.budget ? `$${project.budget.toLocaleString()}` : "N/A"}
+                  {project.budget
+                    ? `$${project.budget.toLocaleString()}`
+                    : "N/A"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {project.start_date
@@ -664,10 +695,7 @@ export const ProjectsTable: React.FC = () => {
       </div>
 
       {/* Modals */}
-      <AddProjectModal
-        open={isAddModalOpen}
-        onOpenChange={setIsAddModalOpen}
-      />
+      <AddProjectModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
 
       <EditProjectModal
         open={isEditModalOpen}

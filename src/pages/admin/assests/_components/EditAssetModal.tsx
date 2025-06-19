@@ -1,27 +1,23 @@
-import { useState, useEffect } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
-import { Asset } from "../_api/apiService"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "sonner"
-import { 
-  Card,
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card"
-import { AlertCircle } from "lucide-react"
+import { useState, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { Asset } from "../_api/apiService";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 // Create an axios instance with JWT token interceptor
 const api = axios.create({
@@ -29,7 +25,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("accessToken");
   if (token) {
     config.headers.Authorization = `JWT ${token}`;
   }
@@ -37,13 +33,13 @@ api.interceptors.request.use((config) => {
 });
 
 interface EditAssetModalProps {
-  asset: Asset
-  isOpen: boolean
-  onClose: () => void
+  asset: Asset;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   // Asset form state
   const [formData, setFormData] = useState({
@@ -51,11 +47,11 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
     value: "",
     expected_lifespan: "",
     is_still_available: true,
-  })
+  });
 
   // Loading and error states
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formError, setFormError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
 
   // Update form when asset data is loaded or modal opens
   useEffect(() => {
@@ -65,57 +61,57 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
         value: asset.value?.toString() || "",
         expected_lifespan: asset.expected_lifespan || "",
         is_still_available: asset.is_still_available || false,
-      })
+      });
     }
-  }, [asset, isOpen])
+  }, [asset, isOpen]);
 
   // Update asset mutation
   const updateAssetMutation = useMutation({
     mutationFn: async (updatedAsset: Partial<Asset>) => {
-      return api.put(`${asset.id}/`, updatedAsset)
+      return api.put(`${asset.id}/`, updatedAsset);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["assets"] })
-      queryClient.invalidateQueries({ queryKey: ["asset", asset.id] })
-      toast.success("Asset updated successfully!")
-      handleClose()
+      queryClient.invalidateQueries({ queryKey: ["assets"] });
+      queryClient.invalidateQueries({ queryKey: ["asset", asset.id] });
+      toast.success("Asset updated successfully!");
+      handleClose();
     },
     onError: (error) => {
-      setFormError("Failed to update asset. Please try again.")
-      toast.error("Failed to update asset. Please try again.")
-      console.error("Update error:", error)
-      setIsSubmitting(false)
-    }
-  })
+      setFormError("Failed to update asset. Please try again.");
+      toast.error("Failed to update asset. Please try again.");
+      console.error("Update error:", error);
+      setIsSubmitting(false);
+    },
+  });
 
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
-    })
-  }
+    });
+  };
 
   // Handle checkbox change
   const handleCheckboxChange = (checked: boolean) => {
     setFormData({
       ...formData,
       is_still_available: checked,
-    })
-  }
+    });
+  };
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setFormError("")
+    e.preventDefault();
+    setIsSubmitting(true);
+    setFormError("");
 
     // Validate form
     if (!formData.name || !formData.value || !formData.expected_lifespan) {
-      setFormError("Please fill out all required fields")
-      setIsSubmitting(false)
-      return
+      setFormError("Please fill out all required fields");
+      setIsSubmitting(false);
+      return;
     }
 
     // Prepare data for submission
@@ -124,10 +120,10 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
       value: parseFloat(formData.value),
       expected_lifespan: formData.expected_lifespan,
       is_still_available: formData.is_still_available,
-    }
+    };
 
-    updateAssetMutation.mutate(assetData)
-  }
+    updateAssetMutation.mutate(assetData);
+  };
 
   const handleClose = () => {
     // Reset form state
@@ -137,11 +133,11 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
         value: asset.value?.toString() || "",
         expected_lifespan: asset.expected_lifespan || "",
         is_still_available: asset.is_still_available || false,
-      })
+      });
     }
-    setIsSubmitting(false)
-    onClose() // This will close the modal without reopening details
-  }
+    setIsSubmitting(false);
+    onClose(); // This will close the modal without reopening details
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -149,9 +145,11 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
         <Card>
           <CardHeader>
             <CardTitle>Edit Asset</CardTitle>
-            <CardDescription>Update the details for the selected asset.</CardDescription>
+            <CardDescription>
+              Update the details for the selected asset.
+            </CardDescription>
           </CardHeader>
-          
+
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               {formError && (
@@ -161,7 +159,7 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
                   <AlertDescription>{formError}</AlertDescription>
                 </Alert>
               )}
-              
+
               <div className="space-y-2">
                 <Label htmlFor="name">Asset Name</Label>
                 <Input
@@ -173,7 +171,7 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="value">Asset Value (NGN)</Label>
                 <Input
@@ -188,7 +186,7 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="expected_lifespan">Expected Lifespan</Label>
                 <Input
@@ -200,37 +198,37 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
                   required
                 />
               </div>
-              
+
               <div className="flex items-center space-x-2 pt-2">
                 <Checkbox
                   id="is_still_available"
                   checked={formData.is_still_available}
                   onCheckedChange={handleCheckboxChange}
                 />
-                <Label htmlFor="is_still_available">Asset is still available</Label>
+                <Label htmlFor="is_still_available">
+                  Asset is still available
+                </Label>
               </div>
             </CardContent>
-            
+
             <CardFooter className="flex justify-between">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-              >
+              <Button type="button" variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button 
+              <Button
                 type="submit"
                 disabled={isSubmitting || updateAssetMutation.isPending}
               >
-                {isSubmitting || updateAssetMutation.isPending ? "Saving..." : "Save Changes"}
+                {isSubmitting || updateAssetMutation.isPending
+                  ? "Saving..."
+                  : "Save Changes"}
               </Button>
             </CardFooter>
           </form>
         </Card>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default EditAssetModal
+export default EditAssetModal;

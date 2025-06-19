@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {  useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import PaginationComponent from "./Pagination";
 import Modals from "./Modal";
@@ -45,28 +45,26 @@ interface ContractorsResponse {
 }
 
 const fetchContractors = async (page = 1): Promise<ContractorsResponse> => {
-  const token = localStorage.getItem("access_token");
-  const response = await axios.get(`${BASE_URL}?page=${page}` , 
-    {
+  const token = localStorage.getItem("accessToken");
+  const response = await axios.get(`${BASE_URL}?page=${page}`, {
     headers: {
       Authorization: `JWT ${token}`,
     },
-  }
-  );
+  });
   return response.data;
 };
 
 const Contractors = () => {
-
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
-  const [selectedContractor, setSelectedContractor] = useState<Contractor | null>(null);
+  const [selectedContractor, setSelectedContractor] =
+    useState<Contractor | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
- const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["contractors", currentPage],
@@ -82,14 +80,12 @@ const Contractors = () => {
 
   const deleteContractorMutation = useMutation({
     mutationFn: async (contractorId: number) => {
-      const token = localStorage.getItem("access_token");
-      await axios.delete(`${BASE_URL}${contractorId}/`,
-          {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  }
-      );
+      const token = localStorage.getItem("accessToken");
+      await axios.delete(`${BASE_URL}${contractorId}/`, {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contractors"] });
@@ -103,7 +99,6 @@ const Contractors = () => {
     setSelectedContractor(contractor);
     setIsModalOpen(true);
   };
-
 
   const handleDelete = () => {
     setIsDeleteDialogOpen(true);
@@ -130,7 +125,8 @@ const Contractors = () => {
   }, [currentPage, queryClient, totalPages]);
 
   if (isLoading) return <SkeletonLoader />;
-  if (error) return <p className="text-red-600">Error: {(error as Error).message}</p>;
+  if (error)
+    return <p className="text-red-600">Error: {(error as Error).message}</p>;
 
   const contractors = data?.results?.contractor || [];
   const hasNextPage = !!data?.next;
@@ -140,7 +136,7 @@ const Contractors = () => {
     <div className="p-6 flex flex-col h-full bg-white">
       <div className="flex justify-between items-center mb-6">
         <div
-           onClick={() => setIsAddModalOpen(true)}
+          onClick={() => setIsAddModalOpen(true)}
           className="cursor-pointer bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
         >
           Add Contractor
@@ -156,11 +152,21 @@ const Contractors = () => {
         <table className="min-w-full bg-white">
           <thead className="bg-gray-100">
             <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Name</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Email</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Craft Specialty</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Years of Experience</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Active</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Name
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Email
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Craft Specialty
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Years of Experience
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Active
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -171,9 +177,15 @@ const Contractors = () => {
                 onClick={() => handleRowClick(contractor)}
               >
                 <td className="px-6 py-4 text-sm text-neutral-700">{`${contractor.first_name} ${contractor.last_name}`}</td>
-                <td className="px-6 py-4 text-sm text-neutral-700">{contractor.email}</td>
-                <td className="px-6 py-4 text-sm text-neutral-700">{contractor.craft_specialty}</td>
-                <td className="px-6 py-4 text-sm text-neutral-700">{contractor.years_of_experience}</td>
+                <td className="px-6 py-4 text-sm text-neutral-700">
+                  {contractor.email}
+                </td>
+                <td className="px-6 py-4 text-sm text-neutral-700">
+                  {contractor.craft_specialty}
+                </td>
+                <td className="px-6 py-4 text-sm text-neutral-700">
+                  {contractor.years_of_experience}
+                </td>
                 <td className="px-6 py-4 text-sm text-neutral-700">
                   {contractor.is_still_active ? (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -201,10 +213,10 @@ const Contractors = () => {
         />
       </div>
 
-      < AddContractorModal 
-     open={isAddModalOpen}
-  onOpenChange={setIsAddModalOpen}
-        />
+      <AddContractorModal
+        open={isAddModalOpen}
+        onOpenChange={setIsAddModalOpen}
+      />
 
       <Modals
         isModalOpen={isModalOpen}

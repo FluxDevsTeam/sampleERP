@@ -46,20 +46,23 @@ interface PaidData {
 }
 
 const fetchPaid = async (): Promise<PaidData> => {
-  const access_token = localStorage.getItem("access_token");
+  const accessToken = localStorage.getItem("accessToken");
   const { data } = await axios.get<PaidData>(
     "https://backend.kidsdesigncompany.com/api/paid/",
     {
       headers: {
-        Authorization: `JWT ${access_token}`
-      }
+        Authorization: `JWT ${accessToken}`,
+      },
     }
   );
   return data;
 };
 
 const PaidTable: React.FC = () => {
-  const { data, isLoading, error } = useQuery<PaidData>({ queryKey: ["paid"], queryFn: fetchPaid });
+  const { data, isLoading, error } = useQuery<PaidData>({
+    queryKey: ["paid"],
+    queryFn: fetchPaid,
+  });
   const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>({});
   const queryClient = useQueryClient();
 
@@ -72,13 +75,13 @@ const PaidTable: React.FC = () => {
 
   const deletePaidMutation = useMutation({
     mutationFn: async (entryId: number) => {
-      const access_token = localStorage.getItem("access_token");
+      const accessToken = localStorage.getItem("accessToken");
       await axios.delete(
         `https://backend.kidsdesigncompany.com/api/paid/${entryId}/`,
         {
           headers: {
-            Authorization: `JWT ${access_token}`
-          }
+            Authorization: `JWT ${accessToken}`,
+          },
         }
       );
     },
@@ -125,7 +128,8 @@ const PaidTable: React.FC = () => {
   };
 
   if (isLoading) return <SkeletonLoader />;
-  if (error) return <p className="text-red-600">Error: {(error as Error).message}</p>;
+  if (error)
+    return <p className="text-red-600">Error: {(error as Error).message}</p>;
 
   return (
     <div className="p-6 flex flex-col h-full bg-white">
@@ -142,10 +146,18 @@ const PaidTable: React.FC = () => {
         <table className="min-w-full bg-white">
           <thead className="bg-gray-400">
             <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Date</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Amount</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Salary</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Contract</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Date
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Amount
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Salary
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Contract
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -155,7 +167,10 @@ const PaidTable: React.FC = () => {
                   className="bg-gray-100 cursor-pointer"
                   onClick={() => toggleCollapse(day.date)}
                 >
-                  <td className="px-6 py-4 text-sm font-semibold text-neutral-900 uppercase" colSpan={4}>
+                  <td
+                    className="px-6 py-4 text-sm font-semibold text-neutral-900 uppercase"
+                    colSpan={4}
+                  >
                     <div className="flex justify-between w-full">
                       <span>{day.date}</span>
                       <span>(Total: {day.daily_total})</span>
@@ -170,10 +185,18 @@ const PaidTable: React.FC = () => {
                       className="hover:bg-gray-50 transition duration-150 ease-in-out cursor-pointer"
                       onClick={() => handleRowClick(entry)}
                     >
-                      <td className="px-6 py-4 text-sm text-neutral-700">{new Date(day.date).toLocaleDateString()}</td>
-                      <td className="px-6 py-4 text-sm text-neutral-700">{entry.amount}</td>
-                      <td className="px-6 py-4 text-sm text-neutral-700">{entry.salary}</td>
-                      <td className="px-6 py-4 text-sm text-neutral-700">{entry.contract}</td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">
+                        {new Date(day.date).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">
+                        {entry.amount}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">
+                        {entry.salary}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-neutral-700">
+                        {entry.contract}
+                      </td>
                     </tr>
                   ))}
               </React.Fragment>
@@ -182,17 +205,16 @@ const PaidTable: React.FC = () => {
         </table>
       </div>
 
-      <AddPaymentModal
-        open={isAddModalOpen}
-        onOpenChange={setIsAddModalOpen}
-      />
+      <AddPaymentModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
 
       {/* Details Modal */}
       <Dialog open={isDetailsModalOpen} onOpenChange={setIsDetailsModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Payment Details</DialogTitle>
-            <DialogDescription>View details for the selected payment.</DialogDescription>
+            <DialogDescription>
+              View details for the selected payment.
+            </DialogDescription>
           </DialogHeader>
 
           {selectedEntry && (
@@ -203,7 +225,9 @@ const PaidTable: React.FC = () => {
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium">Date:</span>
-                <span className="col-span-2">{new Date(selectedEntry.date).toLocaleDateString()}</span>
+                <span className="col-span-2">
+                  {new Date(selectedEntry.date).toLocaleDateString()}
+                </span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium">Salary ID:</span>
@@ -218,7 +242,10 @@ const PaidTable: React.FC = () => {
 
           <DialogFooter>
             <div className="flex justify-around items-center w-full">
-              <Button variant="outline" onClick={() => setIsDetailsModalOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsDetailsModalOpen(false)}
+              >
                 Close
               </Button>
               <Button variant="outline" onClick={handleEdit}>
@@ -243,17 +270,23 @@ const PaidTable: React.FC = () => {
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. It will permanently delete the payment.
+              This action cannot be undone. It will permanently delete the
+              payment.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Confirm</AlertDialogAction>
+            <AlertDialogAction onClick={confirmDelete}>
+              Confirm
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

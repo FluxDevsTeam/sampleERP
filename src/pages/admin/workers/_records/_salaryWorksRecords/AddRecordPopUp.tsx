@@ -27,23 +27,25 @@ const AddRecordPopup: React.FC<AddRecordPopupProps> = ({
 }) => {
   const queryClient = useQueryClient();
   const [isPending, setIsPending] = useState(false);
-  const [newRecord, setNewRecord] = useState({ report: ""});
+  const [newRecord, setNewRecord] = useState({ report: "" });
 
   const addRecordMutation = useMutation({
     mutationFn: async (record: { report: string; date: string }) => {
-       const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("accessToken");
       await axios.post(
         `https://backend.kidsdesigncompany.com/api/salary-workers/${salaryWorkerId}/record/`,
-        record ,
-         {
-                headers: {
-                  Authorization: `JWT ${token}`,
-                },
-              }
+        record,
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["salary-worker-records", salaryWorkerId] });
+      queryClient.invalidateQueries({
+        queryKey: ["salary-worker-records", salaryWorkerId],
+      });
       toast.success("Record added successfully!");
       setNewRecord({ report: "" });
       onClose();
@@ -76,11 +78,13 @@ const AddRecordPopup: React.FC<AddRecordPopupProps> = ({
               id="report"
               name="report"
               value={newRecord.report}
-              onChange={(e) => setNewRecord({ ...newRecord, report: e.target.value })}
+              onChange={(e) =>
+                setNewRecord({ ...newRecord, report: e.target.value })
+              }
               required
             />
           </div>
-          
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel

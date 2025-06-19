@@ -27,10 +27,10 @@ interface ContractorsSummary {
 }
 
 const fetchWithAuth = async (url: string) => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("accessToken");
   const response = await fetch(url, {
     headers: {
-      "Authorization": `JWT ${token}`,
+      Authorization: `JWT ${token}`,
       "Content-Type": "application/json",
     },
   });
@@ -41,12 +41,16 @@ const fetchWithAuth = async (url: string) => {
 };
 
 const fetchSalaryWorkersData = async (): Promise<SalaryWorkersSummary> => {
-  return fetchWithAuth("https://backend.kidsdesigncompany.com/api/salary-workers/");
+  return fetchWithAuth(
+    "https://backend.kidsdesigncompany.com/api/salary-workers/"
+  );
 };
 
 // Fetch contractors data
 const fetchContractorsData = async (): Promise<ContractorsSummary> => {
-  return fetchWithAuth("https://backend.kidsdesigncompany.com/api/contractors/");
+  return fetchWithAuth(
+    "https://backend.kidsdesigncompany.com/api/contractors/"
+  );
 };
 
 const Header = () => {
@@ -76,9 +80,7 @@ const Header = () => {
 
   if (salaryWorkersError || contractorsError) {
     return (
-      <p>
-        Error: {salaryWorkersError?.message || contractorsError?.message}
-      </p>
+      <p>Error: {salaryWorkersError?.message || contractorsError?.message}</p>
     );
   }
 

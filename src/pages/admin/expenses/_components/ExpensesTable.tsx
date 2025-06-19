@@ -93,24 +93,24 @@ interface Expense {
 }
 
 const fetchExpenses = async (): Promise<ExpensesData> => {
-  const access_token = localStorage.getItem("access_token");
+  const accessToken = localStorage.getItem("accessToken");
   const { data } = await axios.get<ExpensesData>(
     "https://backend.kidsdesigncompany.com/api/expense/",
     {
       headers: {
-        Authorization: `JWT ${access_token}`
-      }
+        Authorization: `JWT ${accessToken}`,
+      },
     }
   );
   return data;
 };
 
 const ExpensesTable: React.FC = () => {
-  const { data, isLoading, error } = useQuery<ExpensesData>({ 
-    queryKey: ["expenses"], 
-    queryFn: fetchExpenses 
+  const { data, isLoading, error } = useQuery<ExpensesData>({
+    queryKey: ["expenses"],
+    queryFn: fetchExpenses,
   });
-  
+
   const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>({});
   const queryClient = useQueryClient();
 
@@ -124,13 +124,13 @@ const ExpensesTable: React.FC = () => {
   // Delete mutation
   const deleteExpenseMutation = useMutation({
     mutationFn: async (entryId: number) => {
-      const access_token = localStorage.getItem("access_token");
+      const accessToken = localStorage.getItem("accessToken");
       await axios.delete(
         `https://backend.kidsdesigncompany.com/api/expense/${entryId}/`,
         {
           headers: {
-            Authorization: `JWT ${access_token}`
-          }
+            Authorization: `JWT ${accessToken}`,
+          },
         }
       );
     },
@@ -144,7 +144,7 @@ const ExpensesTable: React.FC = () => {
     onError: (error) => {
       console.error("Delete error:", error);
       toast.error("Failed to delete expense. Please try again.");
-    }
+    },
   });
 
   // Transform Entry to Expense format for EditExpenseModal
@@ -155,18 +155,24 @@ const ExpensesTable: React.FC = () => {
       description: entry.description,
       amount: parseFloat(entry.amount) || 0,
       quantity: parseFloat(entry.quantity) || 0,
-      category: entry.expense_category ? {
-        id: entry.expense_category.id,
-        name: entry.expense_category.name
-      } : undefined,
-      project: entry.linked_project ? {
-        id: entry.linked_project.id,
-        name: entry.linked_project.name
-      } : undefined,
-      shop: entry.sold_item ? {
-        id: entry.sold_item.id,
-        name: entry.sold_item.name || "Shop Item"
-      } : undefined,
+      category: entry.expense_category
+        ? {
+            id: entry.expense_category.id,
+            name: entry.expense_category.name,
+          }
+        : undefined,
+      project: entry.linked_project
+        ? {
+            id: entry.linked_project.id,
+            name: entry.linked_project.name,
+          }
+        : undefined,
+      shop: entry.sold_item
+        ? {
+            id: entry.sold_item.id,
+            name: entry.sold_item.name || "Shop Item",
+          }
+        : undefined,
     };
   };
 
@@ -218,13 +224,13 @@ const ExpensesTable: React.FC = () => {
   };
 
   if (isLoading) return <SkeletonLoader />;
-  if (error) return <p className="text-red-600">Error: {(error as Error).message}</p>;
+  if (error)
+    return <p className="text-red-600">Error: {(error as Error).message}</p>;
 
   return (
     <div className="p-6 flex flex-col h-full bg-white">
       {/* Header with Add Button */}
       <div className=" mb-6">
-        
         <Button
           onClick={() => setIsAddModalOpen(true)}
           className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
@@ -233,19 +239,32 @@ const ExpensesTable: React.FC = () => {
         </Button>
       </div>
 
-     
       {/* Expenses Table */}
       <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
         <table className="min-w-full bg-white">
           <thead className="bg-gray-100">
             <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Date</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Name</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Category</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Project</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Shop Item</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Amount</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">Quantity</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Date
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Name
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Category
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Project
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Shop Item
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Amount
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
+                Quantity
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -255,17 +274,20 @@ const ExpensesTable: React.FC = () => {
                   className="bg-gray-50 cursor-pointer hover:bg-gray-100"
                   onClick={() => toggleCollapse(day.date)}
                 >
-                  <td className="px-6 py-4 text-sm font-semibold text-neutral-900" colSpan={7}>
+                  <td
+                    className="px-6 py-4 text-sm font-semibold text-neutral-900"
+                    colSpan={7}
+                  >
                     <div className="flex justify-between items-center w-full">
                       <span className="flex items-center">
                         <span className="mr-2">
                           {collapsed[day.date] ? "▶" : "▼"}
                         </span>
-                        {new Date(day.date).toLocaleDateString('en-US', { 
-                          weekday: 'long', 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
+                        {new Date(day.date).toLocaleDateString("en-US", {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
                         })}
                       </span>
                       <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
@@ -309,7 +331,8 @@ const ExpensesTable: React.FC = () => {
                       <td className="px-6 py-4 text-sm text-neutral-700">
                         {entry.sold_item ? (
                           <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">
-                            {entry.sold_item.name || `Item #${entry.sold_item.id}`}
+                            {entry.sold_item.name ||
+                              `Item #${entry.sold_item.id}`}
                           </span>
                         ) : (
                           <span className="text-gray-400">N/A</span>
@@ -334,50 +357,75 @@ const ExpensesTable: React.FC = () => {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Expense Details</DialogTitle>
-            <DialogDescription>View and manage the selected expense.</DialogDescription>
+            <DialogDescription>
+              View and manage the selected expense.
+            </DialogDescription>
           </DialogHeader>
 
           {selectedEntry && (
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium text-gray-600">Name:</span>
-                <span className="col-span-2 font-medium">{selectedEntry.name}</span>
+                <span className="col-span-2 font-medium">
+                  {selectedEntry.name}
+                </span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium text-gray-600">Category:</span>
                 <span className="col-span-2">
-                  {selectedEntry.expense_category ? selectedEntry.expense_category.name : "N/A"}
+                  {selectedEntry.expense_category
+                    ? selectedEntry.expense_category.name
+                    : "N/A"}
                 </span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium text-gray-600">Description:</span>
-                <span className="col-span-2">{selectedEntry.description || "N/A"}</span>
+                <span className="col-span-2">
+                  {selectedEntry.description || "N/A"}
+                </span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium text-gray-600">Project:</span>
                 <span className="col-span-2">
-                  {selectedEntry.linked_project ? selectedEntry.linked_project.name : "N/A"}
+                  {selectedEntry.linked_project
+                    ? selectedEntry.linked_project.name
+                    : "N/A"}
                 </span>
               </div>
               {selectedEntry.sold_item && (
                 <>
                   <div className="grid grid-cols-3 items-center gap-4">
-                    <span className="font-medium text-gray-600">Shop Item:</span>
-                    <span className="col-span-2">{selectedEntry.sold_item.name || `Item #${selectedEntry.sold_item.id}`}</span>
+                    <span className="font-medium text-gray-600">
+                      Shop Item:
+                    </span>
+                    <span className="col-span-2">
+                      {selectedEntry.sold_item.name ||
+                        `Item #${selectedEntry.sold_item.id}`}
+                    </span>
                   </div>
                   <div className="grid grid-cols-3 items-center gap-4">
-                    <span className="font-medium text-gray-600">Item Cost:</span>
-                    <span className="col-span-2">${selectedEntry.sold_item.cost_price}</span>
+                    <span className="font-medium text-gray-600">
+                      Item Cost:
+                    </span>
+                    <span className="col-span-2">
+                      ${selectedEntry.sold_item.cost_price}
+                    </span>
                   </div>
                   <div className="grid grid-cols-3 items-center gap-4">
-                    <span className="font-medium text-gray-600">Selling Price:</span>
-                    <span className="col-span-2">${selectedEntry.sold_item.selling_price}</span>
+                    <span className="font-medium text-gray-600">
+                      Selling Price:
+                    </span>
+                    <span className="col-span-2">
+                      ${selectedEntry.sold_item.selling_price}
+                    </span>
                   </div>
                 </>
               )}
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium text-gray-600">Amount:</span>
-                <span className="col-span-2 font-bold text-green-600">${selectedEntry.amount}</span>
+                <span className="col-span-2 font-bold text-green-600">
+                  ${selectedEntry.amount}
+                </span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium text-gray-600">Quantity:</span>
@@ -385,14 +433,19 @@ const ExpensesTable: React.FC = () => {
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="font-medium text-gray-600">Date:</span>
-                <span className="col-span-2">{new Date(selectedEntry.date).toLocaleDateString()}</span>
+                <span className="col-span-2">
+                  {new Date(selectedEntry.date).toLocaleDateString()}
+                </span>
               </div>
             </div>
           )}
 
           <DialogFooter>
             <div className="flex justify-between items-center w-full">
-              <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsViewModalOpen(false)}
+              >
                 Close
               </Button>
               <div className="flex gap-2">
@@ -409,7 +462,7 @@ const ExpensesTable: React.FC = () => {
       </Dialog>
 
       {/* Add Expense Modal */}
-      <AddExpenseModal 
+      <AddExpenseModal
         isOpen={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
         onSuccess={handleAddSuccess}
@@ -427,18 +480,22 @@ const ExpensesTable: React.FC = () => {
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the expense
+              This action cannot be undone. This will permanently delete the
+              expense
               {selectedEntry && ` "${selectedEntry.name}"`} from the system.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={confirmDelete}
               className="bg-red-600 hover:bg-red-700"
               disabled={deleteExpenseMutation.isPending}

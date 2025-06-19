@@ -96,44 +96,48 @@ interface AddPaymentModalProps {
 }
 
 const fetchProjects = async (): Promise<Project[]> => {
-  const token = localStorage.getItem("access_token");
-  const response = await axios.get("https://backend.kidsdesigncompany.com/api/project/" ,
+  const token = localStorage.getItem("accessToken");
+  const response = await axios.get(
+    "https://backend.kidsdesigncompany.com/api/project/",
     {
-  headers: {
-    Authorization: `JWT ${token}`,
-    }},
+      headers: {
+        Authorization: `JWT ${token}`,
+      },
+    }
   );
   return response.data.all_projects || [];
 };
 
 const fetchShopItems = async (): Promise<ShopItem[]> => {
   try {
-    const token = localStorage.getItem("access_token");
-    const response = await axios.get("https://backend.kidsdesigncompany.com/api/sold/" ,
-       {
-  headers: {
-    Authorization: `JWT ${token}`,
-    }},
+    const token = localStorage.getItem("accessToken");
+    const response = await axios.get(
+      "https://backend.kidsdesigncompany.com/api/sold/",
+      {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      }
     );
-    console.log("Fetched Sold API response:", response.data); 
-  
+    console.log("Fetched Sold API response:", response.data);
+
     const items: ShopItem[] = [];
-    
+
     if (response.data.daily_data && Array.isArray(response.data.daily_data)) {
       response.data.daily_data.forEach((day: any) => {
         if (day.entries && Array.isArray(day.entries)) {
           day.entries.forEach((entry: any) => {
-            if (!items.some(item => item.id === entry.id)) {
+            if (!items.some((item) => item.id === entry.id)) {
               items.push({
                 id: entry.id,
-                name: entry.name || "Unnamed item"
+                name: entry.name || "Unnamed item",
               });
             }
           });
         }
       });
     }
-    
+
     console.log("Processed Shop Items:", items);
     return items;
   } catch (error: any) {
@@ -144,21 +148,31 @@ const fetchShopItems = async (): Promise<ShopItem[]> => {
 };
 
 const fetchCategories = async (): Promise<Category[]> => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("accessToken");
   const { data } = await axios.get<Category[]>(
-    "https://backend.kidsdesigncompany.com/api/expense-category/" ,
-     {
-  headers: {
-    Authorization: `JWT ${token}`,
-    }},
+    "https://backend.kidsdesigncompany.com/api/expense-category/",
+    {
+      headers: {
+        Authorization: `JWT ${token}`,
+      },
+    }
   );
-  return data; 
+  return data;
 };
 
-const ItemDropdown: React.FC<ItemDropdownProps> = ({ label, items, selectedItem, isLoading, disabled, onItemChange }) => {
+const ItemDropdown: React.FC<ItemDropdownProps> = ({
+  label,
+  items,
+  selectedItem,
+  isLoading,
+  disabled,
+  onItemChange,
+}) => {
   return (
     <div>
-      <Label htmlFor={`${label.toLowerCase()}Select`} className="block mb-2">{label}</Label>
+      <Label htmlFor={`${label.toLowerCase()}Select`} className="block mb-2">
+        {label}
+      </Label>
       <select
         id={`${label.toLowerCase()}Select`}
         onChange={(e) => onItemChange(e.target.value)}
@@ -181,7 +195,10 @@ const ItemDropdown: React.FC<ItemDropdownProps> = ({ label, items, selectedItem,
   );
 };
 
-const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, onCategoryChange }) => {
+const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
+  selectedCategory,
+  onCategoryChange,
+}) => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState<NewCategoryData>({ name: "" });
@@ -193,14 +210,15 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
 
   const addCategoryMutation = useMutation({
     mutationFn: async (categoryData: NewCategoryData) => {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("accessToken");
       const response = await axios.post<Category>(
         "https://backend.kidsdesigncompany.com/api/expense-category/",
-        categoryData ,
-          {
-  headers: {
-    Authorization: `JWT ${token}`,
-    }},
+        categoryData,
+        {
+          headers: {
+            Authorization: `JWT ${token}`,
+          },
+        }
       );
       return response.data;
     },
@@ -253,11 +271,17 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
                 />
               </div>
               <DialogFooter className="mt-6">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                >
                   Cancel
                 </Button>
                 <Button type="submit" disabled={addCategoryMutation.isPending}>
-                  {addCategoryMutation.isPending ? "Creating..." : "Create Category"}
+                  {addCategoryMutation.isPending
+                    ? "Creating..."
+                    : "Create Category"}
                 </Button>
               </DialogFooter>
             </form>
@@ -269,12 +293,22 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
         id="category"
         name="category"
         value={selectedCategory ?? ""}
-        onChange={(e) => onCategoryChange(e.target.value ? Number(e.target.value) : null)}
+        onChange={(e) =>
+          onCategoryChange(e.target.value ? Number(e.target.value) : null)
+        }
         className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         required
       >
         <option value="">Select Category</option>
-        {isLoading ? <option disabled>Loading...</option> : categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+        {isLoading ? (
+          <option disabled>Loading...</option>
+        ) : (
+          categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))
+        )}
       </select>
     </div>
   );
@@ -286,7 +320,11 @@ interface AddExpenseModalProps {
   onSuccess?: () => void;
 }
 
-const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange, onSuccess }) => {
+const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
+  isOpen,
+  onOpenChange,
+  onSuccess,
+}) => {
   const [formData, setFormData] = useState<ExpenseFormData>({
     name: "",
     amount: "",
@@ -297,52 +335,68 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange,
     description: "",
   });
 
-  const { data: projects = [], isLoading: isLoadingProjects } = useQuery<Project[]>({
+  const { data: projects = [], isLoading: isLoadingProjects } = useQuery<
+    Project[]
+  >({
     queryKey: ["projects"],
     queryFn: fetchProjects,
   });
 
-  const { data: shopItems = [], isLoading: isLoadingShop } = useQuery<ShopItem[]>({
+  const { data: shopItems = [], isLoading: isLoadingShop } = useQuery<
+    ShopItem[]
+  >({
     queryKey: ["shopItems"],
     queryFn: fetchShopItems,
   });
 
   const addExpenseMutation = useMutation({
     mutationFn: async (newExpense: ExpenseFormData) => {
-      if (!newExpense.selectedItem) throw new Error("Please select a project or shop item");
+      if (!newExpense.selectedItem)
+        throw new Error("Please select a project or shop item");
 
       if (newExpense.selectedType === "shop") {
-        const shopItemExists = shopItems.some((item) => item.id === Number(newExpense.selectedItem));
+        const shopItemExists = shopItems.some(
+          (item) => item.id === Number(newExpense.selectedItem)
+        );
         if (!shopItemExists) {
-          throw new Error(`Selected shop item with ID ${newExpense.selectedItem} does not exist.`);
+          throw new Error(
+            `Selected shop item with ID ${newExpense.selectedItem} does not exist.`
+          );
         }
       }
 
       const formattedData = {
         name: newExpense.name,
         amount: Number(newExpense.amount),
-        quantity: newExpense.quantity, 
+        quantity: newExpense.quantity,
         category: newExpense.category,
         description: newExpense.description || "",
-        project: newExpense.selectedType === "project" ? Number(newExpense.selectedItem) : null,
-        shop: newExpense.selectedType === "shop" ? Number(newExpense.selectedItem) : null, 
+        project:
+          newExpense.selectedType === "project"
+            ? Number(newExpense.selectedItem)
+            : null,
+        shop:
+          newExpense.selectedType === "shop"
+            ? Number(newExpense.selectedItem)
+            : null,
       };
 
       console.log("Sending data to API:", formattedData);
 
       try {
-        const token = localStorage.getItem("access_token");
+        const token = localStorage.getItem("accessToken");
         const response = await axios.post(
           "https://backend.kidsdesigncompany.com/api/expense/",
-          formattedData ,
-             {
-  headers: {
-    Authorization: `JWT ${token}`,
-    }},
+          formattedData,
+          {
+            headers: {
+              Authorization: `JWT ${token}`,
+            },
+          }
         );
         return response.data;
       } catch (error: any) {
-        console.error("API Error Details:", error.response?.data); 
+        console.error("API Error Details:", error.response?.data);
         throw error;
       }
     },
@@ -363,7 +417,10 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange,
     onError: (error: any) => {
       console.error("Error details:", error);
       console.error("API Response:", error.response?.data);
-      toast.error(error.response?.data?.message || "Failed to add expense. Please try again.");
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to add expense. Please try again."
+      );
     },
   });
 
@@ -381,7 +438,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange,
         <DialogHeader>
           <DialogTitle>Add New Expense</DialogTitle>
         </DialogHeader>
-        
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -395,7 +452,9 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange,
               id="name"
               name="name"
               value={formData.name}
-              onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, name: e.target.value }))
+              }
               required
             />
           </div>
@@ -406,7 +465,12 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange,
               id="description"
               name="description"
               value={formData.description}
-              onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
             />
           </div>
 
@@ -417,7 +481,9 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange,
               name="amount"
               type="number"
               value={formData.amount}
-              onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, amount: e.target.value }))
+              }
               required
             />
           </div>
@@ -429,7 +495,9 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange,
               name="quantity"
               type="number"
               value={formData.quantity}
-              onChange={(e) => setFormData((prev) => ({ ...prev, quantity: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, quantity: e.target.value }))
+              }
               required
             />
           </div>
@@ -441,10 +509,19 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange,
                 <ItemDropdown
                   label="Project"
                   items={projects}
-                  selectedItem={formData.selectedType === "project" ? formData.selectedItem : ""}
+                  selectedItem={
+                    formData.selectedType === "project"
+                      ? formData.selectedItem
+                      : ""
+                  }
                   isLoading={isLoadingProjects}
-                  disabled={formData.selectedType === "shop" && formData.selectedItem !== ""}
-                  onItemChange={(itemId) => handleSelectItemType("project", itemId)}
+                  disabled={
+                    formData.selectedType === "shop" &&
+                    formData.selectedItem !== ""
+                  }
+                  onItemChange={(itemId) =>
+                    handleSelectItemType("project", itemId)
+                  }
                 />
               </div>
 
@@ -452,23 +529,35 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange,
                 <ItemDropdown
                   label="Shop Item"
                   items={shopItems}
-                  selectedItem={formData.selectedType === "shop" ? formData.selectedItem : ""}
+                  selectedItem={
+                    formData.selectedType === "shop"
+                      ? formData.selectedItem
+                      : ""
+                  }
                   isLoading={isLoadingShop}
-                  disabled={formData.selectedType === "project" && formData.selectedItem !== ""}
-                  onItemChange={(itemId) => handleSelectItemType("shop", itemId)}
+                  disabled={
+                    formData.selectedType === "project" &&
+                    formData.selectedItem !== ""
+                  }
+                  onItemChange={(itemId) =>
+                    handleSelectItemType("shop", itemId)
+                  }
                 />
               </div>
             </div>
             {formData.selectedType && (
               <p className="text-sm text-blue-600 mt-1">
-                Selected {formData.selectedType === "project" ? "Project" : "Shop Item"}
+                Selected{" "}
+                {formData.selectedType === "project" ? "Project" : "Shop Item"}
               </p>
             )}
           </div>
 
           <CategoryDropdown
             selectedCategory={formData.category}
-            onCategoryChange={(categoryId) => setFormData((prev) => ({ ...prev, category: categoryId }))}
+            onCategoryChange={(categoryId) =>
+              setFormData((prev) => ({ ...prev, category: categoryId }))
+            }
           />
 
           <DialogFooter>
@@ -481,7 +570,11 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onOpenChange,
             </Button>
             <Button
               type="submit"
-              disabled={addExpenseMutation.isPending || !formData.selectedItem || !formData.category}
+              disabled={
+                addExpenseMutation.isPending ||
+                !formData.selectedItem ||
+                !formData.category
+              }
               className="flex-1"
             >
               {addExpenseMutation.isPending ? "Adding..." : "Add Expense"}

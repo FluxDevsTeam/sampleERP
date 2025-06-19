@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 type User = {
   role: string;
@@ -6,8 +12,13 @@ type User = {
 
 type AuthContextType = {
   user: User;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: string }>;
-  signup: (userData: SignupData) => Promise<{ success: boolean; error?: string }>;
+  login: (
+    email: string,
+    password: string
+  ) => Promise<{ success: boolean; error?: string; role?: string }>;
+  signup: (
+    userData: SignupData
+  ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   loading: boolean;
 };
@@ -17,7 +28,7 @@ type AuthProviderProps = {
 };
 
 type LoginResponse = {
-  access_token: string;
+  accessToken: string;
   refresh_token: string;
   role: string;
 };
@@ -32,7 +43,6 @@ type SignupData = {
   roles: string[];
 };
 
-
 // Create context with a default value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -42,9 +52,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const token = localStorage.getItem('access_token');
-      const role = localStorage.getItem('user_role');
-      
+      const token = localStorage.getItem("accessToken");
+      const role = localStorage.getItem("user_role");
+
       if (token && role) {
         setUser({ role });
       }
@@ -56,80 +66,86 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('https://backend.kidsdesigncompany.com/auth/login/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        "https://backend.kidsdesigncompany.com/auth/login/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
+        throw new Error(errorData.message || "Login failed");
       }
 
       const data: LoginResponse = await response.json();
-      
-      localStorage.setItem('access_token', data.access_token);
-      localStorage.setItem('refresh_token', data.refresh_token);
-      localStorage.setItem('user_role', data.role);
-      
+
+      localStorage.setItem("accessToken", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token);
+      localStorage.setItem("user_role", data.role);
+
       setUser({ role: data.role });
       return { success: true, role: data.role };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'An unknown error occurred' 
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
       };
     }
   };
 
   const signup = async (userData: SignupData) => {
-  try {
-    const token = localStorage.getItem('access_token');
-    const response = await fetch('https://backend.kidsdesigncompany.com/auth/signup/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `JWT ${token}`
-      },
-      body: JSON.stringify(userData),
-    });
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(
+        "https://backend.kidsdesigncompany.com/auth/signup/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${token}`,
+          },
+          body: JSON.stringify(userData),
+        }
+      );
 
-    const data = await response.json(); // Always parse the response
+      const data = await response.json(); // Always parse the response
 
-    if (!response.ok) {
-      // Log the full error response from backend
-      console.error('Signup failed:', data);
+      if (!response.ok) {
+        // Log the full error response from backend
+        console.error("Signup failed:", data);
 
-      // Attempt to get a message or stringified version
-      const errorMessage =
-        data.message || 
-        (typeof data === 'object' ? JSON.stringify(data) : 'Signup failed');
+        // Attempt to get a message or stringified version
+        const errorMessage =
+          data.message ||
+          (typeof data === "object" ? JSON.stringify(data) : "Signup failed");
 
-      throw new Error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      // Log the caught error
+      console.error("Signup error:", error);
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
-
-    return { success: true, data };
-  } catch (error) {
-    // Log the caught error
-    console.error('Signup error:', error);
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    };
-  }
-};
-
+  };
 
   const logout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user_role');
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user_role");
     setUser(null);
-    return '/login';
+    return "/login";
   };
 
   return (
@@ -142,7 +158,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
