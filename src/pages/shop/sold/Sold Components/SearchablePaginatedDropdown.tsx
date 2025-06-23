@@ -77,7 +77,13 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
         <input
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            const newSearch = e.target.value;
+            setSearch(newSearch);
+            if (newSearch === '') {
+              onChange(name, '');
+            }
+          }}
           onFocus={() => setIsOpen(true)}
           className="w-full border rounded p-2"
         />
