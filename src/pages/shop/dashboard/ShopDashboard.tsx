@@ -56,34 +56,42 @@ const ShopDashboard = () => {
           <DashboardData
             info="Monthly Stock Added"
             digits={dashboardData?.total_added_this_month}
+            currency="₦ "
           ></DashboardData>
           <DashboardData
             info="Total Cost Value"
             digits={dashboardData?.total_cost_value}
+            currency="₦ "
           ></DashboardData>
           <DashboardData
             info="Total Profit Potential"
             digits={dashboardData?.total_profit_potential}
+            currency="₦ "
           ></DashboardData>
           <DashboardData
             info="Total Profit this month"
             digits={dashboardData?.total_profit_this_month}
+            currency="₦ "
           ></DashboardData>
           <DashboardData
             info="Total shop value"
             digits={dashboardData?.total_shop_value}
+            currency="₦ "
           ></DashboardData>
           <DashboardData
             info="Total sold this month"
             digits={dashboardData?.total_sold_this_month}
+            currency="₦ "
           ></DashboardData>
           <DashboardData
             info="Yearly added value"
             digits={dashboardData?.yearly_added_value}
+            currency="₦ "
           ></DashboardData>
           <DashboardData
             info="Yearly profit"
             digits={dashboardData?.yearly_profit}
+            currency="₦ "
           ></DashboardData>
         </div>
 

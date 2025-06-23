@@ -4,29 +4,15 @@ import {
   Bar,
   XAxis,
   YAxis,
-  Cell,
   CartesianGrid,
   ResponsiveContainer,
   ComposedChart,
   Line,
   Area,
   Tooltip,
-  Scatter,
 } from "recharts";
-const colors = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "red",
-  "pink",
-  "brown",
-  "cyan",
-  "green",
-  "indigo",
-  "violet",
-];
 import { Accordion } from "rsuite";
+import { RoundedBar, CustomTooltip } from "../../../components/CustomChartComponents";
 
 const ProjectManagerDashboard = () => {
   document.title = "Product Dashboard - KDC Admin";
@@ -182,31 +168,6 @@ const ProjectManagerDashboard = () => {
       value: expenses[11]?.total || 0,
     },
   ];
-
-  const getPath = (x: number, y: number, width: number, height: number) => {
-    return `M${x},${y + height}C${x + width / 3},${y + height} ${
-      x + width / 2
-    },${y + height / 3}
-    ${x + width / 2}, ${y}
-    C${x + width / 2},${y + height / 3} ${x + (2 * width) / 3},${y + height} ${
-      x + width
-    }, ${y + height}
-    Z`;
-  };
-
-  interface TriangleBarProps {
-    fill?: string;
-    x?: number;
-    y?: number;
-    width?: number;
-    height?: number;
-  }
-
-  const TriangleBar = (props: TriangleBarProps) => {
-    const { fill, x = 0, y = 0, width = 0, height = 0 } = props;
-
-    return <path d={getPath(x, y, width, height)} stroke="none" fill={fill} />;
-  };
 
   const profitData = [
     {
@@ -461,102 +422,55 @@ const ProjectManagerDashboard = () => {
           </Accordion>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-7 items-center rounded-sm mb-9">
-          {/* Income chart */}
-          <div>
-            <h1
-              style={{ fontSize: "clamp(16.5px, 3vw, 23px)" }}
-              className="font-semibold mb-2"
-            >
-              Income
-            </h1>
-            <ResponsiveContainer width="100%" height={447}>
-              <BarChart
-                data={incomeData}
-                margin={{left:10}}
-                className="bg-white max-md:ml-[-7%]"
-              >
-                <defs>
-                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="10%" stopColor="gray" stopOpacity={1} />
-                    <stop offset="90%" stopColor="blue" stopOpacity={0.2} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-
-                <YAxis dataKey="value" className="max-md:hidden max-md:w-0 md:mx-10" />
-                <Tooltip />
-                <Bar
-                  // type="monotone"
-                  dataKey="value"
-                  stroke="#0178a3"
-                  fillOpacity={1}
-                  fill="url(#colorValue)"
-                />
-              </BarChart>
-            </ResponsiveContainer>
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 p-4 bg-gray-50">
+          {/* Income Chart */}
+          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+            <h2 className="text-xl font-semibold mb-4 text-gray-700">Monthly Income</h2>
+            <div className="h-[350px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={incomeData} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                  <YAxis tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} tick={{ fontSize: 12 }} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(240, 240, 240, 0.5)' }} />
+                  <Bar dataKey="value" name="Income" shape={<RoundedBar />} fill="#4A90E2" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          {/* expenses chart */}
-          <div>
-            <h1 style={{ fontSize: "clamp(16.5px, 3vw, 23px)" }}>Expenses</h1>
-            <ResponsiveContainer width="100%" height={460}>
-              <BarChart
-                data={expensesData}
-                margin={{ top: 17, bottom: 9, left: 29 }}
-                className="max-md:mx-[-50px]"
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis dataKey="value" className="max-md:hidden max-md:w-0" />
 
-                {/* <Tooltip /> */}
-                <Bar
-                  dataKey="value"
-                  stroke="black"
-                  fillOpacity={1}
-                  fill="green"
-                  shape={<TriangleBar />}
-                  label={{ position: "top" }}
-                >
-                  {expensesData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={colors[index % 20]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+          {/* Expenses Chart */}
+          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+            <h2 className="text-xl font-semibold mb-4 text-gray-700">Monthly Expenses</h2>
+            <div className="h-[350px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={expensesData} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                  <YAxis tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} tick={{ fontSize: 12 }} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(240, 240, 240, 0.5)' }} />
+                  <Bar dataKey="value" name="Expenses" shape={<RoundedBar />} fill="#F5A623" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          {/* profit chart */}
-          <div className="md:col-span-2">
-            <h1
-              style={{ fontSize: "clamp(16.5px, 3vw, 23px)" }}
-              className="font-semibold mb-5"
-            >
-              Profit
-            </h1>
-            <ResponsiveContainer width="100%" height={400}>
-              <ComposedChart
-                data={profitData}
-                margin={{ left: 30 }}
-                className="max-md:mx-[-50px]"
-              >
-                <CartesianGrid stroke="#f5f5"></CartesianGrid>
-                <XAxis dataKey="month"></XAxis>
-                <YAxis dataKey="value" className="max-md:hidden max-md:w-0" />
 
-                <Tooltip></Tooltip>
-                {/* <Legend></Legend> */}
-                <Area
-                  type="monotone"
-                  dataKey="value"
-                  fill="gray"
-                  stroke="#8884d8"
-                />
-                <Bar dataKey="value" barSize={30} fill="#413ea0" />
-                <Line type="monotone" dataKey="value" stroke="gray" />
-                <Scatter dataKey="value" fill="red" />
-              </ComposedChart>
-            </ResponsiveContainer>
+          {/* Profit Chart */}
+          <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md border border-gray-200">
+            <h2 className="text-xl font-semibold mb-4 text-gray-700">Monthly Profit</h2>
+            <div className="h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={profitData} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                  <YAxis tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} tick={{ fontSize: 12 }} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(240, 240, 240, 0.5)' }} />
+                  <Area type="monotone" dataKey="value" name="Profit" fill="#82ca9d" stroke="#82ca9d" />
+                  <Bar dataKey="value" name="Profit" barSize={20} shape={<RoundedBar />} fill="#413ea0" />
+                  <Line type="monotone" dataKey="value" name="Profit" stroke="#ff7300" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       </div>

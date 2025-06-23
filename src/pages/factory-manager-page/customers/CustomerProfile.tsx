@@ -1,7 +1,7 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FaUser, FaEdit, FaCheck, FaTimes } from "react-icons/fa";
+import { FaUser, FaEdit, FaCheck, FaTimes, FaTrash } from "react-icons/fa";
 import { CustomerResponse } from "./Interfaces"
 
 const CustomerProfile = () => {
@@ -17,9 +17,15 @@ const CustomerProfile = () => {
   const [editedPhone, setEditedPhone] = useState("");
   const [editedAddress, setEditedAddress] = useState("");
   const [updateLoading, setUpdateLoading] = useState(false);
+  const navigate = useNavigate();
   const [updateError, setUpdateError] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
+    const role = localStorage.getItem("user_role");
+    setUserRole(role);
     const fetchCustomer = async () => {
       try {
         setLoading(true);
@@ -66,8 +72,7 @@ const CustomerProfile = () => {
 
     try {
       const response = await fetch(
-
-        `https://backend.kidsdesigncompany.com/api/customer/${customer.customer_details.id}`,
+        `https://backend.kidsdesigncompany.com/api/customer/${customer.customer_details.id}/`,
         {
           method: "PATCH",
           headers: {
@@ -100,37 +105,81 @@ const CustomerProfile = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!customer) return;
+
+    if (!window.confirm('Are you sure you want to delete this customer? This action cannot be undone.')) {
+        return;
+    }
+
+    setDeleteLoading(true);
+    setDeleteError(null);
+
+    try {
+      const response = await fetch(
+        `https://backend.kidsdesigncompany.com/api/customer/${customer.customer_details.id}/`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `JWT ${localStorage.getItem('accessToken')}`
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Delete failed:", errorData);
+        throw new Error(errorData?.detail || "Failed to delete customer.");
+      }
+
+      navigate('/factory-manager/customers');
+
+    } catch (err) {
+      setDeleteError("Error deleting customer.");
+      console.error(err);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   if (loading) return <div className="text-center mt-10">Loading...</div>;
   if (error) return <div className="text-red-500 text-center mt-10">{error}</div>;
   if (!customer) return <div className="text-red-500 text-center mt-10">Customer not found.</div>;
 
+
+
+  const formatNumberWithCommas = (number: number) => {
+    return new Intl.NumberFormat('en-US').format(number);
+  };
+
   return (
     <div className="mx-20 my-10">
       {/* Customer Summary */}
-      <div className="flex justify-between items-center gap-4 mb-24">
-        <article className="border rounded-lg p-5 shadow-md flex-1">
-          <p className="font-bold text-[14px] text-[#767676] mb-2">Total Project Count</p>
-          <p className="text-[#0178A3] text-[36px] font-bold">{customer.total_projects_count}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
+          <h3 className="font-semibold text-lg text-black-600 mb-2">Total Projects</h3>
+          <p className="text-xl font-bold text-blue-600">{customer.total_projects_count}</p>
         </article>
 
-        <article className="border rounded-lg p-5 shadow-md flex-1">
-          <p className="font-bold text-[14px] text-[#767676] mb-2">Active Project Count</p>
-          <p className="text-[#0178A3] text-[36px] font-bold">{customer.active_projects_count}</p>
+        <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
+          <h3 className="font-semibold text-lg text-black-600 mb-2">Active Projects</h3>
+          <p className="text-xl font-bold text-black-900">{customer.active_projects_count}</p>
         </article>
 
-        <article className="border rounded-lg p-5 shadow-md flex-1">
-          <p className="font-bold text-[14px] text-[#767676] mb-2">Total Project Cost</p>
-          <p className="text-[#0178A3] text-[36px] font-bold">{customer.total_projects_cost}</p>
+        <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
+          <h3 className="font-semibold text-lg text-black-600 mb-2">Total Project Cost</h3>
+          <p className="text-xl font-bold text-purple-600">₦{formatNumberWithCommas(customer.total_projects_cost)}</p>
         </article>
 
-        <article className="border rounded-lg p-5 shadow-md flex-1">
-          <p className="font-bold text-[14px] text-[#767676] mb-2">Total Shop-items Count</p>
-          <p className="text-[#0178A3] text-[36px] font-bold">{customer.total_shop_items_count}</p>
+        <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
+          <h3 className="font-semibold text-lg text-black-600 mb-2">Shop Items</h3>
+          <p className="text-xl font-bold text-blue-600">{customer.total_shop_items_count}</p>
         </article>
 
-        <article className="border rounded-lg p-5 shadow-md flex-1">
-          <p className="font-bold text-[14px] text-[#767676] mb-2">Total Shop-items Cost</p>
-          <p className="text-[#0178A3] text-[36px] font-bold">{customer.total_shop_items_cost}</p>
+        <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
+          <h3 className="font-semibold text-lg text-black-600 mb-2">Shop Items Cost</h3>
+          <p className="text-xl font-bold text-red-600">₦{formatNumberWithCommas(customer.total_shop_items_cost)}</p>
         </article>
       </div>
 
@@ -189,15 +238,29 @@ const CustomerProfile = () => {
                 <p>{customer.customer_details.email}</p>
                 <p>{customer.customer_details.phone_number}</p>
                 <p>Address: {customer.customer_details.address || "N/A"}</p>
-                <button
-                  className="bg-[#ff3a30e3] hover:bg-[#97251f] text-white px-4 py-2 rounded-lg flex justify-center items-center mt-2"
-                  onClick={() => setIsEditing(true)}
-                >
-                  <FaEdit className="mr-2" /> Edit
-                </button>
+                <div className="flex items-center gap-2 mt-2">
+                  {userRole === 'ceo' && (
+                    <>
+                      <button
+                        className="bg-[#30ff6be3] hover:bg-[#1f9733] text-white px-4 py-2 rounded-lg flex justify-center items-center"
+                        onClick={() => setIsEditing(true)}
+                      >
+                        <FaEdit className="mr-2" /> Edit
+                      </button>
+                      <button
+                        className="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg flex justify-center items-center"
+                        onClick={handleDelete}
+                        disabled={deleteLoading}
+                      >
+                        {deleteLoading ? 'Deleting...' : <><FaTrash className="mr-2" /> Delete</>}
+                      </button>
+                    </>
+                  )}
+                </div>
               </>
             )}
             {updateError && <p className="text-red-500 mt-2">{updateError}</p>}
+            {deleteError && <p className="text-red-500 mt-2">{deleteError}</p>}
           </div>
         </div>
 

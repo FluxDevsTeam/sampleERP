@@ -2,21 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-
-interface Customer {
-  id: number;
-  name: string;
-}
-
-interface Project {
-  id: number;
-  name: string;
-}
-
-interface InventoryItem {
-  id: number;
-  name: string;
-}
+import SearchablePaginatedDropdown from "./SearchablePaginatedDropdown";
 
 const Modal = ({
   isOpen,
@@ -66,9 +52,6 @@ const Modal = ({
 const AddNewSoldItemPage = () => {
   const navigate = useNavigate();
   const [saleType, setSaleType] = useState<"customer" | "project">("customer");
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [items, setItems] = useState<InventoryItem[]>([]);
   const [formData, setFormData] = useState({
     quantity: "",
     customer: "",
@@ -78,6 +61,10 @@ const AddNewSoldItemPage = () => {
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+
+  useEffect(() => {
+    console.log("Form data updated:", formData);
+  }, [formData]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -89,56 +76,13 @@ const AddNewSoldItemPage = () => {
     }));
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [customerResponse, projectResponse, itemResponse] =
-          await Promise.all([
-            fetch("https://backend.kidsdesigncompany.com/api/customer/", {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-              },
-            }),
-            fetch("https://backend.kidsdesigncompany.com/api/project/", {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-              },
-            }),
-            fetch(
-              "https://backend.kidsdesigncompany.com/api/inventory-item/", {
-                method: "GET",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-                },
-              }
-            ),
-          ]);
-
-        if (!customerResponse.ok || !projectResponse.ok || !itemResponse.ok)
-          throw new Error("Failed to fetch data");
-
-        const customerData = await customerResponse.json();
-        const projectData = await projectResponse.json();
-        const itemData = await itemResponse.json();
-
-        console.log(projectData);
-        
-
-        setCustomers(customerData.results.all_customers);
-        setProjects(projectData.all_projects);
-        setItems(itemData.results.items);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const handleDropdownChange = (name: string, value: string) => {
+    console.log(`handleDropdownChange called with: name=${name}, value=${value}`);
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   useEffect(() => {
     setFormData({
@@ -167,6 +111,7 @@ const AddNewSoldItemPage = () => {
     );
 
     try {
+      console.log("Data being sent to POST request:", submitData);
       const response = await fetch(
         "https://backend.kidsdesigncompany.com/api/sold/",
         {
@@ -180,12 +125,12 @@ const AddNewSoldItemPage = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to submit");
+        throw new Error("Failed to record sale");
       }
 
       setShowSuccessModal(true);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error recording sale:", error);
       setShowErrorModal(true);
     }
   };
@@ -233,23 +178,13 @@ const AddNewSoldItemPage = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1">Item:</label>
-          <select
-            name="item"
-            value={formData.item}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-            required
-          >
-            <option value="">Select an item</option>
-            {items.map(item => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <SearchablePaginatedDropdown
+          endpoint="https://backend.kidsdesigncompany.com/api/inventory-item/"
+          label="Item"
+          name="item"
+          onChange={handleDropdownChange}
+          resultsKey="results.items"
+        />
         <div>
           <label className="block mb-1">Quantity:</label>
           <input
@@ -261,27 +196,17 @@ const AddNewSoldItemPage = () => {
             required
           />
         </div>
-          
+
         {/* CUSTOMER SALE TYPE */}
         {saleType === "customer" && (
           <>
-            <div>
-              <label className="block mb-1">Customer:</label>
-              <select
-                name="customer"
-                value={formData.customer}
-                onChange={handleChange}
-                className="w-full border rounded p-2"
-                required
-              >
-                <option value="">Select a customer</option>
-                {customers.map((customer) => (
-                  <option key={customer.id} value={customer.id}>
-                    {customer.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <SearchablePaginatedDropdown
+              endpoint="https://backend.kidsdesigncompany.com/api/customer/"
+              label="Customer"
+              name="customer"
+              onChange={handleDropdownChange}
+              resultsKey="results.all_customers"
+            />
 
             <div>
               <label className="block mb-1">Logistics:</label>
@@ -298,31 +223,21 @@ const AddNewSoldItemPage = () => {
 
         {/* PROJECT SALE TYPE */}
         {saleType === "project" && (
-          <div>
-            <label className="block mb-1">Project:</label>
-            <select
-              name="project"
-              value={formData.project}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-              required
-            >
-              <option value="">Select a project</option>
-              {projects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SearchablePaginatedDropdown
+            endpoint="https://backend.kidsdesigncompany.com/api/project/"
+            label="Project"
+            name="project"
+            onChange={handleDropdownChange}
+            resultsKey="all_projects"
+          />
         )}
 
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Submit
-          </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Submit
+        </button>
       </form>
 
       <Modal

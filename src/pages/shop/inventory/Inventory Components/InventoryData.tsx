@@ -3,12 +3,14 @@
 interface InventoryDataProps {
   info: string;
   digits: number;
-  trend: string;
+  currency?: string;
 }
 
 const InventoryData = (InventoryData: InventoryDataProps) => {
+  // Format the digits with thousand separators, handling null or undefined values
+  const formattedDigits = (InventoryData.digits ?? 0).toLocaleString();
+
   return (
-    
     <div>
       <div className="bg-white rounded pl-6 py-5 shadow grid items-center h-full">
         <p
@@ -21,9 +23,8 @@ const InventoryData = (InventoryData: InventoryDataProps) => {
           style={{ fontSize: "clamp(14px, 3vw, 32px)" }}
           className="font-black"
         >
-          {InventoryData.digits}
+          {InventoryData.currency}{formattedDigits}
         </p>
-        <p className="text-xs">Trend: {InventoryData.trend}</p>
       </div>
     </div>
   );

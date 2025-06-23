@@ -1,19 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../Modal";
 
 const EditItemPage: React.FC = () => {
+  const userRole = localStorage.getItem("user_role");
   const navigate = useNavigate();
-  const location = useLocation();
+
+  useEffect(() => {
+    if (userRole !== "ceo") {
+      navigate("/shop/inventory");
+    }
+  }, [userRole, navigate]);
+
   const { id } = useParams();
-  const from = location.state?.from;
+
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
-    []
-  );
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+  const [nextCategoriesUrl, setNextCategoriesUrl] = useState<string | null>(null);
+  const [prevCategoriesUrl, setPrevCategoriesUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -67,27 +74,32 @@ const EditItemPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(
-          "https://backend.kidsdesigncompany.com/api/inventory-item-category/",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-        const data = await response.json();
+  const fetchCategories = async (url: string) => {
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+        },
+      });
+      const data = await response.json();
+      if (data.results) {
+        setCategories(data.results);
+        setNextCategoriesUrl(data.next);
+        setPrevCategoriesUrl(data.previous);
+      } else {
         setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
-    fetchCategories();
+  useEffect(() => {
+    fetchCategories(
+      "https://backend.kidsdesigncompany.com/api/inventory-item-category/"
+    );
   }, []);
 
   useEffect(() => {
@@ -224,6 +236,7 @@ const EditItemPage: React.FC = () => {
               Category
             </label>
             <select
+              name="category"
               value={formData.category}
               onChange={(e) =>
                 setFormData({ ...formData, category: e.target.value })
@@ -237,6 +250,28 @@ const EditItemPage: React.FC = () => {
                 </option>
               ))}
             </select>
+            <div className="flex justify-between mt-2">
+              <button
+                type="button"
+                onClick={() =>
+                  prevCategoriesUrl && fetchCategories(prevCategoriesUrl)
+                }
+                disabled={!prevCategoriesUrl}
+                className="px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  nextCategoriesUrl && fetchCategories(nextCategoriesUrl)
+                }
+                disabled={!nextCategoriesUrl}
+                className="px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
           </div>
 
           {/* Other fields... */}

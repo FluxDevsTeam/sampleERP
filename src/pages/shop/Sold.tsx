@@ -79,7 +79,7 @@ export const Sold = () => {
       >
         Sold Summary
       </h1>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-11">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-11">
         <InventoryData info="Non project sales for this month" digits={thisMonthNonProjectSales} trend="up"></InventoryData>
         <InventoryData info="This month profit" digits={thisMonthProfit} trend="up"></InventoryData>
         <InventoryData info="Project sales for this month" digits={thisMonthProjectSales} trend="up"></InventoryData>

@@ -14,64 +14,40 @@ import {
 
 const MonthlyProfitChart = () => {
   const [month1, setMonth1] = useState("January");
-  const [month1Num, setMonth1Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
+  const [month1Num, setMonth1Num] = useState(0);
 
   const [month2, setMonth2] = useState("February");
-  const [month2Num, setMonth2Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
+  const [month2Num, setMonth2Num] = useState(0);
 
   const [month3, setMonth3] = useState("March");
-  const [month3Num, setMonth3Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
+  const [month3Num, setMonth3Num] = useState(0);
 
   const [month4, setMonth4] = useState("April");
-  const [month4Num, setMonth4Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
+  const [month4Num, setMonth4Num] = useState(0);
 
   const [month5, setMonth5] = useState("May");
-  const [month5Num, setMonth5Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
+  const [month5Num, setMonth5Num] = useState(0);
 
   const [month6, setMonth6] = useState("June");
-  const [month6Num, setMonth6Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
+  const [month6Num, setMonth6Num] = useState(0);
 
   const [month7, setMonth7] = useState("July");
-  const [month7Num, setMonth7Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
+  const [month7Num, setMonth7Num] = useState(0);
 
   const [month8, setMonth8] = useState("August");
-  const [month8Num, setMonth8Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
+  const [month8Num, setMonth8Num] = useState(0);
 
   const [month9, setMonth9] = useState("September");
-  const [month9Num, setMonth9Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
+  const [month9Num, setMonth9Num] = useState(0);
 
   const [month10, setMonth10] = useState("October");
-  const [month10Num, setMonth10Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
+  const [month10Num, setMonth10Num] = useState(0);
 
   const [month11, setMonth11] = useState("November");
-  const [month11Num, setMonth11Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
+  const [month11Num, setMonth11Num] = useState(0);
 
   const [month12, setMonth12] = useState("December");
-  const [month12Num, setMonth12Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
+  const [month12Num, setMonth12Num] = useState(0);
 
   const data = [
     { month: month1, value: month1Num },
@@ -93,12 +69,13 @@ const MonthlyProfitChart = () => {
       // INVENTORY DASHBOARD
       try {
         const response = await fetch(
-          "https://backend.kidsdesigncompany.com/api/shopkeeper-dashboard/", {
+          "https://backend.kidsdesigncompany.com/api/shopkeeper-dashboard/",
+          {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
               Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            }
+            },
           }
         );
 

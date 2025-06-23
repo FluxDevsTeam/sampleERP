@@ -146,7 +146,7 @@ const router = createBrowserRouter([
       },
       {
         path: "products",
-        element: <CEOProducts />,
+        element: <ProductsTable />,
       },
       {
         path: "store",
@@ -226,7 +226,7 @@ const router = createBrowserRouter([
       },
       {
         path: "products",
-        element: <FactoryManagerProducts />,
+        element: <ProductsTable />,
       },
       {
         path: "expenses",

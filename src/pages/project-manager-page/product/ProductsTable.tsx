@@ -12,10 +12,12 @@ import {
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/pages/AuthPages/AuthContext";
 // import { Accordion } from "rsuite";
 import Modal from "@/pages/shop/Modal";
 
 interface TableData {
+  id: number;
   Product: string;
   "Linked Projects": string;
   Price: string;
@@ -25,6 +27,7 @@ interface TableData {
 }
 
 const ProductsTable: React.FC = () => {
+  const { user } = useAuth();
   const headers = [
     "Product",
     "Linked Project",
@@ -41,6 +44,7 @@ const ProductsTable: React.FC = () => {
   // SEARCH
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [ordering, setOrdering] = useState<string>("");
 
   // MODAL STATES
   const [showProductDetailsModal, setShowProductDetailsModal] =
@@ -81,16 +85,67 @@ const ProductsTable: React.FC = () => {
   const [showSketch, setShowSketch] = useState(false);
   const [showImage, setShowImage] = useState(false);
 
+    const [editingProgress, setEditingProgress] = useState(false);
+  const [currentProgress, setCurrentProgress] = useState(0);
+
   // RAW MATERIALS Usdc
   const [rawMaterials, setRawMaterials] = useState<any[]>([]);
-  const [productProgress, setProductProgress] = useState<{ [key: number]: number }>({});
+
+  const handleUpdateProgress = async () => {
+    if (!selectedProduct) return;
+    try {
+      const response = await fetch(
+        `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+          body: JSON.stringify({ progress: currentProgress }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update progress");
+      }
+
+      const updatedProduct = await response.json();
+
+      // Update the table data locally without re-fetching everything
+      setTableData((prevTableData) =>
+        prevTableData.map((product) =>
+          product.id === updatedProduct.id
+            ? { ...product, progress: updatedProduct.progress }
+            : product
+        )
+      );
+
+      // Update the selected product in the modal
+      setSelectedProduct(updatedProduct);
+      // Re-fetch to ensure consistency, can be optimized later
+      fetchProducts(); 
+      setEditingProgress(false);
+    } catch (error) {
+      console.error("Error updating progress:", error);
+    }
+  };
 
   const fetchProducts = async () => {
+    let url = `https://backend.kidsdesigncompany.com/api/product/`;
+    const params = new URLSearchParams();
+    if (searchQuery) {
+      params.append('search', searchQuery);
+    }
+    if (ordering) {
+      params.append('ordering', ordering);
+    }
+    if (params.toString()) {
+      url += `?${params.toString()}`;
+    }
     try {
       setLoading(true);
-      const url = searchQuery
-        ? `https://backend.kidsdesigncompany.com/api/product/?search=${searchQuery}`
-        : `https://backend.kidsdesigncompany.com/api/product/`;
+
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -104,18 +159,12 @@ const ProductsTable: React.FC = () => {
       }
 
       const data = await response.json();
-      // console.log("API Response:", data);
       console.log(data);
 
-      const initialProgress: { [key: number]: number } = {};
-      data.results.forEach((item: any) => {
-        initialProgress[item.id] = item.progress;
-      });
-      setProductProgress(initialProgress);
-
       const updatedTableData: TableData[] = data.results.map((item: any) => {
-
         return {
+          id: item.id,
+        
           Product: (
             <div className="items-center">
               <p
@@ -170,28 +219,13 @@ const ProductsTable: React.FC = () => {
             </button>
           ),
           Progress: (
-            <div className="flex items-center space-x-2">
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={productProgress[item.id] !== undefined ? productProgress[item.id] : 0}
-                onChange={(e) => {
-                  const newProgress = parseInt(e.target.value);
-                  setProductProgress((prevProgress) => ({
-                    ...prevProgress,
-                    [item.id]: newProgress,
-                  }));
-                }}
-                className="w-24"
-              />
-              <span>{productProgress[item.id] || 0}%</span>
-              <button
-                onClick={() => handleUpdateProgress(item.id, productProgress[item.id])}
-                className="px-2 py-1 bg-green-500 text-white rounded text-xs"
+            <div className="w-full bg-gray-200 rounded-full h-3 relative">
+              <div
+                className="bg-blue-400 h-3 rounded-full flex items-center justify-center text-white text-xs font-semibold"
+                style={{ width: `${item.progress}%` }}
               >
-                Save
-              </button>
+                <span className="text-[10px]">{item.progress}%</span>
+              </div>
             </div>
           ),
         };
@@ -207,7 +241,7 @@ const ProductsTable: React.FC = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [searchQuery]);
+  }, [searchQuery, ordering]);
 
   // Calculate pagination values
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -238,7 +272,7 @@ const ProductsTable: React.FC = () => {
       (location.state?.from === "addWorker" ||
         location.state?.from === "addContractor" ||
         location.state?.from === "addQuotation" ||
-        location.state?.from === "editQuotation" || // Add this line
+        location.state?.from === "editQuotation" ||
         location.state?.from === "editProduct") &&
       location.state?.productData
     ) {
@@ -593,47 +627,12 @@ const ProductsTable: React.FC = () => {
     }
   };
 
-  const handleUpdateProgress = async (productId: number, progress: number) => {
-    try {
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/product/${productId}/`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-          body: JSON.stringify({ progress: progress }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to update product progress");
-      }
-
-      setModalConfig({
-        isOpen: true,
-        title: "Success",
-        message: "Product progress updated successfully!",
-        type: "success",
-      });
-      fetchProducts(); // Re-fetch products to update the table
-    } catch (error) {
-      console.error("Error updating product progress:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Error",
-        message: "Failed to update product progress",
-        type: "error",
-      });
-    }
-  };
-
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
   };
 
-  const confirmDeleteProduct = () => {
+  const confirmDeleteProduct = (id: number) => {
+    setSelectedProduct({ id });
     setConfirmDelete(true);
   };
 
@@ -694,13 +693,24 @@ const ProductsTable: React.FC = () => {
                   <FontAwesomeIcon icon={faSearch} />
                 </button>
               </div>
-              <button
-                onClick={() => navigate("/project-manager/add-product")}
-                className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
-              >
-                <FontAwesomeIcon className="pr-2" icon={faPlus} />
-                Add Product
-              </button>
+              <div className="flex items-center space-x-4">
+                <select
+                  value={ordering}
+                  onChange={(e) => setOrdering(e.target.value)}
+                  className="bg-white border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                >
+                  <option value="">Sort by</option>
+                  <option value="progress">Progress - Ascending</option>
+                  <option value="-progress">Progress - Descending</option>
+                </select>
+                <button
+                  onClick={() => navigate("/project-manager/add-product")}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                  Add Product
+                </button>
+              </div>
             </div>
             <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
               <thead>
@@ -793,18 +803,65 @@ const ProductsTable: React.FC = () => {
 
             <div>
               {/* PROGRESS BAR */}
-              <p className="text-sm text-gray-20 mb-3">
-                <span className="font-semibold">Progress rate:</span>{" "}
-                <span className="text-xs text-gray-500 mt-1">
-                  {selectedProduct.progress}% complete
-                </span>
-                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                  <div
-                    className="bg-blue-400 h-2.5 rounded-full"
-                    style={{ width: `${selectedProduct.progress}%` }}
-                  ></div>
-                </div>
-              </p>
+              <div className="text-sm text-gray-20 mb-3">
+                <span className="font-semibold">Progress rate:</span>
+                {!editingProgress ? (
+                  <div className="flex items-center mt-1">
+                    <div className="flex-grow">
+                      <span className="text-xs text-gray-500">
+                        {selectedProduct.progress}% complete
+                      </span>
+                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+                        <div
+                          className="bg-blue-400 h-2.5 rounded-full"
+                          style={{ width: `${selectedProduct.progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <button
+                        onClick={() => {
+                          setCurrentProgress(selectedProduct.progress);
+                          setEditingProgress(true);
+                        }}
+                        className="ml-4 px-3 py-1 text-sm bg-blue-500 text-white rounded-lg"
+                      >
+                        Edit
+                      </button>
+                  </div>
+                ) : (
+                  <div className="mt-2">
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-sm text-black-600">
+                        Set Progress: {currentProgress}%
+                      </label>
+                      <div>
+                        <button
+                          onClick={handleUpdateProgress}
+                          className="px-3 py-1 text-sm bg-green-700 text-white rounded-lg mr-2"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingProgress(false)}
+                          className="px-3 py-1 text-sm bg-gray-300 text-black rounded-lg"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={currentProgress}
+                      onChange={(e) =>
+                        setCurrentProgress(Number(e.target.value))
+                      }
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                )}
+              </div>
 
               {/* SKETCH VIEW */}
               <button
@@ -1020,30 +1077,34 @@ const ProductsTable: React.FC = () => {
             {/* Product detail EDIT AND DELETE ICONS */}
             <div className="mt-6 flex items-center justify-between">
               <div className="flex space-x-2">
-                <button
-                  onClick={() =>
-                    navigate(
-                      `/project-manager/edit-product/${selectedProduct.id}`
-                    )
-                  }
-                  className="p-2 pr-3 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
-                >
-                  <FontAwesomeIcon
-                    className="mr-1 text-xs text-blue-400"
-                    icon={faPencil}
-                  />
-                  <span>Update</span>
-                </button>
-                <button
-                  onClick={confirmDeleteProduct}
-                  className="p-2 pr-3 text-red-400 rounded-lg border-2 border-red-400 font-bold"
-                >
-                  <FontAwesomeIcon
-                    className="mr-1 text-xs text-red-400"
-                    icon={faTrash}
-                  />
-                  <span>Delete</span>
-                </button>
+                {user?.role === 'ceo' && (
+                  <>
+                    <button
+                      onClick={() =>
+                        navigate(
+                          `/project-manager/edit-product/${selectedProduct.id}`
+                        )
+                      }
+                      className="p-2 pr-3 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
+                    >
+                      <FontAwesomeIcon
+                        className="mr-1 text-xs text-blue-400"
+                        icon={faPencil}
+                      />
+                      <span>Update</span>
+                    </button>
+                    <button
+                      onClick={() => confirmDeleteProduct(selectedProduct.id)}
+                      className="p-2 pr-3 text-red-400 rounded-lg border-2 border-red-400 font-bold"
+                    >
+                      <FontAwesomeIcon
+                        className="mr-1 text-xs text-red-400"
+                        icon={faTrash}
+                      />
+                      <span>Delete</span>
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -1106,12 +1167,14 @@ const ProductsTable: React.FC = () => {
                         </p>
                       </div>
                       <div className="grid">
-                        <button
-                          onClick={() => handleDeleteContractor(contractor.id)}
-                          className="text-red-400 hover:text-red-600 p-2"
-                        >
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
+                        {user?.role === 'ceo' && (
+                          <button
+                            onClick={() => handleDeleteContractor(contractor.id)}
+                            className="text-red-400 hover:text-red-600 p-2"
+                          >
+                            <FontAwesomeIcon icon={faTrash} />
+                          </button>
+                        )}
                         <button
                           onClick={() => handleEditContractor(contractor)}
                           className="text-blue-400 hover:text-blue-600 p-2"
@@ -1160,7 +1223,8 @@ const ProductsTable: React.FC = () => {
               }}
               className="bg-blue-400 text-white p-1 px-[10px] mb-3 rounded-lg hover:bg-blue-500 transition-colors"
             >
-              <FontAwesomeIcon icon={faPlus} className="text-xs" />
+              <FontAwesomeIcon icon={faPlus}
+className="text-xs" />
             </button>
 
             <div className="space-y-4">
@@ -1181,12 +1245,14 @@ const ProductsTable: React.FC = () => {
                         </p>
                       </div>
                       <div className="grid">
-                        <button
-                          onClick={() => handleDeleteWorker(worker.id)}
-                          className="text-red-400 hover:text-red-600 p-2"
-                        >
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
+                        {user?.role === 'ceo' && (
+                          <button
+                            onClick={() => handleDeleteWorker(worker.id)}
+                            className="text-red-400 hover:text-red-600 p-2"
+                          >
+                            <FontAwesomeIcon icon={faTrash} />
+                          </button>
+                        )}
                         <button
                           onClick={() => handleEditWorker(worker)}
                           className="text-blue-400 hover:text-blue-600 p-2"
@@ -1507,28 +1573,30 @@ const ProductsTable: React.FC = () => {
                     </div>
 
                     <div className="flex justify-end space-x-2 mt-6">
-                      <button
-                        onClick={() =>
-                          navigate(
-                            `/project-manager/edit-quotation/${selectedProduct.id}/${item.id}`
-                          )
-                        }
-                        className="p-1 px-3 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
-                      >
-                        <FontAwesomeIcon
-                          className="text-xs text-blue-400"
-                          icon={faPencil}
-                        />
-                      </button>
-                      <button
-                        onClick={() => deleteQuotation(item.id)}
-                        className="p-1 px-3 text-red-400 rounded-lg border-2 border-red-400 font-bold"
-                      >
-                        <FontAwesomeIcon
-                          className="text-xs text-red-400"
-                          icon={faTrash}
-                        />
-                      </button>
+                      {user?.role === 'ceo' && (
+                        <>
+                          <button
+                            onClick={() =>
+                              navigate(`/project-manager/edit-quotation/${selectedProduct.id}/${item.id}`)
+                            }
+                            className="p-1 px-3 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
+                          >
+                            <FontAwesomeIcon
+                              className="text-xs text-blue-400"
+                              icon={faPencil}
+                            />
+                          </button>
+                          <button
+                            onClick={() => deleteQuotation(item.id)}
+                            className="p-1 px-3 text-red-400 rounded-lg border-2 border-red-400 font-bold"
+                          >
+                            <FontAwesomeIcon
+                              className="text-xs text-red-400"
+                              icon={faTrash}
+                            />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}

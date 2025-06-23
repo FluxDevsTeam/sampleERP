@@ -245,7 +245,7 @@ export const shopSidebarLink: SidebarProps[] = [
   },
   {
     id: nanoid(),
-    text: "Stock Added",
+    text: "Add Stock",
     href: "/shop/stock",
     icon: <FontAwesomeIcon className="text-2xl pr-1" icon={faPlusCircle} />,
   },

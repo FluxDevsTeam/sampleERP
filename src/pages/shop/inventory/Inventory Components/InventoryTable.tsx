@@ -19,6 +19,10 @@ import Modal from "../../Modal";
 interface TableProps {
   headers: string[];
   onModalChange: (isOpen: boolean) => void;
+  searchQuery: string;
+  archived: boolean;
+  emptyStock: boolean;
+  lowStock: boolean;
 }
 
 interface TableData {
@@ -29,7 +33,15 @@ interface TableData {
   [key: string]: string | number | JSX.Element;
 }
 
-const Table: React.FC<TableProps> = ({ headers, onModalChange }) => {
+const Table: React.FC<TableProps> = ({
+  headers,
+  onModalChange,
+  searchQuery,
+  archived,
+  emptyStock,
+  lowStock,
+}) => {
+  const userRole = localStorage.getItem("user_role");
   const [tableData, setTableData] = useState<TableData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -50,8 +62,23 @@ const Table: React.FC<TableProps> = ({ headers, onModalChange }) => {
   const fetchItems = async () => {
     try {
       setLoading(true);
+
+      const params = new URLSearchParams();
+      if (searchQuery) {
+        params.append("search", searchQuery);
+      }
+      if (archived) {
+        params.append("archived", "true");
+      }
+      if (emptyStock) {
+        params.append("empty_stock", "true");
+      }
+      if (lowStock) {
+        params.append("low_stock", "true");
+      }
+
       const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/inventory-item/`,
+        `https://backend.kidsdesigncompany.com/api/inventory-item/?${params.toString()}`,
         {
           method: "GET",
           headers: {
@@ -96,7 +123,7 @@ const Table: React.FC<TableProps> = ({ headers, onModalChange }) => {
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [searchQuery, archived, emptyStock, lowStock]);
 
   // Calculate pagination values
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -390,20 +417,30 @@ const Table: React.FC<TableProps> = ({ headers, onModalChange }) => {
               {selectedProduct.total_price}
             </p>
 
-            <button
-              onClick={editItem}
-              className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold"
-            >
-              <FontAwesomeIcon className="pr-1 text-blue-400" icon={faPencil} />
-              Edit details
-            </button>
-            <button
-              onClick={confirmDeleteItem}
-              className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
-            >
-              <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
-              Delete Item
-            </button>
+            {userRole === "ceo" && (
+              <>
+                <button
+                  onClick={editItem}
+                  className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold"
+                >
+                  <FontAwesomeIcon
+                    className="pr-1 text-blue-400"
+                    icon={faPencil}
+                  />
+                  Edit details
+                </button>
+                <button
+                  onClick={confirmDeleteItem}
+                  className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
+                >
+                  <FontAwesomeIcon
+                    className="pr-1 text-red-400"
+                    icon={faTrash}
+                  />
+                  Delete Item
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

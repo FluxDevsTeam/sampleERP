@@ -10,6 +10,10 @@ const FactoryManagerCustomers = () => {
   const [activeCustomers, setActiveCustomers] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [nextPage, setNextPage] = useState<string | null>(null);
+  const [previousPage, setPreviousPage] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [showModal, setShowModal] = useState(false);
   const [newCustomer, setNewCustomer] = useState({
@@ -72,31 +76,55 @@ const FactoryManagerCustomers = () => {
     }).replace(" ", ", ");
   };
 
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchData();
-        
-        console.log("Fetched data:", data); // Debugging log
-
-        if (data && data.results) {
-          setCustomers(Array.isArray(data.results.all_customers) ? data.results.all_customers : []);
-          setTotalCustomers(data.results.all_customers_count || 0);
-          setActiveCustomers(data.results.active_customers || 0);
-        } else {
-          setError("Invalid data received.");
+  const fetchCustomers = async (url: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `JWT ${localStorage.getItem('accessToken')}`
         }
-      } catch (err) {
-        console.error("Error fetching customers:", err);
-        setError("Failed to load customers.");
-      } finally {
-        setLoading(false);
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
+      const data = await response.json();
 
-    fetchCustomers();
+      console.log("Fetched data:", data); // Debugging log
+
+      if (data && data.results) {
+        setCustomers(Array.isArray(data.results.all_customers) ? data.results.all_customers : []);
+        setTotalCustomers(data.results.all_customers_count || 0);
+        setActiveCustomers(data.results.active_customers || 0);
+        setNextPage(data.next);
+        setPreviousPage(data.previous);
+      } else {
+        setError("Invalid data received.");
+      }
+    } catch (err) {
+      console.error("Error fetching customers:", err);
+      setError("Failed to load customers.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const initialUrl = `https://backend.kidsdesigncompany.com/api/customer/`;
+    fetchCustomers(initialUrl);
   }, []);
+
+  const handleSearch = () => {
+    const searchUrl = `https://backend.kidsdesigncompany.com/api/customer/?search=${searchTerm}`;
+    fetchCustomers(searchUrl);
+    setCurrentPage(1); 
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
+    const initialUrl = `https://backend.kidsdesigncompany.com/api/customer/`;
+    fetchCustomers(initialUrl);
+    setCurrentPage(1);
+  };
 
   if (loading) {
     return (
@@ -116,17 +144,6 @@ const FactoryManagerCustomers = () => {
 
   return (
     <div className="px-10 py-5 text-[#0A0A0A]">
-      <div className="flex justify-between pr-52 m-10">
-        <h2 className="text-[#0178A3] font-semibold text-[24px]">Active Customers</h2>
-        <div className="flex items-center">
-          {[...Array(5)].map((_, i) => (
-            <img key={i} src={img} alt="Customer" className="w-12 h-12 rounded-full -ml-2 first:ml-0" />
-          ))}
-          <span className="bg-gray-500 text-white flex justify-center items-center border w-12 h-12 rounded-full -ml-2 first:ml-0">
-            12+
-          </span>
-        </div>
-      </div>
 
       <div className="flex justify-between items-center gap-28 mb-8">
         <article className="border rounded-lg p-5 shadow-md flex-1">
@@ -135,15 +152,28 @@ const FactoryManagerCustomers = () => {
         </article>
 
         <article className="border rounded-lg p-5 shadow-md flex-1">
-          <p className="font-bold text-[14px] text-[#767676] mb-2">Active Users</p>
+          <p className="font-bold text-[14px] text-[#767676] mb-2">Active Customers</p>
           <p className="text-[#0178A3] text-[36px] font-bold">{activeCustomers}</p>
         </article>
       </div>
 
-      <button onClick={() => setShowModal(true)} className="bg-[#FF3B30] text-white flex items-center gap-3 px-4 py-1 mb-6 rounded-lg">
-        <span className="font-extrabold text-[30px]">+</span>
-        <span className="text-[16px]"> Create Customer</span>
-      </button>
+      <div className="flex justify-between items-center mb-6">
+        <button onClick={() => setShowModal(true)} className="bg-[#232595b3] text-white flex items-center gap-3 px-4 py-1 rounded-lg">
+          <span className="font-extrabold text-[30px]">+</span>
+          <span className="text-[16px]"> Create Customer</span>
+        </button>
+        <div className="flex items-center gap-2">
+          <input 
+            type="text" 
+            placeholder="Search customers..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="border p-2 rounded-lg"
+          />
+          <button onClick={handleSearch} className="bg-blue-600 text-white px-4 py-2 rounded-lg">Search</button>
+          <button onClick={clearSearch} className="bg-gray-500 text-white px-4 py-2 rounded-lg">Clear</button>
+        </div>
+      </div>
 
       {showModal && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
@@ -188,6 +218,34 @@ const FactoryManagerCustomers = () => {
           ))}
         </tbody>
       </table>
+
+      <div className="flex justify-center items-center mt-6">
+        <button 
+          onClick={() => {
+            if (previousPage) {
+              fetchCustomers(previousPage);
+              setCurrentPage(currentPage - 1);
+            }
+          }}
+          disabled={!previousPage || loading}
+          className="bg-gray-500 text-white px-4 py-2 rounded-lg mr-2 disabled:bg-gray-300"
+        >
+          Previous
+        </button>
+        <span className="text-lg font-semibold">{currentPage}</span>
+        <button 
+          onClick={() => {
+            if (nextPage) {
+              fetchCustomers(nextPage);
+              setCurrentPage(currentPage + 1);
+            }
+          }}
+          disabled={!nextPage || loading}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg ml-2 disabled:bg-gray-300"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };
