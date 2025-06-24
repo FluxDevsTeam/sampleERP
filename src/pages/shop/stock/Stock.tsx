@@ -38,44 +38,42 @@ const Stock = () => {
 
   return (
     <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
-      <h1
+      {/* <h1
         style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-        className="font-semibold py-5 mt-2"
+        className="font-medium py-0 mt-2"
       >
         Sold Summary
-      </h1>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-11">
-        <InventoryData
-          info="Yearly Added Stock"
-          digits={stockData.yearly_added_stock_count}
-          trend="up"
-        ></InventoryData>
-        <InventoryData
-          info="Yearly Added Total Cost Price"
-          digits={stockData.yearly_added_total_cost_price}
-          trend="up"
+      </h1> */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mt-4 mb-10">
+      <InventoryData
+          info="Daily Added Cost Total"
+          digits={stockData.daily_added_cost_total}
+          currency="₦"
         ></InventoryData>
         <InventoryData
           info="Monthly Added Stock"
           digits={stockData.monthly_added_stock_count}
-          trend="up"
         ></InventoryData>
         <InventoryData
           info="Monthly Added Total Cost Price"
           digits={stockData.monthly_added_total_cost_price}
-          trend="up"
+          currency="₦"
         ></InventoryData>
         <InventoryData
-          info="Daily Added Cost Total"
-          digits={stockData.daily_added_cost_total}
-          trend="up"
+          info="Yearly Added Stock"
+          digits={stockData.yearly_added_stock_count}
+        ></InventoryData>
+        <InventoryData
+          info="Yearly Added Total Cost Price"
+          digits={stockData.yearly_added_total_cost_price}
+          currency="₦"
         ></InventoryData>
       </div>
 
       <div>
         <h1
           style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-          className="font-semibold py-5 mt-2"
+          className="font-medium py-5 mt-2"
         >
           Stocks Added
         </h1>

@@ -2,12 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-
-interface InventoryItem {
-  id: number;
-  name: string;
-  date: string;
-}
+import SearchablePaginatedDropdown from "../../sold/Sold Components/SearchablePaginatedDropdown";
 
 const Modal = ({
   isOpen,
@@ -56,18 +51,14 @@ const Modal = ({
 
 const AddNewStockPage = () => {
   const navigate = useNavigate();
-  const [items, setItems] = useState<InventoryItem[]>([]);
   const [formData, setFormData] = useState({
     quantity: "",
     item: "",
-    date: new Date().toISOString().split("T")[0], // Set default date to current date
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -75,38 +66,17 @@ const AddNewStockPage = () => {
     }));
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [itemResponse] = await Promise.all([
-          fetch(
-            "https://backend.kidsdesigncompany.com/api/inventory-item/",{
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-              },
-            }
-          ),
-        ]);
-
-        if (!itemResponse.ok) throw new Error("Failed to fetch data");
-        const itemData = await itemResponse.json();
-
-        setItems(itemData.results.items);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const handleDropdownChange = (name: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   useEffect(() => {
     setFormData({
       quantity: "",
       item: "",
-      date: new Date().toISOString().split("T")[0], // Reset date to current date
     });
   }, []);
 
@@ -117,7 +87,6 @@ const AddNewStockPage = () => {
       const submitData = {
         quantity: parseFloat(formData.quantity),
         item: formData.item,
-        date: formData.date,
       };
 
       const response = await fetch(
@@ -156,23 +125,13 @@ const AddNewStockPage = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1">Item:</label>
-          <select
-            name="item"
-            value={formData.item}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-            required
-          >
-            <option value="">Select an item</option>
-            {items.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <SearchablePaginatedDropdown
+          endpoint="https://backend.kidsdesigncompany.com/api/inventory-item/"
+          label="Item"
+          name="item"
+          onChange={handleDropdownChange}
+          resultsKey="results.items"
+        />
         <div>
           <label className="block mb-1">Quantity:</label>
           <input
@@ -185,17 +144,7 @@ const AddNewStockPage = () => {
           />
         </div>
 
-        <div>
-          <label className="block mb-1">Date:</label>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-            required
-          />
-        </div>
+
 
         <button
           type="submit"

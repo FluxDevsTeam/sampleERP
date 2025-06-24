@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ThreeDots } from "react-loader-spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -35,6 +35,7 @@ interface StockEntry {
 interface DailyData {
   date: string;
   entries: StockEntry[];
+  daily_added_cost_total: number;
 }
 
 interface ApiResponse {
@@ -52,6 +53,7 @@ const StockTable: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [stockData, setStockData] = useState<DailyData[]>([]);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [openDates, setOpenDates] = useState<{ [key: string]: boolean }>({});
   const [showModal, setShowModal] = useState(false);
   const [selectedStock, setSelectedStock] = useState<SelectedStock | null>(
@@ -67,12 +69,75 @@ const StockTable: React.FC = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<StockEntry | null>(null);
   const [showImage, setShowImage] = useState(false);
+  const [year, setYear] = useState<number | string>("");
+  const [month, setMonth] = useState<number | string>("");
+  const [day, setDay] = useState<number | string>("");
+  const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isMonthOpen, setIsMonthOpen] = useState(false);
+  const [isDayOpen, setIsDayOpen] = useState(false);
 
-  const fetchItems = async () => {
+  const yearRef = useRef<HTMLDivElement>(null);
+  const monthRef = useRef<HTMLDivElement>(null);
+  const dayRef = useRef<HTMLDivElement>(null);
+
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (yearRef.current && !yearRef.current.contains(event.target as Node)) {
+        setIsYearOpen(false);
+      }
+      if (monthRef.current && !monthRef.current.contains(event.target as Node)) {
+        setIsMonthOpen(false);
+      }
+      if (dayRef.current && !dayRef.current.contains(event.target as Node)) {
+        setIsDayOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+
+  const handleFilter = () => {
+    fetchItems(year, month, day);
+  };
+
+  const handleClear = () => {
+    setYear("");
+    setMonth("");
+    setDay("");
+    fetchItems();
+  };
+
+  const formatNumber = (number: number | string | undefined | null) => {
+    if (number === undefined || number === null || number === "") {
+      return "0";
+    }
+    const num = typeof number === "string" ? parseFloat(number) : number;
+    if (isNaN(num)) {
+      return String(number);
+    }
+    return num.toLocaleString("en-US");
+  };
+
+  useEffect(() => {
+    const role = localStorage.getItem("user_role");
+    setUserRole(role);
+  }, []);
+
+  const fetchItems = async (filterYear?: number | string, filterMonth?: number | string, filterDay?: number | string) => {
     try {
       setLoading(true);
+      let url = "https://backend.kidsdesigncompany.com/api/add-stock/?";
+      if (filterYear) url += `year=${filterYear}&`;
+      if (filterMonth) url += `month=${filterMonth}&`;
+      if (filterDay) url += `day=${filterDay}`;
+
       const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/add-stock/",{
+        url,{
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -89,6 +154,9 @@ const StockTable: React.FC = () => {
       console.log(data);
 
       setStockData(data.daily_data);
+      if (data.daily_data && data.daily_data.length > 0) {
+        setOpenDates({ [data.daily_data[0].date]: true });
+      }
     } catch (error) {
       console.error("Error fetching stock items:", error);
     } finally {
@@ -192,13 +260,65 @@ const StockTable: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-6 ">
-            <button
-              onClick={() => navigate("/shop/add-new-stock-item")}
-              className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
-            >
-              <FontAwesomeIcon className="pr-2" icon={faPlus} />
-              Add Stock
-            </button>
+            <div className="flex justify-between items-center mb-4">
+              <button
+                onClick={() => navigate("/shop/add-new-stock-item")}
+                className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
+              >
+                <FontAwesomeIcon className="pr-2" icon={faPlus} />
+                Add Stock
+              </button>
+              <div className="flex items-center space-x-2">
+                {/* Year Dropdown */}
+                <div className="relative w-24" ref={yearRef}>
+                  <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
+                    <span>{year || 'Year'}</span>
+                    <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} />
+                  </button>
+                  {isYearOpen && (
+                    <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                      <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Year</li>
+                      {[...Array(10)].map((_, i) => {
+                        const y = new Date().getFullYear() - i;
+                        return <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{y}</li>
+                      })}
+                    </ul>
+                  )}
+                </div>
+                {/* Month Dropdown */}
+                <div className="relative w-32" ref={monthRef}>
+                  <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
+                    <span>{month ? months[Number(month) - 1] : 'Month'}</span>
+                    <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} />
+                  </button>
+                  {isMonthOpen && (
+                    <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                      <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Month</li>
+                      {months.map((m, i) => (
+                        <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{m}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                {/* Day Dropdown */}
+                <div className="relative w-24" ref={dayRef}>
+                  <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
+                    <span>{day || 'Day'}</span>
+                    <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} />
+                  </button>
+                  {isDayOpen && (
+                    <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                      <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Day</li>
+                      {[...Array(31)].map((_, i) => (
+                        <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{i + 1}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <button onClick={handleFilter} className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">Filter</button>
+                <button onClick={handleClear} className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors">Clear</button>
+              </div>
+            </div>
 
             {stockData.map((dayData) => (
               <div
@@ -206,21 +326,17 @@ const StockTable: React.FC = () => {
                 className="bg-white shadow-md rounded-lg overflow-auto"
               >
                 <div
-                  className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-300 hover:text-blue-20 w-full"
+                  className="bg-gray-100 p-4 rounded-lg cursor-pointer flex justify-between items-center"
                   onClick={() => toggleDate(dayData.date)}
                 >
-                  <div className="flex items-center space-x-2">
+                  <h3 className="text-lg font-semibold">{formatDate(dayData.date)}</h3>
+                  <div className="flex items-center">
+                    <span className="mr-4 font-semibold text-gray-700">
+                      Total: ₦{formatNumber(dayData.daily_added_cost_total)}
+                    </span>
                     <FontAwesomeIcon
-                      icon={
-                        openDates[dayData.date] ? faChevronUp : faChevronDown
-                      }
+                      icon={openDates[dayData.date] ? faChevronUp : faChevronDown}
                     />
-                    <h3
-                      className="text-lg font-semibold"
-                      style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
-                    >
-                      {formatDate(dayData.date)}
-                    </h3>
                   </div>
                 </div>
 
@@ -240,22 +356,24 @@ const StockTable: React.FC = () => {
                         <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
                           {/* Details */}
                         </th>
+                        {userRole === "ceo" && (
+                          <th className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            Actions
+                          </th>
+                        )}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {dayData.entries.map((entry, index) => (
-                        <tr
-                          key={entry.id ?? index}
-                          className="hover:bg-gray-50"
-                        >
+                        <tr key={entry.id ?? index} className="hover:bg-gray-50">
                           <td className="px-4 py-3 text-sm cursor-pointer hover:text-blue-600">
                             {entry.name}
                           </td>
                           <td className="px-4 py-3 text-sm">
-                            {entry.quantity}
+                            {formatNumber(entry.quantity)}
                           </td>
                           <td className="px-4 py-3 text-sm">
-                            {entry.cost_price}
+                            ₦{formatNumber(entry.cost_price)}
                           </td>
                           <td className="px-4 py-3 text-sm text-blue-400">
                             <button
@@ -409,27 +527,29 @@ const StockTable: React.FC = () => {
               </p>
             </div>
 
-            <div className="mt-4 space-x-2">
-              <button
-                onClick={() =>
-                  navigate(`/shop/edit-stock-item/${selectedItem.id}`)
-                }
-                className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
-              >
-                <FontAwesomeIcon
-                  className="pr-1 text-blue-400"
-                  icon={faPencil}
-                />
-                Edit details
-              </button>
-              <button
-                onClick={() => confirmDeleteStock(selectedItem.id)}
-                className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 font-bold"
-              >
-                <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
-                Delete Item
-              </button>
-            </div>
+            {userRole === 'ceo' && (
+              <div className="mt-4 space-x-2">
+                <button
+                  onClick={() =>
+                    navigate(`/shop/edit-stock-item/${selectedItem.id}`)
+                  }
+                  className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
+                >
+                  <FontAwesomeIcon
+                    className="pr-1 text-blue-400"
+                    icon={faPencil}
+                  />
+                  Edit details
+                </button>
+                <button
+                  onClick={() => confirmDeleteStock(selectedItem.id)}
+                  className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 font-bold"
+                >
+                  <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
+                  Delete Item
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -23,7 +23,6 @@ const InventoryData = (InventoryData: InventoryDataProps) => {
         >
           {InventoryData.digits}
         </p>
-        <p className="text-xs">Trend: {InventoryData.trend}</p>
       </div>
     </div>
   );

@@ -58,27 +58,22 @@ const Stock = () => {
         <InventoryData
           info="Yearly Added Stock"
           digits={yearlyAddedStockCount}
-          trend="up"
         ></InventoryData>
         <InventoryData
           info="Yearly Added Total Cost Price"
           digits={yearlyAddedTotalCostPrice}
-          trend="up"
         ></InventoryData>
         <InventoryData
           info="Monthly Added Stock"
           digits={monthlyAddedStockCount}
-          trend="up"
         ></InventoryData>
         <InventoryData
           info="Monthly Added Total Cost Price"
           digits={monthlyAddedTotalCostPrice}
-          trend="up"
         ></InventoryData>
         <InventoryData
           info="Daily Added Cost Total"
           digits={dailyAddedCostTotal}
-          trend="up"
         ></InventoryData>
       </div>
 

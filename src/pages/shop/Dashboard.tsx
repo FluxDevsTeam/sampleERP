@@ -66,7 +66,7 @@ const Dashboard = () => {
   return (
     <div className="w-11/12 mx-auto mt-6 pl-1 pt-2">
       <div className="mb-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-20">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-20">
           <DashboardData
             info="Monthly Stock Added"
             digits={monthlyStock}

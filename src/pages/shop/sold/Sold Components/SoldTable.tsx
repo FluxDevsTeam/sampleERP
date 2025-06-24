@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ThreeDots } from "react-loader-spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -49,10 +49,12 @@ interface SelectedSale {
 
 const SoldTable: React.FC = () => {
   document.title = "Sold Items - KDC Admin";
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [soldData, setSoldData] = useState<DailyData[]>([]);
+  const [monthlyTotal, setMonthlyTotal] = useState(0);
   const [openDates, setOpenDates] = useState<{ [key: string]: boolean }>({});
   const [showModal, setShowModal] = useState(false);
   const [selectedSale, setSelectedSale] = useState<SelectedSale | null>(null);
@@ -65,12 +67,65 @@ const SoldTable: React.FC = () => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SoldEntry | null>(null);
+  const [year, setYear] = useState<number | string>("");
+  const [month, setMonth] = useState<number | string>("");
+  const [day, setDay] = useState<number | string>("");
+  const [userRole, setUserRole] = useState<string | null>(null);
 
-  const fetchItems = async () => {
+  useEffect(() => {
+    const role = localStorage.getItem("user_role");
+    setUserRole(role);
+  }, []);
+
+  const formatNumber = (number: number | string | undefined | null) => {
+    if (number === undefined || number === null || number === "") {
+      return "0";
+    }
+    const num = typeof number === "string" ? parseFloat(number) : number;
+    if (isNaN(num)) {
+      return String(number);
+    }
+    return num.toLocaleString("en-US");
+  };
+
+  const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isMonthOpen, setIsMonthOpen] = useState(false);
+  const [isDayOpen, setIsDayOpen] = useState(false);
+
+  const yearRef = useRef<HTMLDivElement>(null);
+  const monthRef = useRef<HTMLDivElement>(null);
+  const dayRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (yearRef.current && !yearRef.current.contains(event.target as Node)) {
+        setIsYearOpen(false);
+      }
+      if (monthRef.current && !monthRef.current.contains(event.target as Node)) {
+        setIsMonthOpen(false);
+      }
+      if (dayRef.current && !dayRef.current.contains(event.target as Node)) {
+        setIsDayOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+
+  const fetchItems = async (filterYear?: number | string, filterMonth?: number | string, filterDay?: number | string) => {
     try {
       setLoading(true);
+      let url = "https://backend.kidsdesigncompany.com/api/sold/?";
+      if (filterYear) url += `year=${filterYear}&`;
+      if (filterMonth) url += `month=${filterMonth}&`;
+      if (filterDay) url += `day=${filterDay}`;
+
+
       const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/sold/",{
+        url,{
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -87,12 +142,31 @@ const SoldTable: React.FC = () => {
       console.log(data);
 
       setSoldData(data.daily_data);
+      setMonthlyTotal(data.monthly_total);
+
+      if (data.daily_data && data.daily_data.length > 0) {
+        setOpenDates({ [data.daily_data[0].date]: true });
+      } else {
+        setOpenDates({});
+      }
     } catch (error) {
       console.error("Error fetching sold items:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  const handleFilter = () => {
+    fetchItems(year, month, day);
+  };
+
+  const handleClear = () => {
+    setYear("");
+    setMonth("");
+    setDay("");
+    fetchItems();
+  };
+
 
   useEffect(() => {
     fetchItems();
@@ -189,13 +263,65 @@ const SoldTable: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-6 ">
-            <button
-              onClick={() => navigate("/shop/add-new-sold-item")}
-              className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
-            >
-              <FontAwesomeIcon className="pr-2" icon={faPlus} />
-              Record Sale
-            </button>
+            <div className="flex justify-between items-center mb-4">
+              <button
+                onClick={() => navigate("/shop/add-new-sold-item")}
+                className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
+              >
+                <FontAwesomeIcon className="pr-2" icon={faPlus} />
+                Record Sale
+              </button>
+              <div className="flex items-center space-x-2">
+                {/* Year Dropdown */}
+                <div className="relative w-24" ref={yearRef}>
+                  <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
+                    <span>{year || 'Year'}</span>
+                    <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} />
+                  </button>
+                  {isYearOpen && (
+                    <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                      <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Year</li>
+                      {[...Array(10)].map((_, i) => {
+                        const y = new Date().getFullYear() - i;
+                        return <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{y}</li>
+                      })}
+                    </ul>
+                  )}
+                </div>
+                {/* Month Dropdown */}
+                <div className="relative w-32" ref={monthRef}>
+                  <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
+                    <span>{month ? months[Number(month) - 1] : 'Month'}</span>
+                    <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} />
+                  </button>
+                  {isMonthOpen && (
+                    <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                      <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Month</li>
+                      {months.map((m, i) => (
+                        <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{m}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                {/* Day Dropdown */}
+                <div className="relative w-24" ref={dayRef}>
+                  <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
+                    <span>{day || 'Day'}</span>
+                    <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} />
+                  </button>
+                  {isDayOpen && (
+                    <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                      <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Day</li>
+                      {[...Array(31)].map((_, i) => (
+                        <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{i + 1}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <button onClick={handleFilter} className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">Filter</button>
+                <button onClick={handleClear} className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors">Clear</button>
+              </div>
+            </div>
 
             {soldData.map((dayData) => (
               <div
@@ -223,7 +349,7 @@ const SoldTable: React.FC = () => {
                     className="font-bold"
                     style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
                   >
-                    Total: ₦{dayData.daily_total}
+                    Total: ₦{formatNumber(dayData.daily_total)}
                   </p>
                 </div>
 
@@ -275,28 +401,28 @@ const SoldTable: React.FC = () => {
                             {entry.name}
                           </td>
                           <td className="px-4 py-3 text-sm">
-                            {entry.quantity}
+                            {formatNumber(entry.quantity)}
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {entry.sold_to?.name || "—"}
                           </td>
                           <td className="px-4 py-3 text-sm">
-                            {entry.logistics || "—"}
+                            {entry.logistics ? `₦${formatNumber(entry.logistics)}` : "—"}
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {entry.linked_project?.name || "—"}
                           </td>
                           <td className="px-4 py-3 text-sm">
-                            ₦{entry.cost_price}
+                            ₦{formatNumber(entry.cost_price)}
                           </td>
                           <td className="px-4 py-3 text-sm">
-                            ₦{entry.selling_price}
+                            ₦{formatNumber(entry.selling_price)}
                           </td>
                           <td className="px-4 py-3 text-sm text-blue-600">
-                            ₦{entry.total_price}
+                            ₦{formatNumber(entry.total_price)}
                           </td>
                           <td className="px-4 py-3 text-sm text-blue-400">
-                            ₦{entry.profit}
+                            ₦{formatNumber(entry.profit)}
                           </td>
                           <td className="px-4 py-3 text-sm text-blue-400">
                             <button
@@ -423,7 +549,7 @@ const SoldTable: React.FC = () => {
               </p>
               <p className="text-sm">
                 <span className="font-semibold">Quantity:</span>{" "}
-                {selectedItem.quantity}
+                {formatNumber(selectedItem.quantity)}
               </p>
               <p className="text-sm">
                 <span className="font-semibold">Project:</span>{" "}
@@ -435,41 +561,45 @@ const SoldTable: React.FC = () => {
               </p>
               <p className="text-sm">
                 <span className="font-semibold">Logistics:</span>{" "}
-                {selectedItem.logistics || "—"}
+                {selectedItem.logistics ? `₦${formatNumber(selectedItem.logistics)}` : "—"}
               </p>
               <p className="text-sm">
                 <span className="font-semibold">Cost Price:</span> ₦
-                {selectedItem.cost_price}
+                {formatNumber(selectedItem.cost_price)}
               </p>
               <p className="text-sm">
                 <span className="font-semibold">Selling Price:</span> ₦
-                {selectedItem.selling_price}
+                {formatNumber(selectedItem.selling_price)}
               </p>
               {/* <p className="text-sm">
                 <span className="font-semibold">Total Price:</span> ₦
-                {selectedItem.total_price}
+                {formatNumber(selectedItem.total_price)}
               </p> */}
               <p className="text-sm">
                 <span className="font-semibold">Profit:</span> ₦
-                {selectedItem.profit}
+                {formatNumber(selectedItem.profit)}
               </p>
             </div>
-            <button
-              onClick={() =>
-                navigate(`/shop/edit-sold-item/${selectedItem.id}`)
-              }
-              className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold"
-            >
-              <FontAwesomeIcon className="pr-1 text-blue-400" icon={faPencil} />
-              Edit details
-            </button>
-            <button
-              onClick={() => confirmDeleteSale(selectedItem.id)}
-              className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
-            >
-              <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
-              Delete Item
-            </button>
+            {userRole === 'ceo' && (
+              <>
+                <button
+                  onClick={() =>
+                    navigate(`/shop/edit-sold-item/${selectedItem.id}`)
+                  }
+                  className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold"
+                >
+                  <FontAwesomeIcon className="pr-1 text-blue-400" icon={faPencil} />
+                  Edit details
+                </button>
+                <button
+                  onClick={() => confirmDeleteSale(selectedItem.id)}
+                  className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
+                >
+                  <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
+                  Delete Item
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
