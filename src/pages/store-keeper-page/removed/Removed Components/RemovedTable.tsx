@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ThreeDots } from "react-loader-spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlus,
   faChevronDown,
+  faChevronUp,
   faTrash,
   faXmark,
   faPen,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import Modal from "@/pages/shop/Modal";
-// import reac
 
 const RemovedTable: React.FC = () => {
   document.title = "Removed Items | Kids Design Company";
@@ -29,37 +29,100 @@ const RemovedTable: React.FC = () => {
 
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [openSections, setOpenSections] = useState<string[]>([]);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [year, setYear] = useState<number | string>("");
+  const [month, setMonth] = useState<number | string>("");
+  const [day, setDay] = useState<number | string>("");
+  const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isMonthOpen, setIsMonthOpen] = useState(false);
+  const [isDayOpen, setIsDayOpen] = useState(false);
 
-  const fetchItems = async () => {
+  const yearRef = useRef<HTMLDivElement>(null);
+  const monthRef = useRef<HTMLDivElement>(null);
+  const dayRef = useRef<HTMLDivElement>(null);
+
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const fetchItems = async (filterYear?: number | string, filterMonth?: number | string, filterDay?: number | string) => {
     try {
       setLoading(true);
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/removed/", {
-          method: "GET",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
+      let url = "https://backend.kidsdesigncompany.com/api/removed/?";
+      if (filterYear) url += `year=${filterYear}&`;
+      if (filterMonth) url += `month=${filterMonth}&`;
+      if (filterDay) url += `day=${filterDay}`;
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+        },
+      });
 
       const logData = await response.json();
-      console.log(logData);
 
       if (!response.ok) {
-        throw new Error("Iyegere bro, Network response was not ok");
+        throw new Error("Network response was not ok");
       }
 
       setRemovedData(logData);
+
+      if (logData.daily_data && logData.daily_data.length > 0) {
+        setOpenSections([logData.daily_data[0].date]);
+      }
     } catch (error) {
-      console.error("iyegs, this is the error", error);
+      console.error("Error fetching items:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (yearRef.current && !yearRef.current.contains(event.target as Node)) {
+        setIsYearOpen(false);
+      }
+      if (monthRef.current && !monthRef.current.contains(event.target as Node)) {
+        setIsMonthOpen(false);
+      }
+      if (dayRef.current && !dayRef.current.contains(event.target as Node)) {
+        setIsDayOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const role = localStorage.getItem("user_role");
+    setUserRole(role);
     fetchItems();
   }, []);
+
+  const formatCurrency = (amount: number | string | null | undefined) => {
+    if (amount === null || amount === undefined || amount === '') {
+      return "—";
+    }
+    const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (isNaN(numericAmount)) {
+      return "—";
+    }
+    return `₦${numericAmount.toLocaleString()}`;
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -69,6 +132,17 @@ const RemovedTable: React.FC = () => {
     });
   };
 
+  const handleFilter = () => {
+    fetchItems(year, month, day);
+  };
+
+  const handleClear = () => {
+    setYear("");
+    setMonth("");
+    setDay("");
+    fetchItems();
+  };
+
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === "success") {
@@ -76,16 +150,17 @@ const RemovedTable: React.FC = () => {
     }
   };
 
-  const toggleDate = (e: any) => {
-    const target = e.currentTarget.nextSibling;
-    if (target) {
-      target.classList.toggle("hidden");
-      target.classList.toggle("fade-in");
-    }
+  const toggleDate = (date: string) => {
+    setOpenSections((prevOpenSections) => {
+      if (prevOpenSections.includes(date)) {
+        return prevOpenSections.filter((d) => d !== date);
+      } else {
+        return [...prevOpenSections, date];
+      }
+    });
   };
 
   const handleDeleteClick = (id: number) => {
-    // the id of the item to be deleted is stored in the params of this function. the id stored in the params is got from the entry.id(the last table data in our table)
     setSelectedItemId(id);
     setConfirmDelete(true);
   };
@@ -130,141 +205,144 @@ const RemovedTable: React.FC = () => {
   };
 
   return (
-    <div className="relative">
-      <div className="overflow-x-auto pb-8">
-        {loading ? (
-          <div className="w-1/5 mx-auto">
-            <ThreeDots
-              visible={true}
-              height="80"
-              width="80"
-              color="#60A5FA"
-              radius="9"
-              ariaLabel="three-dots-loading"
-            />
-          </div>
-        ) : (
-          <div className="space-y-6 ">
-            <button
-              onClick={() => navigate("/store-keeper/add-removed")}
-              className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
-            >
-              <FontAwesomeIcon className="pr-2" icon={faPlus} />
-              Record
+    <div className="p-4 md:p-8 ">
+      <div className="flex justify-between items-center mb-8">
+        <button
+          onClick={() => navigate("/store-keeper/add-removed")}
+          className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
+        >
+          <FontAwesomeIcon className="pr-2" icon={faPlus} />
+          Add Removed Item
+        </button>
+        <div className="flex items-center space-x-2">
+          {/* Year Dropdown */}
+          <div className="relative w-24" ref={yearRef}>
+            <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
+              <span>{year || 'Year'}</span>
+              <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} />
             </button>
+            {isYearOpen && (
+              <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Year</li>
+                {[...Array(10)].map((_, i) => {
+                  const y = new Date().getFullYear() - i;
+                  return <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{y}</li>
+                })}
+              </ul>
+            )}
+          </div>
+          {/* Month Dropdown */}
+          <div className="relative w-32" ref={monthRef}>
+            <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
+              <span>{month ? months[Number(month) - 1] : 'Month'}</span>
+              <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} />
+            </button>
+            {isMonthOpen && (
+              <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Month</li>
+                {months.map((m, i) => (
+                  <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{m}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {/* Day Dropdown */}
+          <div className="relative w-24" ref={dayRef}>
+            <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
+              <span>{day || 'Day'}</span>
+              <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} />
+            </button>
+            {isDayOpen && (
+              <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Day</li>
+                {[...Array(31)].map((_, i) => (
+                  <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{i + 1}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <button onClick={handleFilter} className="p-2 bg-blue-400 text-white rounded hover:bg-blue-500">Filter</button>
+          <button onClick={handleClear} className="p-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Clear</button>
+        </div>
+      </div>
 
-            {removedData?.daily_data?.map((dayData: any) => (
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <ThreeDots
+            height="80"
+            width="80"
+            color="#60A5FA"
+            radius="9"
+            ariaLabel="three-dots-loading"
+          />
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {removedData?.daily_data?.map((dayData: any) => (
+            <div key={dayData.date} className="bg-white shadow-md rounded-lg overflow-hidden">
               <div
-                key={dayData.date}
-                className="bg-white shadow-md rounded-lg overflow-auto"
+                className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-200"
+                onClick={() => toggleDate(dayData.date)}
               >
-                <div
-                  className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-300 hover:text-blue-20 w-full"
-                  onClick={toggleDate}
-                >
-                  <div className="flex items-center space-x-2">
-                    <FontAwesomeIcon icon={faChevronDown} />
-                    <h3
-                      className="text-lg font-semibold"
-                      style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
-                    >
-                      {formatDate(dayData.date)}
-                    </h3>
-                  </div>
-                  <p
-                    className="font-bold"
-                    style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
-                  >
-                    Total: ₦{dayData?.daily_total}
+                <div className="flex items-center space-x-2">
+                  <FontAwesomeIcon
+                    icon={openSections.includes(dayData.date) ? faChevronUp : faChevronDown}
+                    className="text-blue-400"
+                  />
+                  <h2 className="text-lg font-semibold text-gray-700">
+                    {formatDate(dayData.date)}
+                  </h2>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-bold text-gray-700">
+                    Total: {formatCurrency(dayData.daily_total)}
                   </p>
                 </div>
-
-                {dayData.date && (
-                  //////// Table
-                  <table className="removed-table min-w-full overflow-auto hidden">
-                    {/* Table headers */}
-                    <thead className="bg-gray-800">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Name
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Quantity
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Price
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Selling Price
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Product used
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Progress
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Associated raw material
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Unit
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400"></th>
-                      </tr>
-                    </thead>
-
-                    {/* Table body */}
-                    <tbody className="divide-y divide-gray-200">
-                      {dayData.entries.map((entry: any) => (
-                        <tr key={entry.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm cursor-pointer hover:text-blue-600">
-                            {entry.name}
-                            {/* {console.log(entry.name)} */}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            {entry.quantity}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            {entry.price || "—"}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            ₦{entry.product_its_used?.selling_price}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            {entry.product_its_used.name || "—"}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            {entry.product_its_used.progress}%
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            {entry.raw_material?.name || "—"}
-                            {/* {console.log(entry.raw_material?.name)} */}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-blue-600">
-                            {entry.raw_material?.unit || "—"}
-                          </td>
-                          <td className="flex justify-evenly px-4 py-3 text-sm text-blue-600">
-                            <FontAwesomeIcon
-                              onClick={() => handleEdit(entry.id)}
-                              className="pr-2 cursor-pointer hover:text-blue-500"
-                              icon={faPen}
-                            />
-                            <FontAwesomeIcon
-                              onClick={() => handleDeleteClick(entry.id)}
-                              className="cursor-pointer text-red-400"
-                              icon={faTrash}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              {openSections.includes(dayData.date) && (
+                <div className="transition-max-height duration-500 ease-in-out overflow-hidden">
+                  <div className="p-4">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Name</th>
+                          <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Quantity</th>
+                          <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Cost Per Unit</th>
+                          <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Total Price</th>
+                          <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Product</th>
+                          <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Progress</th>
+                          {userRole === 'ceo' && <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Actions</th>}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {dayData.entries.map((entry: any) => (
+                          <tr key={entry.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 text-sm cursor-pointer hover:text-blue-600">{entry.name}</td>
+                            <td className="px-4 py-3 text-sm">{entry.quantity}</td>
+                            <td className="px-4 py-3 text-sm">{formatCurrency(entry.price)}</td>
+                            <td className="px-4 py-3 text-sm">{formatCurrency(parseFloat(entry.price) * parseFloat(entry.quantity))}</td>
+                            <td className="px-4 py-3 text-sm">{entry.product_its_used.name || "—"}</td>
+                            <td className="px-4 py-3 text-sm">{entry.product_its_used.progress}%</td>
+                            {userRole === 'ceo' && (
+                              <td className="flex justify-evenly px-4 py-3 text-sm text-blue-600">
+                                <>
+                                  <FontAwesomeIcon onClick={() => handleEdit(entry.id)} className="pr-2 cursor-pointer hover:text-blue-500" icon={faPen} />
+                                  <FontAwesomeIcon onClick={() => handleDeleteClick(entry.id)} className="cursor-pointer text-red-400" icon={faTrash} />
+                                </>
+                              </td>
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          ))}
+        </div>
+      )}
 
       {confirmDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

@@ -92,6 +92,7 @@ import OtherProductionRecords from "./pages/ceo/allProjects/_pages/OtherProducti
 
 import Shop from "./pages/shop/shop.tsx";
 import Product from "./pages/product/product.tsx";
+import EditRecordRemovedItem from "./pages/store-keeper-page/record rm added/record rm added components/EditRecordAddedItem.tsx";
 
 const router = createBrowserRouter([
   {
@@ -339,6 +340,10 @@ const router = createBrowserRouter([
       {
         path: "record-rm-added",
         element: <RecordRemoved />,
+      },
+      {
+        path: "edit-record-removed/:id",
+        element: <EditRecordRemovedItem />,
       },
       {
         path: "add-to-raw-material",

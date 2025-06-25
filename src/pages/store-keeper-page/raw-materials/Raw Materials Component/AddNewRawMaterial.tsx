@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../../shop/Modal";
+import SearchablePaginatedDropdown from "./SearchablePaginatedDropdown";
 
 const AddNewRawMaterial = () => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -15,33 +15,18 @@ const AddNewRawMaterial = () => {
     price: "",
     description: "",
     image: null as File | null,
-    archived: "false", // Add this line
+    archived: "false",
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [categorySearch, setCategorySearch] = useState('');
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(
-          `https://backend.kidsdesigncompany.com/api/raw-materials-category/`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-        if (!response.ok) throw new Error("Failed to fetch categories");
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
+  const handleDropdownChange = (name: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -130,23 +115,18 @@ const AddNewRawMaterial = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            {/* <label className="block text-sm font-medium text-gray-700">
               Category
-            </label>
-            <select
+            </label> */}
+            <SearchablePaginatedDropdown
+              endpoint="https://backend.kidsdesigncompany.com/api/raw-materials-category/"
+              label="Category"
               name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            >
-              <option value="">Select a category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+              resultsKey="results"
+              value={categorySearch}
+              onChange={handleDropdownChange}
+              onSearchChange={setCategorySearch}
+            />
           </div>
 
           <div>

@@ -70,8 +70,8 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
             );
           })}
         </ul>
-        <div className="mx-auto text-center w-2/3 ">
-           <Logout />
+        <div className={clsx("mt-auto", isSidebarOpen ? "px-4" : "px-2")}>
+           <Logout isSidebarOpen={isSidebarOpen} />
         </div>
        
       

@@ -23,7 +23,7 @@ const InventoryData = (InventoryData: InventoryDataProps) => {
           style={{ fontSize: "clamp(10px, 3vw, 24px)" }}
           className="font-medium "
         >
-          {InventoryData.currency ? `${InventoryData.currency} ` : ''}{formattedDigits}
+          {InventoryData.currency? `${InventoryData.currency} ` : ''}{formattedDigits}
         </p>
       </div>
     </div>

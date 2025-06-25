@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ThreeDots } from "react-loader-spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -47,6 +47,32 @@ const RecordRemovedTable: React.FC = () => {
   const [openDates, setOpenDates] = useState<{ [key: string]: boolean }>({});
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [year, setYear] = useState<number | string>("");
+  const [month, setMonth] = useState<number | string>("");
+  const [day, setDay] = useState<number | string>("");
+  const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isMonthOpen, setIsMonthOpen] = useState(false);
+  const [isDayOpen, setIsDayOpen] = useState(false);
+
+  const yearRef = useRef<HTMLDivElement>(null);
+  const monthRef = useRef<HTMLDivElement>(null);
+  const dayRef = useRef<HTMLDivElement>(null);
+
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     title: "",
@@ -55,14 +81,35 @@ const RecordRemovedTable: React.FC = () => {
   });
 
   useEffect(() => {
+    const role = localStorage.getItem("user_role");
+    setUserRole(role);
     fetchData();
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (yearRef.current && !yearRef.current.contains(event.target as Node)) {
+        setIsYearOpen(false);
+      }
+      if (monthRef.current && !monthRef.current.contains(event.target as Node)) {
+        setIsMonthOpen(false);
+      }
+      if (dayRef.current && !dayRef.current.contains(event.target as Node)) {
+        setIsDayOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = async (filterYear?: number | string, filterMonth?: number | string, filterDay?: number | string) => {
     try {
       setLoading(true);
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/add-raw-materials/", {
+      let url = "https://backend.kidsdesigncompany.com/api/add-raw-materials/?";
+      if (filterYear) url += `year=${filterYear}&`;
+      if (filterMonth) url += `month=${filterMonth}&`;
+      if (filterDay) url += `day=${filterDay}`;
+      const response = await fetch(url, {
           method: "GET",
           headers: {
             Authorization: `JWT ${localStorage.getItem("accessToken")}`,
@@ -73,11 +120,30 @@ const RecordRemovedTable: React.FC = () => {
       if (!response.ok) throw new Error("Failed to fetch data");
       const data = await response.json();
       setMaterialData(data);
+      
+      // Open the first date by default if there is data
+      if (data.daily_data && data.daily_data.length > 0) {
+        setOpenDates(prev => ({
+          ...prev,
+          [data.daily_data[0].date]: true
+        }));
+      }
     } catch (error) {
       console.error("Error:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFilter = () => {
+    fetchData(year, month, day);
+  };
+
+  const handleClear = () => {
+    setYear("");
+    setMonth("");
+    setDay("");
+    fetchData();
   };
 
   const toggleDate = (date: string) => {
@@ -146,6 +212,70 @@ const RecordRemovedTable: React.FC = () => {
 
   return (
     <div className="relative">
+      <div className="flex justify-between items-center mb-4">
+      <button
+          onClick={() => navigate("/store-keeper/add-to-raw-material")}
+          className="bg-blue-400 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center"
+        >
+          <FontAwesomeIcon icon={faPlus} className="mr-2" />
+          Add to Raw Material
+        </button>
+
+        <div className="flex items-center space-x-4">
+          <div ref={yearRef} className="relative">
+            <button onClick={() => setIsYearOpen(!isYearOpen)} className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center">
+              {year || "Year"} <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} className="ml-2" />
+            </button>
+            {isYearOpen && (
+              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
+                <ul className="max-h-60 overflow-auto">
+                  {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(y => (
+                    <li key={y} onClick={() => { setYear(y); setIsYearOpen(false); }} className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                      {y}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          <div ref={monthRef} className="relative">
+            <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center">
+              {month ? months[Number(month) - 1] : "Month"} <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} className="ml-2" />
+            </button>
+            {isMonthOpen && (
+              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
+                <ul className="max-h-60 overflow-auto">
+                  {months.map((m, i) => (
+                    <li key={m} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                      {m}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          <div ref={dayRef} className="relative">
+            <button onClick={() => setIsDayOpen(!isDayOpen)} className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center">
+              {day || "Day"} <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} className="ml-2" />
+            </button>
+            {isDayOpen && (
+              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
+                <ul className="max-h-60 overflow-auto">
+                  {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                    <li key={d} onClick={() => { setDay(d); setIsDayOpen(false); }} className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                      {d}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          <button onClick={handleFilter} className="bg-blue-400 text-white px-4 py-2 rounded-md hover:bg-blue-600">Filter</button>
+          <button onClick={handleClear} className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">Clear</button>
+        </div>
+
+      </div>
+      
       <div className="overflow-x-auto pb-8">
         {loading ? (
           <div className="w-1/5 mx-auto">
@@ -159,13 +289,13 @@ const RecordRemovedTable: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            <button
+            {/* <button
               onClick={() => navigate("/store-keeper/add-to-raw-material")}
               className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
             >
               <FontAwesomeIcon className="pr-2" icon={faPlus} />
               Add to raw material
-            </button>
+            </button> */}
             {/* Daily Data Tables */}
             {materialData?.daily_data.map((dayData) => (
               <div
@@ -210,7 +340,7 @@ const RecordRemovedTable: React.FC = () => {
                         <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
                           Cost Price
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400"></th>
+                        {userRole === 'ceo' && <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Actions</th>}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -228,18 +358,20 @@ const RecordRemovedTable: React.FC = () => {
                           <td className="px-4 py-3 text-sm">
                             ₦{parseFloat(entry.cost_price).toLocaleString()}
                           </td>
-                          <td className="flex justify-evenly px-4 py-3 text-sm text-blue-600">
-                            <FontAwesomeIcon
-                              onClick={() => handleEdit(entry.id)}
-                              className="pr-2 cursor-pointer hover:text-blue-500"
-                              icon={faPen}
-                            />
-                            <FontAwesomeIcon
-                              onClick={() => handleDeleteClick(entry.id)}
-                              className="cursor-pointer text-red-400"
-                              icon={faTrash}
-                            />
-                          </td>
+                          {userRole === 'ceo' && (
+                            <td className="flex justify-evenly px-4 py-3 text-sm text-blue-600">
+                              <FontAwesomeIcon
+                                onClick={() => handleEdit(entry.id)}
+                                className="pr-2 cursor-pointer hover:text-blue-500"
+                                icon={faPen}
+                              />
+                              <FontAwesomeIcon
+                                onClick={() => handleDeleteClick(entry.id)}
+                                className="cursor-pointer text-red-400"
+                                icon={faTrash}
+                              />
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>

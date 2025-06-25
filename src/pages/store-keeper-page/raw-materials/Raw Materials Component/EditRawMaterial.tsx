@@ -4,12 +4,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ThreeDots } from "react-loader-spinner";
 import Modal from "@/pages/shop/Modal";
+import SearchablePaginatedDropdown from "./SearchablePaginatedDropdown";
 
 const EditRawMaterial = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const [categoryName, setCategoryName] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -23,6 +24,11 @@ const EditRawMaterial = () => {
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem("user_role"));
+  }, []);
 
   // Fetch raw material details
   useEffect(() => {
@@ -49,33 +55,21 @@ const EditRawMaterial = () => {
           image: null,
           archived: data.archived?.toString() || "false",
         });
+        setCategoryName(data.store_category?.name || "");
       } catch (error) {
         console.error("Error fetching raw material:", error);
       }
     };
 
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(
-          `https://backend.kidsdesigncompany.com/api/raw-materials-category/`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-        if (!response.ok) throw new Error("Failed to fetch categories");
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
     fetchRawMaterial();
-    fetchCategories();
   }, [id]);
+
+  const handleDropdownChange = (name: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -175,23 +169,15 @@ const EditRawMaterial = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Category
-            </label>
-            <select
+            <SearchablePaginatedDropdown
+              endpoint="https://backend.kidsdesigncompany.com/api/raw-materials-category/"
+              label="Category"
               name="category"
-              value={formData.category}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            >
-              <option value="">Select a category</option>
-              {categories.map((category: any) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+              resultsKey="results"
+              value={categoryName}
+              onChange={handleDropdownChange}
+              onSearchChange={setCategoryName}
+            />
           </div>
 
           <div>
@@ -295,7 +281,7 @@ const EditRawMaterial = () => {
             <button
               type="submit"
               className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500"
-              disabled={loading}
+              disabled={loading || userRole !== 'ceo'}
             >
               {loading ? "Updating..." : "Update"}
             </button>

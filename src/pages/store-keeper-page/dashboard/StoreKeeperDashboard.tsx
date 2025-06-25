@@ -8,6 +8,9 @@ import {
   faAnglesLeft,
   faAnglesRight,
   faSearch,
+  faPencil,
+  faTrash,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import DashboardData from "@/pages/shop/dashboard/Dashboard Components/DashboardData";
@@ -30,6 +33,12 @@ const StoreKeeperDashboard: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchTermTwo, setSearchTermTwo] = useState<string>("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<any | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [categoryToEdit, setCategoryToEdit] = useState<any | null>(null);
+  const [editedCategoryName, setEditedCategoryName] = useState("");
+  const [userRole, setUserRole] = useState<string | null>(null);
   const itemsPerPage = 10;
   const accessToken = localStorage.getItem("accessToken");
 
@@ -58,10 +67,6 @@ const StoreKeeperDashboard: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
   const fetchRMCategories = async () => {
     try {
       setLoading(true);
@@ -89,10 +94,6 @@ const StoreKeeperDashboard: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchRMCategories();
-  }, []);
-
   const fetchShopCategoryData = async () => {
     try {
       const response = await fetch(
@@ -119,8 +120,81 @@ const StoreKeeperDashboard: React.FC = () => {
   };
 
   useEffect(() => {
+    const role = localStorage.getItem("user_role");
+    setUserRole(role);
+    fetchDashboardData();
+    fetchRMCategories();
     fetchShopCategoryData();
   }, []);
+
+  const handleUpdateCategory = async () => {
+    if (!categoryToEdit) return;
+    try {
+      const response = await fetch(
+        `https://backend.kidsdesigncompany.com/api/raw-materials-category/${categoryToEdit.id}/`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `JWT ${accessToken}`,
+          },
+          body: JSON.stringify({ name: editedCategoryName }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update category");
+      }
+      fetchRMCategories();
+      closeEditModal();
+    } catch (error) {
+      console.error("Error updating category:", error);
+    }
+  };
+
+  const openEditModal = (category: any) => {
+    setCategoryToEdit(category);
+    setEditedCategoryName(category.name);
+    setShowEditModal(true);
+  };
+
+  const closeEditModal = () => {
+    setShowEditModal(false);
+    setCategoryToEdit(null);
+    setEditedCategoryName("");
+  };
+
+  const openDeleteModal = (category: any) => {
+    setCategoryToDelete(category);
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setCategoryToDelete(null);
+    setShowDeleteModal(false);
+  };
+
+  const confirmDelete = async () => {
+    if (!categoryToDelete) return;
+    try {
+      const response = await fetch(
+        `https://backend.kidsdesigncompany.com/api/raw-materials-category/${categoryToDelete.id}/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `JWT ${accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete category");
+      }
+      fetchRMCategories();
+      closeDeleteModal();
+    } catch (error) {
+      console.error("Error deleting category:", error);
+    }
+  };
 
   // Filter data for both tables
   const filteredTableData = tableData.filter(
@@ -249,7 +323,7 @@ const StoreKeeperDashboard: React.FC = () => {
               })}
             </tbody>
           </table>
-          <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-6 py-4 border-t gap-4">
+          {/* <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-6 py-4 border-t gap-4">
             <span className="text-sm text-blue-400 text-center sm:text-left">
               Showing {indexOfFirstItem + 1} to{" "}
               {Math.min(indexOfLastItem, tableData.length)} of{" "}
@@ -290,8 +364,8 @@ const StoreKeeperDashboard: React.FC = () => {
               >
                 <FontAwesomeIcon icon={faAnglesRight} />
               </button>
-            </div>
-          </div>
+            </div> */}
+          {/* </div> */}
         </div>
       )}
 
@@ -343,6 +417,11 @@ const StoreKeeperDashboard: React.FC = () => {
                 <th className="py-4 px-6 text-left text-sm font-semibold">
                   Name
                 </th>
+                {userRole === 'ceo' && (
+                  <th className="py-4 px-6 text-left text-sm font-semibold">
+                    Actions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -352,11 +431,28 @@ const StoreKeeperDashboard: React.FC = () => {
                     <td className="py-4 px-6 text-sm font-medium text-gray-700 border-b">
                       {useful.name}
                     </td>
+                    {userRole === 'ceo' && (
+                      <td className="px-4 py-3 text-sm text-blue-600">
+                        <>
+                          <button
+                            onClick={() => openEditModal(useful)}
+                            className="text-blue-500 hover:text-blue-700 mr-4"
+                          >
+                            <FontAwesomeIcon icon={faPencil} />
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(useful)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <FontAwesomeIcon icon={faTrash} />
+                          </button>
+                        </>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
             </tbody>
-
           </table>
             {/* pagination stuff */}
             <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-6 py-4 border-t gap-4">
@@ -402,6 +498,83 @@ const StoreKeeperDashboard: React.FC = () => {
                 </button>
               </div>
             </div>
+        </div>
+      )}
+
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium">Edit Category</h3>
+              <FontAwesomeIcon
+                icon={faXmark}
+                onClick={closeEditModal}
+                className="cursor-pointer"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="categoryName"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Category Name
+              </label>
+              <input
+                type="text"
+                id="categoryName"
+                value={editedCategoryName}
+                onChange={(e) => setEditedCategoryName(e.target.value)}
+                className="w-full pl-4 pr-4 py-2 rounded-lg border focus:outline-none focus:border-blue-400"
+              />
+            </div>
+            <div className="flex justify-end gap-4 mt-6">
+              <button
+                onClick={closeEditModal}
+                className="py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateCategory}
+                className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium">Confirm Deletion</h3>
+              <FontAwesomeIcon
+                icon={faXmark}
+                onClick={closeDeleteModal}
+                className="cursor-pointer"
+              />
+            </div>
+            <p>
+              Are you sure you want to delete the category "
+              {categoryToDelete?.name}"?
+            </p>
+            <div className="flex justify-end gap-4 mt-6">
+              <button
+                onClick={closeDeleteModal}
+                className="py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -13,6 +13,7 @@ import {
   faXmark,
   faAnglesLeft,
   faAnglesRight,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import Modal from "@/pages/shop/Modal";
@@ -20,7 +21,7 @@ import Modal from "@/pages/shop/Modal";
 interface TableData {
   Name: string;
   Category: string;
-  Quantity: number;
+  Quantity: string | number;
   Details: JSX.Element;
   [key: string]: string | number | JSX.Element;
 }
@@ -49,13 +50,29 @@ export const RawMaterials: React.FC = () => {
     type: "success" as "success" | "error",
   });
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   // const navigate = useNavigate();
+
+  const handleSearch = () => {
+    setSearchQuery(searchInput);
+  };
+
+  const handleClear = () => {
+    setSearchInput("");
+    setSearchQuery("");
+  };
 
   const fetchRMInfo = async () => {
     setLoading(true);
     try {
+      const params = new URLSearchParams();
+      if (searchQuery) {
+        params.append("search", searchQuery);
+      }
       const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/raw-materials/",
+        `https://backend.kidsdesigncompany.com/api/raw-materials/?${params.toString()}`,
         {
           method: "GET",
           headers: {
@@ -63,6 +80,7 @@ export const RawMaterials: React.FC = () => {
           },
         }
       );
+
 
       if (!response.ok) {
         throw new Error("Authentication failed");
@@ -79,7 +97,7 @@ export const RawMaterials: React.FC = () => {
           return {
             Name: item.name,
             Category: item.store_category?.name,
-            Quantity: item.quantity,
+            Quantity: item.quantity ? Number(item.quantity).toLocaleString() : 0,
             Details: (
               <button
                 onClick={() => handleViewDetails(item)}
@@ -101,6 +119,7 @@ export const RawMaterials: React.FC = () => {
   };
 
   useEffect(() => {
+    setUserRole(localStorage.getItem("user_role"));
     const loadData = async () => {
       await fetchRMInfo();
       if (openProductId) {
@@ -125,7 +144,7 @@ export const RawMaterials: React.FC = () => {
     };
 
     loadData();
-  }, [openProductId, location.search]); // Added location.search to trigger refresh
+  }, [openProductId, searchQuery, location.search]); // Added location.search to trigger refresh
 
   // Calculate pagination values
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -226,29 +245,29 @@ export const RawMaterials: React.FC = () => {
   return (
     <>
       <div className={`wrapper w-11/12 mx-auto mb-0 mt-7 pl-1 pt-2`}>
-        <h1
+        {/* <h1
           className={`${showImagePreview ? "blur-sm" : ""} ${
             showModal ? "blur-md" : ""
           }`}
           style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
         >
           Raw Material Summary
-        </h1>
+        </h1> */}
         <div
-          className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-11 ${
+          className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4 mt-2 ${
             showImagePreview ? "blur-sm" : ""
           } ${showModal ? "blur-md" : ""}`}
         >
           <InventoryData
-            info="Total Cost Value"
-            digits={totalStoreCount}
-            trend="up"
+            info="Total Store Count"
+            digits={totalStoreCount.toLocaleString()}
           ></InventoryData>
           <InventoryData
-            info="Total Store Count"
-            digits={totalStockValue}
-            trend="up"
+            info="Total Cost Value"
+            digits={totalStockValue.toLocaleString()}
+            currency="₦"
           ></InventoryData>
+
         </div>
 
         <div className="relative">
@@ -281,13 +300,46 @@ export const RawMaterials: React.FC = () => {
               </div>
             ) : (
               <div>
-                <button
-                  onClick={() => navigate("/store-keeper/add-raw-material")}
-                  className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
-                >
-                  <FontAwesomeIcon className="pr-2" icon={faPlus} />
-                  Add Raw Material
-                </button>
+                <div className="flex justify-between items-center mb-4">
+                  {/* Left side: Search */}
+                  <div className="flex items-center">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Search..."
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleSearch();
+                          }
+                        }}
+                        className="pl-4 pr-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      />
+                    </div>
+                    <button
+                      onClick={handleSearch}
+                      className="px-4 py-2 bg-blue-400 text-white rounded-r-lg hover:bg-blue-500 transition-colors border-l-0"
+                    >
+                      <FontAwesomeIcon icon={faSearch} />
+                    </button>
+                    <button
+                      onClick={handleClear}
+                      className="ml-2 px-3 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                    >
+                      <FontAwesomeIcon icon={faXmark} />
+                    </button>
+                  </div>
+
+                  {/* Right side: Add button */}
+                  <button
+                    onClick={() => navigate("/store-keeper/add-raw-material")}
+                    className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
+                  >
+                    <FontAwesomeIcon className="pr-2" icon={faPlus} />
+                    Add Raw Material
+                  </button>
+                </div>
                 <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
                   <thead>
                     <tr className="bg-blue-400 text-white">
@@ -419,31 +471,45 @@ export const RawMaterials: React.FC = () => {
                 </p>
                 <p className="text-sm text-gray-20 mb-3">
                   <span className="font-semibold">Price:</span>{" "}
-                  {selectedProduct.price ? selectedProduct.price : "-"}
+                  {selectedProduct.price
+                    ? `₦${Number(selectedProduct.price).toLocaleString()}`
+                    : "-"}
                 </p>
                 <p className="text-sm text-gray-20 mb-3">
                   <span className="font-semibold">Quantity:</span>{" "}
-                  {selectedProduct.quantity ? selectedProduct.quantity : "-"}
+                  {selectedProduct.quantity
+                    ? Number(selectedProduct.quantity).toLocaleString()
+                    : "-"}
                 </p>
                 <p className="text-sm text-gray-20 mb-3">
                   <span className="font-semibold">Unit:</span>{" "}
                   {selectedProduct.unit ? selectedProduct.unit : "-"}
                 </p>
 
-                <button
-                  onClick={editItem}
-                  className="px-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold"
-                >
-                  <FontAwesomeIcon className=" text-blue-400" icon={faPencil} />
-                  {/* Edit details */}
-                </button>
-                <button
-                  onClick={confirmDeleteItem}
-                  className="px-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
-                >
-                  <FontAwesomeIcon className=" text-red-400" icon={faTrash} />
-                  {/* Delete Item */}
-                </button>
+                {userRole === "ceo" && (
+                  <>
+                    <button
+                      onClick={editItem}
+                      className="px-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold"
+                    >
+                      <FontAwesomeIcon
+                        className=" text-blue-400"
+                        icon={faPencil}
+                      />
+                      {/* Edit details */}
+                    </button>
+                    <button
+                      onClick={confirmDeleteItem}
+                      className="px-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
+                    >
+                      <FontAwesomeIcon
+                        className=" text-red-400"
+                        icon={faTrash}
+                      />
+                      {/* Delete Item */}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           )}

@@ -20,7 +20,6 @@ const EditRecordRemovedItem: React.FC = () => {
     material: "",
     quantity: "",
     cost_price: "",
-    date: "",
   });
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
@@ -47,7 +46,6 @@ const EditRecordRemovedItem: React.FC = () => {
           material: data.material?.id.toString() || "",
           quantity: data.quantity || "",
           cost_price: data.cost_price || "",
-          date: data.date || "",
         });
       } catch (error) {
         console.error("Error:", error);
@@ -94,10 +92,7 @@ const EditRecordRemovedItem: React.FC = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            material: parseInt(formData.material),
             quantity: formData.quantity,
-            cost_price: formData.cost_price,
-            date: formData.date,
           }),
         }
       );
@@ -125,7 +120,7 @@ const EditRecordRemovedItem: React.FC = () => {
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === "success") {
-      navigate("/store-keeper/record-removed");
+      navigate("/store-keeper/record-rm-added");
     }
   };
 
@@ -134,12 +129,12 @@ const EditRecordRemovedItem: React.FC = () => {
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center mb-6">
           <button
-            onClick={() => navigate("/store-keeper/record-removed")}
+            onClick={() => navigate("/store-keeper/record-rm-added")}
             className="mr-4 text-gray-600 hover:text-gray-800"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-gray-500">
             Edit Raw Material Record
           </h1>
         </div>
@@ -149,21 +144,9 @@ const EditRecordRemovedItem: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700">
               Raw Material
             </label>
-            <select
-              value={formData.material}
-              onChange={(e) =>
-                setFormData({ ...formData, material: e.target.value })
-              }
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            >
-              <option value="">Select Raw Material</option>
-              {rawMaterials.map((material) => (
-                <option key={material.id} value={material.id}>
-                  {material.name}
-                </option>
-              ))}
-            </select>
+            <h3 className="mt-1 text-lg font-semibold text-gray-500">
+              {rawMaterials.find((material) => material.id.toString() === formData.material)?.name || ""}
+            </h3>
           </div>
 
           <div>
@@ -181,40 +164,10 @@ const EditRecordRemovedItem: React.FC = () => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Cost Price
-            </label>
-            <input
-              type="number"
-              value={formData.cost_price}
-              onChange={(e) =>
-                setFormData({ ...formData, cost_price: e.target.value })
-              }
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Date
-            </label>
-            <input
-              type="date"
-              value={formData.date}
-              onChange={(e) =>
-                setFormData({ ...formData, date: e.target.value })
-              }
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            />
-          </div>
-
           <div className="flex justify-end space-x-3">
             <button
               type="button"
-              onClick={() => navigate("/store-keeper/record-removed")}
+              onClick={() => navigate("/store-keeper/record-rm-added")}
               className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
             >
               Cancel
