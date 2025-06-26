@@ -8,12 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import SkeletonLoader from "../_components/SkeletonLoader";
+import SearchablePaginatedDropdown from "@/pages/shop/sold/Sold Components/SearchablePaginatedDropdown";
+import CategoryDropdown from "../_components/Category";
 
 interface ExpenseFormData {
   name: string;
   amount: number | "";
   quantity: number | "";
-  description: string;
+  description: string | undefined;
   selectedType: string;
   selectedItem: string | null;
   category: number | null;
@@ -32,20 +34,6 @@ interface ShopItem {
 interface Category {
   id: number;
   name: string;
-}
-
-interface ItemDropdownProps {
-  label: string;
-  items: any[];
-  selectedItem: string | null;
-  isLoading: boolean;
-  disabled: boolean;
-  onItemChange: (itemId: string) => void;
-}
-
-interface CategoryDropdownProps {
-  selectedCategory: number | null;
-  onCategoryChange: (categoryId: number | null) => void;
 }
 
 interface Expense {
@@ -67,103 +55,6 @@ interface Expense {
     name: string;
   };
 }
-
-const fetchProjects = async (): Promise<Project[]> => {
-  const response = await axios.get("https://backend.kidsdesigncompany.com/api/project/");
-  return response.data.all_projects || [];
-};
-
-const fetchShopItems = async (): Promise<ShopItem[]> => {
-  try {
-    const response = await axios.get("https://backend.kidsdesigncompany.com/api/sold/");
-    console.log("Fetched Sold API response:", response.data);
-    
-    // Extract items from daily_data entries
-    const items: ShopItem[] = [];
-    
-    if (response.data.daily_data && Array.isArray(response.data.daily_data)) {
-      // Loop through each day
-      response.data.daily_data.forEach((day: any) => {
-        // Loop through each entry in that day
-        if (day.entries && Array.isArray(day.entries)) {
-          day.entries.forEach((entry: any) => {
-            // Only add unique items to the list
-            if (!items.some(item => item.id === entry.id)) {
-              items.push({
-                id: entry.id,
-                name: entry.name || "Unnamed item"
-              });
-            }
-          });
-        }
-      });
-    }
-    
-    console.log("Processed Shop Items:", items);
-    return items;
-  } catch (error) {
-    console.error("Error fetching shop items:", error);
-    toast.error("Failed to fetch shop items. Please try again.");
-    return [];
-  }
-};
-
-const fetchCategories = async (): Promise<Category[]> => {
-  const { data } = await axios.get<Category[]>(
-    "https://backend.kidsdesigncompany.com/api/expense-category/"
-  );
-  return data;
-};
-
-const ItemDropdown: React.FC<ItemDropdownProps> = ({ label, items, selectedItem, isLoading, disabled, onItemChange }) => {
-  return (
-    <div>
-      <Label htmlFor={`${label.toLowerCase()}Select`} className="block mb-2">{label}</Label>
-      <select
-        id={`${label.toLowerCase()}Select`}
-        onChange={(e) => onItemChange(e.target.value)}
-        value={selectedItem || ""}
-        disabled={disabled}
-        className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-      >
-        <option value="">Select a {label}</option>
-        {isLoading ? (
-          <option disabled>Loading...</option>
-        ) : (
-          items.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))
-        )}
-      </select>
-    </div>
-  );
-};
-
-const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, onCategoryChange }) => {
-  const { data: categories = [], isLoading } = useQuery({
-    queryKey: ["categories"],
-    queryFn: fetchCategories,
-  });
-
-  return (
-    <div className="space-y-2">
-      <Label>Category</Label>
-      <select
-        id="category"
-        name="category"
-        value={selectedCategory ?? ""}
-        onChange={(e) => onCategoryChange(e.target.value ? Number(e.target.value) : null)}
-        className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      >
-        <option value="">Select Category</option>
-        {isLoading ? <option disabled>Loading...</option> : categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
-      </select>
-    </div>
-  );
-};
 
 const EditExpense: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -190,32 +81,32 @@ const EditExpense: React.FC = () => {
     enabled: !!id,
   });
 
-  const { data: projects = [], isLoading: isLoadingProjects } = useQuery<Project[]>({
-    queryKey: ["projects"],
-    queryFn: fetchProjects,
-  });
-
-  const { data: shopItems = [], isLoading: isLoadingShop } = useQuery<ShopItem[]>({
-    queryKey: ["shopItems"],
-    queryFn: fetchShopItems,
-  });
-
   // Update mutation
   const updateExpenseMutation = useMutation({
     mutationFn: async (data: ExpenseFormData) => {
       // Format the data according to the API expectations
-      const formattedData = {
+      const formattedData: any = {
         name: data.name,
         description: data.description || "",
         amount: Number(data.amount) || 0,
         quantity: data.quantity,
         category: data.category,
-        project: data.selectedType === "project" ? Number(data.selectedItem) : null,
-        shop: data.selectedType === "shop" ? Number(data.selectedItem) : null,
+        project: data.selectedType === "project" && data.selectedItem ? Number(data.selectedItem) : null,
+        shop: data.selectedType === "shop" && data.selectedItem ? Number(data.selectedItem) : null,
       };
 
+      if (data.selectedType === "other") {
+        formattedData.project = null;
+        formattedData.shop = null;
+      }
+
       console.log("Sending update data to API:", formattedData);
-      await axios.put(`https://backend.kidsdesigncompany.com/api/expense/${id}/`, formattedData);
+      const accessToken = localStorage.getItem("accessToken");
+      await axios.put(`https://backend.kidsdesigncompany.com/api/expense/${id}/`, formattedData, {
+        headers: {
+          Authorization: `JWT ${accessToken}`,
+        },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
@@ -241,6 +132,8 @@ const EditExpense: React.FC = () => {
       } else if (expense.shop) {
         selectedType = "shop";
         selectedItem = expense.shop.id.toString();
+      } else if (expense.category && !expense.project && !expense.shop) {
+        selectedType = "other";
       }
       
       setFormData({
@@ -256,23 +149,18 @@ const EditExpense: React.FC = () => {
   }, [expense]);
 
   // Handle input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "amount" || name === "quantity" ? (value === "" ? "" : Number(value)) : value,
-    }));
+  const handleInputChange = (name: string, value: string) => {
+    if (name === "project" || name === "shop") {
+      setFormData((prev) => ({
+        ...prev,
+        selectedType: name,
+        selectedItem: value,
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleSelectItemType = (type: "project" | "shop", itemId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedItem: itemId,
-      selectedType: type,
-    }));
-  };
-
-  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateExpenseMutation.mutate(formData);
@@ -297,7 +185,7 @@ const EditExpense: React.FC = () => {
                   id="name"
                   name="name"
                   value={formData.name}
-                  onChange={handleChange}
+                  onChange={(e) => handleInputChange(e.target.name, e.target.value)}
                   required
                 />
               </div>
@@ -308,7 +196,7 @@ const EditExpense: React.FC = () => {
                   id="description"
                   name="description"
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) => handleInputChange(e.target.name, e.target.value)}
                 />
               </div>
 
@@ -319,7 +207,7 @@ const EditExpense: React.FC = () => {
                   name="amount"
                   type="number"
                   value={formData.amount}
-                  onChange={handleChange}
+                  onChange={(e) => handleInputChange(e.target.name, e.target.value)}
                   required
                 />
               </div>
@@ -331,7 +219,7 @@ const EditExpense: React.FC = () => {
                   name="quantity"
                   type="number"
                   value={formData.quantity}
-                  onChange={handleChange}
+                  onChange={(e) => handleInputChange(e.target.name, e.target.value)}
                   required
                 />
               </div>
@@ -340,28 +228,46 @@ const EditExpense: React.FC = () => {
                 <Label className="text-lg font-medium">Item Type</Label>
                 <div className="grid grid-cols-2 gap-4 mt-2">
                   <div className="col-span-1">
-                    <ItemDropdown
+                    <SearchablePaginatedDropdown
+                      endpoint="https://backend.kidsdesigncompany.com/api/project/"
                       label="Project"
-                      items={projects}
-                      selectedItem={formData.selectedType === "project" ? formData.selectedItem : ""}
-                      isLoading={isLoadingProjects}
-                      disabled={formData.selectedType === "shop" && !!formData.selectedItem}
-                      onItemChange={(itemId) => handleSelectItemType("project", itemId)}
+                      name="project"
+                      onChange={handleInputChange}
+                      resultsKey="all_projects"
+                      selectedValue={formData.selectedType === "project" ? formData.selectedItem : null}
+                      selectedName={formData.selectedType === "project" ? expense?.project?.name || null : null}
                     />
                   </div>
 
                   <div className="col-span-1">
-                    <ItemDropdown
+                    <SearchablePaginatedDropdown
+                      endpoint="https://backend.kidsdesigncompany.com/api/sold/"
                       label="Shop Item"
-                      items={shopItems}
-                      selectedItem={formData.selectedType === "shop" ? formData.selectedItem : ""}
-                      isLoading={isLoadingShop}
-                      disabled={formData.selectedType === "project" && !!formData.selectedItem}
-                      onItemChange={(itemId) => handleSelectItemType("shop", itemId)}
+                      name="shop"
+                      onChange={handleInputChange}
+                      resultsKey="daily_data"
+                      dataMapper={(data: any[]) => {
+                        const items: { id: number; name: string }[] = [];
+                        data.forEach((day: any) => {
+                          if (day.entries && Array.isArray(day.entries)) {
+                            day.entries.forEach((entry: any) => {
+                              if (!items.some(item => item.id === entry.id)) {
+                                items.push({
+                                  id: entry.id,
+                                  name: entry.name || "Unnamed item"
+                                });
+                              }
+                            });
+                          }
+                        });
+                        return items;
+                      }}
+                      selectedValue={formData.selectedType === "shop" ? formData.selectedItem : null}
+                      selectedName={formData.selectedType === "shop" ? expense?.shop?.name || null : null}
                     />
                   </div>
                 </div>
-                {formData.selectedType && (
+                {formData.selectedType && (formData.selectedType !== "other") && (
                   <p className="text-sm text-blue-600 mt-1">
                     Selected {formData.selectedType === "project" ? "Project" : "Shop Item"}
                   </p>
@@ -383,7 +289,7 @@ const EditExpense: React.FC = () => {
               </Button>
               <Button 
                 type="submit" 
-                disabled={updateExpenseMutation.isPending || !formData.selectedItem || !formData.category}
+                disabled={updateExpenseMutation.isPending || !formData.category}
               >
                 {updateExpenseMutation.isPending ? "Updating..." : "Update Expense"}
               </Button>

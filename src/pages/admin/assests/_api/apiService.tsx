@@ -26,8 +26,18 @@ export interface Asset {
   get_total_value: number;
 }
 
-export interface AssetsResponse {
-  assets: Asset[];
+// Defining the AssetSummary interface that includes the aggregate data
+export interface AssetSummary {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: {
+    assets: Asset[]; // Assuming assets array is nested under results too
+    total_assets_count: number;
+    good_assets_count: number;
+    good_assets_value: number;
+    depreciated_assets_count: number;
+  };
 }
 
 export interface AssetData {
@@ -37,9 +47,21 @@ export interface AssetData {
   is_still_available: boolean;
 }
 
-// Fetch all assets
-export const AssetsData = async (): Promise<AssetsResponse> => {
-  const { data } = await api.get("");
+// Fetch all assets and summary data
+export const AssetsData = async (params?: { search?: string; is_still_available?: boolean; show_deprecated?: boolean }): Promise<AssetSummary> => {
+  const urlParams = new URLSearchParams();
+  if (params?.search) {
+    urlParams.append("search", params.search);
+  }
+  if (params?.is_still_available !== undefined) {
+    urlParams.append("is_still_available", String(params.is_still_available));
+  }
+  // Note: show_deprecated isn't directly supported by the current API based on the interface. 
+  // I'm assuming `is_still_available=false` handles deprecated assets, 
+  // or the backend needs to be updated to support a separate `show_deprecated` param.
+  // For now, I'll use `is_still_available`.
+
+  const { data } = await api.get(`?${urlParams.toString()}`);
   return data;
 };
 

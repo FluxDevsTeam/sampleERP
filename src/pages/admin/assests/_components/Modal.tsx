@@ -20,6 +20,7 @@ interface ModalsProps {
   setIsDeleteDialogOpen: (open: boolean) => void
   handleDelete: () => void
   confirmDelete: () => void
+  isCEO: boolean
 }
 
 const Modals = ({ 
@@ -29,7 +30,8 @@ const Modals = ({
   isDeleteDialogOpen, 
   setIsDeleteDialogOpen, 
   handleDelete, 
-  confirmDelete 
+  confirmDelete, 
+  isCEO 
 }: ModalsProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
@@ -85,12 +87,16 @@ const Modals = ({
               <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                 Close
               </Button>
-              <Button variant="outline" onClick={handleEditClick}>
-                Edit
-              </Button>
-              <Button variant="destructive" onClick={handleDelete}>
-                Delete
-              </Button>
+              {isCEO && (
+                <Button variant="outline" onClick={handleEditClick}>
+                  Edit
+                </Button>
+              )}
+              {isCEO && (
+                <Button variant="destructive" onClick={handleDelete}>
+                  Delete
+                </Button>
+              )}
             </div>
           </DialogFooter>
         </DialogContent>

@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import AddPaymentModal from "./AddPaymentModal";
 import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
 import {
@@ -23,59 +22,110 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import EditPaymentModal from "./EditPaymentModal";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChevronDown,
+  faChevronUp,
+} from "@fortawesome/free-solid-svg-icons";
+import { fetchPaidEntries, PaidSummary, PaidEntry, DailyPaidData } from "../_api/apiService";
+import AddPaidModal from "./AddPaidModal";
+import EditPaidModal from "./EditPaidModal";
 
-interface Entry {
-  id: number;
-  amount: string;
-  date: string;
-  salary: number;
-  contract: number;
+interface PaidTableProps {
+  isTableModalOpen: boolean;
 }
 
-interface DailyData {
-  date: string;
-  entries: Entry[];
-  daily_total: number;
-}
+const PaidTable: React.FC<PaidTableProps> = ({
+  isTableModalOpen,
+}) => {
+  const [year, setYear] = useState<number | ''>( '');
+  const [month, setMonth] = useState<number | ''>( '');
+  const [day, setDay] = useState<number | ''>( '');
 
-interface PaidData {
-  monthly_total: number;
-  weekly_total: number;
-  daily_data: DailyData[];
-}
-
-const fetchPaid = async (): Promise<PaidData> => {
-  const accessToken = localStorage.getItem("accessToken");
-  const { data } = await axios.get<PaidData>(
-    "https://backend.kidsdesigncompany.com/api/paid/",
-    {
-      headers: {
-        Authorization: `JWT ${accessToken}`,
-      },
-    }
-  );
-  return data;
-};
-
-const PaidTable: React.FC = () => {
-  const { data, isLoading, error } = useQuery<PaidData>({
-    queryKey: ["paid"],
-    queryFn: fetchPaid,
+  const { data, isLoading, error } = useQuery<PaidSummary>({ 
+    queryKey: ["paid", year, month, day],
+    queryFn: () => fetchPaidEntries(year, month, day),
   });
+
   const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>({});
   const queryClient = useQueryClient();
+  const currentUserRole = localStorage.getItem("user_role");
+  const isceo = currentUserRole === "ceo";
 
-  // States for modals and selected entry
-  const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // Modal states
+  const [selectedEntry, setSelectedEntry] = useState<PaidEntry | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const deletePaidMutation = useMutation({
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  // Dropdown visibility states
+  const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isMonthOpen, setIsMonthOpen] = useState(false);
+  const [isDayOpen, setIsDayOpen] = useState(false);
+
+  // Refs for click-outside detection
+  const yearRef = useRef<HTMLDivElement>(null);
+  const monthRef = useRef<HTMLDivElement>(null);
+  const dayRef = useRef<HTMLDivElement>(null);
+
+  // Effect for handling click outside dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (yearRef.current && !yearRef.current.contains(event.target as Node)) {
+        setIsYearOpen(false);
+      }
+      if (monthRef.current && !monthRef.current.contains(event.target as Node)) {
+        setIsMonthOpen(false);
+      }
+      if (dayRef.current && !dayRef.current.contains(event.target as Node)) {
+        setIsDayOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Effect to collapse all but the first item on data load
+  useEffect(() => {
+    if (data?.daily_data && data.daily_data.length > 0) {
+      const newCollapsedState: { [key: string]: boolean } = {};
+      data.daily_data.forEach((entry, index) => {
+        newCollapsedState[entry.date] = (index !== 0); // Keep only the first item uncollapsed
+      });
+      setCollapsed(newCollapsedState);
+    }
+  }, [data]);
+
+  // Helper to format numbers with Naira sign
+  const formatNumber = (number: number | string | undefined | null) => {
+    if (number === undefined || number === null || number === "") {
+      return "0";
+    }
+    const num = typeof number === "string" ? parseFloat(number) : number;
+    if (isNaN(num)) {
+      return "0"; // Return "0" for NaN values
+    }
+    return num.toLocaleString("en-NG");
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // Delete mutation (if applicable for paid entries)
+  const deletePaidEntryMutation = useMutation({
     mutationFn: async (entryId: number) => {
       const accessToken = localStorage.getItem("accessToken");
+      // Replace with your actual paid entry deletion endpoint
       await axios.delete(
         `https://backend.kidsdesigncompany.com/api/paid/${entryId}/`,
         {
@@ -88,43 +138,46 @@ const PaidTable: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paid"] });
       setIsDeleteDialogOpen(false);
-      setIsDetailsModalOpen(false);
-      toast.success("Payment deleted successfully!");
+      setIsViewModalOpen(false);
+      setSelectedEntry(null);
+      toast.success("Paid entry deleted successfully!");
+    },
+    onError: (error) => {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete paid entry. Please try again.");
     },
   });
 
-  // Handle row click to show details modal
-  const handleRowClick = (entry: Entry) => {
+  // Event handlers
+  const handleRowClick = (entry: PaidEntry) => {
     setSelectedEntry(entry);
-    setIsDetailsModalOpen(true);
+    setIsViewModalOpen(true);
   };
 
-  // Handle edit button click
-  const handleEdit = () => {
-    setIsDetailsModalOpen(false);
-    setIsEditModalOpen(true);
-  };
-
-  // Handle delete button click
   const handleDelete = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  // Confirm delete
-  const confirmDelete = () => {
-    if (selectedEntry?.id) {
-      deletePaidMutation.mutate(selectedEntry.id);
-    }
+  const handleEdit = () => {
+    setIsViewModalOpen(false); // Close view modal before opening edit modal
+    setIsEditModalOpen(true);
   };
 
-  // Handle successful edit
-  const handleEditSuccess = () => {
-    setIsEditModalOpen(false);
-    setIsDetailsModalOpen(false);
+  const confirmDelete = () => {
+    if (selectedEntry?.id) {
+      deletePaidEntryMutation.mutate(selectedEntry.id);
+    }
   };
 
   const toggleCollapse = (date: string) => {
     setCollapsed((prev) => ({ ...prev, [date]: !prev[date] }));
+  };
+
+  const closeAllModals = () => {
+    setIsViewModalOpen(false);
+    setIsDeleteDialogOpen(false);
+    setIsEditModalOpen(false);
+    setSelectedEntry(null);
   };
 
   if (isLoading) return <SkeletonLoader />;
@@ -132,164 +185,228 @@ const PaidTable: React.FC = () => {
     return <p className="text-red-600">Error: {(error as Error).message}</p>;
 
   return (
-    <div className="p-6 flex flex-col h-full bg-white">
-      <div className="flex justify-between items-center mb-6">
-        <div
-          onClick={() => setIsAddModalOpen(true)}
-          className="cursor-pointer bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:text-white hover:bg-blue-400 transition duration-300"
-        >
-          Add Payment
+    <div className={`relative ${!data?.daily_data?.length ? 'min-h-[300px]' : ''}`}>
+      <div className="flex justify-between items-center mb-4">
+        <Button onClick={() => setIsAddModalOpen(true)} className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">
+          Add Record Paid
+        </Button>
+        <div className="flex items-center space-x-2">
+          {/* Year Dropdown */}
+          <div className="relative w-24" ref={yearRef}>
+            <button
+              onClick={() => setIsYearOpen(!isYearOpen)}
+              className="p-2 border rounded w-full text-left flex justify-between items-center"
+            >
+              <span>{year || 'Year'}</span>
+              <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} />
+            </button>
+            {isYearOpen && (
+              <ul className="absolute z-[9999] w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto shadow-lg">
+                <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Year</li>
+                {[...Array(10)].map((_, i) => {
+                  const y = new Date().getFullYear() - i;
+                  return (
+                    <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">
+                      {y}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+          {/* Month Dropdown */}
+          <div className="relative w-32" ref={monthRef}>
+            <button
+              onClick={() => setIsMonthOpen(!isMonthOpen)}
+              className="p-2 border rounded w-full text-left flex justify-between items-center"
+            >
+              <span>{month ? months[Number(month) - 1] : 'Month'}</span>
+              <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} />
+            </button>
+            {isMonthOpen && (
+              <ul className="absolute z-[9999] w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto shadow-lg">
+                <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Month</li>
+                {months.map((m, i) => (
+                  <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {/* Day Dropdown */}
+          <div className="relative w-24" ref={dayRef}>
+            <button
+              onClick={() => setIsDayOpen(!isDayOpen)}
+              className="p-2 border rounded w-full text-left flex justify-between items-center"
+            >
+              <span>{day || 'Day'}</span>
+              <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} />
+            </button>
+            {isDayOpen && (
+              <ul className="absolute z-[9999] w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto shadow-lg">
+                <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Day</li>
+                {[...Array(31)].map((_, i) => (
+                  <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">
+                    {i + 1}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["paid"] })} className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">Filter</Button>
+          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["paid"] }); }} className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors">Clear</Button>
         </div>
       </div>
-
-      <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
-        <table className="min-w-full bg-white">
-          <thead className="bg-gray-400">
-            <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
-                Date
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
-                Amount
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
-                Salary
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
-                Contract
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {data?.daily_data.map((day) => (
-              <React.Fragment key={day.date}>
-                <tr
-                  className="bg-gray-100 cursor-pointer"
-                  onClick={() => toggleCollapse(day.date)}
+      <div className={`overflow-x-auto pb-8 ${isTableModalOpen || isViewModalOpen || isDeleteDialogOpen ? 'blur-md' : ''}`}>
+        {data?.daily_data?.map((day) => (
+          <div
+            key={day.date}
+            className="bg-white shadow-md rounded-lg overflow-auto mb-6"
+          >
+            <div
+              className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-300 hover:text-blue-20 w-full"
+              onClick={() => toggleCollapse(day.date)}
+            >
+              <div className="flex items-center space-x-2">
+                <FontAwesomeIcon
+                  icon={collapsed[day.date] ? faChevronDown : faChevronUp}
+                />
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
                 >
-                  <td
-                    className="px-6 py-4 text-sm font-semibold text-neutral-900 uppercase"
-                    colSpan={4}
-                  >
-                    <div className="flex justify-between w-full">
-                      <span>{day.date}</span>
-                      <span>(Total: {day.daily_total})</span>
-                    </div>
-                  </td>
-                </tr>
+                  {formatDate(day.date)}
+                </h3>
+              </div>
+              <p
+                className="font-bold"
+                style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
+              >
+                Total: ₦{formatNumber(day.daily_total)}
+              </p>
+            </div>
 
-                {!collapsed[day.date] &&
-                  day.entries.map((entry) => (
-                    <tr
-                      key={entry.id}
-                      className="hover:bg-gray-50 transition duration-150 ease-in-out cursor-pointer"
-                      onClick={() => handleRowClick(entry)}
-                    >
-                      <td className="px-6 py-4 text-sm text-neutral-700">
-                        {new Date(day.date).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-neutral-700">
-                        {entry.amount}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-neutral-700">
-                        {entry.salary}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-neutral-700">
-                        {entry.contract}
-                      </td>
-                    </tr>
-                  ))}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
+            {!collapsed[day.date] && (
+              <table className="min-w-full overflow-auto">
+                <thead className="bg-gray-800">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Details</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {day.entries.map((entry) => {
+                    const workerName = entry.salary_detail 
+                      ? `${entry.salary_detail.first_name} ${entry.salary_detail.last_name}`
+                      : entry.contractor_detail
+                      ? `${entry.contractor_detail.first_name} ${entry.contractor_detail.last_name}`
+                      : "N/A";
+
+                    return (
+                      <tr key={entry.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm">{new Date(entry.date).toLocaleDateString()}</td>
+                        <td className="px-4 py-3 text-sm font-medium">{workerName}</td>
+                        <td className="px-4 py-3 text-sm font-medium">₦ {formatNumber(entry.amount)}</td>
+                        <td className="px-4 py-3 text-sm">
+                          <button
+                            onClick={() => handleRowClick(entry)}
+                            className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
+        ))}
       </div>
 
-      <AddPaymentModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
-
-      {/* Details Modal */}
-      <Dialog open={isDetailsModalOpen} onOpenChange={setIsDetailsModalOpen}>
+      {/* View Paid Entry Modal */}
+      <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Payment Details</DialogTitle>
-            <DialogDescription>
-              View details for the selected payment.
-            </DialogDescription>
+            <DialogTitle>Paid Entry Details</DialogTitle>
+            <DialogDescription>View details for the selected paid entry.</DialogDescription>
           </DialogHeader>
 
           {selectedEntry && (
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Amount:</span>
-                <span className="col-span-2">{selectedEntry.amount}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Date:</span>
+                <span className="font-medium">Name:</span>
                 <span className="col-span-2">
-                  {new Date(selectedEntry.date).toLocaleDateString()}
+                  {selectedEntry.salary_detail 
+                    ? `${selectedEntry.salary_detail.first_name} ${selectedEntry.salary_detail.last_name}`
+                    : selectedEntry.contractor_detail
+                    ? `${selectedEntry.contractor_detail.first_name} ${selectedEntry.contractor_detail.last_name}`
+                    : "N/A"}
                 </span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Salary ID:</span>
-                <span className="col-span-2">{selectedEntry.salary}</span>
+                <span className="font-medium">Amount:</span>
+                <span className="col-span-2">₦ {formatNumber(selectedEntry.amount)}</span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Contract ID:</span>
-                <span className="col-span-2">{selectedEntry.contract}</span>
+                <span className="font-medium">Date:</span>
+                <span className="col-span-2">{new Date(selectedEntry.date).toLocaleDateString()}</span>
               </div>
             </div>
           )}
 
           <DialogFooter>
             <div className="flex justify-around items-center w-full">
-              <Button
-                variant="outline"
-                onClick={() => setIsDetailsModalOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
                 Close
               </Button>
-              <Button variant="outline" onClick={handleEdit}>
-                Edit
-              </Button>
-              <Button variant="destructive" onClick={handleDelete}>
-                Delete
-              </Button>
+              {isceo && (
+                <>
+                  <Button variant="secondary" onClick={handleEdit}>
+                    Edit
+                  </Button>
+                  <Button variant="destructive" onClick={handleDelete}>
+                    Delete
+                  </Button>
+                </>
+              )}
             </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Edit Payment Modal */}
-      {selectedEntry && (
-        <EditPaymentModal
-          id={selectedEntry.id.toString()}
-          open={isEditModalOpen}
-          onOpenChange={setIsEditModalOpen}
-          onSuccess={handleEditSuccess}
-        />
-      )}
-
       {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-      >
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. It will permanently delete the
-              payment.
+              This action cannot be undone. It will permanently delete the paid entry.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>
-              Confirm
-            </AlertDialogAction>
+            <AlertDialogAction onClick={confirmDelete}>Confirm</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AddPaidModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["paid"] })}
+      />
+
+      <EditPaidModal
+        isOpen={isEditModalOpen}
+        onClose={() => closeAllModals()}
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["paid"] })}
+        entry={selectedEntry}
+      />
     </div>
   );
 };

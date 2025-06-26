@@ -10,9 +10,14 @@ import {
   Line,
   Area,
   Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
 } from "recharts";
 import { Accordion } from "rsuite";
 import { RoundedBar, CustomTooltip } from "../../../components/CustomChartComponents";
+import DashboardCard from "../../factory-manager-page/dashboard/DashboardCard";
 
 const ProjectManagerDashboard = () => {
   document.title = "Product Dashboard - KDC Admin";
@@ -29,6 +34,8 @@ const ProjectManagerDashboard = () => {
   const [income, setIncome] = useState<any[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
   const [profit, setProfit] = useState<any[]>([]);
+
+  const [showAllCards, setShowAllCards] = useState(false);
 
   useEffect(() => {
     async function fetchInfo() {
@@ -220,207 +227,130 @@ const ProjectManagerDashboard = () => {
     },
   ];
 
+  // Helper to determine if a key is monetary
+  const isMonetary = (key: string) => {
+    const excluded = [
+      'no_shop_projects_year', 'no_shop_projects_month', 'projects_count_year', 'projects_count_month',
+      'percentage_projects', 'percentage_shop',
+    ];
+    if (key.toLowerCase() === 'other_production_expensis') return true;
+    if (excluded.includes(key.toLowerCase())) return false;
+    return /amount|income|profit|expenses|cost|price|total|contractors|overhead|materials|sold|value|pay|shop/i.test(key);
+  };
+
+  // Helper to filter out percentage cards
+  const isPercentageKey = (key: string) => ['percentage_projects', 'percentage_shop'].includes(key.toLowerCase());
+
+  // Grouped cards
+  const yearlyBreakdownCards = breakdownYear ? Object.entries(breakdownYear)
+    .filter(([key]) => !isPercentageKey(key))
+    .map(([key, value]) => ({
+      key: `breakdownYear-${key}`,
+      title: key.replace(/_/g, ' '),
+      value: Number(value) || 0,
+      currency: isMonetary(key) ? '₦ ' : undefined
+    })) : [];
+
+  const monthlyBreakdownCards = breakdownMonth ? Object.entries(breakdownMonth)
+    .filter(([key]) => !isPercentageKey(key))
+    .map(([key, value]) => ({
+      key: `breakdownMonth-${key}`,
+      title: key.replace(/_/g, ' '),
+      value: Number(value) || 0,
+      currency: isMonetary(key) ? '₦ ' : undefined
+    })) : [];
+
+  const yearlyExpenseCards = expenseBreakdownYear ? Object.entries(expenseBreakdownYear)
+    .map(([key, value]) => ({
+      key: `expenseBreakdownYear-${key}`,
+      title: key.replace(/_/g, ' '),
+      value: Number(value) || 0,
+      currency: isMonetary(key) ? '₦ ' : undefined
+    })) : [];
+
+  const monthlyExpenseCards = expenseBreakdownMonth ? Object.entries(expenseBreakdownMonth)
+    .map(([key, value]) => ({
+      key: `expenseBreakdownMonth-${key}`,
+      title: key.replace(/_/g, ' '),
+      value: Number(value) || 0,
+      currency: isMonetary(key) ? '₦ ' : undefined
+    })) : [];
+
+  // Combine for show more/less logic
+  const allCards = [
+    ...yearlyBreakdownCards,
+    ...monthlyBreakdownCards,
+    ...yearlyExpenseCards,
+    ...monthlyExpenseCards,
+  ];
+
+  // Number of columns in the grid (should match lg:grid-cols-6)
+  const numCols = 6;
+  const numRowsDefault = 2;
+  const defaultVisibleCount = numCols * numRowsDefault;
+  const visibleCards = showAllCards ? allCards : allCards.slice(0, defaultVisibleCount);
+
+  // Helper to render a group with heading, with optional slice
+  const renderCardGroup = (heading: string, cards: any[], start: number, end: number) => {
+    const groupCards = cards.slice(start, end);
+    return groupCards.length ? (
+      <div className="mb-2">
+        <h4 className="text-xs font-semibold text-gray-500 mb-1 pl-1 uppercase tracking-wide">{heading}</h4>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {groupCards.map(card => (
+            <DashboardCard key={card.key} title={card.title} value={card.value} currency={card.currency} />
+          ))}
+        </div>
+      </div>
+    ) : null;
+  };
+
+  // Helper to get visible cards per group for the first N cards
+  function getVisibleGroupSlices(groups: any[][], max: number) {
+    let remaining = max;
+    const slices = [];
+    for (const group of groups) {
+      if (remaining <= 0) {
+        slices.push([0, 0]);
+        continue;
+      }
+      const take = Math.min(group.length, remaining);
+      slices.push([0, take]);
+      remaining -= take;
+    }
+    return slices;
+  }
+
+  const groups = [yearlyBreakdownCards, monthlyBreakdownCards, yearlyExpenseCards, monthlyExpenseCards];
+  const groupNames = ['Yearly Breakdown', 'Monthly Breakdown', 'Yearly Expenses', 'Monthly Expenses'];
+  const groupSlices = showAllCards ? groups.map(g => [0, g.length]) : getVisibleGroupSlices(groups, defaultVisibleCount);
+
   return (
     <div className="w-11/12 mx-auto mt-6 pl-1 pt-2">
       <div className="mb-16">
-        <div className="grid items-center md:grid-cols-2 gap-3 mb-8 md:mb-20">
-          <Accordion className="border-gray-20 border-2">
-            <Accordion.Panel
-              header="Breakdown Year"
-              defaultExpanded
-              style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
+        {/* Grouped card sections, only first 2 rows by default */}
+        {groups.map((group, i) => renderCardGroup(groupNames[i], group, groupSlices[i][0], groupSlices[i][1]))}
+        {allCards.length > defaultVisibleCount && (
+          <div className="flex justify-center mb-4">
+            <button
+              className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-transform duration-200 focus:outline-none"
+              onClick={() => setShowAllCards(v => !v)}
+              title={showAllCards ? 'Show Less' : 'Show More'}
+              aria-label={showAllCards ? 'Show Less' : 'Show More'}
             >
-              <div className="text-gray-500 space-y-2">
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">No shop projects year: </span>
-                  {breakdownYear?.no_shop_projects_year || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Percentage projects: </span>
-                  {breakdownYear?.percentage_projects || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Percentage shop: </span>
-                  {breakdownYear?.percentage_shop || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Profit year:</span>{" "}
-                  {breakdownYear?.profit_year || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Project expenses year: </span>
-                  {breakdownYear?.project_expenses_year || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">
-                    Project shop income year:{" "}
-                  </span>
-                  {breakdownYear?.project_shop_income_year || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Project counts year: </span>
-                  {breakdownYear?.projects_count_year || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">
-                    Total projects income year:{" "}
-                  </span>
-                  {breakdownYear?.total_projects_income_year || 0}
-                </p>
+              <svg
+                className={`w-6 h-6 transform transition-transform duration-300 ${showAllCards ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
               </div>
-            </Accordion.Panel>
-          </Accordion>
-
-          <Accordion className="border-gray-20 border-2">
-            <Accordion.Panel
-              header="Breakdown month"
-              defaultExpanded
-              style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
-            >
-              <div className="text-gray-500 space-y-2">
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">
-                    No shop projects month:{" "}
-                  </span>
-                  {breakdownMonth?.no_shop_projects_month || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Percentage projects: </span>
-                  {breakdownMonth?.percentage_projects || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Percentage shop: </span>
-                  {breakdownMonth?.percentage_shop || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Profit month:</span>{" "}
-                  {breakdownMonth?.profit_month || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">
-                    Project expenses month:{" "}
-                  </span>
-                  {breakdownMonth?.project_expenses_month || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">
-                    Project shop income month:{" "}
-                  </span>
-                  {breakdownMonth?.project_shop_income_month || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Project counts month: </span>
-                  {breakdownMonth?.projects_count_month || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">
-                    Total projects income month:{" "}
-                  </span>
-                  {breakdownMonth?.total_projects_income_month || 0}
-                </p>
-              </div>
-            </Accordion.Panel>
-          </Accordion>
-
-          <Accordion className="border-gray-20 border-2">
-            <Accordion.Panel
-              header="Expense breakdown year"
-              defaultExpanded
-              style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
-            >
-              <div className="text-gray-500 space-y-2">
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Contractors: </span>
-                  {expenseBreakdownYear?.contractors || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Factory Expenses: </span>
-                  {expenseBreakdownYear?.factory_expenses || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">
-                    Other production expenses:{" "}
-                  </span>
-                  {expenseBreakdownYear?.other_production_expensis || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Overhead:</span>{" "}
-                  {expenseBreakdownYear?.overhead || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Raw materials: </span>
-                  {expenseBreakdownYear?.raw_materials || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Sold cost: </span>
-                  {expenseBreakdownYear?.sold_cost || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">
-                    Total project expenses year:{" "}
-                  </span>
-                  {expenseBreakdownYear?.total_project_expenses_year || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">
-                    Yearly sold cost price:{" "}
-                  </span>
-                  {expenseBreakdownYear?.yearly_sold_cost_price || 0}
-                </p>
-              </div>
-            </Accordion.Panel>
-          </Accordion>
-
-          <Accordion className="border-gray-20 border-2">
-            <Accordion.Panel
-              // bodyFill
-              header="Expense breakdown month"
-              defaultExpanded
-              style={{ fontSize: "clamp(12.5px, 3vw, 16px)" }}
-            >
-              <div className="text-gray-500 space-y-2">
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Contractors: </span>
-                  {expenseBreakdownMonth?.contractors || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Factory Expenses: </span>
-                  {expenseBreakdownMonth?.factory_expenses || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">
-                    Other production expenses:{" "}
-                  </span>
-                  {expenseBreakdownMonth?.other_production_expensis || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Overhead:</span>{" "}
-                  {expenseBreakdownMonth?.overhead || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Raw materials: </span>
-                  {expenseBreakdownMonth?.raw_materials || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">Sold cost: </span>
-                  {expenseBreakdownMonth?.sold_cost || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">
-                    Total project expenses month:{" "}
-                  </span>
-                  {expenseBreakdownMonth?.total_project_expenses_month || 0}
-                </p>
-                <p style={{ fontSize: "clamp(11.4px, 3vw, 13.6px)" }}>
-                  <span className="font-semibold">
-                    Monthly sold cost price:{" "}
-                  </span>
-                  {expenseBreakdownMonth?.monthly_sold_cost_price || 0}
-                </p>
-              </div>
-            </Accordion.Panel>
-          </Accordion>
-        </div>
+        )}
 
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 p-4 bg-gray-50">
           {/* Income Chart */}

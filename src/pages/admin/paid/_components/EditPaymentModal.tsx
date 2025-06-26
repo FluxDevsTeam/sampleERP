@@ -188,7 +188,7 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-xl p-20">
         <DialogHeader>
           <DialogTitle>Edit Payment</DialogTitle>
         </DialogHeader>

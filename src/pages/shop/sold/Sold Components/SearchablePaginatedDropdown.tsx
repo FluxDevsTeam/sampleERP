@@ -13,27 +13,40 @@ interface SearchablePaginatedDropdownProps {
   onChange: (name: string, value: string) => void;
   name: string;
   resultsKey: string; // e.g., 'results.all_customers' or 'all_projects'
+  dataMapper?: (data: any) => DropdownItem[];
+  selectedValue?: string | null;
+  selectedName?: string | null;
 }
 
-const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = ({ endpoint, label, onChange, name, resultsKey }) => {
+const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = ({ endpoint, label, onChange, name, resultsKey, dataMapper, selectedValue, selectedName }) => {
   const [items, setItems] = useState<DropdownItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState('');
+  const [searchTerm, setSearchTerm] = useState(''); 
+  const [inputValue, setInputValue] = useState(selectedName || ''); 
   const [nextUrl, setNextUrl] = useState<string | null>(null);
   const [prevUrl, setPrevUrl] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    console.log("Dropdown: useEffect - selectedName changed:", selectedName);
+    setInputValue(selectedName || '');
+    setSearchTerm('');
+  }, [selectedName]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setInputValue(selectedName || '');
+        setSearchTerm('');
+        console.log("Dropdown: handleClickOutside - closing. inputValue:", selectedName || '', "searchTerm:", '');
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [selectedName]);
 
   const fetchData = async (url: string) => {
     try {
@@ -44,14 +57,19 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
       });
       const data = await response.json();
 
-      // Access nested results key
       const keys = resultsKey.split('.');
       let resultItems = data;
       for (const key of keys) {
-        resultItems = resultItems[key];
+        if (resultItems && typeof resultItems === 'object' && key in resultItems) {
+          resultItems = resultItems[key];
+        } else {
+          resultItems = [];
+          break;
+        }
       }
 
-      setItems(resultItems || []);
+      const finalItems = dataMapper ? dataMapper(resultItems) : resultItems;
+      setItems(finalItems || []);
       setNextUrl(data.next);
       setPrevUrl(data.previous);
     } catch (error) {
@@ -60,14 +78,32 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
   };
 
   useEffect(() => {
-    const fullEndpoint = `${endpoint}?search=${search}`;
+    const fullEndpoint = `${endpoint}?search=${searchTerm}`;
     fetchData(fullEndpoint);
-  }, [endpoint, search]);
+  }, [endpoint, searchTerm]);
 
   const handleSelect = (item: DropdownItem) => {
-    onChange(name, String(item.id));
+    onChange(item.name, String(item.id));
     setIsOpen(false);
-    setSearch(item.name);
+    setInputValue(item.name);
+    setSearchTerm('');
+    console.log("Dropdown: handleSelect - after set. inputValue:", item.name, "searchTerm:", '');
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    setSearchTerm(newValue);
+    console.log("Dropdown: handleInputChange - newValue:", newValue, "searchTerm:", newValue);
+    if (newValue === '') {
+      onChange(name, '');
+    }
+  };
+
+  const handleInputFocus = () => {
+    setIsOpen(true);
+    setSearchTerm(inputValue);
+    console.log("Dropdown: handleInputFocus - inputValue:", inputValue, "searchTerm:", inputValue);
   };
 
   return (
@@ -76,15 +112,9 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
       <div className="relative">
         <input
           type="text"
-          value={search}
-          onChange={(e) => {
-            const newSearch = e.target.value;
-            setSearch(newSearch);
-            if (newSearch === '') {
-              onChange(name, '');
-            }
-          }}
-          onFocus={() => setIsOpen(true)}
+          value={isOpen ? searchTerm : inputValue}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
           className="w-full border rounded p-2"
         />
         <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">

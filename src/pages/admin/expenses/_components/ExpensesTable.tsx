@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
-import AddExpenseModal from "./AddExpenseModal";
 import EditExpenseModal from "./EditExpenseModal";
 import {
   Dialog,
@@ -24,6 +23,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChevronDown,
+  faChevronUp,
+  faPlus,
+} from "@fortawesome/free-solid-svg-icons";
+import AddExpenseModal from "./AddExpenseModal";
 
 interface ExpenseCategory {
   id: number;
@@ -59,7 +65,7 @@ interface Entry {
 interface DailyData {
   date: string;
   entries: Entry[];
-  daily_total: number;
+  daily_total?: number;
 }
 
 interface ExpensesData {
@@ -92,10 +98,26 @@ interface Expense {
   };
 }
 
-const fetchExpenses = async (): Promise<ExpensesData> => {
+interface ExpensesTableProps {
+  isTableModalOpen: boolean;
+}
+
+const fetchExpenses = async (year: number | '', month: number | '', day: number | ''): Promise<ExpensesData> => {
   const accessToken = localStorage.getItem("accessToken");
+  const params = new URLSearchParams();
+
+  if (year) {
+    params.append("year", String(year));
+  }
+  if (month) {
+    params.append("month", String(month));
+  }
+  if (day) {
+    params.append("day", String(day));
+  }
+
   const { data } = await axios.get<ExpensesData>(
-    "https://backend.kidsdesigncompany.com/api/expense/",
+    `https://backend.kidsdesigncompany.com/api/expense/?${params.toString()}`,
     {
       headers: {
         Authorization: `JWT ${accessToken}`,
@@ -105,21 +127,88 @@ const fetchExpenses = async (): Promise<ExpensesData> => {
   return data;
 };
 
-const ExpensesTable: React.FC = () => {
+const ExpensesTable: React.FC<ExpensesTableProps> = ({
+  isTableModalOpen,
+}) => {
+  const [year, setYear] = useState<number | ''>( '');
+  const [month, setMonth] = useState<number | ''>( '');
+  const [day, setDay] = useState<number | ''>( '');
+
   const { data, isLoading, error } = useQuery<ExpensesData>({
-    queryKey: ["expenses"],
-    queryFn: fetchExpenses,
+    queryKey: ["expenses", year, month, day],
+    queryFn: () => fetchExpenses(year, month, day),
   });
 
-  const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>({});
+  const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>(() => {
+    const initialCollapsedState: { [key: string]: boolean } = {};
+    if (data?.daily_data && data.daily_data.length > 0) {
+      data.daily_data.forEach((day, index) => {
+        initialCollapsedState[day.date] = index !== 0;
+      });
+    }
+    return initialCollapsedState;
+  });
   const queryClient = useQueryClient();
+  const currentUserRole = localStorage.getItem("user_role");
+  const isceo = currentUserRole === "ceo";
 
   // Modal states
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  // Dropdown visibility states
+  const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isMonthOpen, setIsMonthOpen] = useState(false);
+  const [isDayOpen, setIsDayOpen] = useState(false);
+
+  // Refs for click-outside detection
+  const yearRef = useRef<HTMLDivElement>(null);
+  const monthRef = useRef<HTMLDivElement>(null);
+  const dayRef = useRef<HTMLDivElement>(null);
+
+  // Effect for handling click outside dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (yearRef.current && !yearRef.current.contains(event.target as Node)) {
+        setIsYearOpen(false);
+      }
+      if (monthRef.current && !monthRef.current.contains(event.target as Node)) {
+        setIsMonthOpen(false);
+      }
+      if (dayRef.current && !dayRef.current.contains(event.target as Node)) {
+        setIsDayOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Helper to format numbers with Naira sign
+  const formatNumber = (number: number | string | undefined | null) => {
+    if (number === undefined || number === null || number === "") {
+      return "0";
+    }
+    const num = typeof number === "string" ? parseFloat(number) : number;
+    if (isNaN(num)) {
+      return "0"; // Return "0" for NaN values
+    }
+    return num.toLocaleString("en-NG");
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
 
   // Delete mutation
   const deleteExpenseMutation = useMutation({
@@ -199,11 +288,6 @@ const ExpensesTable: React.FC = () => {
     }
   };
 
-  const handleAddSuccess = () => {
-    queryClient.invalidateQueries({ queryKey: ["expenses"] });
-    toast.success("Expense added successfully!");
-  };
-
   const handleEditSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ["expenses"] });
     setIsEditModalOpen(false);
@@ -218,7 +302,6 @@ const ExpensesTable: React.FC = () => {
   const closeAllModals = () => {
     setIsViewModalOpen(false);
     setIsEditModalOpen(false);
-    setIsAddModalOpen(false);
     setIsDeleteDialogOpen(false);
     setSelectedEntry(null);
   };
@@ -228,283 +311,245 @@ const ExpensesTable: React.FC = () => {
     return <p className="text-red-600">Error: {(error as Error).message}</p>;
 
   return (
-    <div className="p-6 flex flex-col h-full bg-white">
-      {/* Header with Add Button */}
-      <div className=" mb-6">
-        <Button
+    <div className={`relative ${!data?.daily_data?.length ? 'min-h-[300px]' : ''}`}>
+      <div className="flex justify-between items-center mb-4">
+        {/* Add Expense Button (Left-aligned) */}
+        <button
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+          className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
         >
+          <FontAwesomeIcon className="pr-2" icon={faPlus} />
           Add Expense
-        </Button>
+        </button>
+        <div className="flex items-center space-x-2">
+          {/* Year Dropdown */}
+          <div className="relative w-24" ref={yearRef}>
+            <button
+              onClick={() => setIsYearOpen(!isYearOpen)}
+              className="p-2 border rounded w-full text-left flex justify-between items-center"
+            >
+              <span>{year || 'Year'}</span>
+              <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} />
+            </button>
+            {isYearOpen && (
+              <ul className="absolute z-[9999] w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto shadow-lg">
+                <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Year</li>
+                {[...Array(10)].map((_, i) => {
+                  const y = new Date().getFullYear() - i;
+                  return (
+                    <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">
+                      {y}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+          {/* Month Dropdown */}
+          <div className="relative w-32" ref={monthRef}>
+            <button
+              onClick={() => setIsMonthOpen(!isMonthOpen)}
+              className="p-2 border rounded w-full text-left flex justify-between items-center"
+            >
+              <span>{month ? months[Number(month) - 1] : 'Month'}</span>
+              <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} />
+            </button>
+            {isMonthOpen && (
+              <ul className="absolute z-[9999] w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto shadow-lg">
+                <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Month</li>
+                {months.map((m, i) => (
+                  <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {/* Day Dropdown */}
+          <div className="relative w-24" ref={dayRef}>
+            <button
+              onClick={() => setIsDayOpen(!isDayOpen)}
+              className="p-2 border rounded w-full text-left flex justify-between items-center"
+            >
+              <span>{day || 'Day'}</span>
+              <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} />
+            </button>
+            {isDayOpen && (
+              <ul className="absolute z-[9999] w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto shadow-lg">
+                <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Day</li>
+                {[...Array(31)].map((_, i) => (
+                  <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">
+                    {i + 1}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["expenses"] })} className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">Filter</Button>
+          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["expenses"] }); }} className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors">Clear</Button>
+        </div>
       </div>
-
-      {/* Expenses Table */}
-      <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
-        <table className="min-w-full bg-white">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
-                Date
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
-                Name
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
-                Category
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
-                Project
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
-                Shop Item
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
-                Amount
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-neutral-900 uppercase">
-                Quantity
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {data?.daily_data.map((day) => (
-              <React.Fragment key={day.date}>
-                <tr
-                  className="bg-gray-50 cursor-pointer hover:bg-gray-100"
-                  onClick={() => toggleCollapse(day.date)}
+      <div className={`overflow-x-auto pb-8 ${isTableModalOpen || isViewModalOpen || isEditModalOpen || isDeleteDialogOpen || isAddModalOpen ? 'blur-md' : ''}`}>
+        {data?.daily_data?.map((day) => (
+          <div
+            key={day.date}
+            className="bg-white shadow-md rounded-lg overflow-auto mb-6"
+          >
+            <div
+              className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-300 hover:text-blue-20 w-full"
+              onClick={() => toggleCollapse(day.date)}
+            >
+              <div className="flex items-center space-x-2">
+                <FontAwesomeIcon
+                  icon={collapsed[day.date] ? faChevronDown : faChevronUp}
+                />
+                <h3
+                  className="text-lg font-semibold"
+                  style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
                 >
-                  <td
-                    className="px-6 py-4 text-sm font-semibold text-neutral-900"
-                    colSpan={7}
-                  >
-                    <div className="flex justify-between items-center w-full">
-                      <span className="flex items-center">
-                        <span className="mr-2">
-                          {collapsed[day.date] ? "▶" : "▼"}
-                        </span>
-                        {new Date(day.date).toLocaleDateString("en-US", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </span>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                        Total: ${day.daily_total}
-                      </span>
-                    </div>
-                  </td>
-                </tr>
+                  {formatDate(day.date)}
+                </h3>
+              </div>
+              <p
+                className="font-bold"
+                style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
+              >
+                Total: ₦{formatNumber(day.daily_total)}
+              </p>
+            </div>
 
-                {!collapsed[day.date] &&
-                  day.entries.map((entry) => (
-                    <tr
-                      key={entry.id}
-                      className="hover:bg-gray-50 transition duration-150 ease-in-out cursor-pointer"
-                      onClick={() => handleRowClick(entry)}
-                    >
-                      <td className="px-6 py-4 text-sm text-neutral-700">
-                        {new Date(entry.date).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-neutral-700 font-medium">
-                        {entry.name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-neutral-700">
-                        {entry.expense_category ? (
-                          <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                            {entry.expense_category.name}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400">N/A</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-neutral-700">
-                        {entry.linked_project ? (
-                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                            {entry.linked_project.name}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400">N/A</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-neutral-700">
-                        {entry.sold_item ? (
-                          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">
-                            {entry.sold_item.name ||
-                              `Item #${entry.sold_item.id}`}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400">N/A</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-neutral-700 font-medium">
-                        ${entry.amount}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-neutral-700">
-                        {entry.quantity}
+            {!collapsed[day.date] && (
+              <table className="min-w-full overflow-auto">
+                <thead className="bg-gray-800">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Category</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Linked Project</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Linked Shop Item</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Quantity</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Details</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {day.entries.map((entry) => (
+                    <tr key={entry.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm">{new Date(entry.date).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-sm font-medium">{entry.name}</td>
+                      <td className="px-4 py-3 text-sm">{entry.expense_category?.name || "N/A"}</td>
+                      <td className="px-4 py-3 text-sm">{entry.linked_project?.name || "N/A"}</td>
+                      <td className="px-4 py-3 text-sm">{entry.sold_item?.name || "N/A"}</td>
+                      <td className="px-4 py-3 text-sm font-medium">₦ {formatNumber(entry.amount)}</td>
+                      <td className="px-4 py-3 text-sm">{entry.quantity}</td>
+                      <td className="px-4 py-3 text-sm">
+                        <button
+                          onClick={() => handleRowClick(entry)}
+                          className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+                        >
+                          View
+                        </button>
                       </td>
                     </tr>
                   ))}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
+                </tbody>
+              </table>
+            )}
+          </div>
+        ))}
       </div>
 
       {/* View Expense Modal */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Expense Details</DialogTitle>
-            <DialogDescription>
-              View and manage the selected expense.
-            </DialogDescription>
+            <DialogDescription>View details for the selected expense.</DialogDescription>
           </DialogHeader>
 
           {selectedEntry && (
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium text-gray-600">Name:</span>
-                <span className="col-span-2 font-medium">
-                  {selectedEntry.name}
-                </span>
+                <span className="font-medium">Name:</span>
+                <span className="col-span-2">{selectedEntry.name}</span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium text-gray-600">Category:</span>
-                <span className="col-span-2">
-                  {selectedEntry.expense_category
-                    ? selectedEntry.expense_category.name
-                    : "N/A"}
-                </span>
+                <span className="font-medium">Amount:</span>
+                <span className="col-span-2">₦ {formatNumber(selectedEntry.amount)}</span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium text-gray-600">Description:</span>
-                <span className="col-span-2">
-                  {selectedEntry.description || "N/A"}
-                </span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium text-gray-600">Project:</span>
-                <span className="col-span-2">
-                  {selectedEntry.linked_project
-                    ? selectedEntry.linked_project.name
-                    : "N/A"}
-                </span>
-              </div>
-              {selectedEntry.sold_item && (
-                <>
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <span className="font-medium text-gray-600">
-                      Shop Item:
-                    </span>
-                    <span className="col-span-2">
-                      {selectedEntry.sold_item.name ||
-                        `Item #${selectedEntry.sold_item.id}`}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <span className="font-medium text-gray-600">
-                      Item Cost:
-                    </span>
-                    <span className="col-span-2">
-                      ${selectedEntry.sold_item.cost_price}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <span className="font-medium text-gray-600">
-                      Selling Price:
-                    </span>
-                    <span className="col-span-2">
-                      ${selectedEntry.sold_item.selling_price}
-                    </span>
-                  </div>
-                </>
-              )}
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium text-gray-600">Amount:</span>
-                <span className="col-span-2 font-bold text-green-600">
-                  ${selectedEntry.amount}
-                </span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium text-gray-600">Quantity:</span>
+                <span className="font-medium">Quantity:</span>
                 <span className="col-span-2">{selectedEntry.quantity}</span>
               </div>
               <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium text-gray-600">Date:</span>
-                <span className="col-span-2">
-                  {new Date(selectedEntry.date).toLocaleDateString()}
-                </span>
+                <span className="font-medium">Category:</span>
+                <span className="col-span-2">{selectedEntry.expense_category?.name || "N/A"}</span>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">Linked Project:</span>
+                <span className="col-span-2">{selectedEntry.linked_project?.name || "N/A"}</span>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">Sold Item:</span>
+                <span className="col-span-2">{selectedEntry.sold_item?.name || "N/A"}</span>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">Date:</span>
+                <span className="col-span-2">{new Date(selectedEntry.date).toLocaleDateString()}</span>
               </div>
             </div>
           )}
 
           <DialogFooter>
-            <div className="flex justify-between items-center w-full">
-              <Button
-                variant="outline"
-                onClick={() => setIsViewModalOpen(false)}
-              >
+            <div className="flex justify-around items-center w-full">
+              <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
                 Close
               </Button>
-              <div className="flex gap-2">
+              {isceo && (
                 <Button variant="outline" onClick={handleEdit}>
                   Edit
                 </Button>
+              )}
+              {isceo && (
                 <Button variant="destructive" onClick={handleDelete}>
                   Delete
                 </Button>
-              </div>
+              )}
             </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Add Expense Modal */}
-      <AddExpenseModal
-        isOpen={isAddModalOpen}
-        onOpenChange={setIsAddModalOpen}
-        onSuccess={handleAddSuccess}
-      />
-
       {/* Edit Expense Modal */}
-      {selectedEntry && (
+      {selectedEntry && isEditModalOpen && (
         <EditExpenseModal
-          expenseId={selectedEntry.id.toString()}
+          expense={entryToExpense(selectedEntry)}
           isOpen={isEditModalOpen}
           onOpenChange={setIsEditModalOpen}
           onSuccess={handleEditSuccess}
-          initialData={entryToExpense(selectedEntry)}
         />
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-      >
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              expense
-              {selectedEntry && ` "${selectedEntry.name}"`} from the system.
+              This action cannot be undone. It will permanently delete the expense.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              className="bg-red-600 hover:bg-red-700"
-              disabled={deleteExpenseMutation.isPending}
-            >
-              {deleteExpenseMutation.isPending ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
+            <AlertDialogAction onClick={confirmDelete}>Confirm</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AddExpenseModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
     </div>
   );
 };

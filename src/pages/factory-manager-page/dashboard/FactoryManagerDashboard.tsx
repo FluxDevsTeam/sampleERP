@@ -3,41 +3,7 @@ import { factoryData } from "./api";
 import { useState, useEffect } from "react";
 import PieChartComponent from "./PieChart";
 import BarChartComponent from "./Barchart";
-
-// Reusable Dropdown Component
-const Dropdown = ({ title, data, }: {title: string; data: Record<string, number>; }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="relative inline-block text-left w-[400px] mb-2">
-      <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="px-4 py-2 bg-gray-20 text-white rounded-lg hover:bg-gray-700 w-full flex justify-between items-center"
-      >
-        <span>{title}</span>
-        <span className={`text-[25px] transform ${isOpen ? "rotate-180" : ""}`}>
-          &#9662;
-        </span>
-      </button>
-
-      {isOpen && (
-        <div className="absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-          <ul className="p-2">
-            {Object.entries(data).map(([key, value]) => (
-              <li
-                key={key}
-                className="px-4 py-1 hover:bg-gray-100 cursor-pointer flex justify-between"
-              >
-                <span>{key.replace(/_/g, " ")}:</span>
-                <span>{value}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-};
+import DashboardCard from "./DashboardCard";
 
 const FactoryManagerDashboard = () => {
   const [financialHealth, setFinancialHealth] = useState<Record<string, number>>({});
@@ -48,6 +14,23 @@ const FactoryManagerDashboard = () => {
   const [expenseBreakdown, setExpenseBreakdown] = useState<{ name: string; value: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAllCards, setShowAllCards] = useState(false);
+
+  // Number of columns in the grid (should match lg:grid-cols-6)
+  const numCols = 6;
+  const numRowsDefault = 2;
+  const defaultVisibleCount = numCols * numRowsDefault;
+
+  // Helper to determine if a key is monetary
+  const isMonetary = (key: string) => {
+    const excluded = [
+      'active_assets',
+      'deprecated_assets',
+      'sales_count',
+    ];
+    if (excluded.includes(key.toLowerCase())) return false;
+    return /amount|income|profit|paid|value|expenses|cost|sales|pay|assets|shop/i.test(key);
+  };
 
   useEffect(() => {
     const fetchFactory = async () => {
@@ -144,24 +127,115 @@ const FactoryManagerDashboard = () => {
 
   if (error) return <div className="text-red-500">{error}</div>;
 
+  // Grouped cards
+  const financialHealthCards = Object.entries(financialHealth).map(([key, value]) => ({
+    key: `financialHealth-${key}`,
+    title: key.replace(/_/g, ' '),
+    value,
+    currency: isMonetary(key) ? '₦ ' : undefined
+  }));
+  const yearlyDataCards = Object.entries(yearlyData).map(([key, value]) => ({
+    key: `yearlyData-${key}`,
+    title: key.replace(/_/g, ' '),
+    value,
+    currency: isMonetary(key) ? '₦ ' : undefined
+  }));
+  const customerDataCards = Object.entries(customerData).map(([key, value]) => ({
+    key: `customerData-${key}`,
+    title: key.replace(/_/g, ' '),
+    value,
+    currency: isMonetary(key) ? '₦ ' : undefined
+  }));
+  const workerDataCards = Object.entries(workerData).map(([key, value]) => ({
+    key: `workerData-${key}`,
+    title: key.replace(/_/g, ' '),
+    value,
+    currency: isMonetary(key) ? '₦ ' : undefined
+  }));
+  const paidDataCards = Object.entries(paidData).map(([key, value]) => ({
+    key: `paidData-${key}`,
+    title: key.replace(/_/g, ' '),
+    value,
+    currency: isMonetary(key) ? '₦ ' : undefined
+  }));
+
+  // Combine for show more/less logic
+  const allCards = [
+    ...financialHealthCards,
+    ...yearlyDataCards,
+    ...customerDataCards,
+    ...workerDataCards,
+    ...paidDataCards,
+  ];
+
+  // Helper to render a group with heading, with optional slice
+  const renderCardGroup = (heading: string, cards: any[], start: number, end: number) => {
+    const groupCards = cards.slice(start, end);
+    return groupCards.length ? (
+      <div className="mb-2">
+        <h4 className="text-xs font-semibold text-gray-500 mb-1 pl-1 uppercase tracking-wide">{heading}</h4>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {groupCards.map(card => (
+            <DashboardCard key={card.key} title={card.title} value={card.value} currency={card.currency} />
+          ))}
+        </div>
+      </div>
+    ) : null;
+  };
+
+  // Helper to get visible cards per group for the first N cards
+  function getVisibleGroupSlices(groups: any[][], max: number) {
+    let remaining = max;
+    const slices = [];
+    for (const group of groups) {
+      if (remaining <= 0) {
+        slices.push([0, 0]);
+        continue;
+      }
+      const take = Math.min(group.length, remaining);
+      slices.push([0, take]);
+      remaining -= take;
+    }
+    return slices;
+  }
+
+  const groups = [financialHealthCards, yearlyDataCards, customerDataCards, workerDataCards, paidDataCards];
+  const groupNames = ['Financial Health', 'Yearly Data', 'Customer', 'Workers', 'Paid'];
+  const groupSlices = showAllCards ? groups.map(g => [0, g.length]) : getVisibleGroupSlices(groups, defaultVisibleCount);
+
   return (
     <div>
-      <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Financial Health Dropdown */}
-        <Dropdown title="Financial Health" data={financialHealth} />
-
-        {/* Yearly Data Dropdown */}
-        <Dropdown title="Yearly Data" data={yearlyData} />
-        <Dropdown title="Customer" data={customerData} />
-        <Dropdown title="Workers" data={workerData} />
-        <Dropdown title="Paid" data={paidData} />
+      <div className="p-4">
+        {/* Grouped card sections, only first 2 rows by default */}
+        {groups.map((group, i) => renderCardGroup(groupNames[i], group, groupSlices[i][0], groupSlices[i][1]))}
+        {allCards.length > defaultVisibleCount && (
+          <div className="flex justify-center mb-4">
+            <button
+              className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-transform duration-200 focus:outline-none"
+              onClick={() => setShowAllCards(v => !v)}
+              title={showAllCards ? 'Show Less' : 'Show More'}
+              aria-label={showAllCards ? 'Show Less' : 'Show More'}
+            >
+              <svg
+                className={`w-6 h-6 transform transition-transform duration-300 ${showAllCards ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
       <div className="p-4">
         <h2 className="text-lg font-bold mb-8">Financial Overview</h2>
         <PieChartComponent data={expenseBreakdown} />
         <BarChartComponent />
       </div>
-  </div>
+    </div>
   );
 };
 

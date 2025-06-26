@@ -29,10 +29,16 @@ interface CategoryDropdownProps {
 }
 
 const fetchCategories = async (): Promise<Category[]> => {
-  const { data } = await axios.get<{ results: Category[] }>(
-    "https://backend.kidsdesigncompany.com/api/expense-category/"
+  const token = localStorage.getItem("accessToken");
+  const { data } = await axios.get<Category[]>(
+    "https://backend.kidsdesigncompany.com/api/expense-category/",
+    {
+      headers: {
+        Authorization: `JWT ${token}`,
+      },
+    }
   );
-  return data.results;
+  return data;
 };
 
 const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
@@ -42,6 +48,7 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState<NewCategoryData>({ name: "" });
+  const [isDeletingLocal, setIsDeletingLocal] = useState(false);
 
   const { data: categories = [], isLoading } = useQuery<Category[]>({
     queryKey: ["categories"],
@@ -50,9 +57,15 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
 
   const addCategoryMutation = useMutation({
     mutationFn: async (categoryData: NewCategoryData) => {
+      const accessToken = localStorage.getItem("accessToken");
       const response = await axios.post<Category>(
         "https://backend.kidsdesigncompany.com/api/expense-category/",
-        categoryData
+        categoryData,
+        {
+          headers: {
+            Authorization: `JWT ${accessToken}`,
+          },
+        }
       );
       return response.data; // Ensure the response includes id and name
     },
@@ -85,6 +98,35 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
     },
   });
 
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (categoryId: number) => {
+      setIsDeletingLocal(true);
+      const token = localStorage.getItem("accessToken");
+      await axios.delete(`https://backend.kidsdesigncompany.com/api/expense-category/${categoryId}/`, {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      onCategoryChange(null); // Clear selected category after deletion
+      toast.success("Category deleted successfully!");
+      setIsDeletingLocal(false);
+    },
+    onError: (error: any) => {
+      console.error("Error deleting category:", error);
+      toast.error("Failed to delete category. Please try again.");
+      setIsDeletingLocal(false);
+    },
+  });
+
+  const handleDeleteCategory = () => {
+    if (selectedCategory && window.confirm("Are you sure you want to delete this category?")) {
+      deleteCategoryMutation.mutate(selectedCategory);
+    }
+  };
+
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onCategoryChange(e.target.value ? Number(e.target.value) : null);
   };
@@ -106,17 +148,17 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
     <div className="space-y-2">
       <div className="flex items-end justify-between">
         <Label htmlFor="category">Category</Label>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button type="button" variant="outline" size="sm">
-              Create New
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Category</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleAddCategory}>
+        <div className="flex space-x-2">
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button type="button" variant="outline" size="sm" className="text-xs">
+                Create New
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Category</DialogTitle>
+              </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="categoryName">Category Name</Label>
@@ -137,13 +179,27 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={addCategoryMutation.isPending}>
+                <Button
+                  type="button"
+                  onClick={handleAddCategory}
+                  disabled={addCategoryMutation.isPending}
+                >
                   {addCategoryMutation.isPending ? "Creating..." : "Create Category"}
                 </Button>
               </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            onClick={handleDeleteCategory}
+            disabled={!selectedCategory || deleteCategoryMutation.isPending}
+            className="text-xs"
+          >
+            {deleteCategoryMutation.isPending ? "Deleting..." : "Delete"}
+          </Button>
+        </div>
       </div>
 
       <select
