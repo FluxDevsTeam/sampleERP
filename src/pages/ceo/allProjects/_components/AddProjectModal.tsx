@@ -278,13 +278,13 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Project</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <Card className="border-none shadow-none">
-            <CardContent className="space-y-4 pt-4">
+            <CardContent className="pt-4">
               {formError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
@@ -293,193 +293,159 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                 </Alert>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="name">Project Name*</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className={errorDetails.name ? "border-red-500" : ""}
-                />
-                {errorDetails.name && (
-                  <p className="text-sm text-red-500">
-                    {errorDetails.name.join(", ")}
-                  </p>
-                )}
-              </div>
-
-              <div className="mb-4">
-                <SearchablePaginatedDropdown
-                  endpoint="https://backend.kidsdesigncompany.com/api/customer/"
-                  label="Customer"
-                  name="customer_detail"
-                  resultsKey="results.all_customers"
-                  onChange={(name, value) => setFormData((prev) => ({ ...prev, [name]: value }))}
-                  selectedValue={formData.customer_detail}
-                  selectedName={customers.find(c => String(c.id) === formData.customer_detail)?.name || ''}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) => handleSelectChange("status", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="in progress">In Progress</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="delivered">Delivered</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="start_date">Start Date*</Label>
-                  <Input
-                    id="start_date"
-                    name="start_date"
-                    type="date"
-                    value={formData.start_date}
-                    onChange={handleChange}
-                    required
-                    className={errorDetails.start_date ? "border-red-500" : ""}
-                  />
-                  {errorDetails.start_date && (
-                    <p className="text-sm text-red-500">
-                      {errorDetails.start_date.join(", ")}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Left column */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Project Name</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className={errorDetails.name ? "border-red-500" : ""}
+                    />
+                    {errorDetails.name && (
+                      <p className="text-sm text-red-500">
+                        {errorDetails.name.join(", ")}
+                      </p>
+                    )}
+                  </div>
+                  <div className="mb-4">
+                    <SearchablePaginatedDropdown
+                      endpoint="https://backend.kidsdesigncompany.com/api/customer/"
+                      label="Customer"
+                      name="customer_detail"
+                      resultsKey="results.all_customers"
+                      onChange={(_name, value) => setFormData((prev) => ({ ...prev, customer_detail: value }))}
+                      selectedValue={formData.customer_detail}
+                      selectedName={customers.find(c => String(c.id) === formData.customer_detail)?.name || ''}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="note">Note (optional)</Label>
+                    <Textarea
+                      id="note"
+                      name="note"
+                      value={formData.note}
+                      onChange={handleChange}
+                      rows={3}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="invoice_image">Invoice Image (optional)</Label>
+                    <Input
+                      id="invoice_image"
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,application/pdf"
+                      onChange={handleImageChange}
+                      className="cursor-pointer"
+                    />
+                    {invoiceImage && (
+                      <p className="text-sm text-green-600 mt-2">
+                        {invoiceImage.name} selected
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB
                     </p>
-                  )}
+                  </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="deadline">Deadline</Label>
-                  <Input
-                    id="deadline"
-                    name="deadline"
-                    type="date"
-                    value={formData.deadline}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="selling_price">Selling Price (₦)*</Label>
-                  <Input
-                    id="selling_price"
-                    name="selling_price"
-                    type="number"
-                    value={formData.selling_price}
-                    onChange={handleChange}
-                    required
-                    className={
-                      errorDetails.selling_price ? "border-red-500" : ""
-                    }
-                  />
-                  {errorDetails.selling_price && (
-                    <p className="text-sm text-red-500">
-                      {errorDetails.selling_price.join(", ")}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="date_delivered">Date Delivered</Label>
-                  <Input
-                    id="date_delivered"
-                    name="date_delivered"
-                    type="date"
-                    value={formData.date_delivered}
-                    onChange={handleChange}
-                    disabled={!formData.is_delivered}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="logistics">Logistics Cost (₦)</Label>
-                  <Input
-                    id="logistics"
-                    name="logistics"
-                    type="number"
-                    value={formData.logistics}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="service_charge">Service Charge (₦)</Label>
-                  <Input
-                    id="service_charge"
-                    name="service_charge"
-                    type="number"
-                    value={formData.service_charge}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="note">Note</Label>
-                <Textarea
-                  id="note"
-                  name="note"
-                  value={formData.note}
-                  onChange={handleChange}
-                  rows={3}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="invoice_image">Invoice Image</Label>
-                <Input
-                  id="invoice_image"
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif,application/pdf"
-                  onChange={handleImageChange}
-                  className="cursor-pointer"
-                />
-                {invoiceImage && (
-                  <p className="text-sm text-green-600 mt-2">
-                    {invoiceImage.name} selected
-                  </p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB
-                </p>
-              </div>
-
-              <div className="flex flex-col space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="is_delivered"
-                    checked={formData.is_delivered}
-                    onCheckedChange={(checked) =>
-                      handleCheckboxChange("is_delivered", checked as boolean)
-                    }
-                  />
-                  <Label htmlFor="is_delivered">Project is delivered</Label>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="archived"
-                    checked={formData.archived}
-                    onCheckedChange={(checked) =>
-                      handleCheckboxChange("archived", checked as boolean)
-                    }
-                  />
-                  <Label htmlFor="archived">Archive this project</Label>
+                {/* Right column */}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="start_date">Start Date</Label>
+                      <Input
+                        id="start_date"
+                        name="start_date"
+                        type="date"
+                        value={formData.start_date}
+                        onChange={handleChange}
+                        required
+                        className={errorDetails.start_date ? "border-red-500" : ""}
+                      />
+                      {errorDetails.start_date && (
+                        <p className="text-sm text-red-500">
+                          {errorDetails.start_date.join(", ")}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="deadline">Deadline (optional)</Label>
+                      <Input
+                        id="deadline"
+                        name="deadline"
+                        type="date"
+                        value={formData.deadline}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="selling_price">Selling Price (₦)</Label>
+                      <Input
+                        id="selling_price"
+                        name="selling_price"
+                        type="number"
+                        value={formData.selling_price}
+                        onChange={handleChange}
+                        required
+                        className={errorDetails.selling_price ? "border-red-500" : ""}
+                      />
+                      {errorDetails.selling_price && (
+                        <p className="text-sm text-red-500">
+                          {errorDetails.selling_price.join(", ")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="logistics">Logistics Cost (optional)</Label>
+                      <Input
+                        id="logistics"
+                        name="logistics"
+                        type="number"
+                        value={formData.logistics}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="service_charge">Service Charge (optional)</Label>
+                      <Input
+                        id="service_charge"
+                        name="service_charge"
+                        type="number"
+                        value={formData.service_charge}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="is_delivered"
+                        checked={formData.is_delivered}
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange("is_delivered", checked as boolean)
+                        }
+                      />
+                      <Label htmlFor="is_delivered">Project is delivered</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="archived"
+                        checked={formData.archived}
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange("archived", checked as boolean)
+                        }
+                      />
+                      <Label htmlFor="archived">Archive this project</Label>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>

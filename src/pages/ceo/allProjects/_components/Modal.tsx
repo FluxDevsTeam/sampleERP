@@ -130,6 +130,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
 }) => {
   const navigate = useNavigate();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   const userRole = typeof window !== 'undefined' ? localStorage.getItem('user_role') : null;
 
   const handleViewOtherProductionRecords = () => {
@@ -146,7 +147,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   return (
     <>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-5xl">
+        <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Project Details</DialogTitle>
             <DialogDescription>
@@ -155,7 +156,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
           </DialogHeader>
           {selectedProject && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-4">
-              {/* Left Column: Basic Info, Note, Invoice */}
+              {/* Left Column: Basic Info, Note, Invoice, Products, Sold Items */}
               <div className="space-y-4">
                 {/* Basic Info */}
                 <div className="grid grid-cols-3 items-center gap-4">
@@ -207,7 +208,12 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                   <div className="grid grid-cols-3 items-center gap-4">
                     <span className="font-medium">Invoice Image:</span>
                     <span className="col-span-2">
-                      <img src={selectedProject.invoice_image} alt="Invoice" className="max-h-32 rounded shadow" />
+                      <img
+                        src={selectedProject.invoice_image}
+                        alt="Invoice"
+                        className="max-h-32 rounded shadow cursor-pointer hover:opacity-80"
+                        onClick={() => setShowImageModal(true)}
+                      />
                     </span>
                   </div>
                 )}
@@ -218,9 +224,6 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                     <span className="col-span-2">{selectedProject.note}</span>
                   </div>
                 )}
-              </div>
-              {/* Right Column: Tables and Calculations */}
-              <div className="space-y-6">
                 {/* Products */}
                 <div>
                   <span className="font-semibold block mb-1 text-blue-900">Products:</span>
@@ -279,10 +282,13 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                   ) : (
                     <span className="text-red-700">No sold items</span>
                   )}
-                  <div className="text-xs text-green-900 mt-1">
+                  <div className="text-xs text-black mt-1 font-semibold">
                     Total Cost Price: ₦{selectedProject.sold_items.total_cost_price_sold_items} | Total Selling Price: ₦{selectedProject.sold_items.total_selling_price_sold_items}
                   </div>
                 </div>
+              </div>
+              {/* Right Column: Expenses, Other Productions, Calculations */}
+              <div className="space-y-6">
                 {/* Expenses */}
                 <div>
                   <span className="font-semibold block mb-1 text-red-900">Expenses:</span>
@@ -338,27 +344,44 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                   </div>
                 </div>
                 {/* Calculations */}
-                <div>
-                  <span className="font-semibold block mb-1 text-gray-900">Calculations:</span>
-                  <ul className="text-xs text-black space-y-1">
-                    <li>Total Raw Material Cost: ₦{selectedProject.calculations.total_raw_material_cost}</li>
-                    <li>Total Artisan Cost: ₦{selectedProject.calculations.total_artisan_cost}</li>
-                    <li>Total Overhead Cost: ₦{selectedProject.calculations.total_overhead_cost}</li>
-                    <li>Total Products Cost: ₦{selectedProject.calculations.total_products_cost}</li>
-                    <li>Total Product Selling Price: ₦{selectedProject.calculations.total_product_selling_price}</li>
-                    <li>Product Profit: ₦{selectedProject.calculations.product_profit}</li>
-                    <li>Total Cost Price Sold Items: ₦{selectedProject.calculations.total_cost_price_sold_items}</li>
-                    <li>Total Selling Price Sold Items: ₦{selectedProject.calculations.total_selling_price_sold_items}</li>
-                    <li>Shop Items Profit: ₦{selectedProject.calculations.shop_items_profit}</li>
-                    <li>Money Left for Expenses: ₦{selectedProject.calculations.money_left_for_expensis}</li>
-                    <li>Money Left (with logistics/service): ₦{selectedProject.calculations.money_left_for_expensis_with_logistics_and_service_charge}</li>
-                    <li>Total Other Productions Budget: ₦{selectedProject.calculations.total_other_productions_budget}</li>
-                    <li>Total Other Productions Cost: ₦{selectedProject.calculations.total_other_productions_cost}</li>
-                    <li>Total Expenses: ₦{selectedProject.calculations.total_expensis}</li>
-                    <li>Total Money Spent: ₦{selectedProject.calculations.total_money_spent}</li>
-                    <li>Total Paid: ₦{selectedProject.calculations.total_paid}</li>
-                    <li>Final Profit: ₦{selectedProject.calculations.final_profit}</li>
-                  </ul>
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <span className="font-bold text-lg text-blue-900 block mb-3">Calculations</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                    <div className="font-semibold text-blue-900">Total Raw Material Cost:</div>
+                    <div className="text-black">₦{selectedProject.calculations.total_raw_material_cost}</div>
+                    <div className="font-semibold text-blue-900">Total Artisan Cost:</div>
+                    <div className="text-black">₦{selectedProject.calculations.total_artisan_cost}</div>
+                    <div className="font-semibold text-blue-900">Total Overhead Cost:</div>
+                    <div className="text-black">₦{selectedProject.calculations.total_overhead_cost}</div>
+                    <div className="font-semibold text-blue-900">Total Products Cost:</div>
+                    <div className="text-black">₦{selectedProject.calculations.total_products_cost}</div>
+                    <div className="font-semibold text-blue-900">Total Product Selling Price:</div>
+                    <div className="text-black">₦{selectedProject.calculations.total_product_selling_price}</div>
+                    <div className="font-semibold text-blue-900">Product Profit:</div>
+                    <div className="text-black">₦{selectedProject.calculations.product_profit}</div>
+                    <div className="font-semibold text-blue-900">Total Cost Price Sold Items:</div>
+                    <div className="text-black">₦{selectedProject.calculations.total_cost_price_sold_items}</div>
+                    <div className="font-semibold text-blue-900">Total Selling Price Sold Items:</div>
+                    <div className="text-black">₦{selectedProject.calculations.total_selling_price_sold_items}</div>
+                    <div className="font-semibold text-blue-900">Shop Items Profit:</div>
+                    <div className="text-black">₦{selectedProject.calculations.shop_items_profit}</div>
+                    <div className="font-semibold text-blue-900">Money Left for Expenses:</div>
+                    <div className="text-black">₦{selectedProject.calculations.money_left_for_expensis}</div>
+                    <div className="font-semibold text-blue-900">Money Left (with logistics/service):</div>
+                    <div className="text-black">₦{selectedProject.calculations.money_left_for_expensis_with_logistics_and_service_charge}</div>
+                    <div className="font-semibold text-blue-900">Total Other Productions Budget:</div>
+                    <div className="text-black">₦{selectedProject.calculations.total_other_productions_budget}</div>
+                    <div className="font-semibold text-blue-900">Total Other Productions Cost:</div>
+                    <div className="text-black">₦{selectedProject.calculations.total_other_productions_cost}</div>
+                    <div className="font-semibold text-blue-900">Total Expenses:</div>
+                    <div className="text-black">₦{selectedProject.calculations.total_expensis}</div>
+                    <div className="font-semibold text-blue-900">Total Money Spent:</div>
+                    <div className="text-black">₦{selectedProject.calculations.total_money_spent}</div>
+                    <div className="font-semibold text-blue-900">Total Paid:</div>
+                    <div className="text-black">₦{selectedProject.calculations.total_paid}</div>
+                    <div className="font-semibold text-blue-900">Final Profit:</div>
+                    <div className="text-black">₦{selectedProject.calculations.final_profit}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -385,6 +408,25 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Large Invoice Image Modal */}
+      {selectedProject?.invoice_image && (
+        <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
+          <DialogContent className="flex flex-col items-center justify-center bg-black bg-opacity-90 max-w-3xl">
+            <button
+              className="self-end mb-2 px-4 py-2 bg-white text-black rounded hover:bg-gray-200"
+              onClick={() => setShowImageModal(false)}
+            >
+              Close
+            </button>
+            <img
+              src={selectedProject.invoice_image}
+              alt="Invoice Large"
+              className="max-h-[80vh] w-auto rounded shadow-lg border-4 border-white"
+            />
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Edit Project Modal */}
       {selectedProject && (
