@@ -397,14 +397,13 @@ const EditProject = () => {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Project Name*</Label>
+              <Label htmlFor="name">Project Name (optional)</Label>
               <Input
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Enter project name"
-                required
                 className={errorDetails.name ? "border-red-500" : ""}
               />
               {errorDetails.name && (
@@ -415,7 +414,7 @@ const EditProject = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="customer_detail">Customer*</Label>
+              <Label htmlFor="customer_detail">Customer (optional)</Label>
               <Select
                 value={formData.customer_detail}
                 onValueChange={handleCustomerChange}
@@ -481,14 +480,13 @@ const EditProject = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="start_date">Start Date*</Label>
+                <Label htmlFor="start_date">Start Date (optional)</Label>
                 <Input
                   id="start_date"
                   name="start_date"
                   type="date"
                   value={formData.start_date}
                   onChange={handleChange}
-                  required
                   className={errorDetails.start_date ? "border-red-500" : ""}
                 />
                 {errorDetails.start_date && (
@@ -518,14 +516,13 @@ const EditProject = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="selling_price">Selling Price (₦)*</Label>
+                <Label htmlFor="selling_price">Selling Price (₦) (optional)</Label>
                 <Input
                   id="selling_price"
                   name="selling_price"
                   type="number"
                   value={formData.selling_price}
                   onChange={handleChange}
-                  required
                   className={errorDetails.selling_price ? "border-red-500" : ""}
                 />
                 {errorDetails.selling_price && (

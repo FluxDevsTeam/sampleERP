@@ -28,15 +28,32 @@ const EditContractor = () => {
     address: "",
     craft_specialty: "",
     years_of_experience: 0,
+    date_joined: "",
+    date_left: "",
+    guarantor_name: "",
+    guarantor_phone_number: "",
+    guarantor_address: "",
     is_still_active: true,
   });
+  const [image, setImage] = useState<File | null>(null);
+  const [agreementFormImage, setAgreementFormImage] = useState<File | null>(null);
+  const [originalData, setOriginalData] = useState<any>(null);
 
   // Fetch the contractor data to populate the form
   useEffect(() => {
     const fetchContractor = async () => {
       try {
-        const response = await axios.get(`https://backend.kidsdesigncompany.com/api/contractors/${id}/`);
-        setFormData(response.data);
+        const token = localStorage.getItem("accessToken");
+        const response = await axios.get(`https://backend.kidsdesigncompany.com/api/contractors/${id}/`, {
+          headers: { Authorization: `JWT ${token}` },
+        });
+        const normalized = {
+          ...response.data,
+          date_joined: response.data.date_joined ? response.data.date_joined.slice(0, 10) : "",
+          date_left: response.data.date_left ? response.data.date_left.slice(0, 10) : "",
+        };
+        setFormData(normalized);
+        setOriginalData(normalized);
       } catch (error) {
         toast.error("Failed to fetch contractor data.");
       }
@@ -44,6 +61,17 @@ const EditContractor = () => {
 
     fetchContractor();
   }, [id]);
+
+  const isChanged = () => {
+    if (!originalData) return false;
+    for (const key in formData) {
+      if (formData[key as keyof typeof formData] !== originalData[key]) {
+        return true;
+      }
+    }
+    if (image || agreementFormImage) return true;
+    return false;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -53,12 +81,34 @@ const EditContractor = () => {
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, files } = e.target;
+    if (files && files[0]) {
+      if (name === "image") setImage(files[0]);
+      if (name === "agreement_form_image") setAgreementFormImage(files[0]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsPending(true);
 
     try {
-      await axios.put(`https://backend.kidsdesigncompany.com/api/contractors/${id}/`, formData);
+      const data = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (originalData && value !== originalData[key]) {
+          data.append(key, value as string);
+        }
+      });
+      if (image) data.append("image", image);
+      if (agreementFormImage) data.append("agreement_form_image", agreementFormImage);
+      const token = localStorage.getItem("accessToken");
+      await axios.patch(`https://backend.kidsdesigncompany.com/api/contractors/${id}/`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `JWT ${token}`,
+        },
+      });
       queryClient.invalidateQueries({ queryKey: ["contractors"], refetchType: "active" });
       toast.success("Contractor updated successfully!");
       navigate("/admin/workers");
@@ -71,12 +121,13 @@ const EditContractor = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <Card className="max-w-md mx-auto">
+      <Card className="mx-auto w-full md:max-w-3xl lg:max-w-5xl">
         <CardHeader>
           <CardTitle>Edit Contractor</CardTitle>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* First Name (required) */}
             <div className="space-y-2">
               <Label htmlFor="first_name">First Name</Label>
               <Input
@@ -87,7 +138,7 @@ const EditContractor = () => {
                 required
               />
             </div>
-
+            {/* Last Name (required) */}
             <div className="space-y-2">
               <Label htmlFor="last_name">Last Name</Label>
               <Input
@@ -98,7 +149,7 @@ const EditContractor = () => {
                 required
               />
             </div>
-
+            {/* Email (required) */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -110,52 +161,122 @@ const EditContractor = () => {
                 required
               />
             </div>
-
+            {/* Phone Number (optional) */}
             <div className="space-y-2">
-              <Label htmlFor="phone_number">Phone Number</Label>
+              <Label htmlFor="phone_number">Phone Number (optional)</Label>
               <Input
                 id="phone_number"
                 name="phone_number"
                 value={formData.phone_number}
                 onChange={handleChange}
-                required
               />
             </div>
-
+            {/* Address (optional) */}
             <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address">Address (optional)</Label>
               <Input
                 id="address"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                required
               />
             </div>
-
+            {/* Craft Specialty (optional) */}
             <div className="space-y-2">
-              <Label htmlFor="craft_specialty">Craft Specialty</Label>
+              <Label htmlFor="craft_specialty">Craft Specialty (optional)</Label>
               <Input
                 id="craft_specialty"
                 name="craft_specialty"
                 value={formData.craft_specialty}
                 onChange={handleChange}
-                required
               />
             </div>
-
+            {/* Years of Experience (optional) */}
             <div className="space-y-2">
-              <Label htmlFor="years_of_experience">Years of Experience</Label>
+              <Label htmlFor="years_of_experience">Years of Experience (optional)</Label>
               <Input
                 id="years_of_experience"
                 name="years_of_experience"
                 type="number"
                 value={formData.years_of_experience}
                 onChange={handleChange}
-                required
               />
             </div>
-
+            {/* Date Joined (optional) */}
+            <div className="space-y-2">
+              <Label htmlFor="date_joined">Date Joined (optional)</Label>
+              <Input
+                id="date_joined"
+                name="date_joined"
+                type="date"
+                value={formData.date_joined}
+                onChange={handleChange}
+              />
+            </div>
+            {/* Date Left (optional) */}
+            <div className="space-y-2">
+              <Label htmlFor="date_left">Date Left (optional)</Label>
+              <Input
+                id="date_left"
+                name="date_left"
+                type="date"
+                value={formData.date_left}
+                onChange={handleChange}
+              />
+            </div>
+            {/* Guarantor Name (optional) */}
+            <div className="space-y-2">
+              <Label htmlFor="guarantor_name">Guarantor Name (optional)</Label>
+              <Input
+                id="guarantor_name"
+                name="guarantor_name"
+                value={formData.guarantor_name}
+                onChange={handleChange}
+              />
+            </div>
+            {/* Guarantor Phone Number (optional) */}
+            <div className="space-y-2">
+              <Label htmlFor="guarantor_phone_number">Guarantor Phone Number (optional)</Label>
+              <Input
+                id="guarantor_phone_number"
+                name="guarantor_phone_number"
+                value={formData.guarantor_phone_number}
+                onChange={handleChange}
+              />
+            </div>
+            {/* Guarantor Address (optional) */}
+            <div className="space-y-2">
+              <Label htmlFor="guarantor_address">Guarantor Address (optional)</Label>
+              <Input
+                id="guarantor_address"
+                name="guarantor_address"
+                value={formData.guarantor_address}
+                onChange={handleChange}
+              />
+            </div>
+            {/* Image (optional) */}
+            <div className="space-y-2">
+              <Label htmlFor="image">Image (optional)</Label>
+              <Input
+                id="image"
+                name="image"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </div>
+            {/* Agreement Form Image (optional) */}
+            <div className="space-y-2">
+              <Label htmlFor="agreement_form_image">Agreement Form Image (optional)</Label>
+              <Input
+                id="agreement_form_image"
+                name="agreement_form_image"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </div>
+            {/* Is Still Active (optional) */}
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -165,7 +286,7 @@ const EditContractor = () => {
                 onChange={handleChange}
                 className="h-4 w-4"
               />
-              <Label htmlFor="is_still_active">Active</Label>
+              <Label htmlFor="is_still_active">Active (optional)</Label>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
@@ -176,7 +297,7 @@ const EditContractor = () => {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending || !isChanged()}>
               {isPending ? "Updating..." : "Update Contractor"}
             </Button>
           </CardFooter>

@@ -130,6 +130,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
 }) => {
   const navigate = useNavigate();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const userRole = typeof window !== 'undefined' ? localStorage.getItem('user_role') : null;
 
   const handleViewOtherProductionRecords = () => {
     if (selectedProject?.id) {
@@ -197,12 +198,16 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
               <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                 Close
               </Button>
-              <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
-                Edit
-              </Button>
-              <Button variant="destructive" onClick={handleDelete}>
-                Delete
-              </Button>
+              {userRole === 'ceo' && (
+                <>
+                  <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
+                    Edit
+                  </Button>
+                  <Button variant="destructive" onClick={handleDelete}>
+                    Delete
+                  </Button>
+                </>
+              )}
               <Button variant="outline" onClick={handleViewOtherProductionRecords}>
                 Records
               </Button>

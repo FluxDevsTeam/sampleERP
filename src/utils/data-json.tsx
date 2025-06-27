@@ -81,12 +81,6 @@ export const sidebarLink: SidebarProps[] = [
   },
   {
     id: nanoid(),
-    text: "Overhead",
-    href: "/ceo/overhead", // Removed "dashboard"
-    icon: <RawMaterialIcon className="currentColor" />,
-  },
-  {
-    id: nanoid(),
     text: "Shop",
     href: "/ceo/shop", // Removed "dashboard"
     icon: <FinancesIcon className="currentColor" />,

@@ -118,104 +118,67 @@ const MonthlyTrendsCharts = () => {
     return <div className="text-red-600 p-8">Error: {error}</div>;
   }
 
+  if (!data) return <div className="text-red-600 p-8">No data available</div>;
+
+  // Prepare grouped data for recharts
+  const months = data.income.map((item) => item.month);
+  const groupedData = months.map((month, idx) => ({
+    month,
+    income: data.income[idx]?.total || 0,
+    expenses: data.expenses[idx]?.total || 0,
+  }));
+
   return (
-    <div className="space-y-8 p-4">
-      <h1 className="text-2xl font-bold text-center mb-8">
-        Financial Dashboard - Monthly Trends
-      </h1>
-
-      {/* Income Chart */}
-      <div
-        style={{
-          backgroundColor: "#f5f7fa",
-          borderRadius: "12px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-          padding: "25px",
-          width: "100%",
-          marginBottom: "30px",
-          transition: "transform 0.3s ease",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "1.25rem",
-            fontWeight: "600",
-            marginBottom: "20px",
-            color: "#4CAF50",
-            textAlign: "center",
-          }}
-        >
-          Monthly Income
-        </h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            data={data?.income || []}
-            margin={{ top: 20, right: 30, left: 30, bottom: 60 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="month"
-              angle={-45}
-              textAnchor="end"
-              height={70}
-              tick={{ fontSize: 12 }}
-            />
-            <YAxis
-              tickFormatter={(value) => `NGN${value.toLocaleString()}`}
-              tick={{ fontSize: 12 }}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend />
-            <Bar dataKey="total" name="Income" fill="#4CAF50" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Expenses Chart */}
-      <div
-        style={{
-          backgroundColor: "#f5f7fa",
-          borderRadius: "12px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-          padding: "25px",
-          width: "100%",
-          marginBottom: "30px",
-          transition: "transform 0.3s ease",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "1.25rem",
-            fontWeight: "600",
-            marginBottom: "20px",
-            color: "#F44336",
-            textAlign: "center",
-          }}
-        >
-          Monthly Expenses
-        </h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            data={data?.expenses || []}
-            margin={{ top: 20, right: 30, left: 30, bottom: 60 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="month"
-              angle={-45}
-              textAnchor="end"
-              height={70}
-              tick={{ fontSize: 12 }}
-            />
-            <YAxis
-              tickFormatter={(value) => `NGN${value.toLocaleString()}`}
-              tick={{ fontSize: 12 }}
-            />
-            <Tooltip content={<CustomExpensesTooltip />} />
-            <Legend />
-            <Bar dataKey="total" name="Expenses" fill="#F44336" />
-          </BarChart>
-        </ResponsiveContainer>
+    <div className="w-full px-4">
+      <div className="flex flex-col w-full">
+        <div className="flex-1 bg-gradient-to-br from-[#e0f2ff] to-[#f5f7fa] rounded-2xl shadow-2xl p-8 border border-blue-100 relative overflow-hidden">
+          <h2 className="text-2xl font-bold mb-6 text-blue-700 text-center tracking-wide z-10">Monthly Income & Expenses</h2>
+          <ResponsiveContainer width="100%" height={440}>
+            <BarChart
+              data={groupedData}
+              margin={{ top: 30, right: 40, left: 40, bottom: 80 }}
+              barCategoryGap={24}
+              barGap={0}
+            >
+              <CartesianGrid strokeDasharray="6 6" stroke="#e0e7ef" />
+              <XAxis
+                dataKey="month"
+                angle={-30}
+                textAnchor="end"
+                height={90}
+                tick={{ fontSize: 16, fontWeight: 600, fill: '#374151' }}
+                axisLine={{ stroke: '#b3c2d1', strokeWidth: 2 }}
+              />
+              <YAxis
+                tickFormatter={(value) => `₦${value.toLocaleString()}`}
+                tick={{ fontSize: 16, fontWeight: 600, fill: '#374151' }}
+                axisLine={{ stroke: '#b3c2d1', strokeWidth: 2 }}
+                width={90}
+              />
+              <Tooltip
+                wrapperStyle={{ borderRadius: 14, boxShadow: '0 4px 16px rgba(0,0,0,0.10)' }}
+                cursor={{ fill: '#e0f2fe', opacity: 0.2 }}
+                formatter={(value: number, name: string) => [`₦${value.toLocaleString()}`, name === 'income' ? 'Income' : 'Expenses']}
+              />
+              <Legend
+                iconType="circle"
+                wrapperStyle={{ fontSize: 16, fontWeight: 700, color: '#2563eb', paddingBottom: 12 }}
+              />
+              <Bar dataKey="income" name="Income" fill="url(#incomeGradient)" barSize={40} radius={0} isAnimationActive={true} />
+              <Bar dataKey="expenses" name="Expenses" fill="url(#expensesGradient)" barSize={40} radius={0} isAnimationActive={true} />
+              <defs>
+                <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#2563eb" stopOpacity={0.95} />
+                  <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.7} />
+                </linearGradient>
+                <linearGradient id="expensesGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#F44336" stopOpacity={0.95} />
+                  <stop offset="100%" stopColor="#fca5a5" stopOpacity={0.7} />
+                </linearGradient>
+              </defs>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

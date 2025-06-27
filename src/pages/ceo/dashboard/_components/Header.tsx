@@ -89,30 +89,6 @@ interface CEODashboardData {
   };
 }
 
-// Dropdown component for reuse
-const DropdownSection = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="mb-6 border rounded-lg shadow-md overflow-hidden">
-      <div
-        className="p-4 bg-gray-50 flex justify-between items-center cursor-pointer"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <h3 className="font-bold text-xl">{title}</h3>
-        {isOpen ? <MdExpandLess size={24} /> : <MdExpandMore size={24} />}
-      </div>
-      {isOpen && <div className="p-4 bg-white">{children}</div>}
-    </div>
-  );
-};
-
 // Data card component styled like the Header component
 const DataCard = ({
   label,
@@ -120,309 +96,25 @@ const DataCard = ({
 }: {
   label: string;
   value: number | string;
-}) => (
-  <div className="p-4 border rounded-lg shadow-md">
-    <div className="flex justify-between items-center text-xl">
-      <p>{label}</p>
-      <img src={Frame180 || "/placeholder.svg"} alt="icon" />
-    </div>
-    <div className="flex space-x-8 text-sm">
-      <span className="text-green-200">
-        <MdArrowOutward />
-      </span>
-      <span>
-        {typeof value === "number"
-          ? value.toLocaleString("en-US", {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 2,
-            })
-          : value}
-      </span>
+}) => {
+  // Show Naira sign only for numbers and not for percentage or string values
+  const isNumber = typeof value === "number";
+  const isPercent = typeof value === "string" && value.trim().endsWith("%");
+  return (
+    <div className="p-4 border rounded-lg shadow-md flex flex-col items-center justify-center">
+      <div className="text-base font-medium text-center mb-1">{label}</div>
+      <div className="text-lg font-semibold text-blue-700">
+        {isNumber ? "₦" : ""}
+        {isNumber ? value.toLocaleString("en-NG") : value}
     </div>
   </div>
 );
+};
 
 // Fetch CEO dashboard data
 const fetchCEODashboard = async (): Promise<CEODashboardData> => {
   const { data } = await api.get<CEODashboardData>("ceo-dashboard/");
   return data;
-};
-
-// Key metrics component
-const KeyMetrics = ({ data }: { data: CEODashboardData }) => {
-  return (
-    <DropdownSection title="Key Business Metrics">
-      <div className="md:grid md:grid-cols-4 grid grid-cols-1 md:gap-4 gap-4">
-        <DataCard
-          label="Total Income (Year)"
-          value={data.key_metrics.total_income_year}
-        />
-        <DataCard
-          label="Total Expenses (Year)"
-          value={data.key_metrics.total_expenses_year}
-        />
-        <DataCard
-          label="Total Profit (Year)"
-          value={data.key_metrics.total_profit_year}
-        />
-        <DataCard
-          label="Overhead Cost"
-          value={data.key_metrics.overhead_cost}
-        />
-      </div>
-      <div className="md:grid md:grid-cols-4 grid grid-cols-1 md:gap-4 gap-4 mt-4">
-        <DataCard
-          label="Total Income (Month)"
-          value={data.key_metrics.total_income_month}
-        />
-        <DataCard
-          label="Total Expenses (Month)"
-          value={data.key_metrics.total_expenses_month}
-        />
-        <DataCard
-          label="Profit (Month)"
-          value={data.key_metrics.profit_month}
-        />
-        <DataCard
-          label="Suggested Overhead"
-          value={data.key_metrics.suggested_overhead_cost}
-        />
-      </div>
-      <div className="md:grid md:grid-cols-3 grid grid-cols-1 md:gap-4 gap-4 mt-4">
-        <DataCard
-          label="Current Assets Value"
-          value={data.key_metrics.current_assets_value}
-        />
-        <DataCard
-          label="Inventory Value"
-          value={data.key_metrics.inventory_value}
-        />
-        <DataCard
-          label="Total Store Value"
-          value={data.key_metrics.total_store_value}
-        />
-      </div>
-    </DropdownSection>
-  );
-};
-
-// Income breakdown component
-const IncomeBreakdown = ({ data }: { data: CEODashboardData }) => {
-  return (
-    <>
-      <DropdownSection title="Monthly Income Breakdown">
-        <div className="md:grid md:grid-cols-4 grid grid-cols-1 md:gap-4 gap-4">
-          <DataCard
-            label="Projects"
-            value={data.income_breakdown_month.projects}
-          />
-          <DataCard
-            label="Non-Shop Projects"
-            value={data.income_breakdown_month.no_shop_projects}
-          />
-          <DataCard
-            label="Shop Sales"
-            value={data.income_breakdown_month.shop_sales}
-          />
-          <DataCard
-            label="Non-Project Shop"
-            value={data.income_breakdown_month.non_project_shop_sales}
-          />
-        </div>
-        <div className="md:grid md:grid-cols-2 grid grid-cols-1 md:gap-4 gap-4 mt-4">
-          <DataCard
-            label="Projects %"
-            value={`${data.income_breakdown_month.percentage_projects}%`}
-          />
-          <DataCard
-            label="Shop %"
-            value={`${data.income_breakdown_month.percentage_shop}%`}
-          />
-        </div>
-      </DropdownSection>
-
-      <DropdownSection title="Yearly Income Breakdown">
-        <div className="md:grid md:grid-cols-4 grid grid-cols-1 md:gap-4 gap-4">
-          <DataCard
-            label="Projects"
-            value={data.income_breakdown_year.projects}
-          />
-          <DataCard
-            label="Non-Shop Projects"
-            value={data.income_breakdown_year.no_shop_projects}
-          />
-          <DataCard
-            label="Shop Sales"
-            value={data.income_breakdown_year.shop_sales}
-          />
-          <DataCard
-            label="Non-Project Shop"
-            value={data.income_breakdown_year.non_project_shop_sales}
-          />
-        </div>
-        <div className="md:grid md:grid-cols-2 grid grid-cols-1 md:gap-4 gap-4 mt-4">
-          <DataCard
-            label="Projects %"
-            value={`${data.income_breakdown_year.percentage_projects}%`}
-          />
-          <DataCard
-            label="Shop %"
-            value={`${data.income_breakdown_year.percentage_shop}%`}
-          />
-        </div>
-      </DropdownSection>
-    </>
-  );
-};
-
-// Expense breakdown component
-const ExpenseBreakdown = ({ data }: { data: CEODashboardData }) => {
-  return (
-    <>
-      <DropdownSection title="Monthly Expense Breakdown">
-        <div className="md:grid md:grid-cols-4 grid grid-cols-1 md:gap-4 gap-4">
-          <DataCard
-            label="Salaries"
-            value={data.expense_breakdown_month.salaries}
-          />
-          <DataCard
-            label="Contractors"
-            value={data.expense_breakdown_month.contractors}
-          />
-          <DataCard
-            label="Raw Materials"
-            value={data.expense_breakdown_month.raw_materials}
-          />
-          <DataCard
-            label="Assets"
-            value={data.expense_breakdown_month.assets}
-          />
-        </div>
-        <div className="md:grid md:grid-cols-3 grid grid-cols-1 md:gap-4 gap-4 mt-4">
-          <DataCard
-            label="Factory Expenses"
-            value={data.expense_breakdown_month.factory_expenses}
-          />
-          <DataCard
-            label="Other Production"
-            value={data.expense_breakdown_month.other_production_expensis}
-          />
-          <DataCard
-            label="Cost Price"
-            value={data.expense_breakdown_month.monthly_sold_cost_price}
-          />
-        </div>
-      </DropdownSection>
-
-      <DropdownSection title="Yearly Expense Breakdown">
-        <div className="md:grid md:grid-cols-4 grid grid-cols-1 md:gap-4 gap-4">
-          <DataCard
-            label="Salaries"
-            value={data.expense_breakdown_year.salaries}
-          />
-          <DataCard
-            label="Contractors"
-            value={data.expense_breakdown_year.contractors}
-          />
-          <DataCard
-            label="Raw Materials"
-            value={data.expense_breakdown_year.raw_materials}
-          />
-          <DataCard label="Assets" value={data.expense_breakdown_year.assets} />
-        </div>
-        <div className="md:grid md:grid-cols-3 grid grid-cols-1 md:gap-4 gap-4 mt-4">
-          <DataCard
-            label="Factory Expenses"
-            value={data.expense_breakdown_year.factory_expenses}
-          />
-          <DataCard
-            label="Other Production"
-            value={data.expense_breakdown_year.other_production_expensis}
-          />
-          <DataCard
-            label="Cost Price"
-            value={data.expense_breakdown_year.monthly_sold_cost_price}
-          />
-        </div>
-      </DropdownSection>
-    </>
-  );
-};
-
-// Asset analysis component
-const AssetAnalysis = ({ data }: { data: CEODashboardData }) => {
-  return (
-    <DropdownSection title="Asset Analysis">
-      <div className="md:grid md:grid-cols-2 grid grid-cols-1 md:gap-4 gap-4">
-        <DataCard
-          label="Active Assets"
-          value={data.asset_analysis.active_assets}
-        />
-        <DataCard
-          label="Deprecated Assets"
-          value={data.asset_analysis.deprecated_assets}
-        />
-      </div>
-    </DropdownSection>
-  );
-};
-
-// Customer metrics component
-const CustomerMetrics = ({ data }: { data: CEODashboardData }) => {
-  return (
-    <DropdownSection title="Customer Metrics">
-      <div className="md:grid md:grid-cols-3 grid grid-cols-1 md:gap-4 gap-4">
-        <DataCard
-          label="All Customers"
-          value={data.customers.all_customers_count}
-        />
-        <DataCard
-          label="Active Customers"
-          value={data.customers.active_customers_count}
-        />
-        <DataCard
-          label="Owing Customers"
-          value={data.customers.owing_customers_count}
-        />
-      </div>
-    </DropdownSection>
-  );
-};
-
-// Additional metrics component
-const AdditionalMetrics = ({ data }: { data: CEODashboardData }) => {
-  return (
-    <DropdownSection title="Additional Metrics">
-      <div className="md:grid md:grid-cols-3 grid grid-cols-1 md:gap-4 gap-4">
-        <DataCard
-          label="Total Workers"
-          value={data.additional_metrics.total_salary_workers}
-        />
-        <DataCard
-          label="Active Workers"
-          value={data.additional_metrics.active_salary_workers}
-        />
-        <DataCard
-          label="Total Contractors"
-          value={data.additional_metrics.total_contractors}
-        />
-      </div>
-      <div className="md:grid md:grid-cols-3 grid grid-cols-1 md:gap-4 gap-4 mt-4">
-        <DataCard
-          label="Active Contractors"
-          value={data.additional_metrics.active_contractors}
-        />
-        <DataCard
-          label="Inventory Items"
-          value={data.additional_metrics.inventory_items}
-        />
-        <DataCard
-          label="Raw Materials"
-          value={data.additional_metrics.raw_materials_types}
-        />
-      </div>
-    </DropdownSection>
-  );
 };
 
 // Main CEO Dashboard component
@@ -431,6 +123,13 @@ const Header = () => {
     queryKey: ["ceo-dashboard"],
     queryFn: fetchCEODashboard,
   });
+
+  // Collapsible state for each section
+  const [openSection, setOpenSection] = useState<'key' | 'income' | 'expense' | 'asset' | 'customer' | 'additional'>('key');
+
+  const handleSectionClick = (section: typeof openSection) => {
+    setOpenSection(section);
+  };
 
   if (isLoading) return <p className="p-6">Loading dashboard data...</p>;
   if (error)
@@ -441,14 +140,131 @@ const Header = () => {
 
   return (
     <div className="p-6">
-      <p className="md:text-2xl text-black font-bold py-6">Dashboard Headers</p>
+      {/* Collapsible Section Headers Row */}
+      <div className="flex gap-4 mb-4 overflow-x-auto whitespace-nowrap w-full">
+        <button className={`shrink-0 max-w-xs flex items-center justify-between ml-1 px-2 py-8 rounded-xl shadow bg-blue-50/60 hover:bg-blue-100 transition font-semibold text-blue-700 ${openSection === 'key' ? 'ring-2 ring-blue-400 rounded-full' : ''}`} onClick={() => handleSectionClick('key')}>
+          Key Business Metrics {openSection === 'key' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+        </button>
+        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-green-50/60 hover:bg-green-100 transition font-semibold text-green-700 ${openSection === 'income' ? 'ring-2 ring-green-400 rounded-full' : ''}`} onClick={() => handleSectionClick('income')}>
+          Income Breakdown {openSection === 'income' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+        </button>
+        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-red-50/60 hover:bg-red-100 transition font-semibold text-red-700 ${openSection === 'expense' ? 'ring-2 ring-red-400 rounded-full' : ''}`} onClick={() => handleSectionClick('expense')}>
+          Expense Breakdown {openSection === 'expense' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+        </button>
+        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-purple-50/60 hover:bg-purple-100 transition font-semibold text-purple-700 ${openSection === 'asset' ? 'ring-2 ring-purple-400 rounded-full' : ''}`} onClick={() => handleSectionClick('asset')}>
+          Asset & Store Analysis {openSection === 'asset' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+        </button>
+        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-yellow-50/60 hover:bg-yellow-100 transition font-semibold text-yellow-700 ${openSection === 'customer' ? 'ring-2 ring-yellow-400 rounded-full' : ''}`} onClick={() => handleSectionClick('customer')}>
+          Customer & Workforce Metrics {openSection === 'customer' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+        </button>
+        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-gray-50/60 hover:bg-gray-100 transition font-semibold text-gray-700 ${openSection === 'additional' ? 'ring-2 ring-gray-400 rounded-full' : ''}`} onClick={() => handleSectionClick('additional')}>
+          Additional Metrics {openSection === 'additional' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+        </button>
+      </div>
 
-      <KeyMetrics data={data} />
-      <IncomeBreakdown data={data} />
-      <ExpenseBreakdown data={data} />
-      <AssetAnalysis data={data} />
-      <CustomerMetrics data={data} />
-      <AdditionalMetrics data={data} />
+      {/* Collapsible Section Content */}
+      {openSection === 'key' && (
+        <section className="mb-8 bg-blue-50/60 rounded-2xl shadow p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <DataCard label="This Year Total Income" value={data.key_metrics.total_income_year} />
+            <DataCard label="This Year Total Expenses" value={data.key_metrics.total_expenses_year} />
+            <DataCard label="This Year Total Profit" value={data.key_metrics.total_profit_year} />
+            <DataCard label="This Month Total Income" value={data.key_metrics.total_income_month} />
+            <DataCard label="This Month Total Expenses" value={data.key_metrics.total_expenses_month} />
+            <DataCard label="This Month Profit" value={data.key_metrics.profit_month} />
+          </div>
+        </section>
+      )}
+      {openSection === 'income' && (
+        <section className="mb-8 bg-green-50/60 rounded-2xl shadow p-6">
+          <div className="mb-6">
+            <h4 className="font-semibold text-green-700 mb-2">Monthly Income Breakdown</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <DataCard label="Projects" value={data.income_breakdown_month.projects} />
+              <DataCard label="Non-Shop Projects" value={data.income_breakdown_month.no_shop_projects} />
+              <DataCard label="Shop Sales" value={data.income_breakdown_month.shop_sales} />
+              <DataCard label="Non-Project Shop" value={data.income_breakdown_month.non_project_shop_sales} />
+              <DataCard label="Projects %" value={`${data.income_breakdown_month.percentage_projects}%`} />
+              <DataCard label="Shop %" value={`${data.income_breakdown_month.percentage_shop}%`} />
+            </div>
+          </div>
+          <div>
+            <h4 className="font-semibold text-green-700 mb-2">Yearly Income Breakdown</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <DataCard label="Projects" value={data.income_breakdown_year.projects} />
+              <DataCard label="Non-Shop Projects" value={data.income_breakdown_year.no_shop_projects} />
+              <DataCard label="Shop Sales" value={data.income_breakdown_year.shop_sales} />
+              <DataCard label="Non-Project Shop" value={data.income_breakdown_year.non_project_shop_sales} />
+              <DataCard label="Projects %" value={`${data.income_breakdown_year.percentage_projects}%`} />
+              <DataCard label="Shop %" value={`${data.income_breakdown_year.percentage_shop}%`} />
+            </div>
+          </div>
+        </section>
+      )}
+      {openSection === 'expense' && (
+        <section className="mb-8 bg-red-50/60 rounded-2xl shadow p-6">
+          <div className="mb-6">
+            <h4 className="font-semibold text-red-700 mb-2">Monthly Expense Breakdown</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <DataCard label="Salaries" value={data.expense_breakdown_month.salaries} />
+              <DataCard label="Contractors" value={data.expense_breakdown_month.contractors} />
+              <DataCard label="Raw Materials" value={data.expense_breakdown_month.raw_materials} />
+              <DataCard label="Assets" value={data.expense_breakdown_month.assets} />
+              <DataCard label="Factory Expenses" value={data.expense_breakdown_month.factory_expenses} />
+              <DataCard label="Other Production" value={data.expense_breakdown_month.other_production_expensis} />
+              <DataCard label="Cost Price" value={data.expense_breakdown_month.monthly_sold_cost_price} />
+            </div>
+          </div>
+          <div>
+            <h4 className="font-semibold text-red-700 mb-2">Yearly Expense Breakdown</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <DataCard label="Salaries" value={data.expense_breakdown_year.salaries} />
+              <DataCard label="Contractors" value={data.expense_breakdown_year.contractors} />
+              <DataCard label="Raw Materials" value={data.expense_breakdown_year.raw_materials} />
+              <DataCard label="Assets" value={data.expense_breakdown_year.assets} />
+              <DataCard label="Factory Expenses" value={data.expense_breakdown_year.factory_expenses} />
+              <DataCard label="Other Production" value={data.expense_breakdown_year.other_production_expensis} />
+              <DataCard label="Cost Price" value={data.expense_breakdown_year.monthly_sold_cost_price} />
+            </div>
+          </div>
+        </section>
+      )}
+      {openSection === 'asset' && (
+        <section className="mb-8 bg-purple-50/60 rounded-2xl shadow p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <DataCard label="Active Assets" value={data.asset_analysis.active_assets} />
+            <DataCard label="Deprecated Assets" value={data.asset_analysis.deprecated_assets} />
+            <DataCard label="Current Assets Value" value={data.key_metrics.current_assets_value} />
+            <DataCard label="Inventory Value" value={data.key_metrics.inventory_value} />
+            <DataCard label="Total Store Value" value={data.key_metrics.total_store_value} />
+            <DataCard label="Overhead Cost" value={data.key_metrics.overhead_cost} />
+          </div>
+        </section>
+      )}
+      {openSection === 'customer' && (
+        <section className="mb-8 bg-yellow-50/60 rounded-2xl shadow p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <DataCard label="All Customers" value={data.customers.all_customers_count} />
+            <DataCard label="Active Customers" value={data.customers.active_customers_count} />
+            <DataCard label="Owing Customers" value={data.customers.owing_customers_count} />
+            <DataCard label="Total Workers" value={data.additional_metrics.total_salary_workers} />
+            <DataCard label="Active Workers" value={data.additional_metrics.active_salary_workers} />
+            <DataCard label="Total Contractors" value={data.additional_metrics.total_contractors} />
+          </div>
+        </section>
+      )}
+      {openSection === 'additional' && (
+        <section className="mb-8 bg-gray-50/60 rounded-2xl shadow p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <DataCard label="Active Contractors" value={data.additional_metrics.active_contractors} />
+            <DataCard label="Inventory Items" value={data.additional_metrics.inventory_items} />
+            <DataCard label="Raw Materials" value={data.additional_metrics.raw_materials_types} />
+            <DataCard label="Suggested Overhead" value={data.key_metrics.suggested_overhead_cost} />
+            <DataCard label="Profit (Month)" value={data.key_metrics.profit_month} />
+            <DataCard label="Non-Project Shop" value={data.income_breakdown_month.non_project_shop_sales} />
+          </div>
+        </section>
+      )}
     </div>
   );
 };

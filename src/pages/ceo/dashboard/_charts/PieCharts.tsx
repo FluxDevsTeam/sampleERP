@@ -77,11 +77,11 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
 // Format large numbers to be more readable
 const formatValue = (value: number): string => {
   if (value >= 1000000) {
-    return `NGN ${(value / 1000000).toFixed(1)}M`;
+    return `₦ ${(value / 1000000).toFixed(1)}M`;
   } else if (value >= 1000) {
-    return `NGN ${(value / 1000).toFixed(1)}K`;
+    return `₦ ${(value / 1000).toFixed(1)}K`;
   }
-  return `NGN ${value}`;
+  return `₦ ${value}`;
 };
 
 const PieCharts = () => {
@@ -217,7 +217,7 @@ const PieCharts = () => {
             Annual Expense Distribution
           </h2>
           <p className="text-center text-blue-600 font-medium mt-1">
-            Total: NGN {yearTotal.toLocaleString()}
+            Total: ₦ {yearTotal.toLocaleString()}
           </p>
         </div>
 
@@ -279,7 +279,7 @@ const PieCharts = () => {
             Monthly Expense Distribution
           </h2>
           <p className="text-center text-neutral-600 font-medium mt-1">
-            Total: NGN {monthTotal.toLocaleString()}
+            Total: ₦ {monthTotal.toLocaleString()}
           </p>
         </div>
 

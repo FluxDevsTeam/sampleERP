@@ -300,7 +300,7 @@ const AddProject = () => {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Project Name*</Label>
+              <Label htmlFor="name">Project Name (optional)</Label>
               <Input
                 id="name"
                 name="name"
@@ -317,7 +317,7 @@ const AddProject = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="customer_detail">Customer*</Label>
+              <Label htmlFor="customer_detail">Customer (optional)</Label>
               <Select
                 value={formData.customer_detail}
                 onValueChange={handleCustomerChange}

@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import SearchablePaginatedDropdown from "../../../shop/sold/Sold Components/SearchablePaginatedDropdown";
 
 interface CustomerDetail {
   id: number;
@@ -371,44 +372,16 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="customer_detail">Customer*</Label>
-                <Select
-                  value={formData.customer_detail}
-                  onValueChange={handleCustomerChange}
-                  disabled={isLoadingCustomers}
-                >
-                  <SelectTrigger
-                    className={errorDetails.customer ? "border-red-500" : ""}
-                  >
-                    <SelectValue placeholder="Select a customer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {isLoadingCustomers ? (
-                      <SelectItem value="loading" disabled>
-                        Loading customers...
-                      </SelectItem>
-                    ) : customers.length > 0 ? (
-                      customers.map((customer) => (
-                        <SelectItem
-                          key={customer.id}
-                          value={customer.id.toString()}
-                        >
-                          {customer.name}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="no-customers" disabled>
-                        No customers found
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-                {errorDetails.customer && (
-                  <p className="text-sm text-red-500">
-                    {errorDetails.customer.join(", ")}
-                  </p>
-                )}
+              <div className="mb-4">
+                <SearchablePaginatedDropdown
+                  endpoint="https://backend.kidsdesigncompany.com/api/customer/"
+                  label="Customer"
+                  name="customer_detail"
+                  resultsKey="results.all_customers"
+                  onChange={(name, value) => setFormData((prev) => ({ ...prev, [name]: value }))}
+                  selectedValue={formData.customer_detail}
+                  selectedName={customers.find(c => String(c.id) === formData.customer_detail)?.name || ''}
+                />
               </div>
 
               <div className="space-y-2">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -28,16 +28,31 @@ const EditSalaryWorker = () => {
     address: "",
     craft_specialty: "",
     years_of_experience: 0,
+    position: "",
     salary: 0,
     is_still_active: true,
+    date_joined: "",
+    date_left: "",
+    guarantor_name: "",
+    guarantor_phone_number: "",
+    guarantor_address: "",
   });
+  const [image, setImage] = useState<File | null>(null);
+  const [agreementFormImage, setAgreementFormImage] = useState<File | null>(null);
+  const [originalData, setOriginalData] = useState<any>(null);
 
   // Fetch the salary worker data to populate the form
   useEffect(() => {
     const fetchSalaryWorker = async () => {
       try {
         const response = await axios.get(`https://backend.kidsdesigncompany.com/api/salary-workers/${id}/`);
-        setFormData(response.data);
+        const normalized = {
+          ...response.data,
+          date_joined: response.data.date_joined ? response.data.date_joined.slice(0, 10) : "",
+          date_left: response.data.date_left ? response.data.date_left.slice(0, 10) : "",
+        };
+        setFormData(normalized);
+        setOriginalData(normalized);
       } catch (error) {
         toast.error("Failed to fetch salary worker data.");
       }
@@ -54,12 +69,43 @@ const EditSalaryWorker = () => {
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, files } = e.target;
+    if (files && files[0]) {
+      if (name === "image") setImage(files[0]);
+      if (name === "agreement_form_image") setAgreementFormImage(files[0]);
+    }
+  };
+
+  const isChanged = () => {
+    if (!originalData) return false;
+    // Check if any field in formData is different from originalData
+    for (const key in formData) {
+      if (formData[key as keyof typeof formData] !== originalData[key]) {
+        return true;
+      }
+    }
+    // Check if a new file is selected
+    if (image || agreementFormImage) return true;
+    return false;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsPending(true);
-
     try {
-      await axios.put(`https://backend.kidsdesigncompany.com/api/salary-workers/${id}/`, formData);
+      const data = new FormData();
+      // Only append changed fields
+      Object.entries(formData).forEach(([key, value]) => {
+        if (originalData && value !== originalData[key]) {
+          data.append(key, value as string);
+        }
+      });
+      if (image) data.append("image", image);
+      if (agreementFormImage) data.append("agreement_form_image", agreementFormImage);
+      await axios.patch(`https://backend.kidsdesigncompany.com/api/salary-workers/${id}/`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       queryClient.invalidateQueries({ queryKey: ["salary-workers"], refetchType: "active" });
       toast.success("Salary worker updated successfully!");
       navigate("/admin/workers");
@@ -72,113 +118,90 @@ const EditSalaryWorker = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <Card className="max-w-md mx-auto">
+      <Card className="mx-auto w-full md:max-w-3xl lg:max-w-5xl">
         <CardHeader>
           <CardTitle>Edit Salary Worker</CardTitle>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="first_name">First Name</Label>
-              <Input
-                id="first_name"
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-                required
-              />
+              <Input id="first_name" name="first_name" value={formData.first_name} onChange={handleChange} required />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="last_name">Last Name</Label>
-              <Input
-                id="last_name"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                required
-              />
+              <Input id="last_name" name="last_name" value={formData.last_name} onChange={handleChange} required />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
+              <Label htmlFor="email">Email (optional)</Label>
+              <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone_number">Phone Number</Label>
-              <Input
-                id="phone_number"
-                name="phone_number"
-                value={formData.phone_number}
-                onChange={handleChange}
-                required
-              />
+              <Label htmlFor="phone_number">Phone Number (optional)</Label>
+              <Input id="phone_number" name="phone_number" value={formData.phone_number} onChange={handleChange} />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-              />
+              <Label htmlFor="address">Address (optional)</Label>
+              <Input id="address" name="address" value={formData.address} onChange={handleChange} />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="craft_specialty">Craft Specialty</Label>
-              <Input
-                id="craft_specialty"
-                name="craft_specialty"
-                value={formData.craft_specialty}
-                onChange={handleChange}
-                required
-              />
+              <Label htmlFor="craft_specialty">Craft Specialty (optional)</Label>
+              <Input id="craft_specialty" name="craft_specialty" value={formData.craft_specialty} onChange={handleChange} />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="years_of_experience">Years of Experience</Label>
-              <Input
-                id="years_of_experience"
-                name="years_of_experience"
-                type="number"
-                value={formData.years_of_experience}
-                onChange={handleChange}
-                required
-              />
+              <Label htmlFor="years_of_experience">Years of Experience (optional)</Label>
+              <Input id="years_of_experience" name="years_of_experience" type="number" value={formData.years_of_experience} onChange={handleChange} />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="salary">Salary</Label>
-              <Input
-                id="salary"
-                name="salary"
-                type="number"
-                value={formData.salary}
-                onChange={handleChange}
-                required
-              />
+              <Input id="salary" name="salary" type="number" value={formData.salary} onChange={handleChange} required />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="date_joined">Date Joined (optional)</Label>
+              <Input id="date_joined" name="date_joined" type="date" value={formData.date_joined} onChange={handleChange} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="date_left">Date Left (optional)</Label>
+              <Input id="date_left" name="date_left" type="date" value={formData.date_left} onChange={handleChange} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="guarantor_name">Guarantor Name (optional)</Label>
+              <Input id="guarantor_name" name="guarantor_name" value={formData.guarantor_name} onChange={handleChange} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="guarantor_phone_number">Guarantor Phone Number (optional)</Label>
+              <Input id="guarantor_phone_number" name="guarantor_phone_number" value={formData.guarantor_phone_number} onChange={handleChange} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="guarantor_address">Guarantor Address (optional)</Label>
+              <Input id="guarantor_address" name="guarantor_address" value={formData.guarantor_address} onChange={handleChange} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="image">Image (optional)</Label>
+              <Input id="image" name="image" type="file" accept="image/*" onChange={handleFileChange} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="agreement_form_image">Agreement Form Image (optional)</Label>
+              <Input id="agreement_form_image" name="agreement_form_image" type="file" accept="image/*" onChange={handleFileChange} />
             </div>
 
             <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="is_still_active"
-                name="is_still_active"
-                checked={formData.is_still_active}
-                onChange={handleChange}
-                className="h-4 w-4"
-              />
-              <Label htmlFor="is_still_active">Active</Label>
+              <input type="checkbox" id="is_still_active" name="is_still_active" checked={formData.is_still_active} onChange={handleChange} className="h-4 w-4" />
+              <Label htmlFor="is_still_active">Active (optional)</Label>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
@@ -189,7 +212,7 @@ const EditSalaryWorker = () => {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending || !isChanged()}>
               {isPending ? "Updating..." : "Update Salary Worker"}
             </Button>
           </CardFooter>

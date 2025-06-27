@@ -136,6 +136,7 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
           </ul>
           <div className="flex justify-between p-2">
             <button
+              type="button"
               onClick={() => prevUrl && fetchData(prevUrl)}
               disabled={!prevUrl}
               className="px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
@@ -143,6 +144,7 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
               Previous
             </button>
             <button
+              type="button"
               onClick={() => nextUrl && fetchData(nextUrl)}
               disabled={!nextUrl}
               className="px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50"

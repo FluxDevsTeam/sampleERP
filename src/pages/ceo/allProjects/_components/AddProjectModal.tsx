@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import SearchablePaginatedDropdown from "../../../shop/sold/Sold Components/SearchablePaginatedDropdown";
 
 interface Customer {
   id: number;
@@ -309,53 +310,16 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="customer_detail">Customer*</Label>
-                <Select
-                  value={formData.customer_detail}
-                  onValueChange={handleCustomerChange}
-                  disabled={isLoadingCustomers}
-                >
-                  <SelectTrigger
-                    className={
-                      errorDetails.customer_detail ? "border-red-500" : ""
-                    }
-                  >
-                    <SelectValue placeholder="Select a customer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {isLoadingCustomers ? (
-                      <SelectItem value="placeholder" disabled>
-                        Loading customers...
-                      </SelectItem>
-                    ) : customers.length > 0 ? (
-                      customers.map((customer) => (
-                        <SelectItem
-                          key={customer.id}
-                          value={customer.id.toString()}
-                        >
-                          {customer.name}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="placeholder" disabled>
-                        No customers found
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-                {errorDetails.customer_detail && (
-                  <p className="text-sm text-red-500">
-                    {Array.isArray(errorDetails.customer_detail)
-                      ? errorDetails.customer_detail.join(", ")
-                      : "Invalid customer selection"}
-                  </p>
-                )}
-                {customers.length === 0 && !isLoadingCustomers && (
-                  <p className="text-sm text-amber-500">
-                    Failed to load customers from API.
-                  </p>
-                )}
+              <div className="mb-4">
+                <SearchablePaginatedDropdown
+                  endpoint="https://backend.kidsdesigncompany.com/api/customer/"
+                  label="Customer"
+                  name="customer_detail"
+                  resultsKey="results.all_customers"
+                  onChange={(name, value) => setFormData((prev) => ({ ...prev, [name]: value }))}
+                  selectedValue={formData.customer_detail}
+                  selectedName={customers.find(c => String(c.id) === formData.customer_detail)?.name || ''}
+                />
               </div>
 
               <div className="space-y-2">

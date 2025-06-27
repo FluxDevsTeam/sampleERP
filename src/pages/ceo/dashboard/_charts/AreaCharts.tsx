@@ -65,71 +65,60 @@ const AreaChartComponent = () => {
 
   const renderChart = ({ data, title, color, id }: ChartProps) => (
     <div
-      style={{
-        backgroundColor: "#f5f7fa",
-        borderRadius: "12px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        padding: "25px",
-        width: "100%",
-        marginBottom: "30px",
-        transition: "transform 0.3s ease",
-      }}
+      className="backdrop-blur-md bg-white/60 border border-blue-200 rounded-3xl shadow-2xl p-10 relative overflow-hidden w-full"
+      style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)', marginBottom: 40 }}
     >
-      <h3
-        style={{
-          fontSize: "1.25rem",
-          fontWeight: "600",
-          marginBottom: "20px",
-          color: "#2c3e50",
-          textAlign: "center",
-        }}
-      >
-        {title}
-      </h3>
-      <div style={{ height: "300px" }}>
+      <div className="absolute inset-0 pointer-events-none" style={{background: 'linear-gradient(135deg, rgba(59,130,246,0.10) 0%, rgba(168,85,247,0.10) 100%)'}}></div>
+      <h3 className="text-3xl font-extrabold mb-8 text-blue-700 text-center tracking-wide relative z-10">{title}</h3>
+      <div style={{ height: "380px" }} className="relative z-10">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}
-            margin={{ top: 10, right: 30, left: 20, bottom: 30 }}
+            margin={{ top: 20, right: 40, left: 40, bottom: 40 }}
           >
             <defs>
               <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={color} stopOpacity={0.8} />
-                <stop offset="95%" stopColor={color} stopOpacity={0} />
+                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.9} />
+                <stop offset="60%" stopColor="#818cf8" stopOpacity={0.5} />
+                <stop offset="95%" stopColor="#a5b4fc" stopOpacity={0.1} />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="month"
-              tick={{ fontSize: "12px" }}
+              tick={{ fontSize: 13, fontWeight: 500, fill: '#3730a3' }}
               angle={-30}
-              dy={10} // Adjusts vertical position of labels
-              height={50} // Gives more space for angled labels
+              dy={10}
+              height={60}
+              axisLine={{ stroke: '#6366f1', strokeWidth: 2 }}
             />
             <YAxis
-              tick={{ fontSize: "10px" }}
-              tickFormatter={(value: number) => `NGN${value}`}
+              tick={{ fontSize: 13, fontWeight: 500, fill: '#3730a3' }}
+              tickFormatter={(value: number) => `₦${value.toLocaleString()}`}
+              axisLine={{ stroke: '#6366f1', strokeWidth: 2 }}
+              width={100}
             />
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <CartesianGrid strokeDasharray="6 6" stroke="#e0e7ef" />
             <Tooltip
-              formatter={(value: number) => [
-                `$${value}`,
-                title.replace("Monthly ", ""),
-              ]}
+              formatter={(value: number) => [`₦${value.toLocaleString()}`, title.replace("Monthly ", "")]}
               contentStyle={{
-                backgroundColor: "#f5f7fa",
-                border: "none",
-                borderRadius: "8px",
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-                padding: "12px",
+                background: 'rgba(255,255,255,0.95)',
+                border: 'none',
+                borderRadius: '16px',
+                boxShadow: '0 8px 32px 0 rgba(59,130,246,0.10)',
+                padding: '18px',
+                fontSize: 18,
+                color: '#3730a3',
+                fontWeight: 700,
               }}
             />
             <Area
               type="monotone"
               dataKey="total"
-              stroke={color}
-              strokeWidth={2}
+              stroke="#6366f1"
+              strokeWidth={4}
               fillOpacity={1}
               fill={`url(#${id})`}
+              activeDot={{ r: 8, fill: '#6366f1', stroke: '#fff', strokeWidth: 3 }}
             />
           </AreaChart>
         </ResponsiveContainer>

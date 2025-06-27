@@ -53,17 +53,19 @@ const Header = () => {
 
       <div className="md:grid md:grid-cols-5 grid grid-cols-1 md:space-x-4 space-x-0 md:space-y-0 space-y-4">
         {summaryItems.map((item, index) => (
-          <div key={index} className="p-4 border rounded-lg shadow-md">
-            <div className="flex justify-between items-center text-xl">
-              <p>{item.label}</p>
-              <img src={Frame180 || "/placeholder.svg"} alt="icon" />
-            </div>
-            <div className="flex space-x-8 text-sm">
-              <span className="text-green-200">
-                <MdArrowOutward />
-              </span>
-              <span>{item.value}</span>
-            </div>
+          <div key={index} className="bg-white rounded pl-4 py-5 shadow grid items-center h-full">
+            <p
+              style={{ fontSize: "clamp(10px, 3vw, 20px)" }}
+              className="text-blue-400 font-bold"
+            >
+              {item.label}
+            </p>
+            <p
+              style={{ fontSize: "clamp(10px, 3vw, 24px)" }}
+              className="font-medium"
+            >
+              {item.value}
+            </p>
           </div>
         ))}
       </div>

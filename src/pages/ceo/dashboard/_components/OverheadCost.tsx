@@ -76,7 +76,7 @@ export default function OverheadCost() {
       <h2 className="text-xl font-bold mb-4">Overhead Cost</h2>
       <p className="mb-4">
         Current Base Cost:{" "}
-        <strong>NGN{data?.overhead_cost_base ?? "N/A"}</strong>
+        <strong>₦{data?.overhead_cost_base ?? "N/A"}</strong>
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
