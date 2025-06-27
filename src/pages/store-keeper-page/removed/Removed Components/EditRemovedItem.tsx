@@ -110,7 +110,7 @@ const EditRemovedItem: React.FC = () => {
 
     try {
       const requestBody = {
-        product_its_used: parseInt(formData.product),
+        product: parseInt(formData.product),
         quantity: parseFloat(formData.quantity),
       };
 
