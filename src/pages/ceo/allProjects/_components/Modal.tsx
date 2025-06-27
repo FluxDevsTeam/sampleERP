@@ -154,181 +154,212 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
             </DialogDescription>
           </DialogHeader>
           {selectedProject && (
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Name:</span>
-                <span className="col-span-2">{selectedProject.name}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Customer:</span>
-                <span className="col-span-2">{selectedProject.customer_detail.name}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Status:</span>
-                <span className="col-span-2 capitalize">{selectedProject.status}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Selling Price:</span>
-                <span className="col-span-2">₦{selectedProject.selling_price}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Production Cost:</span>
-                <span className="col-span-2">₦{selectedProject.products.total_production_cost}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Logistics:</span>
-                <span className="col-span-2">₦{selectedProject.logistics}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Service Charge:</span>
-                <span className="col-span-2">₦{selectedProject.service_charge}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Start Date:</span>
-                <span className="col-span-2">{selectedProject.start_date}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Deadline:</span>
-                <span className="col-span-2">{selectedProject.deadline || "Not set"}</span>
-              </div>
-              {/* Products */}
-              <div>
-                <span className="font-semibold block mb-1 text-blue-900">Products:</span>
-                {selectedProject.products?.products?.length ? (
-                  <table className="w-full text-sm border mb-2">
-                    <thead>
-                      <tr className="bg-blue-100">
-                        <th className="p-1 border text-blue-900">Name</th>
-                        <th className="p-1 border text-blue-900">Selling Price</th>
-                        <th className="p-1 border text-blue-900">Progress (%)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedProject.products.products.map((prod) => (
-                        <tr key={prod.id}>
-                          <td className="p-1 border text-black">{prod.name}</td>
-                          <td className="p-1 border text-black">₦{prod.selling_price}</td>
-                          <td className="p-1 border text-black">{prod.progress}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <span className="text-red-700">No products</span>
-                )}
-                <div className="text-xs text-blue-900 mt-1">
-                  Total Project Selling Price: ₦{selectedProject.products.total_project_selling_price} | Total Production Cost: ₦{selectedProject.products.total_production_cost} | Total Profit: ₦{selectedProject.products.total_profit}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-4">
+              {/* Left Column: Basic Info, Note, Invoice */}
+              <div className="space-y-4">
+                {/* Basic Info */}
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="font-medium">Name:</span>
+                  <span className="col-span-2">{selectedProject.name}</span>
                 </div>
-              </div>
-              {/* Sold Items */}
-              <div>
-                <span className="font-semibold block mb-1 text-green-900">Sold Items:</span>
-                {selectedProject.sold_items?.sold_items?.length ? (
-                  <table className="w-full text-sm border mb-2">
-                    <thead>
-                      <tr className="bg-green-100">
-                        <th className="p-1 border text-green-900">Name</th>
-                        <th className="p-1 border text-green-900">Quantity</th>
-                        <th className="p-1 border text-green-900">Cost Price</th>
-                        <th className="p-1 border text-green-900">Selling Price</th>
-                        <th className="p-1 border text-green-900">Total Price</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedProject.sold_items.sold_items.map((item) => (
-                        <tr key={item.id}>
-                          <td className="p-1 border text-black">{item.name}</td>
-                          <td className="p-1 border text-black">{item.quantity}</td>
-                          <td className="p-1 border text-black">₦{item.cost_price}</td>
-                          <td className="p-1 border text-black">₦{item.selling_price}</td>
-                          <td className="p-1 border text-black">₦{item.total_price}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <span className="text-red-700">No sold items</span>
-                )}
-                <div className="text-xs text-green-900 mt-1">
-                  Total Cost Price: ₦{selectedProject.sold_items.total_cost_price_sold_items} | Total Selling Price: ₦{selectedProject.sold_items.total_selling_price_sold_items}
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="font-medium">Customer:</span>
+                  <span className="col-span-2">{selectedProject.customer_detail.name}</span>
                 </div>
-              </div>
-              {/* Expenses */}
-              <div>
-                <span className="font-semibold block mb-1 text-red-900">Expenses:</span>
-                {selectedProject.expenses?.expenses?.length ? (
-                  <table className="w-full text-sm border mb-2">
-                    <thead>
-                      <tr className="bg-red-100">
-                        <th className="p-1 border text-red-900">Name</th>
-                        <th className="p-1 border text-red-900">Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedProject.expenses.expenses.map((exp, idx) => (
-                        <tr key={idx}>
-                          <td className="p-1 border text-black">{exp.name}</td>
-                          <td className="p-1 border text-black">₦{exp.amount}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <span className="text-red-700">No expenses</span>
-                )}
-                <div className="text-xs text-red-900 mt-1">
-                  Total Expenses: ₦{selectedProject.expenses.total_expenses}
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="font-medium">Status:</span>
+                  <span className="col-span-2 capitalize">{selectedProject.status}</span>
                 </div>
-              </div>
-              {/* Other Productions */}
-              <div>
-                <span className="font-semibold block mb-1 text-purple-900">Other Productions:</span>
-                {selectedProject.other_productions?.other_productions?.length ? (
-                  <table className="w-full text-sm border mb-2">
-                    <thead>
-                      <tr className="bg-purple-100">
-                        <th className="p-1 border text-purple-900">Name</th>
-                        <th className="p-1 border text-purple-900">Cost</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedProject.other_productions.other_productions.map((op) => (
-                        <tr key={op.id}>
-                          <td className="p-1 border text-black">{op.name}</td>
-                          <td className="p-1 border text-black">₦{op.cost ?? '-'} </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <span className="text-red-700">No other productions</span>
-                )}
-                <div className="text-xs text-purple-900 mt-1">
-                  Total Cost: ₦{selectedProject.other_productions.total_cost} | Total Budget: ₦{selectedProject.other_productions.total_budget}
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="font-medium">Selling Price:</span>
+                  <span className="col-span-2">₦{selectedProject.selling_price}</span>
                 </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="font-medium">Production Cost:</span>
+                  <span className="col-span-2">₦{selectedProject.products.total_production_cost}</span>
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="font-medium">Logistics:</span>
+                  <span className="col-span-2">₦{selectedProject.logistics}</span>
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="font-medium">Service Charge:</span>
+                  <span className="col-span-2">₦{selectedProject.service_charge}</span>
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="font-medium">Start Date:</span>
+                  <span className="col-span-2">{selectedProject.start_date}</span>
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="font-medium">Deadline:</span>
+                  <span className="col-span-2">{selectedProject.deadline || "Not set"}</span>
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="font-medium">Date Delivered:</span>
+                  <span className="col-span-2">{selectedProject.date_delivered || "Not set"}</span>
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <span className="font-medium">Timeframe (days):</span>
+                  <span className="col-span-2">{selectedProject.timeframe ?? "-"}</span>
+                </div>
+                {/* Invoice Image */}
+                {selectedProject.invoice_image && (
+                  <div className="grid grid-cols-3 items-center gap-4">
+                    <span className="font-medium">Invoice Image:</span>
+                    <span className="col-span-2">
+                      <img src={selectedProject.invoice_image} alt="Invoice" className="max-h-32 rounded shadow" />
+                    </span>
+                  </div>
+                )}
+                {/* Note */}
+                {selectedProject.note && (
+                  <div className="grid grid-cols-3 items-center gap-4">
+                    <span className="font-medium">Note:</span>
+                    <span className="col-span-2">{selectedProject.note}</span>
+                  </div>
+                )}
               </div>
-              {/* Calculations */}
-              <div>
-                <span className="font-semibold block mb-1 text-gray-900">Calculations:</span>
-                <ul className="text-xs text-black space-y-1">
-                  <li>Total Raw Material Cost: ₦{selectedProject.calculations.total_raw_material_cost}</li>
-                  <li>Total Artisan Cost: ₦{selectedProject.calculations.total_artisan_cost}</li>
-                  <li>Total Overhead Cost: ₦{selectedProject.calculations.total_overhead_cost}</li>
-                  <li>Total Products Cost: ₦{selectedProject.calculations.total_products_cost}</li>
-                  <li>Total Product Selling Price: ₦{selectedProject.calculations.total_product_selling_price}</li>
-                  <li>Product Profit: ₦{selectedProject.calculations.product_profit}</li>
-                  <li>Total Cost Price Sold Items: ₦{selectedProject.calculations.total_cost_price_sold_items}</li>
-                  <li>Total Selling Price Sold Items: ₦{selectedProject.calculations.total_selling_price_sold_items}</li>
-                  <li>Shop Items Profit: ₦{selectedProject.calculations.shop_items_profit}</li>
-                  <li>Money Left for Expenses: ₦{selectedProject.calculations.money_left_for_expensis}</li>
-                  <li>Money Left (with logistics/service): ₦{selectedProject.calculations.money_left_for_expensis_with_logistics_and_service_charge}</li>
-                  <li>Total Other Productions Budget: ₦{selectedProject.calculations.total_other_productions_budget}</li>
-                  <li>Total Other Productions Cost: ₦{selectedProject.calculations.total_other_productions_cost}</li>
-                  <li>Total Expenses: ₦{selectedProject.calculations.total_expensis}</li>
-                  <li>Total Money Spent: ₦{selectedProject.calculations.total_money_spent}</li>
-                  <li>Total Paid: ₦{selectedProject.calculations.total_paid}</li>
-                  <li>Final Profit: ₦{selectedProject.calculations.final_profit}</li>
-                </ul>
+              {/* Right Column: Tables and Calculations */}
+              <div className="space-y-6">
+                {/* Products */}
+                <div>
+                  <span className="font-semibold block mb-1 text-blue-900">Products:</span>
+                  {selectedProject.products?.products?.length ? (
+                    <table className="w-full text-sm border mb-2">
+                      <thead>
+                        <tr className="bg-blue-100">
+                          <th className="p-1 border text-blue-900">Name</th>
+                          <th className="p-1 border text-blue-900">Selling Price</th>
+                          <th className="p-1 border text-blue-900">Progress (%)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedProject.products.products.map((prod) => (
+                          <tr key={prod.id}>
+                            <td className="p-1 border text-black">{prod.name}</td>
+                            <td className="p-1 border text-black">₦{prod.selling_price}</td>
+                            <td className="p-1 border text-black">{prod.progress}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <span className="text-red-700">No products</span>
+                  )}
+                  <div className="text-xs text-blue-900 mt-1">
+                    Total Project Selling Price: ₦{selectedProject.products.total_project_selling_price} | Total Production Cost: ₦{selectedProject.products.total_production_cost} | Total Profit: ₦{selectedProject.products.total_profit}
+                  </div>
+                </div>
+                {/* Sold Items */}
+                <div>
+                  <span className="font-semibold block mb-1 text-green-900">Sold Items:</span>
+                  {selectedProject.sold_items?.sold_items?.length ? (
+                    <table className="w-full text-sm border mb-2">
+                      <thead>
+                        <tr className="bg-green-100">
+                          <th className="p-1 border text-green-900">Name</th>
+                          <th className="p-1 border text-green-900">Quantity</th>
+                          <th className="p-1 border text-green-900">Cost Price</th>
+                          <th className="p-1 border text-green-900">Selling Price</th>
+                          <th className="p-1 border text-green-900">Total Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedProject.sold_items.sold_items.map((item) => (
+                          <tr key={item.id}>
+                            <td className="p-1 border text-black">{item.name}</td>
+                            <td className="p-1 border text-black">{item.quantity}</td>
+                            <td className="p-1 border text-black">₦{item.cost_price}</td>
+                            <td className="p-1 border text-black">₦{item.selling_price}</td>
+                            <td className="p-1 border text-black">₦{item.total_price}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <span className="text-red-700">No sold items</span>
+                  )}
+                  <div className="text-xs text-green-900 mt-1">
+                    Total Cost Price: ₦{selectedProject.sold_items.total_cost_price_sold_items} | Total Selling Price: ₦{selectedProject.sold_items.total_selling_price_sold_items}
+                  </div>
+                </div>
+                {/* Expenses */}
+                <div>
+                  <span className="font-semibold block mb-1 text-red-900">Expenses:</span>
+                  {selectedProject.expenses?.expenses?.length ? (
+                    <table className="w-full text-sm border mb-2">
+                      <thead>
+                        <tr className="bg-red-100">
+                          <th className="p-1 border text-red-900">Name</th>
+                          <th className="p-1 border text-red-900">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedProject.expenses.expenses.map((exp, idx) => (
+                          <tr key={idx}>
+                            <td className="p-1 border text-black">{exp.name}</td>
+                            <td className="p-1 border text-black">₦{exp.amount}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <span className="text-red-700">No expenses</span>
+                  )}
+                  <div className="text-xs text-red-900 mt-1">
+                    Total Expenses: ₦{selectedProject.expenses.total_expenses}
+                  </div>
+                </div>
+                {/* Other Productions */}
+                <div>
+                  <span className="font-semibold block mb-1 text-purple-900">Other Productions:</span>
+                  {selectedProject.other_productions?.other_productions?.length ? (
+                    <table className="w-full text-sm border mb-2">
+                      <thead>
+                        <tr className="bg-purple-100">
+                          <th className="p-1 border text-purple-900">Name</th>
+                          <th className="p-1 border text-purple-900">Cost</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedProject.other_productions.other_productions.map((op) => (
+                          <tr key={op.id}>
+                            <td className="p-1 border text-black">{op.name}</td>
+                            <td className="p-1 border text-black">₦{op.cost ?? '-'} </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <span className="text-red-700">No other productions</span>
+                  )}
+                  <div className="text-xs text-purple-900 mt-1">
+                    Total Cost: ₦{selectedProject.other_productions.total_cost} | Total Budget: ₦{selectedProject.other_productions.total_budget}
+                  </div>
+                </div>
+                {/* Calculations */}
+                <div>
+                  <span className="font-semibold block mb-1 text-gray-900">Calculations:</span>
+                  <ul className="text-xs text-black space-y-1">
+                    <li>Total Raw Material Cost: ₦{selectedProject.calculations.total_raw_material_cost}</li>
+                    <li>Total Artisan Cost: ₦{selectedProject.calculations.total_artisan_cost}</li>
+                    <li>Total Overhead Cost: ₦{selectedProject.calculations.total_overhead_cost}</li>
+                    <li>Total Products Cost: ₦{selectedProject.calculations.total_products_cost}</li>
+                    <li>Total Product Selling Price: ₦{selectedProject.calculations.total_product_selling_price}</li>
+                    <li>Product Profit: ₦{selectedProject.calculations.product_profit}</li>
+                    <li>Total Cost Price Sold Items: ₦{selectedProject.calculations.total_cost_price_sold_items}</li>
+                    <li>Total Selling Price Sold Items: ₦{selectedProject.calculations.total_selling_price_sold_items}</li>
+                    <li>Shop Items Profit: ₦{selectedProject.calculations.shop_items_profit}</li>
+                    <li>Money Left for Expenses: ₦{selectedProject.calculations.money_left_for_expensis}</li>
+                    <li>Money Left (with logistics/service): ₦{selectedProject.calculations.money_left_for_expensis_with_logistics_and_service_charge}</li>
+                    <li>Total Other Productions Budget: ₦{selectedProject.calculations.total_other_productions_budget}</li>
+                    <li>Total Other Productions Cost: ₦{selectedProject.calculations.total_other_productions_cost}</li>
+                    <li>Total Expenses: ₦{selectedProject.calculations.total_expensis}</li>
+                    <li>Total Money Spent: ₦{selectedProject.calculations.total_money_spent}</li>
+                    <li>Total Paid: ₦{selectedProject.calculations.total_paid}</li>
+                    <li>Final Profit: ₦{selectedProject.calculations.final_profit}</li>
+                  </ul>
+                </div>
               </div>
             </div>
           )}
