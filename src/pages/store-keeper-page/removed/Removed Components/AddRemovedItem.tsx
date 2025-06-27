@@ -35,7 +35,7 @@ const AddRemovedItem: React.FC = () => {
 
     try {
       const requestBody = {
-        item: parseInt(formData.material),
+        material: parseInt(formData.material),
         product: parseInt(formData.product),
         quantity: parseFloat(formData.quantity),
       };
