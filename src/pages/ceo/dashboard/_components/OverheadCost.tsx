@@ -72,9 +72,9 @@ export default function OverheadCost() {
     );
 
   return (
-    <div className="p-6 max-w-md bg-[#f5f7fa] rounded-lg shadow-md">
+    <div className="p-0 max-w-md bg-[#f5f7fa] rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4">Overhead Cost</h2>
-      <p className="mb-4">
+      <p className="mb-2">
         Current Base Cost:{" "}
         <strong>₦{data?.overhead_cost_base ?? "N/A"}</strong>
       </p>
@@ -88,7 +88,7 @@ export default function OverheadCost() {
         />
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+          className="w-full bg-blue-400 text-white py-2 rounded hover:bg-blue-600"
           disabled={mutation.isPending}
         >
           {mutation.isPending ? "Updating..." : "Update Cost"}

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -37,6 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../../AuthPages/AuthContext";
+import PaginationComponent from "../allProjects/_components/Pagination";
 
 // Role options constant
 const roleOptions = [
@@ -67,8 +68,10 @@ interface UserFormData {
 
 interface ApiResponse {
   results: User[];
+  count: number;
 }
 
+const USERS_PER_PAGE = 10;
 const ProfileManagement = () => {
   const API_URL = "https://backend.kidsdesigncompany.com/auth/signup/";
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -91,16 +94,17 @@ const ProfileManagement = () => {
   });
   const [createPassword, setCreatePassword] = useState("");
   const [createVerifyPassword, setCreateVerifyPassword] = useState("");
-  const [isTermsAgreed, setIsTermsAgreed] = useState(false);
   const [createError, setCreateError] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const { signup } = useAuth();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const { data, isLoading, error, refetch } = useQuery<ApiResponse>({
-    queryKey: ["users"],
+    queryKey: ["users", currentPage],
     queryFn: async () => {
       const accessToken = localStorage.getItem("accessToken");
-      const response = await axios.get<ApiResponse>(API_URL, {
+      const response = await axios.get<ApiResponse>(`${API_URL}?page=${currentPage}&page_size=${USERS_PER_PAGE}`, {
         headers: {
           Authorization: `JWT ${accessToken}`,
           "Content-Type": "application/json",
@@ -110,6 +114,13 @@ const ProfileManagement = () => {
     },
     retry: 3,
   });
+
+  useEffect(() => {
+    if (data?.results) {
+      const totalCount = data.count || 0;
+      setTotalPages(Math.ceil(totalCount / USERS_PER_PAGE));
+    }
+  }, [data]);
 
   const handleEditClick = (user: User) => {
     setEditingUser(user);
@@ -193,10 +204,6 @@ const ProfileManagement = () => {
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreateError("");
-    if (!isTermsAgreed) {
-      setCreateError("You must accept the terms and conditions");
-      return;
-    }
     if (createPassword !== createVerifyPassword) {
       setCreateError("Passwords do not match");
       return;
@@ -220,7 +227,6 @@ const ProfileManagement = () => {
         setCreateFormData({ first_name: "", last_name: "", email: "", phone_number: "", roles: [""] });
         setCreatePassword("");
         setCreateVerifyPassword("");
-        setIsTermsAgreed(false);
         refetch();
       }
     } catch (err) {
@@ -249,25 +255,6 @@ const ProfileManagement = () => {
         </p>
       </div>
     );
-
-  const getRoleBadgeColor = (role: string): string => {
-    switch (role) {
-      case "ceo":
-        return "bg-purple-100 text-purple-800";
-      case "admin":
-        return "bg-blue-100 text-blue-800";
-      case "project_manager":
-        return "bg-green-100 text-green-800";
-      case "storekeeper":
-        return "bg-yellow-100 text-yellow-800";
-      case "factory_manager":
-        return "bg-orange-100 text-orange-800";
-      case "shopkeeper":
-        return "bg-pink-100 text-pink-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
 
   const formatRoleName = (role: string): string => {
     return role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase());
@@ -307,7 +294,7 @@ const ProfileManagement = () => {
             max-w-full px-2 py-0.5 text-xs"
                   >
                     {user.roles?.map((role, index) => (
-                      <Badge key={index} className={getRoleBadgeColor(role)}>
+                      <Badge key={index} className="bg-gray-200 text-black">
                         {formatRoleName(role)}
                       </Badge>
                     ))}
@@ -336,6 +323,14 @@ const ProfileManagement = () => {
           </TableBody>
         </Table>
       </div>
+
+      <PaginationComponent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        hasNextPage={currentPage < totalPages}
+        hasPreviousPage={currentPage > 1}
+        handlePageChange={setCurrentPage}
+      />
 
       {/* Edit User Modal */}
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
@@ -506,10 +501,6 @@ const ProfileManagement = () => {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            <div className="flex items-center gap-1">
-              <input type="checkbox" id="is_terms_agreed" checked={isTermsAgreed} onChange={e => setIsTermsAgreed(e.target.checked)} required />
-              <label htmlFor="is_terms_agreed" className="text-sm font-semibold text-blue-20">Accept terms and conditions</label>
             </div>
             {createError && <div className="text-red-500 text-sm text-center">{createError}</div>}
             <Button type="submit" className="bg-blue-400 text-white w-full font-semibold text-sm py-2" disabled={isCreating}>
