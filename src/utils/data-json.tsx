@@ -91,12 +91,6 @@ export const sidebarLink: SidebarProps[] = [
     href: "/ceo/settings", 
     icon: <SettingsIcon className="currentColor" />,
   },
-  {
-    id: nanoid(),
-    text: "Sign Up",
-    href: "/ceo/signup", 
-    icon: <LogoutIcon className="currentColor" />,
-  },
 ];
 
 export const projectManagerSidebarLink: SidebarProps[] = [

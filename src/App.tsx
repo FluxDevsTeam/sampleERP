@@ -178,10 +178,6 @@ const router = createBrowserRouter([
         element: <OtherProductionRecords />,
       },
       {
-        path: "signup",
-        element: <SignUp />,
-      },
-      {
         path: "settings",
         element: <Settings />,
       },

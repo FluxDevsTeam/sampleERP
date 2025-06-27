@@ -63,7 +63,12 @@ interface ApiResponse {
 
 // Fetch production records from the API
 const fetchProductionRecords = async (projectId: string): Promise<ApiResponse> => {
-  const response = await axios.get(`${BASE_URL}/project/${projectId}/other-production-record/`);
+  const token = localStorage.getItem('accessToken');
+  const response = await axios.get(`${BASE_URL}/project/${projectId}/other-production-record/`, {
+    headers: {
+      Authorization: `JWT ${token}`,
+    },
+  });
   return response.data;
 };
 
@@ -71,7 +76,7 @@ const fetchProductionRecords = async (projectId: string): Promise<ApiResponse> =
 interface FormValues {
   name: string;
   budget: string;
-  cost: string;
+  cost?: string;
 }
 
 const OtherProductionRecords = () => {
@@ -109,7 +114,12 @@ const OtherProductionRecords = () => {
   // Add record mutation
   const addRecordMutation = useMutation({
     mutationFn: async (values: FormValues) => {
-      const response = await axios.post(`${BASE_URL}/project/${projectId}/other-production-record/`, values);
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.post(`${BASE_URL}/project/${projectId}/other-production-record/`, values, {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -127,7 +137,12 @@ const OtherProductionRecords = () => {
   const editRecordMutation = useMutation({
     mutationFn: async (values: FormValues & { id: number }) => {
       const { id, ...data } = values;
-      const response = await axios.patch(`${BASE_URL}/project/${projectId}/other-production-record/${id}/`, data);
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.patch(`${BASE_URL}/project/${projectId}/other-production-record/${id}/`, data, {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -144,7 +159,12 @@ const OtherProductionRecords = () => {
   // Delete record mutation
   const deleteRecordMutation = useMutation({
     mutationFn: async (id: number) => {
-      await axios.delete(`${BASE_URL}/project/${projectId}/other-production-record/${id}/`);
+      const token = localStorage.getItem('accessToken');
+      await axios.delete(`${BASE_URL}/project/${projectId}/other-production-record/${id}/`, {
+        headers: {
+          Authorization: `JWT ${token}`,
+        },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['productionRecords', projectId] });
@@ -158,13 +178,17 @@ const OtherProductionRecords = () => {
 
   // Handle form submission for adding a new record
   const onSubmit = (values: FormValues) => {
-    addRecordMutation.mutate(values);
+    const payload = { ...values };
+    if (!payload.cost) delete payload.cost;
+    addRecordMutation.mutate(payload);
   };
 
   // Handle form submission for editing a record
   const onEditSubmit = (values: FormValues) => {
     if (selectedRecord) {
-      editRecordMutation.mutate({ id: selectedRecord.id, ...values });
+      const payload = { ...values };
+      if (!payload.cost) delete payload.cost;
+      editRecordMutation.mutate({ id: selectedRecord.id, ...payload });
     }
   };
 
@@ -300,9 +324,9 @@ const OtherProductionRecords = () => {
                 name="cost"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cost</FormLabel>
+                    <FormLabel>Cost (optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Actual cost" type="number" {...field} required />
+                      <Input placeholder="Actual cost" type="number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -367,9 +391,9 @@ const OtherProductionRecords = () => {
                 name="cost"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cost</FormLabel>
+                    <FormLabel>Cost (optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Actual cost" type="number" {...field} required />
+                      <Input placeholder="Actual cost" type="number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

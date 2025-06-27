@@ -477,6 +477,7 @@ const ProjectsTable = () => {
                 <th className="py-4 px-4 text-center text-sm font-semibold">Start Date</th>
                 <th className="py-4 px-4 text-center text-sm font-semibold">End Date</th>
                 <th className="py-4 px-4 text-center text-sm font-semibold">Details</th>
+                <th className="py-4 px-4 text-center text-sm font-semibold">Records</th>
               </tr>
             </thead>
             <tbody>
@@ -561,6 +562,14 @@ const ProjectsTable = () => {
                       >
                         Details
                       </button>
+                    </td>
+                    <td className="py-5 px-4 border-b border-gray-200 text-sm text-center text-gray-700">
+                      <a
+                        href={`/ceo/projects/${project.id}/records`}
+                        className="px-3 py-1 text-purple-600 border-2 border-purple-400 rounded hover:bg-purple-50"
+                      >
+                        Records
+                      </a>
                     </td>
                   </tr>
                 ))

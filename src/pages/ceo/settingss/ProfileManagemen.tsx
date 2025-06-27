@@ -36,6 +36,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "../../AuthPages/AuthContext";
 
 // Role options constant
 const roleOptions = [
@@ -80,6 +81,20 @@ const ProfileManagement = () => {
     phone_number: "",
     roles: [],
   });
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [createFormData, setCreateFormData] = useState<UserFormData>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone_number: "",
+    roles: [""]
+  });
+  const [createPassword, setCreatePassword] = useState("");
+  const [createVerifyPassword, setCreateVerifyPassword] = useState("");
+  const [isTermsAgreed, setIsTermsAgreed] = useState(false);
+  const [createError, setCreateError] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const { signup } = useAuth();
 
   const { data, isLoading, error, refetch } = useQuery<ApiResponse>({
     queryKey: ["users"],
@@ -166,6 +181,55 @@ const ProfileManagement = () => {
     }));
   };
 
+  const handleCreateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCreateFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreateRoleChange = (value: string) => {
+    setCreateFormData((prev) => ({ ...prev, roles: [value] }));
+  };
+
+  const handleCreateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreateError("");
+    if (!isTermsAgreed) {
+      setCreateError("You must accept the terms and conditions");
+      return;
+    }
+    if (createPassword !== createVerifyPassword) {
+      setCreateError("Passwords do not match");
+      return;
+    }
+    if (!createFormData.roles[0]) {
+      setCreateError("Please select a role");
+      return;
+    }
+    setIsCreating(true);
+    try {
+      const result = await signup({
+        ...createFormData,
+        password: createPassword,
+        verify_password: createVerifyPassword,
+      });
+      if (!result.success) {
+        setCreateError(result.error || "Signup failed");
+      } else {
+        toast.success("Profile successfully created");
+        setIsCreateModalOpen(false);
+        setCreateFormData({ first_name: "", last_name: "", email: "", phone_number: "", roles: [""] });
+        setCreatePassword("");
+        setCreateVerifyPassword("");
+        setIsTermsAgreed(false);
+        refetch();
+      }
+    } catch (err) {
+      setCreateError("An unexpected error occurred");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-screen">
@@ -211,9 +275,10 @@ const ProfileManagement = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-neutral-800 mb-8">
-        Profile Management
-      </h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-neutral-800">Profile Management</h1>
+        <Button onClick={() => setIsCreateModalOpen(true)} className="bg-blue-400 text-white">Create New Profile</Button>
+      </div>
 
       <div className="rounded-md border my-5">
         <Table>
@@ -395,6 +460,64 @@ const ProfileManagement = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Create New Profile Modal */}
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create New Profile</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleCreateSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="first_name" className="block text-sm font-medium mb-1">First Name</label>
+                <Input id="first_name" name="first_name" value={createFormData.first_name} onChange={handleCreateChange} required />
+              </div>
+              <div>
+                <label htmlFor="last_name" className="block text-sm font-medium mb-1">Last Name</label>
+                <Input id="last_name" name="last_name" value={createFormData.last_name} onChange={handleCreateChange} required />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
+              <Input id="email" name="email" type="email" value={createFormData.email} onChange={handleCreateChange} required />
+            </div>
+            <div>
+              <label htmlFor="phone_number" className="block text-sm font-medium mb-1">Phone Number</label>
+              <Input id="phone_number" name="phone_number" value={createFormData.phone_number} onChange={handleCreateChange} required />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium mb-1">Password</label>
+              <Input id="password" name="password" type="password" value={createPassword} onChange={e => setCreatePassword(e.target.value)} required />
+            </div>
+            <div>
+              <label htmlFor="verify_password" className="block text-sm font-medium mb-1">Confirm Password</label>
+              <Input id="verify_password" name="verify_password" type="password" value={createVerifyPassword} onChange={e => setCreateVerifyPassword(e.target.value)} required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Role</label>
+              <Select value={createFormData.roles[0] || ""} onValueChange={handleCreateRoleChange} required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {roleOptions.map((role) => (
+                    <SelectItem key={role} value={role}>{formatRoleName(role)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-1">
+              <input type="checkbox" id="is_terms_agreed" checked={isTermsAgreed} onChange={e => setIsTermsAgreed(e.target.checked)} required />
+              <label htmlFor="is_terms_agreed" className="text-sm font-semibold text-blue-20">Accept terms and conditions</label>
+            </div>
+            {createError && <div className="text-red-500 text-sm text-center">{createError}</div>}
+            <Button type="submit" className="bg-blue-400 text-white w-full font-semibold text-sm py-2" disabled={isCreating}>
+              {isCreating ? "Creating..." : "Create Profile"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
