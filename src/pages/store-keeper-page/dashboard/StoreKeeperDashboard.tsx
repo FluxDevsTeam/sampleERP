@@ -227,27 +227,32 @@ const StoreKeeperDashboard: React.FC = () => {
           <DashboardData
             info="Amount added this month"
             digits={dashboardData?.added_amount_this_month}
-          ></DashboardData>
+            currency="₦"
+          />
           <DashboardData
             info="Amount added this year"
             digits={dashboardData?.added_amount_this_year}
-          ></DashboardData>
+            currency="₦"
+          />
           <DashboardData
             info="Removed amount year"
             digits={dashboardData?.removed_amount_year}
-          ></DashboardData>
+            currency="₦"
+          />
           <DashboardData
             info="Removed cost month"
             digits={dashboardData?.removed_cost_month}
-          ></DashboardData>
+            currency="₦"
+          />
           <DashboardData
             info="Total Raw materials"
             digits={dashboardData?.total_raw_materials}
-          ></DashboardData>
+          />
           <DashboardData
             info="Total value"
             digits={dashboardData?.total_value}
-          ></DashboardData>
+            currency="₦"
+          />
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 items-center rounded-sm mb-[100px] max-md:mb-[40px]">
