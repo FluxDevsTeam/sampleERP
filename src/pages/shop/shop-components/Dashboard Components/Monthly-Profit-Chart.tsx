@@ -12,6 +12,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+// Format number with naira sign and commas
+const formatNaira = (value: number) => `₦${value.toLocaleString()}`;
+
 const MonthlyProfitChart = () => {
   const [month1, setMonth1] = useState("January");
   const [month1Num, setMonth1Num] = useState(
@@ -161,11 +164,11 @@ const MonthlyProfitChart = () => {
         Monthly Profit
       </h1>
       <ResponsiveContainer width="100%" height={400}>
-        <ComposedChart data={data}>
+        <ComposedChart data={data} margin={{ left: 40, right: 10, top: 5, bottom: 5 }}>
           <CartesianGrid stroke="#f5f5"></CartesianGrid>
           <XAxis dataKey="month"></XAxis>
-          <YAxis></YAxis>
-          <Tooltip></Tooltip>
+          <YAxis tickFormatter={formatNaira} width={60}></YAxis>
+          <Tooltip formatter={(value: number) => formatNaira(value)}></Tooltip>
           {/* <Legend></Legend> */}
           <Area type="monotone" dataKey="value" fill="gray" stroke="#8884d8" />
           <Bar dataKey="value" barSize={30} fill="#413ea0" />

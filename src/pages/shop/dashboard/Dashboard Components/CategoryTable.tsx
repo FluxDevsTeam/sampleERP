@@ -21,6 +21,14 @@ interface TableData {
   [key: string]: string | number;
 }
 
+// Format number with naira sign and commas
+const formatNaira = (value: number | string): string => {
+  if (typeof value === 'string' || value === null || value === undefined) {
+    return value as string;
+  }
+  return `₦${value.toLocaleString()}`;
+};
+
 const CategoryTable: React.FC<TableProps> = ({ headers }) => {
   const [tableData, setTableData] = useState<TableData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -81,6 +89,15 @@ const CategoryTable: React.FC<TableProps> = ({ headers }) => {
     setCurrentPage(pageNumber);
   };
 
+  // Function to render cell content with proper formatting
+  const renderCellContent = (header: string, value: string | number) => {
+    if (header === "Category") {
+      return value;
+    }
+    // Apply Naira formatting to monetary columns
+    return formatNaira(value);
+  };
+
   return (
     <div className="relative">
       <div className="overflow-x-auto pb-8">
@@ -120,7 +137,7 @@ const CategoryTable: React.FC<TableProps> = ({ headers }) => {
                         key={`${index}-${header}`}
                         className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700"
                       >
-                        {row[header]}
+                        {renderCellContent(header, row[header])}
                       </td>
                     ))}
                   </tr>

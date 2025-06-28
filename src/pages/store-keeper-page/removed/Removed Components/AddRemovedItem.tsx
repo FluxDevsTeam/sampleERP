@@ -92,7 +92,7 @@ const AddRemovedItem: React.FC = () => {
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-500">Add Removed Item</h1>
+          <h1 className="text-2xl font-bold text-gray-500">Remove Item</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

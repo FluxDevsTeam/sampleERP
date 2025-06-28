@@ -331,7 +331,7 @@ const AddItemPage: React.FC = () => {
           {/* description */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Description
+              Description (optional)
             </label>
             <textarea
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
@@ -346,7 +346,7 @@ const AddItemPage: React.FC = () => {
           {/* image */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Image
+              Image (optional)
             </label>
             <input
               type="file"
@@ -365,7 +365,9 @@ const AddItemPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-600"
+              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-600 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               {loading ? "Adding..." : "Add Item"}
             </button>

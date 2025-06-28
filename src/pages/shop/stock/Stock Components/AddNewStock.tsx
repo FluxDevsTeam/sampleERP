@@ -51,6 +51,7 @@ const Modal = ({
 
 const AddNewStockPage = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     quantity: "",
     item: "",
@@ -82,6 +83,7 @@ const AddNewStockPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const submitData = {
@@ -109,6 +111,8 @@ const AddNewStockPage = () => {
     } catch (error) {
       console.error("Error:", error);
       setShowErrorModal(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -144,13 +148,14 @@ const AddNewStockPage = () => {
           />
         </div>
 
-
-
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          disabled={loading}
+          className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
-          Submit
+          {loading ? "Submitting..." : "Submit"}
         </button>
       </form>
 

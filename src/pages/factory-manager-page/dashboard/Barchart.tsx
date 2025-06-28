@@ -3,6 +3,9 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cart
 import { factoryData } from './api';
 import { RoundedBar, CustomTooltip } from '../../../components/CustomChartComponents';
 
+// Format number with naira sign and commas
+const formatNaira = (value: number) => `₦${value.toLocaleString()}`;
+
 const BarChartComponent = () => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -54,7 +57,7 @@ const BarChartComponent = () => {
             <BarChart data={incomeData} margin={{ top: 5, right: 20, left: 20, bottom: 5 }} barGap={5}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} tick={{ fontSize: 12 }} />
+              <YAxis tickFormatter={formatNaira} tick={{ fontSize: 12 }} width={80} />
               <Tooltip content={<CustomTooltip />} cursor={{fill: 'rgba(240, 240, 240, 0.5)'}} />
               <Legend iconType="circle" iconSize={10} />
               <Bar dataKey="Project" shape={<RoundedBar />} fill="#4A90E2" />
@@ -71,7 +74,7 @@ const BarChartComponent = () => {
             <BarChart data={expenseData} margin={{ top: 5, right: 20, left: 20, bottom: 5 }} barGap={5}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} tick={{ fontSize: 12 }} />
+              <YAxis tickFormatter={formatNaira} tick={{ fontSize: 12 }} width={80} />
               <Tooltip content={<CustomTooltip />} cursor={{fill: 'rgba(240, 240, 240, 0.5)'}} />
               <Legend iconType="circle" iconSize={10} />
               <Bar dataKey="Project" shape={<RoundedBar />} fill="#F5A623" />

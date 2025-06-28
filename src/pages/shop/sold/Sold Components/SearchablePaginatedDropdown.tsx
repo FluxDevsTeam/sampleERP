@@ -29,24 +29,24 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
 
   useEffect(() => {
     console.log("Dropdown: useEffect - selectedName changed:", selectedName);
-    setInputValue(selectedName || '');
-    setSearchTerm('');
+    if (selectedName) {
+      setInputValue(selectedName);
+    }
   }, [selectedName]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
-        setInputValue(selectedName || '');
         setSearchTerm('');
-        console.log("Dropdown: handleClickOutside - closing. inputValue:", selectedName || '', "searchTerm:", '');
+        console.log("Dropdown: handleClickOutside - closing. inputValue:", inputValue, "searchTerm:", '');
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [selectedName]);
+  }, [inputValue]);
 
   const fetchData = async (url: string) => {
     try {
@@ -83,7 +83,7 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
   }, [endpoint, searchTerm]);
 
   const handleSelect = (item: DropdownItem) => {
-    onChange(item.name, String(item.id));
+    onChange(name, String(item.id));
     setIsOpen(false);
     setInputValue(item.name);
     setSearchTerm('');
@@ -112,7 +112,7 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
       <div className="relative">
         <input
           type="text"
-          value={isOpen ? searchTerm : (selectedName ?? inputValue)}
+          value={inputValue}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           className="w-full border rounded p-2"

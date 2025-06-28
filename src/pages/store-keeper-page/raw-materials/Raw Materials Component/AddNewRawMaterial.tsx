@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../../shop/Modal";
 import SearchablePaginatedDropdown from "./SearchablePaginatedDropdown";
+import { deleteRawMaterialCategory } from "./rawMaterialCategoryOperations";
 
 const AddNewRawMaterial = () => {
   const navigate = useNavigate();
@@ -20,6 +21,14 @@ const AddNewRawMaterial = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [categorySearch, setCategorySearch] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "success" as "success" | "error",
+  });
 
   const handleDropdownChange = (name: string, value: string) => {
     setFormData((prev) => ({
@@ -51,6 +60,7 @@ const AddNewRawMaterial = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitLoading(true);
 
     const formDataToSend = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
@@ -79,7 +89,35 @@ const AddNewRawMaterial = () => {
     } catch (error) {
       console.error("Error adding raw material:", error);
       setShowErrorModal(true);
+    } finally {
+      setSubmitLoading(false);
     }
+  };
+
+  const handleDeleteCategory = async () => {
+    if (!formData.category) {
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: "Please select a category to delete",
+        type: "error",
+      });
+      return;
+    }
+
+    await deleteRawMaterialCategory(
+      formData.category,
+      setLoading,
+      setModalConfig,
+      () => {
+        setFormData(prev => ({ ...prev, category: "" }));
+        setCategorySearch("");
+      }
+    );
+  };
+
+  const handleCloseModal = () => {
+    setModalConfig({ ...modalConfig, isOpen: false });
   };
 
   return (
@@ -115,12 +153,33 @@ const AddNewRawMaterial = () => {
           </div>
 
           <div>
-            {/* <label className="block text-sm font-medium text-gray-700">
-              Category
-            </label> */}
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Category
+              </label>
+              <div className="flex space-x-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("/store-keeper/raw-materials/add-category")}
+                  className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center font-medium shadow-sm"
+                >
+                  <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                  Add Category
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteCategory}
+                  disabled={!formData.category || loading}
+                  className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center font-medium shadow-sm"
+                >
+                  <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                  Delete Category
+                </button>
+              </div>
+            </div>
             <SearchablePaginatedDropdown
               endpoint="https://backend.kidsdesigncompany.com/api/raw-materials-category/"
-              label="Category"
+              label=""
               name="category"
               resultsKey="results"
               value={categorySearch}
@@ -173,7 +232,7 @@ const AddNewRawMaterial = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Description
+              Description (optional)
             </label>
             <textarea
               name="description"
@@ -216,7 +275,7 @@ const AddNewRawMaterial = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Image
+              Image (optional)
             </label>
             <input
               type="file"
@@ -230,9 +289,12 @@ const AddNewRawMaterial = () => {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500"
+              disabled={submitLoading}
+              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+                submitLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Add Raw Material
+              {submitLoading ? "Adding..." : "Add Raw Material"}
             </button>
           </div>
         </form>
@@ -255,6 +317,14 @@ const AddNewRawMaterial = () => {
         title="Error"
         message="There was an error adding the raw material. Please try again."
         type="error"
+      />
+
+      <Modal
+        isOpen={modalConfig.isOpen}
+        onClose={handleCloseModal}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
       />
     </div>
   );

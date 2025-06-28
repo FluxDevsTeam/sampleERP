@@ -63,7 +63,7 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
       <div className="bg-white p-4 rounded-lg shadow-md border border-gray-100">
         <p className="font-medium text-gray-900">{payload[0].name}</p>
         <p className="text-lg font-bold text-blue-600">
-          ${payload[0].value.toLocaleString()}
+          ₦{payload[0].value.toLocaleString()}
         </p>
         <p className="text-sm text-gray-500">
           {(payload[0].payload.percent * 100).toFixed(1)}% of total

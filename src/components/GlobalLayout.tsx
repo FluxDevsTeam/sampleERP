@@ -15,18 +15,15 @@ const GlobalLayout = ({ children, data }: NavBarProps) => {
     setIsSidebarOpen(!isSidebarOpen);
   };
   return (
-    <main className="h-screen w-full grid grid-cols-1 lg:grid-cols-[auto_1fr] inter">
-      <Sidebar
-        isSidebarOpen={isSidebarOpen}
-        toggleSidebar={toggleSidebar}
-        data={data}
-      />
-
-      <div className="flex flex-col w-full h-screen">
-        <NavBar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} title="Welcome" />
-        <div className="flex-1 w-full overflow-auto">{children}</div>
+    <div className="h-screen w-full flex flex-col">
+      {/* NavBar at the top, full width */}
+      <NavBar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} title="" />
+      {/* Sidebar and content below NavBar */}
+      <div className="flex flex-1 h-0">
+        <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} data={data} />
+        <div className="flex-1 w-full overflow-auto bg-gray-50">{children}</div>
       </div>
-    </main>
+    </div>
   );
 };
 

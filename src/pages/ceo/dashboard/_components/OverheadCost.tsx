@@ -72,8 +72,8 @@ export default function OverheadCost() {
     );
 
   return (
-    <div className="p-0 max-w-md bg-[#f5f7fa] rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4">Overhead Cost</h2>
+    <div className="p-0  pl-2 max-w-md bg-[#f5f7fa] rounded-lg shadow-md">
+      <h2 className="text-xl font-bold mb-1">Overhead Cost</h2>
       <p className="mb-2">
         Current Base Cost:{" "}
         <strong>₦{data?.overhead_cost_base ?? "N/A"}</strong>

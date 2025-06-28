@@ -66,6 +66,7 @@ const StockTable: React.FC = () => {
     type: "success" as "success" | "error",
   });
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<StockEntry | null>(null);
   const [showImage, setShowImage] = useState(false);
@@ -75,6 +76,7 @@ const StockTable: React.FC = () => {
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isMonthOpen, setIsMonthOpen] = useState(false);
   const [isDayOpen, setIsDayOpen] = useState(false);
+  const [filterLoading, setFilterLoading] = useState(false);
 
   const yearRef = useRef<HTMLDivElement>(null);
   const monthRef = useRef<HTMLDivElement>(null);
@@ -102,14 +104,18 @@ const StockTable: React.FC = () => {
 
 
   const handleFilter = () => {
+    setFilterLoading(true);
     fetchItems(year, month, day);
+    setFilterLoading(false);
   };
 
   const handleClear = () => {
+    setFilterLoading(true);
     setYear("");
     setMonth("");
     setDay("");
     fetchItems();
+    setFilterLoading(false);
   };
 
   const formatNumber = (number: number | string | undefined | null) => {
@@ -230,12 +236,12 @@ const StockTable: React.FC = () => {
     setSelectedStock({ id, name: selectedStock?.name || "" });
   };
 
-  const handleConfirmDelete = async () => {
-    if (selectedStock) {
-      await handleDelete(selectedStock.id);
-      setConfirmDelete(false);
-      setShowDetailsModal(false);
-    }
+  const handleConfirmDelete = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setDeleteLoading(true);
+    await handleDelete(selectedStock?.id || 0);
+    setDeleteLoading(false);
   };
 
   const handleViewDetails = (entry: StockEntry) => {
@@ -315,8 +321,24 @@ const StockTable: React.FC = () => {
                     </ul>
                   )}
                 </div>
-                <button onClick={handleFilter} className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">Filter</button>
-                <button onClick={handleClear} className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors">Clear</button>
+                <button
+                  onClick={handleFilter}
+                  disabled={filterLoading}
+                  className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors ${
+                    filterLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {filterLoading ? "Filtering..." : "Filter"}
+                </button>
+                <button
+                  onClick={handleClear}
+                  disabled={filterLoading}
+                  className={`px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors ${
+                    filterLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {filterLoading ? "Clearing..." : "Clear"}
+                </button>
               </div>
             </div>
 
@@ -448,9 +470,12 @@ const StockTable: React.FC = () => {
             <div className="space-y-3 mt-4">
               <button
                 onClick={handleConfirmDelete}
-                className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center"
+                disabled={deleteLoading}
+                className={`w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center ${
+                  deleteLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                Confirm
+                {deleteLoading ? "Deleting..." : "Confirm"}
               </button>
               <button
                 onClick={() => setConfirmDelete(false)}

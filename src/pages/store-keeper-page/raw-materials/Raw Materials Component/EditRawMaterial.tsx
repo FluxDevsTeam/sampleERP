@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ThreeDots } from "react-loader-spinner";
 import Modal from "@/pages/shop/Modal";
 import SearchablePaginatedDropdown from "./SearchablePaginatedDropdown";
+import { deleteRawMaterialCategory } from "./rawMaterialCategoryOperations";
 
 const EditRawMaterial = () => {
   const { id } = useParams();
@@ -25,6 +26,12 @@ const EditRawMaterial = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "success" as "success" | "error",
+  });
 
   useEffect(() => {
     setUserRole(localStorage.getItem("user_role"));
@@ -128,6 +135,32 @@ const EditRawMaterial = () => {
     }
   };
 
+  const handleDeleteCategory = async () => {
+    if (!formData.category) {
+      setModalConfig({
+        isOpen: true,
+        title: "Error",
+        message: "Please select a category to delete",
+        type: "error",
+      });
+      return;
+    }
+
+    await deleteRawMaterialCategory(
+      formData.category,
+      setLoading,
+      setModalConfig,
+      () => {
+        setFormData(prev => ({ ...prev, category: "" }));
+        setCategoryName("");
+      }
+    );
+  };
+
+  const handleCloseModal = () => {
+    setModalConfig({ ...modalConfig, isOpen: false });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -169,9 +202,33 @@ const EditRawMaterial = () => {
           </div>
 
           <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Category
+              </label>
+              <div className="flex space-x-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("/store-keeper/raw-materials/add-category")}
+                  className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center font-medium shadow-sm"
+                >
+                  <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                  Add Category
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteCategory}
+                  disabled={!formData.category || loading}
+                  className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center font-medium shadow-sm"
+                >
+                  <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                  Delete Category
+                </button>
+              </div>
+            </div>
             <SearchablePaginatedDropdown
               endpoint="https://backend.kidsdesigncompany.com/api/raw-materials-category/"
-              label="Category"
+              label=""
               name="category"
               resultsKey="results"
               value={categoryName}
@@ -224,7 +281,7 @@ const EditRawMaterial = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Description
+              Description (optional)
             </label>
             <textarea
               name="description"
@@ -267,13 +324,14 @@ const EditRawMaterial = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Image
+              Image (optional)
             </label>
             <input
               type="file"
-              accept="image/*"
+              name="image"
               onChange={handleFileChange}
               className="mt-1 block w-full"
+              accept="image/*"
             />
           </div>
 
@@ -308,6 +366,14 @@ const EditRawMaterial = () => {
         title="Error"
         message="There was an error updating the raw material. Please try again."
         type="error"
+      />
+
+      <Modal
+        isOpen={modalConfig.isOpen}
+        onClose={handleCloseModal}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
       />
     </div>
   );

@@ -53,15 +53,36 @@ export const RawMaterials: React.FC = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  // const navigate = useNavigate();
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [rawMaterials, setRawMaterials] = useState<any[]>([]);
+  const [filteredMaterials, setFilteredMaterials] = useState<any[]>([]);
 
-  const handleSearch = () => {
-    setSearchQuery(searchInput);
+  const handleSearch = async () => {
+    setSearchLoading(true);
+    try {
+      // Simulate search delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const filtered = rawMaterials.filter((material) =>
+        material.name.toLowerCase().includes(searchInput.toLowerCase())
+      );
+      setFilteredMaterials(filtered);
+      setCurrentPage(1);
+    } finally {
+      setSearchLoading(false);
+    }
   };
 
-  const handleClear = () => {
-    setSearchInput("");
-    setSearchQuery("");
+  const handleClear = async () => {
+    setSearchLoading(true);
+    try {
+      // Simulate clear delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+      setSearchInput("");
+      setFilteredMaterials(rawMaterials);
+      setCurrentPage(1);
+    } finally {
+      setSearchLoading(false);
+    }
   };
 
   const fetchRMInfo = async () => {
@@ -111,6 +132,8 @@ export const RawMaterials: React.FC = () => {
       );
 
       setTableData(updatedTableData);
+      setRawMaterials(logData.results.items);
+      setFilteredMaterials(logData.results.items);
     } catch (error) {
       console.error("Error fetching items:", error);
     } finally {
@@ -260,11 +283,11 @@ export const RawMaterials: React.FC = () => {
         >
           <InventoryData
             info="Total Store Count"
-            digits={totalStoreCount.toLocaleString()}
+            digits={totalStoreCount}
           ></InventoryData>
           <InventoryData
             info="Total Cost Value"
-            digits={totalStockValue.toLocaleString()}
+            digits={totalStockValue}
             currency="₦"
           ></InventoryData>
 
@@ -319,15 +342,29 @@ export const RawMaterials: React.FC = () => {
                     </div>
                     <button
                       onClick={handleSearch}
-                      className="px-4 py-2 bg-blue-400 text-white rounded-r-lg hover:bg-blue-500 transition-colors border-l-0"
+                      disabled={searchLoading}
+                      className={`px-4 py-2 bg-blue-400 text-white rounded-r-lg hover:bg-blue-500 transition-colors border-l-0 ${
+                        searchLoading ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                     >
-                      <FontAwesomeIcon icon={faSearch} />
+                      {searchLoading ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <FontAwesomeIcon icon={faSearch} />
+                      )}
                     </button>
                     <button
                       onClick={handleClear}
-                      className="ml-2 px-3 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                      disabled={searchLoading}
+                      className={`ml-2 px-3 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors ${
+                        searchLoading ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                     >
-                      <FontAwesomeIcon icon={faXmark} />
+                      {searchLoading ? (
+                        <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <FontAwesomeIcon icon={faXmark} />
+                      )}
                     </button>
                   </div>
 

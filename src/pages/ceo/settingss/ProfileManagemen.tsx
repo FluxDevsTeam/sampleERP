@@ -271,7 +271,7 @@ const ProfileManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
+              {/* <TableHead>ID</TableHead> */}
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
@@ -282,13 +282,14 @@ const ProfileManagement = () => {
           <TableBody>
             {data?.results?.map((user) => (
               <TableRow key={user.id}>
-                <TableCell>{user.id}</TableCell>
+                {/* <TableCell>{user.id}</TableCell> */}
                 <TableCell>
                   {user.first_name} {user.last_name}
                 </TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.phone_number || "-"}</TableCell>
-                <TableCell>
+                <TableCell>{user.roles || "-"}</TableCell>
+                {/* <TableCell>
                   <div
                     className="flex gap-2 text-center flex-wrap  truncate text-ellipsis overflow-hidden
             max-w-full px-2 py-0.5 text-xs"
@@ -299,7 +300,7 @@ const ProfileManagement = () => {
                       </Badge>
                     ))}
                   </div>
-                </TableCell>
+                </TableCell> */}
                 <TableCell>
                   <div className="flex gap-2">
                     <Button

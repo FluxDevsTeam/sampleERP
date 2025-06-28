@@ -1,10 +1,12 @@
 import { Outlet } from "react-router-dom";
 import GlobalLayout from "../../components/GlobalLayout";
-import { storeKeeperSidebarLink } from "../../utils/data-json";
+import { getSidebarForRole } from "../../utils/data-json";
 
 const StoreKeeperLayout = () => {
+  const role = typeof window !== 'undefined' ? localStorage.getItem('user_role') : null;
+  const sidebar = getSidebarForRole(role);
   return (
-    <GlobalLayout data={storeKeeperSidebarLink}>
+    <GlobalLayout data={sidebar}>
       <Outlet />
     </GlobalLayout>
   );

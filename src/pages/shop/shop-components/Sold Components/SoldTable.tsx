@@ -63,6 +63,7 @@ const SoldTable: React.FC = () => {
     type: "success" as "success" | "error",
   });
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SoldEntry | null>(null);
 
@@ -160,11 +161,13 @@ const SoldTable: React.FC = () => {
   };
 
   const handleConfirmDelete = async () => {
+    setDeleteLoading(true);
     if (selectedSale) {
       await handleDelete(selectedSale.id);
       setConfirmDelete(false);
       setShowDetailsModal(false);
     }
+    setDeleteLoading(false);
   };
 
   const handleViewDetails = (entry: SoldEntry) => {
@@ -371,9 +374,12 @@ const SoldTable: React.FC = () => {
             <div className="space-y-3 mt-4">
               <button
                 onClick={handleConfirmDelete}
-                className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center"
+                disabled={deleteLoading}
+                className={`w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center ${
+                  deleteLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                Confirm
+                {deleteLoading ? "Deleting..." : "Confirm"}
               </button>
               <button
                 onClick={() => setConfirmDelete(false)}

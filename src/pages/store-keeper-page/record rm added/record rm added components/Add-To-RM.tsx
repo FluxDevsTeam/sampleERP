@@ -15,6 +15,7 @@ interface ModalConfig {
 const AddToRM: React.FC = () => {
   const navigate = useNavigate();
   const [materialSearch, setMaterialSearch] = useState('');
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [formData, setFormData] = useState({
     item: "", // Changed from material to item
     quantity: "",
@@ -66,6 +67,7 @@ const AddToRM: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitLoading(true);
 
     const payload = {
       item: parseInt(formData.item), // Changed from material to item
@@ -115,6 +117,8 @@ const AddToRM: React.FC = () => {
         message: error instanceof Error ? error.message : "Failed to add raw material",
         type: "error"
       });
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
@@ -184,9 +188,12 @@ const AddToRM: React.FC = () => {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              disabled={submitLoading}
+              className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ${
+                submitLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Add Raw Material
+              {submitLoading ? "Adding..." : "Add Raw Material"}
             </button>
           </div>
         </form>

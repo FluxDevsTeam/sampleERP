@@ -57,6 +57,7 @@ const StockTable: React.FC = () => {
     type: "success" as "success" | "error",
   });
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<StockEntry | null>(null);
 
@@ -153,12 +154,12 @@ const StockTable: React.FC = () => {
     setSelectedStock({ id, name: selectedStock?.name || "" });
   };
 
-  const handleConfirmDelete = async () => {
-    if (selectedStock) {
-      await handleDelete(selectedStock.id);
-      setConfirmDelete(false);
-      setShowDetailsModal(false);
-    }
+  const handleConfirmDelete = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setDeleteLoading(true);
+    await handleDelete(selectedStock?.id || 0);
+    setDeleteLoading(false);
   };
 
   const handleViewDetails = (entry: StockEntry) => {
@@ -314,9 +315,12 @@ const StockTable: React.FC = () => {
             <div className="space-y-3 mt-4">
               <button
                 onClick={handleConfirmDelete}
-                className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center"
+                disabled={deleteLoading}
+                className={`w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center ${
+                  deleteLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                Confirm
+                {deleteLoading ? "Deleting..." : "Confirm"}
               </button>
               <button
                 onClick={() => setConfirmDelete(false)}

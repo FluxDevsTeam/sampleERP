@@ -65,12 +65,14 @@ const SoldTable: React.FC = () => {
     type: "success" as "success" | "error",
   });
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SoldEntry | null>(null);
   const [year, setYear] = useState<number | string>("");
   const [month, setMonth] = useState<number | string>("");
   const [day, setDay] = useState<number | string>("");
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [filterLoading, setFilterLoading] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem("user_role");
@@ -157,14 +159,18 @@ const SoldTable: React.FC = () => {
   };
 
   const handleFilter = () => {
+    setFilterLoading(true);
     fetchItems(year, month, day);
+    setFilterLoading(false);
   };
 
   const handleClear = () => {
+    setFilterLoading(true);
     setYear("");
     setMonth("");
     setDay("");
     fetchItems();
+    setFilterLoading(false);
   };
 
 
@@ -235,11 +241,13 @@ const SoldTable: React.FC = () => {
   };
 
   const handleConfirmDelete = async () => {
+    setDeleteLoading(true);
     if (selectedSale) {
       await handleDelete(selectedSale.id);
       setConfirmDelete(false);
       setShowDetailsModal(false);
     }
+    setDeleteLoading(false);
   };
 
   const handleViewDetails = (entry: SoldEntry) => {
@@ -318,8 +326,24 @@ const SoldTable: React.FC = () => {
                     </ul>
                   )}
                 </div>
-                <button onClick={handleFilter} className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">Filter</button>
-                <button onClick={handleClear} className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors">Clear</button>
+                <button
+                  onClick={handleFilter}
+                  disabled={filterLoading}
+                  className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors ${
+                    filterLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {filterLoading ? "Filtering..." : "Filter"}
+                </button>
+                <button
+                  onClick={handleClear}
+                  disabled={filterLoading}
+                  className={`px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors ${
+                    filterLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {filterLoading ? "Clearing..." : "Clear"}
+                </button>
               </div>
             </div>
 
@@ -498,9 +522,12 @@ const SoldTable: React.FC = () => {
             <div className="space-y-3 mt-4">
               <button
                 onClick={handleConfirmDelete}
-                className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center"
+                disabled={deleteLoading}
+                className={`w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center ${
+                  deleteLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                Confirm
+                {deleteLoading ? "Deleting..." : "Confirm"}
               </button>
               <button
                 onClick={() => setConfirmDelete(false)}

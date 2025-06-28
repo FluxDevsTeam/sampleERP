@@ -127,6 +127,31 @@ const Header = () => {
   // Collapsible state for each section
   const [openSection, setOpenSection] = useState<'key' | 'income' | 'expense' | 'asset' | 'customer' | 'additional'>('key');
 
+  // Check if sidebar is open by looking for the sidebar element and its width
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // Update sidebar state when window resizes or sidebar toggles
+  React.useEffect(() => {
+    const checkSidebarState = () => {
+      const sidebar = document.querySelector('aside');
+      if (sidebar) {
+        const sidebarWidth = sidebar.offsetWidth;
+        setIsSidebarOpen(sidebarWidth > 100);
+      }
+    };
+
+    checkSidebarState();
+    window.addEventListener('resize', checkSidebarState);
+    
+    // Check periodically for sidebar state changes
+    const interval = setInterval(checkSidebarState, 500);
+    
+    return () => {
+      window.removeEventListener('resize', checkSidebarState);
+      clearInterval(interval);
+    };
+  }, []);
+
   const handleSectionClick = (section: typeof openSection) => {
     setOpenSection(section);
   };
@@ -141,23 +166,23 @@ const Header = () => {
   return (
     <div className="p-6">
       {/* Collapsible Section Headers Row */}
-      <div className="flex gap-4 mb-4 overflow-x-auto whitespace-nowrap w-full">
-        <button className={`shrink-0 max-w-xs flex items-center justify-between ml-1 px-2 py-8 rounded-xl shadow bg-blue-50/60 hover:bg-blue-100 transition font-semibold text-blue-700 ${openSection === 'key' ? 'ring-2 ring-blue-400 rounded-full' : ''}`} onClick={() => handleSectionClick('key')}>
+      <div className={`flex gap-4 mb-4 py-2  whitespace-nowrap w-full ${isSidebarOpen ? 'lg:grid lg:grid-cols-6 lg:gap-3 lg:overflow-visible' : ''}`}>
+        <button className={`shrink-0 max-w-xs flex items-center justify-between ml-1 px-2 py-8 rounded-xl shadow bg-blue-50/60 hover:bg-blue-100 transition font-semibold text-blue-700 ${openSection === 'key' ? 'ring-2 ring-blue-400 rounded-full' : ''} ${isSidebarOpen ? 'lg:max-w-none' : ''}`} onClick={() => handleSectionClick('key')}>
           Key Business Metrics {openSection === 'key' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
         </button>
-        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-green-50/60 hover:bg-green-100 transition font-semibold text-green-700 ${openSection === 'income' ? 'ring-2 ring-green-400 rounded-full' : ''}`} onClick={() => handleSectionClick('income')}>
+        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-green-50/60 hover:bg-green-100 transition font-semibold text-green-700 ${openSection === 'income' ? 'ring-2 ring-green-400 rounded-full' : ''} ${isSidebarOpen ? 'lg:max-w-none' : ''}`} onClick={() => handleSectionClick('income')}>
           Income Breakdown {openSection === 'income' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
         </button>
-        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-red-50/60 hover:bg-red-100 transition font-semibold text-red-700 ${openSection === 'expense' ? 'ring-2 ring-red-400 rounded-full' : ''}`} onClick={() => handleSectionClick('expense')}>
+        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-teal-50/60 hover:bg-teal-100 transition font-semibold text-teal-700 ${openSection === 'expense' ? 'ring-2 ring-teal-400 rounded-full' : ''} ${isSidebarOpen ? 'lg:max-w-none' : ''}`} onClick={() => handleSectionClick('expense')}>
           Expense Breakdown {openSection === 'expense' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
         </button>
-        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-purple-50/60 hover:bg-purple-100 transition font-semibold text-purple-700 ${openSection === 'asset' ? 'ring-2 ring-purple-400 rounded-full' : ''}`} onClick={() => handleSectionClick('asset')}>
+        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-purple-50/60 hover:bg-purple-100 transition font-semibold text-purple-700 ${openSection === 'asset' ? 'ring-2 ring-purple-400 rounded-full' : ''} ${isSidebarOpen ? 'lg:max-w-none' : ''}`} onClick={() => handleSectionClick('asset')}>
           Asset & Store Analysis {openSection === 'asset' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
         </button>
-        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-yellow-50/60 hover:bg-yellow-100 transition font-semibold text-yellow-700 ${openSection === 'customer' ? 'ring-2 ring-yellow-400 rounded-full' : ''}`} onClick={() => handleSectionClick('customer')}>
-          Customer & Workforce Metrics {openSection === 'customer' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-yellow-50/60 hover:bg-yellow-100 transition font-semibold text-yellow-700 ${openSection === 'customer' ? 'ring-2 ring-yellow-400 rounded-full' : ''} ${isSidebarOpen ? 'lg:max-w-none' : ''}`} onClick={() => handleSectionClick('customer')}>
+          Customers & Workers {openSection === 'customer' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
         </button>
-        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-gray-50/60 hover:bg-gray-100 transition font-semibold text-gray-700 ${openSection === 'additional' ? 'ring-2 ring-gray-400 rounded-full' : ''}`} onClick={() => handleSectionClick('additional')}>
+        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-gray-50/60 hover:bg-gray-100 transition font-semibold text-gray-700 ${openSection === 'additional' ? 'ring-2 ring-gray-400 rounded-full' : ''} ${isSidebarOpen ? 'lg:max-w-none' : ''}`} onClick={() => handleSectionClick('additional')}>
           Additional Metrics {openSection === 'additional' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
         </button>
       </div>
@@ -202,9 +227,9 @@ const Header = () => {
         </section>
       )}
       {openSection === 'expense' && (
-        <section className="mb-8 bg-red-50/60 rounded-2xl shadow p-6">
+        <section className="mb-8 bg-teal-50/60 rounded-2xl shadow p-6">
           <div className="mb-6">
-            <h4 className="font-semibold text-red-700 mb-2">Monthly Expense Breakdown</h4>
+            <h4 className="font-semibold text-teal-700 mb-2">Monthly Expense Breakdown</h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               <DataCard label="Salaries" value={data.expense_breakdown_month.salaries} />
               <DataCard label="Contractors" value={data.expense_breakdown_month.contractors} />
@@ -216,7 +241,7 @@ const Header = () => {
             </div>
           </div>
           <div>
-            <h4 className="font-semibold text-red-700 mb-2">Yearly Expense Breakdown</h4>
+            <h4 className="font-semibold text-teal-700 mb-2">Yearly Expense Breakdown</h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               <DataCard label="Salaries" value={data.expense_breakdown_year.salaries} />
               <DataCard label="Contractors" value={data.expense_breakdown_year.contractors} />

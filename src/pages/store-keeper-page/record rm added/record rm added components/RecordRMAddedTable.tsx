@@ -43,6 +43,7 @@ interface ApiResponse {
 const RecordRemovedTable: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [filterLoading, setFilterLoading] = useState(false);
   const [materialData, setMaterialData] = useState<ApiResponse | null>(null);
   const [openDates, setOpenDates] = useState<{ [key: string]: boolean }>({});
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -135,15 +136,25 @@ const RecordRemovedTable: React.FC = () => {
     }
   };
 
-  const handleFilter = () => {
-    fetchData(year, month, day);
+  const handleFilter = async () => {
+    setFilterLoading(true);
+    try {
+      await fetchData(year, month, day);
+    } finally {
+      setFilterLoading(false);
+    }
   };
 
-  const handleClear = () => {
+  const handleClear = async () => {
+    setFilterLoading(true);
     setYear("");
     setMonth("");
     setDay("");
-    fetchData();
+    try {
+      await fetchData();
+    } finally {
+      setFilterLoading(false);
+    }
   };
 
   const toggleDate = (date: string) => {
@@ -218,7 +229,7 @@ const RecordRemovedTable: React.FC = () => {
           className="bg-blue-400 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center"
         >
           <FontAwesomeIcon icon={faPlus} className="mr-2" />
-          Add to Raw Material
+          Add Raw Material
         </button>
 
         <div className="flex items-center space-x-4">
@@ -270,8 +281,24 @@ const RecordRemovedTable: React.FC = () => {
               </div>
             )}
           </div>
-          <button onClick={handleFilter} className="bg-blue-400 text-white px-4 py-2 rounded-md hover:bg-blue-600">Filter</button>
-          <button onClick={handleClear} className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">Clear</button>
+          <button 
+            onClick={handleFilter} 
+            disabled={filterLoading}
+            className={`bg-blue-400 text-white px-4 py-2 rounded-md hover:bg-blue-600 ${
+              filterLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {filterLoading ? "Filtering..." : "Filter"}
+          </button>
+          <button 
+            onClick={handleClear} 
+            disabled={filterLoading}
+            className={`bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 ${
+              filterLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {filterLoading ? "Clearing..." : "Clear"}
+          </button>
         </div>
 
       </div>
@@ -294,7 +321,7 @@ const RecordRemovedTable: React.FC = () => {
               className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
             >
               <FontAwesomeIcon className="pr-2" icon={faPlus} />
-              Add to raw material
+              Add Raw Material
             </button> */}
             {/* Daily Data Tables */}
             {materialData?.daily_data.map((dayData) => (

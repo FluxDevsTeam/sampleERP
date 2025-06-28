@@ -1,20 +1,35 @@
 import { Logo as img } from "../assets";
-import { IoClose } from "react-icons/io5";
-import { NavBarProps } from "./NavBar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import clsx from "clsx";
 
-const Logo = ({ toggleSidebar }: NavBarProps) => {
+interface LogoProps {
+  isSidebarOpen: boolean;
+  toggleSidebar: () => void;
+}
+
+const Logo = ({ isSidebarOpen, toggleSidebar }: LogoProps) => {
   return (
-    <div className=" min-h-[77px] bg-gray-10 flex items-center justify-between lg:justify-center px-3  w-full">
-      <img src={img} alt="logo" className="h-[50px] object-contain" />
-      <button
-        type="button"
-        aria-label="Toggle menu"
-        className="text-blue-10 text-4xl block lg:hidden"
-        onClick={toggleSidebar}
-      >
-        <IoClose />
-      </button>
-    </div>
+    <button
+      onClick={toggleSidebar}
+      className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 group"
+    >
+      <img 
+        src={img} 
+        alt="logo" 
+        className={clsx(
+          "object-contain transition-all duration-300",
+          isSidebarOpen ? "h-[45px]" : "h-[35px]"
+        )} 
+      />
+      <FontAwesomeIcon 
+        icon={isSidebarOpen ? faChevronLeft : faChevronRight} 
+        className={clsx(
+          "text-gray-500 group-hover:text-blue-600 transition-all duration-200",
+          isSidebarOpen ? "text-sm" : "text-xs"
+        )}
+      />
+    </button>
   );
 };
 

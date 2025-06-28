@@ -21,13 +21,50 @@ import {
   faPlusMinus,
   faFaceSmile,
   faScrewdriverWrench,
+  faChevronDown,
+  faChevronRight,
+  faChartLine,
+  faUsers,
+  faBuilding,
+  faShieldAlt,
+  faStore,
+  faWarehouse,
+  faCog,
+  faTachometerAlt,
+  faBoxes,
+  faClipboardList,
+  faUserTie,
+  faIndustry,
+  faChartBar,
+  faFileInvoiceDollar,
+  faHandshake,
+  faTools,
+  faClipboardCheck,
+  faUserCog,
+  faChartPie,
+  faBoxOpen,
+  faTruck,
+  faShoppingCart,
+  faCashRegister,
+  faPalette,
+  faPaintBrush,
+  faRuler,
+  faCalculator,
+  faFileAlt,
+  faCalendarAlt,
+  faClock,
+  faCheckCircle,
+  faExclamationTriangle,
+  faInfoCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
 export interface SidebarProps {
   id: string;
   text: string;
-  href: string;
+  href?: string;
   icon: ReactElement;
+  isDropdown?: boolean;
+  dropdownItems?: SidebarProps[];
 }
 
 export const sidebarLink: SidebarProps[] = [
@@ -35,61 +72,202 @@ export const sidebarLink: SidebarProps[] = [
     id: nanoid(),
     text: "Dashboard",
     href: "/ceo/dashboard",
-    icon: <HomeIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "Projects",
-    href: "/ceo/projects", // Removed "dashboard"
-    icon: <ProjectsIcon className="currentColor" />,
+    text: "Project Manager",
+    isDropdown: true,
+    icon: <FontAwesomeIcon icon={faUserTie} className="text-lg" />,
+    dropdownItems: [
+      {
+        id: nanoid(),
+        text: "Dashboard",
+        href: "/ceo/project-manager/dashboard",
+        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Products",
+        href: "/ceo/project-manager/products",
+        icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Customers",
+        href: "/ceo/project-manager/customers",
+        icon: <FontAwesomeIcon icon={faUsers} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Projects",
+        href: "/ceo/project-manager/projects",
+        icon: <FontAwesomeIcon icon={faClipboardCheck} className="text-lg" />,
+      },
+    ],
   },
   {
     id: nanoid(),
-    text: "Customers",
-    href: "/ceo/customers",
-    icon: <TransferIcon className="currentColor" />,
+    text: "Factory Manager",
+    isDropdown: true,
+    icon: <FontAwesomeIcon icon={faIndustry} className="text-lg" />,
+    dropdownItems: [
+      {
+        id: nanoid(),
+        text: "Dashboard",
+        href: "/ceo/factory-manager/dashboard",
+        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Workers",
+        href: "/ceo/factory-manager/workers",
+        icon: <FontAwesomeIcon icon={faUsers} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Assets",
+        href: "/ceo/factory-manager/assets",
+        icon: <FontAwesomeIcon icon={faBuilding} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Customers",
+        href: "/ceo/factory-manager/customers",
+        icon: <FontAwesomeIcon icon={faHandshake} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Expenses",
+        href: "/ceo/factory-manager/expenses",
+        icon: <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Projects",
+        href: "/ceo/factory-manager/projects",
+        icon: <FontAwesomeIcon icon={faClipboardCheck} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Products",
+        href: "/ceo/factory-manager/products",
+        icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
+      },
+    ],
   },
   {
     id: nanoid(),
-    text: "Workers",
-    href: "/ceo/workers",
-    icon: <ArchiveIcon className="currentColor" />,
-  },
-  {
-    id: nanoid(),
-    text: "Assets",
-    href: "/ceo/assets", // Fixed "asssets" typo and removed "dashboard"
-    icon: <FinancesIcon className="currentColor" />,
-  },
-  {
-    id: nanoid(),
-    text: "Products",
-    href: "/ceo/products",
-    icon: <StaffIcon className="currentColor" />,
-  },
-  {
-    id: nanoid(),
-    text: "Store",
-    href: "/ceo/store",
-    icon: <TransferIcon className="currentColor" />,
-  },
-  {
-    id: nanoid(),
-    text: "Expenses",
-    href: "/ceo/expenses",
-    icon: <OrdersIcon className="currentColor" />,
+    text: "Admin",
+    isDropdown: true,
+    icon: <FontAwesomeIcon icon={faShieldAlt} className="text-lg" />,
+    dropdownItems: [
+      {
+        id: nanoid(),
+        text: "Dashboard",
+        href: "/ceo/admin/dashboard",
+        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Assets",
+        href: "/ceo/admin/assets",
+        icon: <FontAwesomeIcon icon={faBuilding} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Expenses",
+        href: "/ceo/admin/expenses",
+        icon: <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Paid",
+        href: "/ceo/admin/paid",
+        icon: <FontAwesomeIcon icon={faCheckCircle} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Workers",
+        href: "/ceo/admin/workers",
+        icon: <FontAwesomeIcon icon={faUsers} className="text-lg" />,
+      },
+    ],
   },
   {
     id: nanoid(),
     text: "Shop",
-    href: "/ceo/shop", // Removed "dashboard"
-    icon: <FinancesIcon className="currentColor" />,
+    isDropdown: true,
+    icon: <FontAwesomeIcon icon={faStore} className="text-lg" />,
+    dropdownItems: [
+      {
+        id: nanoid(),
+        text: "Dashboard",
+        href: "/ceo/shop/dashboard",
+        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Inventory",
+        href: "/ceo/shop/inventory",
+        icon: <FontAwesomeIcon icon={faBoxOpen} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Sold Items",
+        href: "/ceo/shop/sold",
+        icon: <FontAwesomeIcon icon={faCashRegister} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Add Stock",
+        href: "/ceo/shop/stock",
+        icon: <FontAwesomeIcon icon={faPlusCircle} className="text-lg" />,
+      },
+    ],
   },
-   {
+  {
+    id: nanoid(),
+    text: "Store",
+    isDropdown: true,
+    icon: <FontAwesomeIcon icon={faWarehouse} className="text-lg" />,
+    dropdownItems: [
+      {
+        id: nanoid(),
+        text: "Dashboard",
+        href: "/ceo/store/dashboard",
+        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Raw Materials",
+        href: "/ceo/store/raw-materials",
+        icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Removed Items",
+        href: "/ceo/store/removed",
+        icon: <FontAwesomeIcon icon={faMinusCircle} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Add Raw Material",
+        href: "/ceo/store/record-rm-added",
+        icon: <FontAwesomeIcon icon={faPlusMinus} className="text-lg" />,
+      },
+      {id: nanoid(),
+        text: "Products",
+        href: "/store-keeper/products",
+        icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
+        },
+    ],
+  },
+  {
     id: nanoid(),
     text: "Settings",
     href: "/ceo/settings", 
-    icon: <SettingsIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faCog} className="text-lg" />,
   },
 ];
 
@@ -98,25 +276,89 @@ export const projectManagerSidebarLink: SidebarProps[] = [
     id: nanoid(),
     text: "Dashboard",
     href: "/project-manager/dashboard",
-    icon: <FontAwesomeIcon className="text-[22px]" icon={faHome} />,
+    icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
   },
   {
     id: "2",
     text: "Product",
     href: "/project-manager/main",
-    icon: <FontAwesomeIcon className="text-[22px]" icon={faTableCells} />,
+    icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
   },
   {
     id: nanoid(),
     text: "Customers",
     href: "/project-manager/customers",
-    icon: <FontAwesomeIcon className="text-[22px]" icon={faFaceSmile} />,
+    icon: <FontAwesomeIcon icon={faUsers} className="text-lg" />,
   },
   {
     id: nanoid(),
     text: "Projects",
     href: "/project-manager/projects",
-    icon: <FontAwesomeIcon className="text-[22px]" icon={faScrewdriverWrench} />,
+    icon: <FontAwesomeIcon icon={faClipboardCheck} className="text-lg" />,
+  },
+  {
+    id: nanoid(),
+    text: "Store",
+    isDropdown: true,
+    icon: <FontAwesomeIcon icon={faWarehouse} className="text-lg" />,
+    dropdownItems: [
+      {
+        id: nanoid(),
+        text: "Dashboard",
+        href: "/project-manager/store/dashboard",
+        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Raw Materials",
+        href: "/project-manager/store/raw-materials",
+        icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Removed Items",
+        href: "/project-manager/store/removed",
+        icon: <FontAwesomeIcon icon={faMinusCircle} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Add Raw Material",
+        href: "/project-manager/store/record-rm-added",
+        icon: <FontAwesomeIcon icon={faPlusMinus} className="text-lg" />,
+      },
+    ],
+  },
+  {
+    id: nanoid(),
+    text: "Shop",
+    isDropdown: true,
+    icon: <FontAwesomeIcon icon={faStore} className="text-lg" />,
+    dropdownItems: [
+      {
+        id: nanoid(),
+        text: "Dashboard",
+        href: "/project-manager/shop/dashboard",
+        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Inventory",
+        href: "/project-manager/shop/inventory",
+        icon: <FontAwesomeIcon icon={faBoxOpen} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Sold Items",
+        href: "/project-manager/shop/sold",
+        icon: <FontAwesomeIcon icon={faCashRegister} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Add Stock",
+        href: "/project-manager/shop/stock",
+        icon: <FontAwesomeIcon icon={faPlusCircle} className="text-lg" />,
+      },
+    ],
   },
 ];
 
@@ -125,43 +367,107 @@ export const FactoryManagerSidebarLink: SidebarProps[] = [
     id: nanoid(),
     text: "Dashboard",
     href: "/factory-manager/dashboard",
-    icon: <HomeIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "workers",
+    text: "Workers",
     href: "/factory-manager/workers",
-    icon: <StaffIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faUsers} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "assets",
+    text: "Assets",
     href: "/factory-manager/assets",
-    icon: <FinancesIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faBuilding} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "customers",
+    text: "Customers",
     href: "/factory-manager/customers",
-    icon: <RawMaterialIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faHandshake} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "expenses",
+    text: "Expenses",
     href: "/factory-manager/expenses",
-    icon: <OrdersIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "projects",
+    text: "Projects",
     href: "/factory-manager/projects",
-    icon: <ArchiveIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faClipboardCheck} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "products",
+    text: "Products",
     href: "/factory-manager/products",
-    icon: <ProjectsIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
+  },
+  {
+    id: nanoid(),
+    text: "Store",
+    isDropdown: true,
+    icon: <FontAwesomeIcon icon={faWarehouse} className="text-lg" />,
+    dropdownItems: [
+      {
+        id: nanoid(),
+        text: "Dashboard",
+        href: "/factory-manager/store/dashboard",
+        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Raw Materials",
+        href: "/factory-manager/store/raw-materials",
+        icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Removed Items",
+        href: "/factory-manager/store/removed",
+        icon: <FontAwesomeIcon icon={faMinusCircle} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Add Raw Material",
+        href: "/factory-manager/store/record-rm-added",
+        icon: <FontAwesomeIcon icon={faPlusMinus} className="text-lg" />,
+      },
+    ],
+  },
+  {
+    id: nanoid(),
+    text: "Shop",
+    isDropdown: true,
+    icon: <FontAwesomeIcon icon={faStore} className="text-lg" />,
+    dropdownItems: [
+      {
+        id: nanoid(),
+        text: "Dashboard",
+        href: "/factory-manager/shop/dashboard",
+        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Inventory",
+        href: "/factory-manager/shop/inventory",
+        icon: <FontAwesomeIcon icon={faBoxOpen} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Sold Items",
+        href: "/factory-manager/shop/sold",
+        icon: <FontAwesomeIcon icon={faCashRegister} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Add Stock",
+        href: "/factory-manager/shop/stock",
+        icon: <FontAwesomeIcon icon={faPlusCircle} className="text-lg" />,
+      },
+    ],
   },
 ];
 
@@ -170,36 +476,31 @@ export const storeKeeperSidebarLink: SidebarProps[] = [
     id: nanoid(),
     text: "Dashboard",
     href: "/store-keeper/dashboard",
-    icon: <HomeIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "Raw material",
+    text: "Raw Materials",
     href: "/store-keeper/raw-materials",
-    icon: <RawMaterialIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "Removed",
+    text: "Removed Items",
     href: "/store-keeper/removed",
-    icon: (
-      <FontAwesomeIcon
-        className="text-2xl pr-[7.3px] ml-[2px]"
-        icon={faMinusCircle}
-      />
-    ),
+    icon: <FontAwesomeIcon icon={faMinusCircle} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "Add to Raw Material",
+    text: "Add Raw Material",
     href: "/store-keeper/record-rm-added",
-    icon: (
-      <FontAwesomeIcon
-        className="text-2xl pr-[7.3px] ml-[2px]"
-        icon={faPlusMinus}
-      />
-    ),
+    icon: <FontAwesomeIcon icon={faPlusMinus} className="text-lg" />,
   },
+  {id: nanoid(),
+    text: "Products",
+    href: "/store-keeper/products",
+    icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
+    },
 ];
 
 export const shopSidebarLink: SidebarProps[] = [
@@ -207,35 +508,25 @@ export const shopSidebarLink: SidebarProps[] = [
     id: nanoid(),
     text: "Dashboard",
     href: "/shop/dashboard",
-    icon: (
-      <FontAwesomeIcon
-        className="text-2xl pr-[7.3px] ml-[2px]"
-        icon={faHome}
-      />
-    ),
+    icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
   },
   {
     id: nanoid(),
     text: "Inventory",
     href: "/shop/inventory",
-    icon: (
-      <FontAwesomeIcon
-        className="text-2xl pr-[7.3px] ml-[2px]"
-        icon={faReceipt}
-      />
-    ),
+    icon: <FontAwesomeIcon icon={faBoxOpen} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "Sold",
+    text: "Sold Items",
     href: "/shop/sold",
-    icon: <FontAwesomeIcon className="text-2xl pr-1" icon={faMoneyBill} />,
+    icon: <FontAwesomeIcon icon={faCashRegister} className="text-lg" />,
   },
   {
     id: nanoid(),
     text: "Add Stock",
     href: "/shop/stock",
-    icon: <FontAwesomeIcon className="text-2xl pr-1" icon={faPlusCircle} />,
+    icon: <FontAwesomeIcon icon={faPlusCircle} className="text-lg" />,
   },
 ];
 
@@ -244,30 +535,113 @@ export const adminSidebarLink: SidebarProps[] = [
     id: nanoid(),
     text: "Dashboard",
     href: "/admin/dashboard",
-    icon: <HomeIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "assets",
+    text: "Assets",
     href: "/admin/assets",
-    icon: <OrdersIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faBuilding} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "expenses",
+    text: "Expenses",
     href: "/admin/expenses",
-    icon: <RawMaterialIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "paid",
+    text: "Paid",
     href: "/admin/paid",
-    icon: <ArchiveIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faCheckCircle} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "workers",
+    text: "Workers",
     href: "/admin/workers",
-    icon: <FinancesIcon className="currentColor" />,
+    icon: <FontAwesomeIcon icon={faUsers} className="text-lg" />,
+  },
+  {
+    id: nanoid(),
+    text: "Store",
+    isDropdown: true,
+    icon: <FontAwesomeIcon icon={faWarehouse} className="text-lg" />,
+    dropdownItems: [
+      {
+        id: nanoid(),
+        text: "Dashboard",
+        href: "/admin/store/dashboard",
+        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Raw Materials",
+        href: "/admin/store/raw-materials",
+        icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Removed Items",
+        href: "/admin/store/removed",
+        icon: <FontAwesomeIcon icon={faMinusCircle} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Add Raw Material",
+        href: "/admin/store/record-rm-added",
+        icon: <FontAwesomeIcon icon={faPlusMinus} className="text-lg" />,
+      },
+    ],
+  },
+  {
+    id: nanoid(),
+    text: "Shop",
+    isDropdown: true,
+    icon: <FontAwesomeIcon icon={faStore} className="text-lg" />,
+    dropdownItems: [
+      {
+        id: nanoid(),
+        text: "Dashboard",
+        href: "/admin/shop/dashboard",
+        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Inventory",
+        href: "/admin/shop/inventory",
+        icon: <FontAwesomeIcon icon={faBoxOpen} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Sold Items",
+        href: "/admin/shop/sold",
+        icon: <FontAwesomeIcon icon={faCashRegister} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Add Stock",
+        href: "/admin/shop/stock",
+        icon: <FontAwesomeIcon icon={faPlusCircle} className="text-lg" />,
+      },
+    ],
   },
 ];
+
+export function getSidebarForRole(role: string | null | undefined) {
+  switch (role) {
+    case 'ceo':
+      return sidebarLink;
+    case 'admin':
+      return adminSidebarLink;
+    case 'project_manager':
+      return projectManagerSidebarLink;
+    case 'factory_manager':
+      return FactoryManagerSidebarLink;
+    case 'storekeeper':
+      return storeKeeperSidebarLink;
+    case 'shopkeeper':
+      return shopSidebarLink;
+    default:
+      return [];
+  }
+}

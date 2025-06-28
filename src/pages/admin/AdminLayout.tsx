@@ -1,10 +1,12 @@
 import { Outlet } from "react-router-dom";
-import {adminSidebarLink } from "../../utils/data-json";
+import { getSidebarForRole } from "../../utils/data-json";
 import GlobalLayout from "../../components/GlobalLayout";
 
 const AdminLayout = () => {
+  const role = typeof window !== 'undefined' ? localStorage.getItem('user_role') : null;
+  const sidebar = getSidebarForRole(role);
   return (
-    <GlobalLayout data={adminSidebarLink}>
+    <GlobalLayout data={sidebar}>
       <Outlet />
     </GlobalLayout>
   );

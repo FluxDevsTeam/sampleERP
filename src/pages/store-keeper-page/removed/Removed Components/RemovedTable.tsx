@@ -16,6 +16,7 @@ const RemovedTable: React.FC = () => {
   document.title = "Removed Items | Kids Design Company";
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [filterLoading, setFilterLoading] = useState(false);
 
   const [removedData, setRemovedData] = useState<{ daily_data: any[] }>({
     daily_data: [],
@@ -31,9 +32,9 @@ const RemovedTable: React.FC = () => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [openSections, setOpenSections] = useState<string[]>([]);
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [year, setYear] = useState<number | string>("");
-  const [month, setMonth] = useState<number | string>("");
-  const [day, setDay] = useState<number | string>("");
+  const [year, setYear] = useState<string>("");
+  const [month, setMonth] = useState<string>("");
+  const [day, setDay] = useState<string>("");
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isMonthOpen, setIsMonthOpen] = useState(false);
   const [isDayOpen, setIsDayOpen] = useState(false);
@@ -57,7 +58,7 @@ const RemovedTable: React.FC = () => {
     "December",
   ];
 
-  const fetchItems = async (filterYear?: number | string, filterMonth?: number | string, filterDay?: number | string) => {
+  const fetchItems = async (filterYear?: string, filterMonth?: string, filterDay?: string) => {
     try {
       setLoading(true);
       let url = "https://backend.kidsdesigncompany.com/api/removed/?";
@@ -132,15 +133,25 @@ const RemovedTable: React.FC = () => {
     });
   };
 
-  const handleFilter = () => {
-    fetchItems(year, month, day);
+  const handleFilter = async () => {
+    setFilterLoading(true);
+    try {
+      await fetchItems(year, month, day);
+    } finally {
+      setFilterLoading(false);
+    }
   };
 
-  const handleClear = () => {
-    setYear("");
-    setMonth("");
-    setDay("");
-    fetchItems();
+  const handleClear = async () => {
+    setFilterLoading(true);
+    setYear('');
+    setMonth('');
+    setDay('');
+    try {
+      await fetchItems();
+    } finally {
+      setFilterLoading(false);
+    }
   };
 
   const handleCloseModal = () => {
@@ -212,7 +223,7 @@ const RemovedTable: React.FC = () => {
           className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
         >
           <FontAwesomeIcon className="pr-2" icon={faPlus} />
-          Add Removed Item
+          Remove Item
         </button>
         <div className="flex items-center space-x-2">
           {/* Year Dropdown */}
@@ -226,7 +237,7 @@ const RemovedTable: React.FC = () => {
                 <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Year</li>
                 {[...Array(10)].map((_, i) => {
                   const y = new Date().getFullYear() - i;
-                  return <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{y}</li>
+                  return <li key={i} onClick={() => { setYear(y.toString()); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{y}</li>
                 })}
               </ul>
             )}
@@ -241,7 +252,7 @@ const RemovedTable: React.FC = () => {
               <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
                 <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Month</li>
                 {months.map((m, i) => (
-                  <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{m}</li>
+                  <li key={i} onClick={() => { setMonth((i + 1).toString()); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{m}</li>
                 ))}
               </ul>
             )}
@@ -256,13 +267,29 @@ const RemovedTable: React.FC = () => {
               <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
                 <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Day</li>
                 {[...Array(31)].map((_, i) => (
-                  <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{i + 1}</li>
+                  <li key={i} onClick={() => { setDay((i + 1).toString()); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{i + 1}</li>
                 ))}
               </ul>
             )}
           </div>
-          <button onClick={handleFilter} className="p-2 bg-blue-400 text-white rounded hover:bg-blue-500">Filter</button>
-          <button onClick={handleClear} className="p-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Clear</button>
+          <button 
+            onClick={handleFilter} 
+            disabled={filterLoading}
+            className={`p-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+              filterLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {filterLoading ? "Filtering..." : "Filter"}
+          </button>
+          <button 
+            onClick={handleClear} 
+            disabled={filterLoading}
+            className={`p-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 ${
+              filterLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {filterLoading ? "Clearing..." : "Clear"}
+          </button>
         </div>
       </div>
 

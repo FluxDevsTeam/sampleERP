@@ -52,6 +52,7 @@ const Modal = ({
 const AddNewSoldItemPage = () => {
   const navigate = useNavigate();
   const [saleType, setSaleType] = useState<"customer" | "project">("customer");
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     quantity: "",
     customer: "",
@@ -96,6 +97,7 @@ const AddNewSoldItemPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     // Prepare submit data based on sale type
     const submitData = Object.fromEntries(
@@ -132,6 +134,8 @@ const AddNewSoldItemPage = () => {
     } catch (error) {
       console.error("Error recording sale:", error);
       setShowErrorModal(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -234,9 +238,12 @@ const AddNewSoldItemPage = () => {
 
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          disabled={loading}
+          className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
-          Submit
+          {loading ? "Submitting..." : "Submit"}
         </button>
       </form>
 

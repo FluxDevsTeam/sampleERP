@@ -41,6 +41,8 @@ const StoreKeeperDashboard: React.FC = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const itemsPerPage = 10;
   const accessToken = localStorage.getItem("accessToken");
+  const [editLoading, setEditLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const fetchDashboardData = async () => {
     try {
@@ -129,6 +131,7 @@ const StoreKeeperDashboard: React.FC = () => {
 
   const handleUpdateCategory = async () => {
     if (!categoryToEdit) return;
+    setEditLoading(true);
     try {
       const response = await fetch(
         `https://backend.kidsdesigncompany.com/api/raw-materials-category/${categoryToEdit.id}/`,
@@ -148,6 +151,8 @@ const StoreKeeperDashboard: React.FC = () => {
       closeEditModal();
     } catch (error) {
       console.error("Error updating category:", error);
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -175,6 +180,7 @@ const StoreKeeperDashboard: React.FC = () => {
 
   const confirmDelete = async () => {
     if (!categoryToDelete) return;
+    setDeleteLoading(true);
     try {
       const response = await fetch(
         `https://backend.kidsdesigncompany.com/api/raw-materials-category/${categoryToDelete.id}/`,
@@ -193,6 +199,8 @@ const StoreKeeperDashboard: React.FC = () => {
       closeDeleteModal();
     } catch (error) {
       console.error("Error deleting category:", error);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -262,7 +270,7 @@ const StoreKeeperDashboard: React.FC = () => {
       </div>
 
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-500 mb-4 mt-4 sm:mt-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 mb-4 mt-4 sm:mt-8">
           Shop Category Data
         </h1>
         <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
@@ -321,7 +329,7 @@ const StoreKeeperDashboard: React.FC = () => {
                       {entry.materials_count}
                     </td>
                     <td className="py-4 px-6 text-sm text-gray-700">
-                      {entry.total_materials_value}
+                      {typeof entry.total_materials_value === 'number' ? `₦${entry.total_materials_value.toLocaleString()}` : entry.total_materials_value}
                     </td>
                   </tr>
                 );
@@ -377,7 +385,7 @@ const StoreKeeperDashboard: React.FC = () => {
       {/* TABLE 2 */}
       {/* Header Section */}
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-500 mb-4 mt-4 sm:mt-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 mb-4 mt-4 sm:mt-8">
           Raw Materials Categories Management
         </h1>
         <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
@@ -535,15 +543,19 @@ const StoreKeeperDashboard: React.FC = () => {
             <div className="flex justify-end gap-4 mt-6">
               <button
                 onClick={closeEditModal}
-                className="py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors"
+                disabled={editLoading}
+                className="py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateCategory}
-                className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                disabled={editLoading}
+                className={`py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors ${
+                  editLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                Save Changes
+                {editLoading ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>
@@ -568,15 +580,19 @@ const StoreKeeperDashboard: React.FC = () => {
             <div className="flex justify-end gap-4 mt-6">
               <button
                 onClick={closeDeleteModal}
-                className="py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors"
+                disabled={deleteLoading}
+                className="py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                disabled={deleteLoading}
+                className={`py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors ${
+                  deleteLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                Delete
+                {deleteLoading ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>

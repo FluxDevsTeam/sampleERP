@@ -20,7 +20,7 @@ export const RoundedBar = (props: any) => {
           <p className="label text-lg font-bold">{`${label}`}</p>
           {payload.map((pld: any, index: number) => (
             <div key={index} style={{ color: pld.fill }}>
-              <p className="intro">{`${pld.name}: ${pld.value.toLocaleString()}`}</p>
+              <p className="intro">{`${pld.name}: ₦${pld.value.toLocaleString()}`}</p>
             </div>
           ))}
         </div>

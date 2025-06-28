@@ -23,6 +23,7 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
   const [nextUrl, setNextUrl] = useState<string | null>(null);
   const [prevUrl, setPrevUrl] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<DropdownItem | null>(null);
+  const [paginationLoading, setPaginationLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Update selected item when value changes
@@ -104,6 +105,15 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
     }
   };
 
+  const handlePagination = async (url: string) => {
+    setPaginationLoading(true);
+    try {
+      await fetchData(url);
+    } finally {
+      setPaginationLoading(false);
+    }
+  };
+
   useEffect(() => {
     const fullEndpoint = `${endpoint}?search=${value}`;
     fetchData(fullEndpoint);
@@ -154,18 +164,22 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
           </ul>
           <div className="flex justify-between p-2">
             <button
-              onClick={() => prevUrl && fetchData(prevUrl)}
-              disabled={!prevUrl}
-              className="px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+              onClick={() => prevUrl && handlePagination(prevUrl)}
+              disabled={!prevUrl || paginationLoading}
+              className={`px-3 py-1 bg-gray-200 text-gray-700 rounded ${
+                !prevUrl || paginationLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Previous
+              {paginationLoading ? "Loading..." : "Previous"}
             </button>
             <button
-              onClick={() => nextUrl && fetchData(nextUrl)}
-              disabled={!nextUrl}
-              className="px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+              onClick={() => nextUrl && handlePagination(nextUrl)}
+              disabled={!nextUrl || paginationLoading}
+              className={`px-3 py-1 bg-gray-200 text-gray-700 rounded ${
+                !nextUrl || paginationLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Next
+              {paginationLoading ? "Loading..." : "Next"}
             </button>
           </div>
         </div>

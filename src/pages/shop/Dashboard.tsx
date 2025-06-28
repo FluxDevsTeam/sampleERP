@@ -12,8 +12,8 @@ const Dashboard = () => {
   const categoryTableHeaders = [
     "Category",
     "Total Cost Value",
-    "Total Profit",
     "Total Stock Value",
+    "Total Profit",
   ];
 
   const [totalCostValue, setTotalCostValue] = useState(0);

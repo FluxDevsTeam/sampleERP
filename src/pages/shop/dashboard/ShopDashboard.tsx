@@ -11,8 +11,8 @@ const ShopDashboard = () => {
   const categoryTableHeaders = [
     "Category",
     "Total Cost Value",
-    "Total Profit",
     "Total Stock Value",
+    "Total Profit",
   ];
 
     const [dashboardData, setDashboardData] = useState<any>(null);

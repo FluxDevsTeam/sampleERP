@@ -7,7 +7,12 @@ import {
   Cell,
   CartesianGrid,
   ResponsiveContainer,
+  Tooltip,
 } from "recharts";
+
+// Format number with naira sign and commas
+const formatNaira = (value: number) => `₦${value.toLocaleString()}`;
+
 const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', 'red', 'pink', 'brown', 'cyan', 'green', 'indigo', 'violet'];
 
 const MonthlyAddedValueSpikedChart = () => {
@@ -185,12 +190,12 @@ const MonthlyAddedValueSpikedChart = () => {
       <ResponsiveContainer width="100%" height={460}>
         <BarChart
           data={data}
-          margin={{ top: 17, bottom: 9 }}
+          margin={{ left: 40, right: 10, top: 17, bottom: 9 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
-          <YAxis />
-          {/* <Tooltip /> */}
+          <YAxis tickFormatter={formatNaira} width={60} />
+          <Tooltip formatter={(value: number) => formatNaira(value)} />
           <Bar
             dataKey="value"
             stroke="black"
