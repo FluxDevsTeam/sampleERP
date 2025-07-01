@@ -559,7 +559,7 @@ const ProjectsTable = () => {
               <thead className="bg-gray-50 hidden md:table-header-group">
               <tr>
                   <th className="py-4 px-4 text-left text-sm font-semibold">Project Name</th>
-                  <th className="py-4 px-4 text-left text-sm font-semibold">Customer</th>
+                  {/* <th className="py-4 px-4 text-left text-sm font-semibold">Customer</th> */}
                   <th className="py-4 px-4 text-left text-sm font-semibold">Status</th>
                   <th className="py-4 px-4 text-left text-sm font-semibold">Progress</th>
                   <th className="py-4 px-4 text-left text-sm font-semibold">Start Date</th>
@@ -585,19 +585,19 @@ const ProjectsTable = () => {
                         </span>
                         {project.name}
                       </td>
-                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                      {/* <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
                         <span className="font-semibold md:hidden">
-                          Customer:{" "}
+                          Customer: {" "}
                         </span>
                         <span
                           title={project.customer_detail.name}
                           style={{ display: 'inline-block', maxWidth: '120px', verticalAlign: 'bottom', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                         >
-                          {project.customer_detail.name.length > 13
-                            ? project.customer_detail.name.slice(0, 13) + '...'
+                          {project.customer_detail.name.length > 10
+                            ? project.customer_detail.name.slice(0, 10) + '...'
                             : project.customer_detail.name}
                         </span>
-                      </td>
+                      </td> */}
                       <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
                         <span className="font-semibold md:hidden">
                           Status:{" "}
@@ -609,7 +609,7 @@ const ProjectsTable = () => {
                               : project.status === "completed"
                               ? "bg-green-100 text-green-800"
                               : project.status === "delivered"
-                              ? "bg-green-400 text-green-800"
+                              ? "bg-green-400 text-white"
                               : project.status === "cancelled"
                               ? "bg-red-100 text-red-800"
                               : ""

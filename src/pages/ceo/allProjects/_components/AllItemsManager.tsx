@@ -17,6 +17,8 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
   const userRole = typeof window !== "undefined" ? localStorage.getItem("user_role") : null;
   const [dirty, setDirty] = React.useState(false);
   const initialLoad = React.useRef(true);
+  const [pendingSave, setPendingSave] = React.useState(false);
+  const [userTyped, setUserTyped] = React.useState(false);
 
   React.useEffect(() => {
     let loadedItems = project.all_items;
@@ -30,6 +32,8 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
     setItems(Array.isArray(loadedItems) ? loadedItems : []);
     initialLoad.current = true;
     setDirty(false);
+    setSaveStatus('idle');
+    setPendingSave(false);
   }, [project.all_items]);
 
   // Auto-save effect
@@ -38,18 +42,22 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
       initialLoad.current = false;
       return;
     }
+    if (!userTyped) return;
     setDirty(true);
+    setPendingSave(true);
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
-    setSaveStatus('saving');
-    setIsSaving(true);
     saveTimeout.current = setTimeout(() => {
+      setPendingSave(false);
+      setSaveStatus('saving');
+      setIsSaving(true);
       saveItems();
+      setTimeout(() => setSaveStatus('idle'), 900);
     }, 1000);
     return () => {
       if (saveTimeout.current) clearTimeout(saveTimeout.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items]);
+  }, [items, userTyped]);
 
   const saveItems = async () => {
     if (!dirty) return;
@@ -62,7 +70,6 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
       );
       setSaveStatus('saved');
       onUpdate(items);
-      setTimeout(() => setSaveStatus('idle'), 1200);
       setDirty(false);
     } catch (err) {
       setSaveStatus('idle');
@@ -82,10 +89,15 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
 
   // Add Item
   const handleAddItem = () => {
+    // Only add a new item if there is no empty item at the end
+    if (items.length > 0 && (!items[items.length - 1].item || items[items.length - 1].item.trim() === "")) return;
     setItems((prev) => [...prev, { item: "", price: "", quantity: 1 }]);
+    setUserTyped(false);
+    setEditingAll(true);
   };
   // Edit Item
   const handleItemChange = (idx: number, field: "item" | "price" | "quantity", value: any) => {
+    setUserTyped(true);
     setItems((prev) => prev.map((itm, i) => i === idx ? { ...itm, [field]: value } : itm));
   };
   // Delete Item (CEO only)
@@ -197,11 +209,11 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
             {isSaving ? 'Saving...' : '+ Add Item'}
           </button>
           <div className="flex items-center gap-4">
-            {saveStatus === 'saving' && dirty && (
-              <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded shadow text-base">Saving...</span>
+            {saveStatus === 'saving' && !pendingSave && !initialLoad.current && (
+              <span className="px-5 py-2 bg-blue-100 text-white rounded shadow text-xs">Saving...</span>
             )}
-            {saveStatus === 'saved' && (
-              <span className="px-4 py-2 bg-green-100 text-green-700 rounded shadow text-base">Saved</span>
+            {saveStatus === 'saved' && !initialLoad.current && (
+              <span className="px-3 py-1 bg-green-100 text-green-700 rounded shadow text-xs">Saved</span>
             )}
           </div>
         </div>

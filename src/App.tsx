@@ -354,7 +354,7 @@ const router = createBrowserRouter([
   {
     path: "/factory-manager",
     element: (
-      <ProtectedRoute allowedRoles={["factory_manager", "ceo"]}>
+      <ProtectedRoute allowedRoles={["factory_manager", "ceo", "admin", "project_manager"]}>
         <FactoryManagerSharedLayout />
       </ProtectedRoute>
     ),

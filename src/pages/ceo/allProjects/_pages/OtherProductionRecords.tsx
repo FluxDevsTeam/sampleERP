@@ -80,7 +80,7 @@ interface FormValues {
 }
 
 const OtherProductionRecords = () => {
-  const { projectId } = useParams<{ projectId: string }>(); // Change to string
+  const { id: projectId } = useParams<{ id: string }>(); // Use 'id' from route as projectId
   const queryClient = useQueryClient();
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -178,8 +178,14 @@ const OtherProductionRecords = () => {
 
   // Handle form submission for adding a new record
   const onSubmit = (values: FormValues) => {
-    const payload = { ...values };
+    if (!projectId) {
+      toast.error('Project ID is missing. Cannot create record.');
+      return;
+    }
+    const payload: any = { ...values, project: projectId };
     if (!payload.cost) delete payload.cost;
+    if (!payload.budget) delete payload.budget;
+    console.log('POST payload to /other-production-record/:', payload);
     addRecordMutation.mutate(payload);
   };
 
@@ -224,7 +230,7 @@ const OtherProductionRecords = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Other Production Records</h1>
-          <p className="text-gray-500">Project ID: {projectId}</p>
+          {/* <p className="text-gray-500">Project ID: {projectId}</p> */}
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
@@ -243,30 +249,32 @@ const OtherProductionRecords = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           {records.map((record) => (
-            <Card key={record.id} className="overflow-hidden">
-              <CardHeader className="bg-blue-50 pb-2">
-                <CardTitle>{record.name}</CardTitle>
+            <Card key={record.id} className="overflow-hidden p-2 text-sm">
+              <CardHeader className="bg-blue-50 pb-1 px-2">
+                <CardTitle className="text-base font-semibold">{record.name}</CardTitle>
               </CardHeader>
-              <CardContent className="pt-4">
-                <div className="grid grid-cols-2 gap-2">
+              <CardContent className="pt-2 px-2 pb-2">
+                <div className="grid grid-cols-2 gap-1">
                   <div>
-                    <p className="text-sm text-gray-500">Budget</p>
-                    <p className="font-medium">₦{record.budget}</p>
+                    <p className="text-xs text-gray-500">Budget</p>
+                    <p className="font-medium text-xs">₦{record.budget}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Cost</p>
-                    <p className="font-medium">₦{record.cost}</p>
+                    <p className="text-xs text-gray-500">Cost</p>
+                    <p className="font-medium text-xs">₦{record.cost}</p>
                   </div>
                 </div>
-                <div className="flex justify-end gap-2 mt-4">
+                <div className="flex justify-end gap-1 mt-2">
                   <Button size="sm" variant="outline" onClick={() => handleEdit(record)}>
                     Edit
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleDelete(record)}>
-                    Delete
-                  </Button>
+                  {typeof window !== 'undefined' && localStorage.getItem('user_role') === 'ceo' && (
+                    <Button size="sm" variant="destructive" onClick={() => handleDelete(record)}>
+                      Delete
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

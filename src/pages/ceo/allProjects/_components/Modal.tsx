@@ -200,11 +200,19 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
     setStatusLoading(true);
     try {
       const token = localStorage.getItem('accessToken');
-      const payload: Record<string, any> = { status: newStatus };
-      if (newStatus === 'delivered') {
+      let statusToSend = newStatus;
+      // Only allow valid statuses
+      if (statusToSend === 'in_progress' || statusToSend === 'pending') statusToSend = 'in progress';
+      if (statusToSend !== 'in progress' && statusToSend !== 'completed' && statusToSend !== 'delivered') statusToSend = 'in progress';
+      const payload: Record<string, any> = { status: statusToSend };
+      if (statusToSend === 'delivered') {
         payload['is_delivered'] = true;
         payload['date_delivered'] = dayjs().format('YYYY-MM-DD');
+      } else {
+        payload['is_delivered'] = false;
+        payload['date_delivered'] = null;
       }
+      console.log('PATCH payload to backend:', payload);
       await axios.patch(
         `https://backend.kidsdesigncompany.com/api/project/${selectedProject.id}/`,
         payload,
@@ -760,9 +768,18 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                 {/* Other Productions Table */}
                 {selectedProject.other_productions?.other_productions?.length > 0 && (
                   <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <h4 className="text-md font-semibold text-gray-700 mb-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-md font-semibold text-gray-700">
                       Other Productions
                     </h4>
+                      <button
+                        onClick={handleViewOtherProductionRecords}
+                        className="px-3 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500 transition-colors"
+                        disabled={!selectedProject}
+                      >
+                        + View
+                      </button>
+                    </div>
                     <div className="overflow-x-auto">
                       <table className="min-w-full text-sm">
                         <thead className="bg-blue-400 text-white">
@@ -866,8 +883,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
               value={newStatus}
               onChange={e => setNewStatus(e.target.value)}
             >
-              <option value="pending">Pending</option>
-              <option value="in_progress">In Progress</option>
+              <option value="in progress">In Progress</option>
               <option value="completed">Completed</option>
               <option value="delivered">Delivered</option>
               {/* Add more statuses as needed */}
