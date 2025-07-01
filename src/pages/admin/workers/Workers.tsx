@@ -12,8 +12,8 @@ import { useNavigate } from "react-router-dom";
 
 const Workers = () => {
   document.title = "Workers - KDC Admin";
-  const salaryTableHeaders = ["First Name", "Last Name", "Status", "Date Joined", "Salary Amount", "Details"];
-  const contractorTableHeaders = ["First Name", "Last Name", "Status", "Date Joined", "Details"];
+  const salaryTableHeaders = ["First Name", "Last Name", "Status", "Date Joined", "Salary Amount", "Details", "Record"];
+  const contractorTableHeaders = ["First Name", "Last Name", "Status", "Date Joined", "Details", "Record"];
 
   const [totalSalaryWorkersCount, setTotalSalaryWorkersCount] = useState(0);
   const [totalContractorsCount, setTotalContractorsCount] = useState(0);

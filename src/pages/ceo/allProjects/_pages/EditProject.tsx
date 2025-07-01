@@ -63,6 +63,92 @@ interface ApiErrorResponse {
   [key: string]: string[];
 }
 
+// Task and Subtask types
+interface Subtask {
+  title: string;
+  checked: boolean;
+}
+interface Task {
+  title: string;
+  checked: boolean;
+  subtasks: Subtask[];
+}
+
+// --- TasksEditor component (OUTSIDE main component) ---
+const TasksEditor: React.FC<{
+  tasks: Task[];
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+}> = ({ tasks, setTasks }) => {
+  const handleTaskChange = (idx: number, field: 'title' | 'checked', value: any) => {
+    setTasks(prev => prev.map((task, i) => i === idx ? { ...task, [field]: value } : task));
+  };
+  const handleAddTask = () => {
+    setTasks(prev => [...prev, { title: '', checked: false, subtasks: [] }]);
+  };
+  const handleRemoveTask = (idx: number) => {
+    setTasks(prev => prev.filter((_, i) => i !== idx));
+  };
+  const handleSubtaskChange = (taskIdx: number, subIdx: number, field: 'title' | 'checked', value: any) => {
+    setTasks(prev => prev.map((task, i) =>
+      i === taskIdx
+        ? { ...task, subtasks: task.subtasks.map((sub, j) => j === subIdx ? { ...sub, [field]: value } : sub) }
+        : task
+    ));
+  };
+  const handleAddSubtask = (taskIdx: number) => {
+    setTasks(prev => prev.map((task, i) =>
+      i === taskIdx ? { ...task, subtasks: [...task.subtasks, { title: '', checked: false }] } : task
+    ));
+  };
+  const handleRemoveSubtask = (taskIdx: number, subIdx: number) => {
+    setTasks(prev => prev.map((task, i) =>
+      i === taskIdx ? { ...task, subtasks: task.subtasks.filter((_, j) => j !== subIdx) } : task
+    ));
+  };
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <label className="font-semibold">Tasks</label>
+        <button type="button" className="px-2 py-1 bg-blue-500 text-white rounded" onClick={handleAddTask}>Add Task</button>
+      </div>
+      {tasks.length === 0 && <div className="text-gray-500 text-sm">No tasks yet.</div>}
+      {tasks.map((task, idx) => (
+        <div key={idx} className="border rounded-lg p-3 mb-2 bg-gray-50">
+          <div className="flex items-center gap-2 mb-2">
+            <input type="checkbox" checked={task.checked} onChange={e => handleTaskChange(idx, 'checked', e.target.checked)} />
+            <input
+              placeholder="Task title"
+              value={task.title}
+              onChange={e => handleTaskChange(idx, 'title', e.target.value)}
+              className="w-1/2 border px-2 py-1 rounded"
+            />
+            <button type="button" className="ml-2 px-2 py-1 bg-red-500 text-white rounded" onClick={() => handleRemoveTask(idx)}>Remove</button>
+          </div>
+          <div className="ml-6">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs text-gray-600">Subtasks</span>
+              <button type="button" className="px-2 py-1 bg-blue-400 text-white rounded text-xs" onClick={() => handleAddSubtask(idx)}>Add Subtask</button>
+            </div>
+            {task.subtasks.length === 0 && <div className="text-gray-400 text-xs">No subtasks</div>}
+            {task.subtasks.map((sub, subIdx) => (
+              <div key={subIdx} className="flex items-center gap-2 mb-1">
+                <input type="checkbox" checked={sub.checked} onChange={e => handleSubtaskChange(idx, subIdx, 'checked', e.target.checked)} />
+                <input
+                  placeholder="Subtask title"
+                  value={sub.title}
+                  onChange={e => handleSubtaskChange(idx, subIdx, 'title', e.target.value)}
+                  className="w-1/2 border px-2 py-1 rounded"
+                />
+                <button type="button" className="ml-2 px-2 py-1 bg-red-400 text-white rounded text-xs" onClick={() => handleRemoveSubtask(idx, subIdx)}>Remove</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const EditProject = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -97,6 +183,7 @@ const EditProject = () => {
   const [errorDetails, setErrorDetails] = useState<ApiErrorResponse>({});
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   // Fetch project data
   const {
@@ -205,6 +292,19 @@ const EditProject = () => {
       if (project.invoice_image) {
         setCurrentInvoiceImage(project.invoice_image);
       }
+    }
+  }, [project]);
+
+  // Prepopulate tasks from project if available
+  useEffect(() => {
+    if (project && (project as any).tasks && Array.isArray((project as any).tasks)) {
+      setTasks((project as any).tasks.map((task: any) => ({
+        title: task.title || '',
+        checked: !!task.checked,
+        subtasks: Array.isArray(task.subtasks) ? task.subtasks.map((sub: any) => ({ title: sub.title || '', checked: !!sub.checked })) : []
+      })));
+    } else {
+      setTasks([]);
     }
   }, [project]);
 
@@ -369,6 +469,9 @@ const EditProject = () => {
     if (invoiceImage) {
       formDataToSubmit.append("invoice_image", invoiceImage);
     }
+
+    // Append tasks as JSON string
+    formDataToSubmit.append('tasks', JSON.stringify(tasks));
 
     updateProjectMutation.mutate(formDataToSubmit);
   };
@@ -651,6 +754,11 @@ const EditProject = () => {
                 />
                 <Label htmlFor="archived">Archive this project</Label>
               </div>
+            </div>
+
+            {/* Tasks Section */}
+            <div className="space-y-2">
+              <TasksEditor tasks={tasks} setTasks={setTasks} />
             </div>
           </CardContent>
 

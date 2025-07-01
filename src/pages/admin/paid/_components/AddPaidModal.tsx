@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import SearchablePaginatedDropdown from "../../../shop/sold/Sold Components/SearchablePaginatedDropdown";
+import SearchablePaginatedDropdown from "./SearchablePaginatedDropdown";
 
 interface AddPaidModalProps {
   isOpen: boolean;
@@ -83,6 +83,7 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
 
   const handleWorkerChange = (name: string, value: string) => {
     console.log("AddPaidModal: handleWorkerChange - name:", name, "value:", value);
+    
     setWorkerId(value);
     setSelectedWorkerName(name);
   };

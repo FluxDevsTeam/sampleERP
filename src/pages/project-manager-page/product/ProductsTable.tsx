@@ -1,4 +1,4 @@
-import React, { useEffect, useState, JSX } from "react";
+import React, { useEffect, useState, JSX, useRef } from "react";
 import { ThreeDots } from "react-loader-spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,19 +10,27 @@ import {
   faAnglesLeft,
   faAnglesRight,
   faSearch,
+  faArrowUp,
+  faArrowDown,
+  faChevronDown,
+  faChevronUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/pages/AuthPages/AuthContext";
 // import { Accordion } from "rsuite";
 import Modal from "@/pages/shop/Modal";
+import SearchablePaginatedProjectDropdown from "./SearchablePaginatedProjectDropdown";
+import DashboardCard from "../../factory-manager-page/dashboard/DashboardCard";
 
 interface TableData {
   id: number;
   Product: string;
-  "Linked Projects": string;
-  Price: string;
+  "Linked Project": string;
+  "Selling price": string;
+  Quantity: string | number;
   Progress: JSX.Element;
   Details: JSX.Element;
+  Quotation: JSX.Element;
   [key: string]: string | number | JSX.Element;
 }
 
@@ -32,14 +40,27 @@ const ProductsTable: React.FC = () => {
     "Product",
     "Linked Project",
     "Selling price",
+    "Quantity",
     "Progress",
     "Details",
+    "Quotation",
   ];
   // TABLE DATA
   const [tableData, setTableData] = useState<TableData[]>([]);
 
   // LOADING
   const [loading, setLoading] = useState<boolean>(true);
+  const [isUpdatingProgress, setIsUpdatingProgress] = useState(false);
+  const [isDeletingProduct, setIsDeletingProduct] = useState(false);
+  const [isDeletingContractor, setIsDeletingContractor] = useState(false);
+  const [isDeletingWorker, setIsDeletingWorker] = useState(false);
+  const [isDeletingQuotation, setIsDeletingQuotation] = useState(false);
+  const [isSavingContractor, setIsSavingContractor] = useState(false);
+  const [isSavingWorker, setIsSavingWorker] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+
+  // USER ROLE
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   // SEARCH
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -91,8 +112,36 @@ const ProductsTable: React.FC = () => {
   // RAW MATERIALS Usdc
   const [rawMaterials, setRawMaterials] = useState<any[]>([]);
 
+  // PROJECT FILTER STATE
+  const [projects, setProjects] = useState<any[]>([]);
+  const [selectedProject, setSelectedProject] = useState<string>("");
+  const [projectPage, setProjectPage] = useState(1);
+  const [projectTotalPages, setProjectTotalPages] = useState(1);
+  const PROJECTS_PER_PAGE = 10;
+
+  // Dropdown state
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [projectSearch, setProjectSearch] = useState("");
+  const [projectDropdownPage, setProjectDropdownPage] = useState(1);
+  const [projectDropdownNext, setProjectDropdownNext] = useState<string | null>(null);
+  const [projectDropdownPrev, setProjectDropdownPrev] = useState<string | null>(null);
+  const [projectDropdownItems, setProjectDropdownItems] = useState<any[]>([]);
+  const [projectDropdownCount, setProjectDropdownCount] = useState(0);
+  const PROJECTS_DROPDOWN_PAGE_SIZE = 10;
+
+  // Add state for expanded image at the top of the component
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
+
+  // Get user role on component mount
+  useEffect(() => {
+    const role = localStorage.getItem("user_role");
+    setUserRole(role);
+  }, []);
+
   const handleUpdateProgress = async () => {
     if (!selectedProduct) return;
+    setIsUpdatingProgress(true);
     try {
       const response = await fetch(
         `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/`,
@@ -128,6 +177,8 @@ const ProductsTable: React.FC = () => {
       setEditingProgress(false);
     } catch (error) {
       console.error("Error updating progress:", error);
+    } finally {
+      setIsUpdatingProgress(false);
     }
   };
 
@@ -139,6 +190,9 @@ const ProductsTable: React.FC = () => {
     }
     if (ordering) {
       params.append('ordering', ordering);
+    }
+    if (selectedProject) {
+      params.append('project', selectedProject);
     }
     if (params.toString()) {
       url += `?${params.toString()}`;
@@ -182,7 +236,7 @@ const ProductsTable: React.FC = () => {
               <button
                 onClick={() =>
                   navigate(
-                    `/project-manager/add-contractor/${selectedProduct.id}`
+                    `/project-manager/add-contractor/${item.id}`
                   )
                 }
                 className="hidden my-2 border-blue-400 border-[2px] px-2 rounded-lg"
@@ -196,7 +250,7 @@ const ProductsTable: React.FC = () => {
               <br />
               <button
                 onClick={() =>
-                  navigate(`/project-manager/add-worker/${selectedProduct.id}`)
+                  navigate(`/project-manager/add-worker/${item.id}`)
                 }
                 className="hidden border-blue-400 border-[2px] px-2 rounded-lg"
               >
@@ -209,7 +263,8 @@ const ProductsTable: React.FC = () => {
             </div>
           ),
           "Linked Project": item.linked_project?.name || "-",
-          "Selling price": `₦${item.selling_price}`,
+          "Selling price": `₦${Number(item.selling_price).toLocaleString()}`,
+          Quantity: item.quantity || "-",
           Details: (
             <button
               onClick={() => handleViewDetails(item)}
@@ -221,12 +276,24 @@ const ProductsTable: React.FC = () => {
           Progress: (
             <div className="w-full bg-gray-200 rounded-full h-3 relative">
               <div
-                className="bg-blue-400 h-3 rounded-full flex items-center justify-center text-white text-xs font-semibold"
+                className={`bg-blue-400 h-3 rounded-full`}
                 style={{ width: `${item.progress}%` }}
-              >
-                <span className="text-[10px]">{item.progress}%</span>
+              ></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className={`text-green-200 text-xs font-semibold ${item.progress > 59 ? "text-white" : ""}`}>{item.progress}%</span>
               </div>
             </div>
+          ),
+          Quotation: (
+            <button
+              onClick={() => {
+                setSelectedProduct(item);
+                setShowQuotationModal(true);
+              }}
+              className="px-3 py-1 text-green-400 border-2 border-green-400 rounded hover:bg-green-50"
+            >
+              Quotation
+            </button>
           ),
         };
       });
@@ -241,7 +308,7 @@ const ProductsTable: React.FC = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [searchQuery, ordering]);
+  }, [searchQuery, ordering, selectedProject]);
 
   // Calculate pagination values
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -347,16 +414,17 @@ const ProductsTable: React.FC = () => {
   }, [selectedProduct?.id]);
 
   const deleteQuotation = async (id: number) => {
-    const url = `https://backend.kidsdesigncompany.com/api/product/${selectedProduct?.id}/quotation/${id}/`;
-
+    setIsDeletingQuotation(true);
     try {
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-        },
-      });
+      const response = await fetch(
+        `https://backend.kidsdesigncompany.com/api/product/${selectedProduct?.id}/quotation/${id}/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to delete quotation");
@@ -380,6 +448,8 @@ const ProductsTable: React.FC = () => {
         message: "Failed to delete quotation",
         type: "error",
       });
+    } finally {
+      setIsDeletingQuotation(false);
     }
   };
 
@@ -392,6 +462,7 @@ const ProductsTable: React.FC = () => {
   // DELETING PRODUCT
   const deleteProduct = async () => {
     if (selectedProduct) {
+      setIsDeletingProduct(true);
       try {
         const response = await fetch(
           `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/`,
@@ -425,14 +496,15 @@ const ProductsTable: React.FC = () => {
           message: "Failed to delete product",
           type: "error",
         });
+      } finally {
+        setIsDeletingProduct(false);
       }
     }
   };
 
   // DELEETING CONTRACTOR
   const handleDeleteContractor = async (contractorId: number) => {
-    if (!confirm("Are you sure you want to remove this contractor?")) return;
-
+    setIsDeletingContractor(true);
     try {
       const response = await fetch(
         `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/contractor/${contractorId}/`,
@@ -472,6 +544,8 @@ const ProductsTable: React.FC = () => {
         message: "Failed to remove contractor",
         type: "error",
       });
+    } finally {
+      setIsDeletingContractor(false);
     }
   };
 
@@ -482,8 +556,9 @@ const ProductsTable: React.FC = () => {
 
   const saveEditedContractor = async () => {
     if (!editingContractor) return;
-
+    setIsSavingContractor(true);
     try {
+      const { date: contractorDate, ...restContractor } = editingContractor || {};
       const response = await fetch(
         `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/contractor/${editingContractor.id}/`,
         {
@@ -492,7 +567,7 @@ const ProductsTable: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
-          body: JSON.stringify(editingContractor),
+          body: JSON.stringify(restContractor),
         }
       );
 
@@ -526,13 +601,14 @@ const ProductsTable: React.FC = () => {
         message: "Failed to update contractor",
         type: "error",
       });
+    } finally {
+      setIsSavingContractor(false);
     }
   };
 
   // DELETING WORKER
   const handleDeleteWorker = async (workerId: number) => {
-    if (!confirm("Are you sure you want to remove this worker?")) return;
-
+    setIsDeletingWorker(true);
     try {
       const response = await fetch(
         `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/salary/${workerId}/`,
@@ -572,6 +648,8 @@ const ProductsTable: React.FC = () => {
         message: "Failed to remove worker",
         type: "error",
       });
+    } finally {
+      setIsDeletingWorker(false);
     }
   };
 
@@ -582,8 +660,9 @@ const ProductsTable: React.FC = () => {
 
   const saveEditedWorker = async () => {
     if (!editingWorker) return;
-
+    setIsSavingWorker(true);
     try {
+      const { date: workerDate, ...restWorker } = editingWorker || {};
       const response = await fetch(
         `https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/salary/${editingWorker.id}/`,
         {
@@ -592,7 +671,7 @@ const ProductsTable: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: `JWT ${localStorage.getItem("accessToken")}`,
           },
-          body: JSON.stringify(editingWorker),
+          body: JSON.stringify(restWorker),
         }
       );
 
@@ -624,6 +703,8 @@ const ProductsTable: React.FC = () => {
         message: "Failed to update worker",
         type: "error",
       });
+    } finally {
+      setIsSavingWorker(false);
     }
   };
 
@@ -639,14 +720,70 @@ const ProductsTable: React.FC = () => {
   const handleConfirmDelete = async (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
-    const button = e.currentTarget;
-    button.disabled = true;
-    setTimeout(() => {
-      button.disabled = false;
-    }, 3000);
-
-    await deleteProduct();
+    e.preventDefault();
+    setIsConfirmingDelete(true);
+    try {
+      await deleteProduct();
+    } finally {
+      setIsConfirmingDelete(false);
+    }
   };
+
+  // Fetch projects with pagination
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch(
+          `https://backend.kidsdesigncompany.com/api/project/?page=${projectPage}&page_size=${PROJECTS_PER_PAGE}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        if (!response.ok) throw new Error("Failed to fetch projects");
+        const data = await response.json();
+        setProjects(data.all_projects || data.results || []);
+        setProjectTotalPages(Math.ceil((data.count || (data.all_projects?.length ?? 0)) / PROJECTS_PER_PAGE));
+      } catch (error) {
+        setProjects([]);
+        setProjectTotalPages(1);
+      }
+    };
+    fetchProjects();
+  }, [projectPage]);
+
+  // Fetch projects for dropdown
+  useEffect(() => {
+    let url = `https://backend.kidsdesigncompany.com/api/project/?ordering=-start_date&page=${projectDropdownPage}&page_size=${PROJECTS_DROPDOWN_PAGE_SIZE}`;
+    if (projectSearch) url += `&search=${encodeURIComponent(projectSearch)}`;
+    fetch(url, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        const projects = data.all_projects || data.results || [];
+        setProjectDropdownItems(Array.isArray(projects) ? projects : []);
+        setProjectDropdownNext(data.next);
+        setProjectDropdownPrev(data.previous);
+        setProjectDropdownCount(data.count || (projects.length ?? 0));
+      });
+  }, [projectDropdownPage, projectSearch]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
@@ -659,7 +796,7 @@ const ProductsTable: React.FC = () => {
 
       <div
         className={`overflow-x-auto pb-6 ${
-          showProductDetailsModal ? "blur-sm" : ""
+          showProductDetailsModal || showQuotationModal ? "blur-sm" : ""
         }`}
       >
         {loading ? (
@@ -694,14 +831,27 @@ const ProductsTable: React.FC = () => {
                 </button>
               </div>
               <div className="flex items-center space-x-4">
+                {/* Sort by Dropdown */}
+                {/* Project Filter Dropdown */}
+                <div className="w-56">
+                  <SearchablePaginatedProjectDropdown
+                    endpoint="https://backend.kidsdesigncompany.com/api/project/?ordering=-start_date"
+                    onChange={(value) => {
+                      setSelectedProject(value);
+                      setCurrentPage(1);
+                    }}
+                    selectedValue={selectedProject}
+                    selectedName={projects.find((p) => String(p.id) === selectedProject)?.name || ""}
+                  />
+                </div>
                 <select
                   value={ordering}
                   onChange={(e) => setOrdering(e.target.value)}
-                  className="bg-white border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  className="bg-white border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                 >
                   <option value="">Sort by</option>
-                  <option value="progress">Progress - Ascending</option>
-                  <option value="-progress">Progress - Descending</option>
+                  <option value="progress">Progress ▲</option>
+                  <option value="-progress">Progress ▼</option>
                 </select>
                 <button
                   onClick={() => navigate("/project-manager/add-product")}
@@ -788,7 +938,7 @@ const ProductsTable: React.FC = () => {
             className="absolute overflow-scroll inset-0 bg-black opacity-50"
             onClick={() => setShowProductDetailsModal(false)}
           ></div>
-          <div className="bg-white overflow-scroll rounded-lg p-6 max-h-[90vh] max-w-lg w-full mx-4 border-2 border-gray-800 shadow-lg relative z-[100]">
+          <div className="bg-white overflow-scroll rounded-2xl p-10 max-h-[90vh] max-w-5xl w-full mx-4 border-2 border-blue-400 shadow-2xl relative z-[100]">
             {/* NAME */}
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-gray-20">
@@ -802,99 +952,43 @@ const ProductsTable: React.FC = () => {
               </button>
             </div>
 
-            <div>
-              {/* PROGRESS BAR */}
-              <div className="text-sm text-gray-20 mb-3">
-                <span className="font-semibold">Progress rate:</span>
-                {!editingProgress ? (
-                  <div className="flex items-center mt-1">
-                    <div className="flex-grow">
-                      <span className="text-xs text-gray-500">
-                        {selectedProduct.progress}% complete
-                      </span>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                        <div
-                          className="bg-blue-400 h-2.5 rounded-full"
-                          style={{ width: `${selectedProduct.progress}%` }}
-                        ></div>
+            {/* Calculation Cards */}
+            {selectedProduct.calculations && (
+              <>
+                <div className="w-full mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                  <DashboardCard title="Total raw material cost" value={Number(selectedProduct.calculations.total_raw_material_cost) || 0} currency="₦" />
+                  <DashboardCard title="Total production cost" value={Number(selectedProduct.calculations.total_production_cost) || 0} currency="₦" />
+                  <DashboardCard title="Total overhead Cost" value={Number(selectedProduct.calculations.total_overhead_cost) || 0} currency="₦" />
+                  <DashboardCard title="Quantity" value={Number(selectedProduct.calculations.quantity) || 0} />
+                  <DashboardCard title="Profit" value={Number(selectedProduct.calculations.profit) || 0} currency="₦" />
+                  <DashboardCard title="Profit per item" value={Number(selectedProduct.calculations.profit_per_item) || 0} currency="₦" />
                       </div>
-                    </div>
-                    <button
-                        onClick={() => {
-                          setCurrentProgress(selectedProduct.progress);
-                          setEditingProgress(true);
-                        }}
-                        className="ml-4 px-3 py-1 text-sm bg-blue-500 text-white rounded-lg"
-                      >
-                        Edit
+                {/* Action Buttons Row */}
+                <div className="flex gap-4 justify-end mb-8">
+                      <button
+                    onClick={() => setShowContractorsModal(true)}
+                    className="px-4 py-2 bg-blue-400 text-white rounded-lg font-semibold shadow hover:bg-blue-500 transition-colors"
+                  >
+                    View Contractors
                       </button>
-                  </div>
-                ) : (
-                  <div className="mt-2">
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="text-sm text-black-600">
-                        Set Progress: {currentProgress}%
-                      </label>
-                      <div>
                         <button
-                          onClick={handleUpdateProgress}
-                          className="px-3 py-1 text-sm bg-green-700 text-white rounded-lg mr-2"
+                    onClick={() => setShowWorkersModal(true)}
+                    className="px-4 py-2 bg-blue-400 text-white rounded-lg font-semibold shadow hover:bg-blue-500 transition-colors"
                         >
-                          Save
+                    View Salary Workers
                         </button>
                         <button
-                          onClick={() => setEditingProgress(false)}
-                          className="px-3 py-1 text-sm bg-gray-300 text-black rounded-lg"
+                    onClick={() => setShowQuotationModal(true)}
+                    className="px-4 py-2 bg-purple-500 text-white rounded-lg font-semibold shadow hover:bg-purple-600 transition-colors"
                         >
-                          Cancel
+                    View Quotation
                         </button>
                       </div>
-                    </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={currentProgress}
-                      onChange={(e) =>
-                        setCurrentProgress(Number(e.target.value))
-                      }
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* SKETCH VIEW */}
-              <button
-                onClick={() => setShowSketch(!showSketch)}
-                className="mb-2 border-[1.4px] border-gray-20 rounded-md text-blue-400 block text-xs px-1"
-              >
-                View sketch
-              </button>
-              {showSketch && selectedProduct.sketch && (
-                <img
-                  onClick={() => setShowSketch(!showSketch)}
-                  className="mb-6"
-                  src={selectedProduct.sketch}
-                  alt={`${selectedProduct.name} sketch`}
-                />
-              )}
-
-              {/* IMAGE VIEW */}
-              <button
-                onClick={() => setShowImage(!showImage)}
-                className="mb-2 border-[1.4px] border-gray-20 rounded-md text-blue-400 block text-xs px-1"
-              >
-                View image
-              </button>
-              {showImage && selectedProduct.images && (
-                <img
-                  onClick={() => setShowImage(!showImage)}
-                  className="mb-6"
-                  src={selectedProduct.images}
-                  alt={`${selectedProduct.name} image`}
-                />
-              )}
+              </>
+            )}
+            <div className="flex flex-col md:flex-row gap-8">
+              {/* LEFT: Details */}
+              <div className="flex-1">
               {/* other prodict details */}
               <div>
                 {/* COLOUR */}
@@ -945,134 +1039,97 @@ const ProductsTable: React.FC = () => {
                 {/* LINKED PROJECTS */}
                 <p className="text-sm text-gray-20 mb-3">
                   <span className="font-semibold">Linked Project:</span>{" "}
-                  {selectedProduct.linked_project.name}
+                  {selectedProduct.linked_project?.name}
                 </p>
-
-                {/* CALCULATIONS */}
-                <ol className="text-sm text-gray-20 mb-3">
-                  <span
-                    className="inline-block mb-1 font-semibold text-blue-400 underline cursor-pointer"
-                    onClick={(e) => {
-                      const listItems = e.currentTarget.nextElementSibling;
-                      if (listItems) {
-                        listItems.classList.toggle("hidden");
-                      }
-                    }}
-                  >
-                    Calculations
-                  </span>
-                  <div className="hidden">
-                    {selectedProduct.calculations ? (
-                      <>
-                        <li className="mb-1">
-                          <span className="font-semibold">Profit: </span>
-                          {selectedProduct.calculations.profit}
-                        </li>
-                        <li className="mb-1">
-                          <span className="font-semibold">
-                            Profit per item:{" "}
-                          </span>
-                          {selectedProduct.calculations.profit_per_item}
-                        </li>
-                        <li className="mb-1">
-                          <span className="font-semibold">Quantity: </span>
-                          {selectedProduct.calculations.quantity}
-                        </li>
-                        <li className="mb-1">
-                          <span className="font-semibold">
-                            Total overhead Cost:{" "}
-                          </span>
-                          {selectedProduct.calculations.total_overhead_cost}
-                        </li>
-                        <li className="mb-1">
-                          <span className="font-semibold">
-                            Total per item:{" "}
-                          </span>
-                          {selectedProduct.calculations.total_per_item}
-                        </li>
-                        <li className="mb-1">
-                          <span className="font-semibold">
-                            Total production cost:{" "}
-                          </span>
-                          {selectedProduct.calculations.total_production_cost}
-                        </li>
-                        <li className="mb-1">
-                          <span className="font-semibold">
-                            Total raw material cost:{" "}
-                          </span>
-                          {selectedProduct.calculations.total_raw_material_cost}
-                        </li>
-                      </>
-                    ) : (
-                      <li className="italic text-gray-500">
-                        No calculations available
-                      </li>
-                    )}
-                  </div>
-                </ol>
-
-                <ol className="text-sm text-gray-20 mb-3">
-                  <span
-                    className="inline-block mb-1 font-semibold text-blue-400 underline cursor-pointer"
-                    onClick={(e) => {
-                      const listItems = e.currentTarget.nextElementSibling;
-                      if (listItems) {
-                        listItems.classList.toggle("hidden");
-                      }
-                    }}
-                  >
-                    Raw materials (qty)
-                  </span>
-                  <div className="hidden">
-                    {rawMaterials.length > 0 ? (
-                      rawMaterials.map((material, index) => (
-                        <li key={index} className="mb-1">
-                          <span className="font-semibold">
-                            {" "}
-                            {material.material_name} -{" "}
-                            <span className="font-normal">
-                              {material.total_quantity}
-                            </span>
-                          </span>
-                        </li>
-                      ))
-                    ) : (
-                      <li className="italic text-gray-500">
-                        No raw materials available
-                      </li>
-                    )}
-                  </div>
-                </ol>
+                </div>
               </div>
-              {/* CONTRACTORS */}
-              <p className="text-sm text-gray-20 mb-3">
-                <span
-                  className="inline-block mb-1 font-semibold text-blue-400 underline cursor-pointer"
-                  onClick={() => setShowContractorsModal(true)}
-                >
-                  Contractors
-                </span>
-              </p>
-
-              {/* WORRKERS */}
-              <p className="text-sm text-gray-20 mb-3">
-                <span
-                  className="inline-block mb-1 font-semibold text-blue-400 underline cursor-pointer"
-                  onClick={() => setShowWorkersModal(true)}
-                >
-                  Workers
-                </span>
-              </p>
-
-              {/* QUOTATION */}
-              <p className="text-sm text-gray-20 mb-3">
-                <span
-                  className="inline-block mb-1 font-semibold text-blue-400 underline cursor-pointer"
-                  onClick={() => setShowQuotationModal(true)}
-                >
-                  Quotation
-                </span>
-              </p>
+              {/* RIGHT: Progress and Images */}
+              <div className="flex flex-col items-center md:w-1/3 w-full">
+                {/* Progress Bar */}
+                <div className="text-sm text-gray-20 mb-3 w-full">
+                  <span className="font-bold">Progress rate:</span>
+                  {!editingProgress ? (
+                    <div className="flex items-center mt-1">
+                      <div className="flex-grow">
+                        <span className="text-xs text-gray-500">
+                          {selectedProduct.progress}% complete
+                  </span>
+                        <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+                          <div
+                            className="bg-blue-400 h-2.5 rounded-full"
+                            style={{ width: `${selectedProduct.progress}%` }}
+                          ></div>
+                  </div>
+                      </div>
+                      {userRole !== "shopkeeper" && userRole !== "storekeeper" && (
+                        <button
+                          onClick={() => {
+                            setCurrentProgress(selectedProduct.progress);
+                            setEditingProgress(true);
+                          }}
+                          className="ml-4 px-3 py-1 text-sm bg-blue-400 text-white rounded-lg"
+                        >
+                          Edit
+                        </button>
+                    )}
+                  </div>
+                  ) : (
+                    <div className="mt-2">
+                      <div className="flex justify-between items-center mb-2">
+                        <label className="text-sm text-black-600">
+                          Set Progress: {currentProgress}%
+                        </label>
+                        <div>
+                          <button
+                            onClick={handleUpdateProgress}
+                            disabled={isUpdatingProgress}
+                            className={`px-3 py-1 text-sm bg-blue-400 text-white rounded-lg mr-2 ${
+                              isUpdatingProgress ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
+                          >
+                            {isUpdatingProgress ? "Saving..." : "Save"}
+                          </button>
+                          <button
+                            onClick={() => setEditingProgress(false)}
+                            className="px-3 py-1 text-sm bg-gray-300 text-black rounded-lg"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={currentProgress}
+                        onChange={(e) =>
+                          setCurrentProgress(Number(e.target.value))
+                        }
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      />
+                    </div>
+                  )}
+                </div>
+                {/* Thumbnails for Sketch and Image */}
+                <div className="flex gap-4 mb-4">
+                  {selectedProduct.sketch && (
+                    <img
+                      src={selectedProduct.sketch}
+                      alt={`${selectedProduct.name} sketch`}
+                      className="w-24 h-24 object-cover rounded shadow cursor-pointer border border-gray-200 hover:scale-105 transition-transform"
+                      onClick={() => setExpandedImage(selectedProduct.sketch)}
+                    />
+                  )}
+                  {selectedProduct.images && (
+                    <img
+                      src={selectedProduct.images}
+                      alt={`${selectedProduct.name} image`}
+                      className="w-24 h-24 object-cover rounded shadow cursor-pointer border border-gray-200 hover:scale-105 transition-transform"
+                      onClick={() => setExpandedImage(selectedProduct.images)}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Product detail EDIT AND DELETE ICONS */}
@@ -1112,84 +1169,101 @@ const ProductsTable: React.FC = () => {
         </div>
       )}
 
-      {/* Contractors Modal */}
-      {showContractorsModal && (
+      {/* Expanded Image Overlay */}
+      {expandedImage && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black bg-opacity-80" onClick={() => setExpandedImage(null)}>
+          <img src={expandedImage} alt="Expanded" className="max-w-3xl max-h-[90vh] rounded-lg shadow-2xl border-4 border-white" />
+        </div>
+      )}
+
+      {/* contractors modal */}
+      {showContractorsModal && selectedProduct && (
         <div
           className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150] ${
             modalConfig.isOpen ? "hidden" : ""
-          }`}
+          } ${showEditContractorModal ? "blur-sm" : ""}`}
         >
-          <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg text-blue-400 font-bold">
-                Contractors for {selectedProduct.name}
-              </h3>
+          <div className="bg-white rounded-2xl p-20 w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
+            <div className="flex flex-col items-center w-full mb-6">
+              <h3 className="text-2xl pb-10 font-bold text-blue-400 text-center">Contractors for <span className="font-extrabold text-3xl">{selectedProduct.name}</span></h3>
               <button
                 onClick={() => setShowContractorsModal(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="absolute top-6 right-8 text-gray-500 hover:text-gray-700 text-3xl font-bold"
+                aria-label="Close"
               >
                 <FontAwesomeIcon icon={faXmark} />
               </button>
             </div>
 
-            <button
-              onClick={() =>
-                navigate(
-                  `/project-manager/add-contractor/${selectedProduct.id}`
-                )
-              }
-              className="bg-blue-400 text-white p-1 px-[10px] mb-3 rounded-lg hover:bg-blue-500 transition-colors"
-            >
-              <FontAwesomeIcon icon={faPlus} className="text-xs" />
-            </button>
+            <div className="w-full">
+              <div className="flex justify-start mb-4">
+                {user?.role !== 'storekeeper' && (
+                  <button
+                    onClick={() => {
+                      navigate(`/project-manager/add-contractor/${selectedProduct.id}`, {
+                        state: { from: "contractorsModal", returnTo: "contractors" },
+                      });
+                    }}
+                    className="px-4 py-2 text-lg bg-blue-400 rounded-lg text-white font-semibold hover:bg-blue-500 flex items-center gap-2 shadow"
+                  >
+                    <FontAwesomeIcon icon={faPlus} /> Add Contractor
+                  </button>
+                )}
+              </div>
 
-            <div className="space-y-4">
-              {selectedProduct.contractors &&
-              selectedProduct.contractors.length > 0 ? (
-                selectedProduct.contractors.map(
-                  (contractor: any, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-md shadow-md"
-                    >
-                      <div>
-                        <p className="font-semibold text-gray-20">
-                          {contractor.linked_contractor?.first_name}{" "}
-                          {contractor.linked_contractor?.last_name}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Date:{" "}
-                          {new Date(contractor.date).toLocaleDateString(
-                            "en-GB"
-                          )}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Cost: ₦{contractor.cost || "-"}
-                        </p>
-                      </div>
-                      <div className="grid">
+              {selectedProduct?.contractors?.length > 0 ? (
+                <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[12px]">
+                  <thead>
+                    <tr className="bg-blue-400 text-white">
+                      {/* <th className="py-1 px-2 text-left font-bold">#</th> */}
+                      <th className="py-1 px-2 text-left font-bold">Name</th>
+                      <th className="py-1 px-2 text-left font-bold">Date</th>
+                      <th className="py-1 px-2 text-left font-bold">Cost</th>
+                      {user?.role === 'ceo' && (
+                        <th className="py-1 px-2 text-left font-bold">Actions</th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedProduct.contractors.map((contractor: any, index: number) => (
+                      <tr key={index} className="border-b">
+                        {/* <td className="py-1 px-2">{index + 1}</td> */}
+                        <td className="py-1 px-2">
+                          {contractor.linked_contractor?.first_name} {contractor.linked_contractor?.last_name}
+                        </td>
+                        <td className="py-1 px-2">
+                          {new Date(contractor.date).toLocaleDateString("en-GB")}
+                        </td>
+                        <td className="py-1 px-2">₦{contractor.cost || "-"}</td>
                         {user?.role === 'ceo' && (
-                          <button
-                            onClick={() => handleDeleteContractor(contractor.id)}
-                            className="text-red-400 hover:text-red-600 p-2"
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </button>
+                          <td className="py-1 px-2">
+                            <button
+                              onClick={() => handleEditContractor(contractor)}
+                              className="p-1 px-2 text-blue-400 rounded border border-blue-400 font-bold mr-2 text-xs"
+                            >
+                              <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteContractor(contractor.id)}
+                              disabled={isDeletingContractor}
+                              className={`p-1 px-2 text-red-400 rounded border border-red-400 font-bold text-xs ${
+                                isDeletingContractor ? "opacity-50 cursor-not-allowed" : ""
+                              }`}
+                            >
+                              {isDeletingContractor ? "Deleting..." : (
+                                <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
+                              )}
+                            </button>
+                          </td>
                         )}
-                        <button
-                          onClick={() => handleEditContractor(contractor)}
-                          className="text-blue-400 hover:text-blue-600 p-2"
-                        >
-                          <FontAwesomeIcon icon={faSearch} />
-                        </button>
-                      </div>
-                    </div>
-                  )
-                )
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               ) : (
-                <p className="text-center italic text-gray-500">
-                  No contractors attached
-                </p>
+                <div className="w-full flex flex-col items-center">
+                  <p className="italic text-gray-500 mb-4">No contractors attached</p>
+                </div>
               )}
             </div>
           </div>
@@ -1203,71 +1277,85 @@ const ProductsTable: React.FC = () => {
             modalConfig.isOpen ? "hidden" : ""
           } ${showEditWorkerModal ? "blur-sm" : ""}`}
         >
-          <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg text-blue-400 font-bold">
-                Workers for {selectedProduct.name}
-              </h3>
+          <div className="bg-white rounded-2xl p-20 w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
+            <div className="flex flex-col items-center w-full mb-6">
+              <h3 className="text-2xl pb-10 font-bold text-blue-400 text-center">Salary Workers for <span className="font-extrabold text-3xl">{selectedProduct.name}</span></h3>
               <button
                 onClick={() => setShowWorkersModal(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="absolute top-6 right-8 text-gray-500 hover:text-gray-700 text-3xl font-bold"
+                aria-label="Close"
               >
                 <FontAwesomeIcon icon={faXmark} />
               </button>
             </div>
 
-            <button
-              onClick={() => {
-                navigate(`/project-manager/add-worker/${selectedProduct.id}`, {
-                  state: { from: "workersModal", returnTo: "workers" },
-                });
-              }}
-              className="bg-blue-400 text-white p-1 px-[10px] mb-3 rounded-lg hover:bg-blue-500 transition-colors"
-            >
-              <FontAwesomeIcon icon={faPlus}
-className="text-xs" />
-            </button>
+            <div className="w-full">
+              <div className="flex justify-start mb-4">
+                {user?.role !== 'storekeeper' && (
+                  <button
+                    onClick={() => {
+                      navigate(`/project-manager/add-worker/${selectedProduct.id}`, {
+                        state: { from: "workersModal", returnTo: "workers" },
+                      });
+                    }}
+                    className="px-4 py-2 text-lg bg-blue-400 rounded-lg text-white font-semibold hover:bg-blue-500 flex items-center gap-2 shadow"
+                  >
+                    <FontAwesomeIcon icon={faPlus} /> Add Worker
+                  </button>
+                )}
+              </div>
 
-            <div className="space-y-4">
               {selectedProduct?.salary_workers?.length > 0 ? (
-                selectedProduct.salary_workers.map(
-                  (worker: any, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-md shadow-md"
-                    >
-                      <div>
-                        <p className="font-semibold text-gray-20">
-                          {worker.linked_salary_worker?.first_name}{" "}
-                          {worker.linked_salary_worker?.last_name}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Date: {worker.date}
-                        </p>
-                      </div>
-                      <div className="grid">
+                <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[12px]">
+                  <thead>
+                    <tr className="bg-blue-400 text-white">
+                      {/* <th className="py-1 px-2 text-left font-bold">#</th> */}
+                      <th className="py-1 px-2 text-left font-bold">Name</th>
+                      <th className="py-1 px-2 text-left font-bold">Date</th>
+                      {user?.role === 'ceo' && (
+                        <th className="py-1 px-2 text-left font-bold">Actions</th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedProduct.salary_workers.map((worker: any, index: number) => (
+                      <tr key={index} className="border-b">
+                        {/* <td className="py-1 px-2">{index + 1}</td> */}
+                        <td className="py-1 px-2">
+                          {worker.linked_salary_worker?.first_name} {worker.linked_salary_worker?.last_name}
+                        </td>
+                        <td className="py-1 px-2">
+                          {new Date(worker.date).toLocaleDateString("en-GB")}
+                        </td>
                         {user?.role === 'ceo' && (
-                          <button
-                            onClick={() => handleDeleteWorker(worker.id)}
-                            className="text-red-400 hover:text-red-600 p-2"
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </button>
+                          <td className="py-1 px-2">
+                            <button
+                              onClick={() => handleEditWorker(worker)}
+                              className="p-1 px-2 text-blue-400 rounded border border-blue-400 font-bold mr-2 text-xs"
+                            >
+                              <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteWorker(worker.id)}
+                              disabled={isDeletingWorker}
+                              className={`p-1 px-2 text-red-400 rounded border border-red-400 font-bold text-xs ${
+                                isDeletingWorker ? "opacity-50 cursor-not-allowed" : ""
+                              }`}
+                            >
+                              {isDeletingWorker ? "Deleting..." : (
+                                <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
+                              )}
+                            </button>
+                          </td>
                         )}
-                        <button
-                          onClick={() => handleEditWorker(worker)}
-                          className="text-blue-400 hover:text-blue-600 p-2"
-                        >
-                          <FontAwesomeIcon icon={faSearch} />
-                        </button>
-                      </div>
-                    </div>
-                  )
-                )
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               ) : (
-                <p className="text-center italic text-gray-500">
-                  No workers attached
-                </p>
+                <div className="w-full flex flex-col items-center">
+                  <p className="italic text-gray-500 mb-4">No workers attached</p>
+                </div>
               )}
             </div>
           </div>
@@ -1317,22 +1405,6 @@ className="text-xs" />
                   className="mt-1 py-2 pl-3 block w-full border-gray-300 rounded-md shadow-sm"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  value={editingContractor.date || ""}
-                  onChange={(e) =>
-                    setEditingContractor({
-                      ...editingContractor,
-                      date: e.target.value,
-                    })
-                  }
-                  className="mt-1 py-2 pl-3 block w-full border-gray-300 rounded-md shadow-sm"
-                />
-              </div>
             </div>
             <div className="mt-4 flex justify-end space-x-2">
               <button
@@ -1343,9 +1415,12 @@ className="text-xs" />
               </button>
               <button
                 onClick={saveEditedContractor}
-                className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500"
+                disabled={isSavingContractor}
+                className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ${
+                  isSavingContractor ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                Save
+                {isSavingContractor ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>
@@ -1376,22 +1451,6 @@ className="text-xs" />
                   {editingWorker.linked_salary_worker?.last_name || ""}
                 </label>
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  value={editingWorker.date || ""}
-                  onChange={(e) =>
-                    setEditingWorker({
-                      ...editingWorker,
-                      date: e.target.value,
-                    })
-                  }
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm py-2 pl-3"
-                />
-              </div>
             </div>
             <div className="mt-4 flex justify-end space-x-2">
               <button
@@ -1402,9 +1461,12 @@ className="text-xs" />
               </button>
               <button
                 onClick={saveEditedWorker}
-                className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500"
+                disabled={isSavingWorker}
+                className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+                  isSavingWorker ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                Save
+                {isSavingWorker ? "Saving..." : "Save"}
               </button>
             </div>
           </div>
@@ -1418,195 +1480,106 @@ className="text-xs" />
             modalConfig.isOpen ? "hidden" : ""
           }`}
         >
-          <div className="bg-white rounded-lg p-6 w-[500px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center">
-                <h3 className="text-lg text-blue-400 font-bold">
-                  Quotation for {selectedProduct.name}
-                </h3>
+          <div className="bg-white rounded-2xl p-20 w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
+            <div className="flex flex-col items-center w-full mb-6">
+              <h3 className="text-2xl pb-10 font-bold text-blue-400 text-center">Quotations for <span className="font-extrabold text-3xl">{selectedProduct.name}</span></h3>
                 <button
-                  onClick={() =>
-                    navigate(
-                      `/project-manager/add-quotation/${selectedProduct.id}`
-                    )
-                  }
-                  className="ml-3 px-2 py-1 text-sm bg-blue-400 rounded-md text-white"
-                >
-                  <FontAwesomeIcon icon={faPlus} />
-                </button>
-              </div>
-              <button
                 onClick={() => setShowQuotationModal(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="absolute top-6 right-8 text-gray-500 hover:text-gray-700 text-3xl font-bold"
+                aria-label="Close"
               >
                 <FontAwesomeIcon icon={faXmark} />
-              </button>
-            </div>
-            {quotation && quotation.length > 0 ? (
-              <div>
-                {quotation.map((item: any, index: number) => (
-                  <div key={index} className="mb-2">
-                    <div className="mt-2">
-                      <p
-                        onClick={(e) => {
-                          const nextSibling =
-                            e.currentTarget.nextElementSibling;
-                          if (nextSibling) {
-                            nextSibling.classList.toggle("hidden");
-                          }
-                          if (nextSibling?.classList.contains("hidden")) {
-                            e.currentTarget.classList.add("mb-2");
-                          } else {
-                            e.currentTarget.classList.remove("mb-2");
-                          }
-                        }}
-                        className="font-semibold mb-2 underline cursor-pointer"
-                      >
-                        Quotation
-                      </p>
-
-                      <div className="hidden mb-2">
-                        {item.quotation?.length > 0 ? (
-                          item.quotation.map(
-                            (
-                              quotationFn: { name: string; quantity: number },
-                              index: number
-                            ) => (
-                              <span key={index} className="inline-block w-full">
-                                <span className="font-black">*</span>{" "}
-                                {quotationFn.name}: {quotationFn.quantity}
-                              </span>
-                            )
-                          )
-                        ) : (
-                          <p className="text-sm text-gray-500">
-                            No quotation available
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <p className="font-semibold">
-                      Department:{" "}
-                      <span className="font-normal text-blue-700">
-                        {item.department || "-"}
-                      </span>
-                    </p>
-                    <p className="font-semibold">
-                      Project name:{" "}
-                      <span className="font-normal text-blue-700">
-                        {item.project_name || "-"}
-                      </span>
-                    </p>
-
-                    {/* WORKERS */}
-                    <div className="mt-2">
-                      <p
-                        onClick={(e) => {
-                          const nextSibling =
-                            e.currentTarget.nextElementSibling;
-                          if (nextSibling) {
-                            nextSibling.classList.toggle("hidden");
-                          }
-                          if (nextSibling?.classList.contains("hidden")) {
-                            e.currentTarget.classList.add("mb-2");
-                          } else {
-                            e.currentTarget.classList.remove("mb-2");
-                          }
-                        }}
-                        className="font-semibold underline cursor-pointer"
-                      >
-                        Workers
-                      </p>
-
-                      <div className="hidden mb-2">
-                        {item.salary_worker?.length > 0 ? (
-                          item.salary_worker.map((workerFn: any) => (
-                            <li
-                              key={workerFn.name}
-                              className="text-sm text-gray-500"
-                            >
-                              {workerFn.name || "-"}
-                            </li>
-                          ))
-                        ) : (
-                          <p className="text-sm text-gray-500">
-                            No workers available
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* CONTRACTORS */}
-                    <div className="mt-2">
-                      <p
-                        onClick={(e) => {
-                          const nextSibling =
-                            e.currentTarget.nextElementSibling;
-                          if (nextSibling) {
-                            nextSibling.classList.toggle("hidden");
-                          }
-                          if (nextSibling?.classList.contains("hidden")) {
-                            e.currentTarget.classList.add("mb-2");
-                          } else {
-                            e.currentTarget.classList.remove("mb-2");
-                          }
-                        }}
-                        className="font-semibold underline cursor-pointer"
-                      >
-                        Contractors
-                      </p>
-                      <div className="hidden mb-2">
-                        {item.contractor?.length > 0 ? (
-                          item.contractor.map((workerFn: any) => (
-                            <li
-                              key={workerFn.name}
-                              className="text-sm text-gray-500"
-                            >
-                              {workerFn.name || "-"}
-                            </li>
-                          ))
-                        ) : (
-                          <p className="text-sm text-gray-500">
-                            No contractors available
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end space-x-2 mt-6">
+                </button>
+              </div>
+            {/* Department, Project, Workers, Contractors as table columns */}
+            <div className="w-full">
+              <div className="flex justify-start mb-4">
+                {user?.role !== 'storekeeper' && (
+                  <button
+                    onClick={() => navigate(`/project-manager/add-quotation/${selectedProduct.id}`)}
+                    className="px-4 py-2 text-lg bg-blue-400 rounded-lg text-white font-semibold hover:bg-blue-500 flex items-center gap-2 shadow"
+                  >
+                    <FontAwesomeIcon icon={faPlus} /> Add Quotation
+                  </button>
+                )}
+              </div>
+              {quotation && quotation.length > 0 ? (
+                <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[12px]">
+                  <thead>
+                    <tr className="bg-blue-400 text-white">
+                      {/* <th className="py-1 px-2 text-left font-bold">#</th> */}
+                      <th className="py-1 px-2 text-left font-bold">Department</th>
+                      <th className="py-1 px-2 text-left font-bold">Project</th>
+                      <th className="py-1 px-2 text-left font-bold">Workers</th>
+                      <th className="py-1 px-2 text-left font-bold">Contractors</th>
+                      <th className="py-1 px-2 text-left font-bold">Items</th>
                       {user?.role === 'ceo' && (
-                        <>
+                        <th className="py-1 px-2 text-left font-bold">Actions</th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {quotation.map((item: any, index: number) => (
+                      <tr key={index} className="border-b">
+                        {/* <td className="py-1 px-2">{index + 1}</td> */}
+                        <td className="py-1 px-2">{item.department || '-'}</td>
+                        <td className="py-1 px-2">{item.project_name || '-'}</td>
+                        <td className="py-1 px-2">{item.salary_worker?.length > 0 ? (
+                          <div className="flex flex-col gap-1">
+                            {item.salary_worker.map((w: any, i: number) => (
+                              <span key={i}>{w.name}</span>
+                            ))}
+                      </div>
+                        ) : '-'}</td>
+                        <td className="py-1 px-2">{item.contractor?.length > 0 ? (
+                          <div className="flex flex-col gap-1">
+                            {item.contractor.map((c: any, i: number) => (
+                              <span key={i}>{c.name}</span>
+                            ))}
+                    </div>
+                        ) : '-'}</td>
+                        <td className="py-1 px-2">
+                          {item.quotation?.length > 0 ? (
+                            <ul className="list-disc ml-4">
+                              {item.quotation.map((q: any, i: number) => (
+                                <li key={i}>{q.name}: {q.quantity}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <span className="text-gray-400 italic">No items</span>
+                          )}
+                        </td>
+                      {user?.role === 'ceo' && (
+                          <td className="py-1 px-2">
                           <button
-                            onClick={() =>
-                              navigate(`/project-manager/edit-quotation/${selectedProduct.id}/${item.id}`)
-                            }
-                            className="p-1 px-3 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
-                          >
-                            <FontAwesomeIcon
-                              className="text-xs text-blue-400"
-                              icon={faPencil}
-                            />
+                              onClick={() => navigate(`/project-manager/edit-quotation/${selectedProduct.id}/${item.id}`)}
+                              className="p-1 px-2 text-blue-400 rounded border border-blue-400 font-bold mr-2 text-xs"
+                            >
+                              <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
                           </button>
                           <button
                             onClick={() => deleteQuotation(item.id)}
-                            className="p-1 px-3 text-red-400 rounded-lg border-2 border-red-400 font-bold"
+                            disabled={isDeletingQuotation}
+                            className={`p-1 px-2 text-red-400 rounded border border-red-400 font-bold text-xs ${
+                              isDeletingQuotation ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
                           >
-                            <FontAwesomeIcon
-                              className="text-xs text-red-400"
-                              icon={faTrash}
-                            />
+                            {isDeletingQuotation ? "Deleting..." : (
+                              <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
+                            )}
                           </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="italic text-gray-500">
-                No quotation items available
-              </p>
-            )}
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="w-full flex flex-col items-center">
+                  <p className="italic text-gray-500 mb-4">No quotation items available</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -1627,9 +1600,12 @@ className="text-xs" />
             <div className="space-y-3 mt-4">
               <button
                 onClick={handleConfirmDelete}
-                className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center"
+                disabled={isConfirmingDelete || isDeletingProduct}
+                className={`w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 ${
+                  isConfirmingDelete || isDeletingProduct ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                Confirm
+                {isConfirmingDelete || isDeletingProduct ? "Deleting..." : "Delete"}
               </button>
               <button
                 onClick={() => setConfirmDelete(false)}

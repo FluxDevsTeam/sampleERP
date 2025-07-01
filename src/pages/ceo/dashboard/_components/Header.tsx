@@ -103,7 +103,7 @@ const DataCard = ({
   return (
     <div className="p-4 border rounded-lg shadow-md flex flex-col items-center justify-center">
       <div className="text-base font-medium text-center mb-1">{label}</div>
-      <div className="text-lg font-semibold text-blue-700">
+      <div className="text-lg font-semibold text-blue-400">
         {isNumber ? "₦" : ""}
         {isNumber ? value.toLocaleString("en-NG") : value}
     </div>

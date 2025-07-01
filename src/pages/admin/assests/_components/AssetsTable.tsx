@@ -17,6 +17,7 @@ import {
   faAnglesLeft,
   faAnglesRight,
 } from "@fortawesome/free-solid-svg-icons";
+import { Button } from "@/components/ui/button";
 
 interface AssetsTableProps {
   headers: string[];
@@ -228,14 +229,15 @@ const AssetsTable = ({
       </div>
 
       <Modals
+        selectedAsset={selectedAsset}
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
-        selectedAsset={selectedAsset}
-        handleDelete={handleDelete}
         isDeleteDialogOpen={isDeleteDialogOpen}
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        handleDelete={handleDelete}
         confirmDelete={confirmDelete}
         isCEO={isCEO}
+        isDeleting={deleteAssetMutation.isPending}
       />
     </div>
   );

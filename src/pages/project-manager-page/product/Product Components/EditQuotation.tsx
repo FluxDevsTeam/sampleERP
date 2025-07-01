@@ -7,6 +7,7 @@ import {
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import Modal from "@/pages/shop/Modal";
+import SearchablePaginatedMultiSelectDropdown from './SearchablePaginatedMultiSelectDropdown';
 
 interface QuotationItem {
   name: string;
@@ -52,6 +53,8 @@ const EditQuotation: React.FC = () => {
     message: "",
     type: "success" as "success" | "error",
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -160,13 +163,11 @@ const EditQuotation: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const quotationData: QuotationData = {
       department,
-      quotation: quotationItems.map((item) => ({
-        name: item.name,
-        quantity: item.quantity,
-      })),
+      quotation: quotationItems.filter((item) => item.name.trim() !== ""),
       contractor: selectedContractors,
       salary_worker: selectedWorkers,
     };
@@ -234,6 +235,8 @@ const EditQuotation: React.FC = () => {
           error instanceof Error ? error.message : "Failed to save quotation",
         type: "error",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -335,56 +338,39 @@ const EditQuotation: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700">
               Contractors
             </label>
-            <select
-              multiple
-              value={selectedContractors.map(String)}
-              onChange={(e) =>
-                setSelectedContractors(
-                  Array.from(e.target.selectedOptions, (option) =>
-                    Number(option.value)
-                  )
-                )
-              }
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            >
-              {contractors.map((contractor) => (
-                <option key={contractor.id} value={contractor.id}>
-                  {contractor.first_name} {contractor.last_name}
-                </option>
-              ))}
-            </select>
+            <SearchablePaginatedMultiSelectDropdown
+              endpoint="https://backend.kidsdesigncompany.com/api/contractors/"
+              label="Contractors"
+              selectedValues={selectedContractors}
+              onChange={setSelectedContractors}
+              resultsKey="results.contractor"
+              dataMapper={(data) => (Array.isArray(data) ? data.map((c) => ({ id: c.id, name: `${c.first_name} ${c.last_name}` })) : [])}
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Salary Workers
             </label>
-            <select
-              multiple
-              value={selectedWorkers.map(String)}
-              onChange={(e) =>
-                setSelectedWorkers(
-                  Array.from(e.target.selectedOptions, (option) =>
-                    Number(option.value)
-                  )
-                )
-              }
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            >
-              {workers.map((worker) => (
-                <option key={worker.id} value={worker.id}>
-                  {worker.first_name} {worker.last_name}
-                </option>
-              ))}
-            </select>
+            <SearchablePaginatedMultiSelectDropdown
+              endpoint="https://backend.kidsdesigncompany.com/api/salary-workers/"
+              label="Salary Workers"
+              selectedValues={selectedWorkers}
+              onChange={setSelectedWorkers}
+              resultsKey="results.workers"
+              dataMapper={(data) => (Array.isArray(data) ? data.map((w) => ({ id: w.id, name: `${w.first_name} ${w.last_name}` })) : [])}
+            />
           </div>
 
           <div className="flex justify-end">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500"
+              disabled={isSubmitting}
+              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Submit Quotation
+              {isSubmitting ? "Updating..." : "Update Quotation"}
             </button>
           </div>
         </form>

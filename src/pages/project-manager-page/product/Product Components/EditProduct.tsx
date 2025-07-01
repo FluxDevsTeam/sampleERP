@@ -4,6 +4,7 @@ import { ThreeDots } from "react-loader-spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Modal from "@/pages/shop/Modal";
+import SearchablePaginatedProjectDropdown from '../SearchablePaginatedProjectDropdown';
 
 const EditProduct: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +21,7 @@ const EditProduct: React.FC = () => {
   const [productDetails, setProductDetails] = useState<any>(null);
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     project: "",
     name: "",
@@ -30,6 +32,7 @@ const EditProduct: React.FC = () => {
     progress: 0,
     selling_price: "",
     overhead_cost: "",
+    quantity: "",
     image: null,
     sketch: null,
   });
@@ -65,6 +68,7 @@ const EditProduct: React.FC = () => {
           progress: data.progress || 0,
           selling_price: data.selling_price || "",
           overhead_cost: data.overhead_cost || "",
+          quantity: data.quantity || "",
           image: null,
           sketch: null,
         });
@@ -126,6 +130,7 @@ const EditProduct: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     try {
       const formDataToSubmit = new FormData();
@@ -138,6 +143,7 @@ const EditProduct: React.FC = () => {
       formDataToSubmit.append("progress", formData.progress.toString());
       formDataToSubmit.append("selling_price", formData.selling_price);
       formDataToSubmit.append("overhead_cost", formData.overhead_cost);
+      formDataToSubmit.append("quantity", formData.quantity);
       if (formData.image) {
         formDataToSubmit.append("images", formData.image);
       }
@@ -174,6 +180,8 @@ const EditProduct: React.FC = () => {
         message: "Failed to update item",
         type: "error",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -232,7 +240,7 @@ const EditProduct: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div
-        className={`max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 ${
+        className={`max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-10 ${
           modalConfig.isOpen ? "hidden" : ""
         }`}
       >
@@ -248,27 +256,19 @@ const EditProduct: React.FC = () => {
 
         <form
           onSubmit={handleSubmit}
-          className={`space-y-6 ${modalConfig.isOpen ? "hidden" : ""}`}
+          className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${modalConfig.isOpen ? "hidden" : ""}`}
           encType="multipart/form-data"
         >
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Project
             </label>
-            <select
-              name="project"
-              value={formData.project}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            >
-              <option value="">Choose a project</option>
-              {projects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-            </select>
+            <SearchablePaginatedProjectDropdown
+              endpoint="https://backend.kidsdesigncompany.com/api/project/?ordering=-start_date"
+              onChange={(value) => setFormData((prev) => ({ ...prev, project: value }))}
+              selectedValue={formData.project}
+              selectedName={projects && projects.find((p: any) => String(p.id) === formData.project)?.name}
+            />
           </div>
 
           <div>
@@ -380,6 +380,21 @@ const EditProduct: React.FC = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
+              Quantity
+            </label>
+            <input
+              type="number"
+              name="quantity"
+              value={formData.quantity}
+              onChange={handleInputChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              required
+              min="1"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
               New Image (optional)
             </label>
             <input
@@ -404,15 +419,15 @@ const EditProduct: React.FC = () => {
             />
           </div>
 
-          <div className="flex justify-end">
+          <div className="md:col-span-2 flex justify-end">
             <button
               type="submit"
-              disabled={loading}
-              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
+              disabled={loading || isSubmitting}
+              className={`px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-lg font-semibold shadow ${
+                loading || isSubmitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              {loading ? "Updating..." : "Update Product"}
+              {isSubmitting ? "Updating..." : "Update Product"}
             </button>
           </div>
         </form>

@@ -184,6 +184,17 @@ const ContractorsTable = ({
                       View
                     </button>
                   </td>
+                  <td className="py-3 px-4">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/admin/contractors/${worker.id}/records`);
+                      }}
+                      className="px-3 py-1 text-green-400 border-2 border-green-400 rounded hover:bg-green-300 hover:text-white transition-colors"
+                    >
+                      Record
+                    </button>
+                  </td>
                 </tr>
               ))
             )}

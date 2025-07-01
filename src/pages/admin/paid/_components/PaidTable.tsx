@@ -188,7 +188,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
     <div className={`relative ${!data?.daily_data?.length ? 'min-h-[300px]' : ''}`}>
       <div className="flex justify-between items-center mb-4">
         <Button onClick={() => setIsAddModalOpen(true)} className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">
-          Add Record Paid
+          Record Payment
         </Button>
         <div className="flex items-center space-x-2">
           {/* Year Dropdown */}
@@ -254,8 +254,8 @@ const PaidTable: React.FC<PaidTableProps> = ({
               </ul>
             )}
           </div>
-          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["paid"] })} className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">Filter</Button>
-          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["paid"] }); }} className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors">Clear</Button>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["paid"] })} disabled={isLoading} className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">Filter</Button>
+          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["paid"] }); }} disabled={isLoading} className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors">Clear</Button>
         </div>
       </div>
       <div className={`overflow-x-auto pb-8 ${isTableModalOpen || isViewModalOpen || isDeleteDialogOpen ? 'blur-md' : ''}`}>
@@ -369,7 +369,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
                   <Button variant="secondary" onClick={handleEdit}>
                     Edit
                   </Button>
-                  <Button variant="destructive" onClick={handleDelete}>
+                  <Button variant="destructive" onClick={handleDelete} disabled={deletePaidEntryMutation.isPending}>
                     Delete
                   </Button>
                 </>

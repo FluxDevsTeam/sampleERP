@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdCancel } from "react-icons/md";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import ProjectModals from "./Modal";
 import PaginationComponent from "./Pagination";
 import AddProjectModal from "./AddProjectModal";
+import dayjs from "dayjs";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import ProjectTaskManager from "./ProjectTaskManager";
 
 interface Product {
   id: number;
@@ -85,7 +88,7 @@ interface Project {
   other_productions: {
     total_cost: number;
     total_budget: number;
-    other_productions: Array<{ id: number; name: string; cost: string | null }>;
+    other_productions: Array<{ id: number; name: string; cost: string | null; budget: string | null }>;
   };
   selling_price: string;
   logistics: string;
@@ -104,6 +107,31 @@ interface PaginatedProjectsResponse {
 }
 
 const BASE_URL = "https://backend.kidsdesigncompany.com/api";
+
+const getTimeRemainingInfo = (project: Project) => {
+  const { deadline, status, date_delivered, is_delivered } = project;
+
+  if (
+    status === "delivered" ||
+    status === "cancelled" ||
+    date_delivered ||
+    is_delivered
+  ) {
+    return { text: "-", color: "" };
+  }
+
+  if (!deadline) {
+    return { text: "N/A", color: "" };
+  }
+
+  const today = dayjs();
+  const deadlineDate = dayjs(deadline);
+  const days = deadlineDate.diff(today, "day");
+  const dayText = Math.abs(days) === 1 ? "day" : "days";
+  const color = days < 0 ? "text-red-500" : "";
+
+  return { text: `${days} ${dayText}`, color };
+};
 
 const fetchProjects = async (
   page = 1,
@@ -128,7 +156,7 @@ const fetchProjects = async (
     return acc;
   }, {} as Record<string, string>);
 
-  const response = await axios.get(`${BASE_URL}/project/`, {
+  const response = await axios.get(`${BASE_URL}/project/?ordering=-start_date`, {
     params: filteredParams,
     headers: {
       Authorization: `JWT ${token}`,
@@ -140,6 +168,7 @@ const fetchProjects = async (
 const ProjectsTable = () => {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const [totalPages, setTotalPages] = useState(1);
@@ -148,6 +177,8 @@ const ProjectsTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [showTasksModal, setShowTasksModal] = useState(false);
+  const [selectedTasksProject, setSelectedTasksProject] = useState<Project | null>(null);
 
   const { data, error, isLoading, refetch } =
     useQuery<PaginatedProjectsResponse>({
@@ -217,6 +248,8 @@ const ProjectsTable = () => {
   const [filterStatus, setFilterStatus] = useState('');
   const filterDropdownRef = useRef<HTMLDivElement>(null);
 
+  const [orderBy, setOrderBy] = useState<string>(searchParams.get('ordering') || '-start_date');
+
   useEffect(() => {
     if (!showFilterDropdown) return;
     function handleClickOutside(event: MouseEvent) {
@@ -231,6 +264,28 @@ const ProjectsTable = () => {
   }, [showFilterDropdown]);
 
   const userRole = typeof window !== 'undefined' ? localStorage.getItem('user_role') : null;
+
+  const handleViewRecords = (projectId: number) => {
+    const basePath =
+      userRole === "ceo"
+        ? "/ceo"
+        : userRole === "factory_manager"
+        ? "/factory-manager"
+        : userRole === "project_manager"
+        ? "/project-manager"
+        : userRole === "storekeeper"
+        ? "/store-keeper"
+        : userRole === "admin"
+        ? "/admin"
+        : "/ceo";
+
+    navigate(`${basePath}/projects/${projectId}/records`);
+  };
+
+  const handleViewTasks = (project: Project) => {
+    setSelectedTasksProject(project);
+    setShowTasksModal(true);
+  };
 
   if (isLoading)
     return (
@@ -263,9 +318,10 @@ const ProjectsTable = () => {
         <div className="flex items-center gap-x-2">
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 whitespace-nowrap"
+            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={isLoading}
           >
-            Add Project
+            {isLoading ? 'Loading...' : 'Add Project'}
           </button>
           {/* Filter by Status Dropdown */}
           <div className="relative ml-2">
@@ -290,7 +346,16 @@ const ProjectsTable = () => {
               </svg>
             </button>
             {showFilterDropdown && (
-              <div className="absolute right-0 mt-2 w-64 bg-white border rounded-lg shadow-xl z-10">
+              <div
+                ref={filterDropdownRef}
+                className="absolute right-0 mt-2 w-64 bg-white border rounded-lg shadow-xl z-10"
+                tabIndex={-1}
+                onBlur={e => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                    setShowFilterDropdown(false);
+                  }
+                }}
+              >
                 <div className="p-4">
                   {/* Boolean checkboxes with tri-state for archived and is_delivered */}
                   <div className="flex flex-col gap-2 mt-2">
@@ -357,6 +422,26 @@ const ProjectsTable = () => {
                         />
                         <span>No</span>
                       </label>
+                    </div>
+                    {/* Order By Dropdown */}
+                    <div className="flex items-center gap-2 mt-2">
+                      <span>Order by:</span>
+                      <select
+                        className="border rounded px-2 py-1"
+                        value={orderBy}
+                        onChange={e => {
+                          setOrderBy(e.target.value);
+                          const params = new URLSearchParams(searchParams);
+                          params.set('ordering', e.target.value);
+                          params.set('page', '1');
+                          setSearchParams(params);
+                        }}
+                      >
+                        <option value="-start_date">Newest</option>
+                        <option value="start_date">Oldest</option>
+                        <option value="-deadline">Latest Deadline</option>
+                        <option value="deadline">Earliest Deadline</option>
+                      </select>
                     </div>
                     {/* Past Deadline */}
                     <label className="flex items-center cursor-pointer mb-2">
@@ -446,9 +531,10 @@ const ProjectsTable = () => {
                 params.set('page', '1');
                 setSearchParams(params);
               }}
-              className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
+              className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={isLoading}
             >
-              Search
+              {isLoading ? 'Searching...' : 'Search'}
             </button>
             <button
               onClick={() => {
@@ -457,9 +543,10 @@ const ProjectsTable = () => {
                 params.set('page', '1');
                 setSearchParams(params);
               }}
-              className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+              className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={isLoading}
             >
-              Clear
+              {isLoading ? 'Clearing...' : 'Clear'}
             </button>
           </div>
         </div>
@@ -467,115 +554,152 @@ const ProjectsTable = () => {
 
       <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
         <div className="overflow-x-auto pb-6">
+          {projects.length > 0 ? (
           <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-            <thead className="bg-blue-400 text-white">
+              <thead className="bg-gray-50 hidden md:table-header-group">
               <tr>
-                <th className="py-4 px-4 text-left text-sm font-semibold">Name</th>
-                <th className="py-4 px-4 text-center text-sm font-semibold">Progress</th>
-                <th className="py-4 px-4 text-center text-sm font-semibold">Status</th>
-                <th className="py-4 px-4 text-center text-sm font-semibold">Total Product Selling Price</th>
-                <th className="py-4 px-4 text-center text-sm font-semibold">Start Date</th>
-                <th className="py-4 px-4 text-center text-sm font-semibold">End Date</th>
-                <th className="py-4 px-4 text-center text-sm font-semibold">Details</th>
-                <th className="py-4 px-4 text-center text-sm font-semibold">Records</th>
-              </tr>
-            </thead>
-            <tbody>
-              {projects.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-8 text-center text-gray-500 text-lg">
-                    No projects found.
-                  </td>
+                  <th className="py-4 px-4 text-left text-sm font-semibold">Project Name</th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold">Customer</th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold">Status</th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold">Progress</th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold">Start Date</th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold">Deadline</th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold">Date Delivered</th>
+                  <th className="py-4 px-1 w-16 text-left text-sm font-semibold">Timeframe</th>
+                  <th className="py-4 px-1 w-20 text-left text-sm font-semibold">Time Remaining</th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold">Tasks</th>
+                  <th className="py-4 px-4 text-left text-sm font-semibold">Details</th>
                 </tr>
-              ) : (
-                projects.map((project: Project) => (
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {projects.map((project) => {
+                  const timeRemainingInfo = getTimeRemainingInfo(project);
+                  return (
                   <tr
                     key={project.id}
-                    className="hover:bg-gray-100"
+                      className="cursor-pointer hover:bg-gray-50 md:table-row flex flex-col md:flex-row"
                   >
-                    <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                      <p className="text-md font-bold">{project.name}</p>
+                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                        <span className="font-semibold md:hidden">
+                          Project Name:{" "}
+                        </span>
+                        {project.name}
+                      </td>
+                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                        <span className="font-semibold md:hidden">
+                          Customer:{" "}
+                        </span>
+                        <span
+                          title={project.customer_detail.name}
+                          style={{ display: 'inline-block', maxWidth: '120px', verticalAlign: 'bottom', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                        >
+                          {project.customer_detail.name.length > 13
+                            ? project.customer_detail.name.slice(0, 13) + '...'
+                            : project.customer_detail.name}
+                        </span>
+                      </td>
+                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                        <span className="font-semibold md:hidden">
+                          Status:{" "}
+                        </span>
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            project.status === "in progress"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : project.status === "completed"
+                              ? "bg-green-100 text-green-800"
+                              : project.status === "delivered"
+                              ? "bg-green-400 text-green-800"
+                              : project.status === "cancelled"
+                              ? "bg-red-100 text-red-800"
+                              : ""
+                          }`}
+                        >
+                          {project.status}
+                        </span>
                     </td>
                     <td className="py-5 px-4 border-b border-gray-200 text-sm text-center text-gray-700">
                       <div className="w-full bg-gray-200 rounded-full h-1">
                         <div
-                          className="bg-lime-400 h-1 rounded-full"
-                          style={{ width: `${project.products.progress || 0}%` }}
+                            className="bg-lime-600 h-1 rounded-full"
+                            style={{
+                              width: `${project.products.progress || 0}%`,
+                            }}
                         ></div>
                       </div>
                       <p className="text-sm mt-1">
                         {project.products.progress || 0}%
                       </p>
                     </td>
-                    <td className="py-5 px-4 border-b border-gray-200 text-sm text-center text-gray-700">
-                      <div className="flex items-center justify-center space-x-2">
-                        {project.status === "completed" ||
-                        project.status === "in progress" ||
-                        project.status === "delivered" ? (
-                          <div className="w-3 h-1 bg-gray-300 border rounded-full flex items-center justify-start overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${
-                                project.status === "completed"
-                                  ? "bg-blue-700"
-                                  : project.status === "in progress"
-                                  ? "bg-neutral-700"
-                                  : project.status === "delivered"
-                                  ? "bg-lime-700"
-                                  : ""
-                              }`}
-                              style={{
-                                width:
-                                  project.status === "completed" ||
-                                  project.status === "delivered"
-                                    ? "100%"
-                                    : "50%",
-                              }}
-                            ></div>
-                          </div>
-                        ) : (
-                          <span className="w-3 h-1 bg-red-400 border rounded-full"></span>
-                        )}
-                        <p
-                          className={`text-sm ${
-                            project.status === "completed"
-                              ? "text-blue-700"
-                              : project.status === "in progress"
-                              ? "text-neutral-700"
-                              : project.status === "delivered"
-                              ? "text-lime-400"
-                              : "text-red-400"
-                          }`}
+                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                        <span className="font-semibold md:hidden">
+                          Start Date:{" "}
+                        </span>
+                        {project.start_date}
+                      </td>
+                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                        <span className="font-semibold md:hidden">
+                          Deadline:{" "}
+                        </span>
+                        {project.deadline || "Not set"}
+                      </td>
+                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                        <span className="font-semibold md:hidden">
+                          Date Delivered:{" "}
+                        </span>
+                        {project.date_delivered
+                          ? new Date(project.date_delivered).toLocaleDateString()
+                          : "N/A"}
+                    </td>
+                      <td className="py-5 px-1 w-16 border-b border-gray-200 text-sm text-left text-gray-700">
+                        <span className="font-semibold md:hidden">
+                          Timeframe: {' '}
+                        </span>
+                        {project.timeframe
+                          ? `${project.timeframe} ${
+                              project.timeframe === 1 ? "day" : "days"
+                            }`
+                          : "N/A"}
+                    </td>
+                      <td
+                        className={`py-5 px-1 w-20 border-b border-gray-200 text-sm text-left ${timeRemainingInfo.color}`}
+                      >
+                        <span className="font-semibold md:hidden">
+                          Time Remaining: {' '}
+                        </span>
+                        {timeRemainingInfo.text}
+                      </td>
+                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-center">
+                        <button
+                          onClick={e => { e.stopPropagation(); handleViewTasks(project); }}
+                          className="px-2 py-1 text-blue-400 border border-blue-300 rounded hover:bg-blue-50"
                         >
-                          {project.status}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="py-5 px-4 border-b border-gray-200 text-sm text-center text-gray-700">
-                      ₦ {project.calculations.total_product_selling_price}
-                    </td>
-                    <td className="py-5 px-4 border-b border-gray-200 text-sm text-center text-gray-700">{project.start_date}</td>
-                    <td className="py-5 px-4 border-b border-gray-200 text-sm text-center text-gray-700">{project.deadline || "Not set"}</td>
-                    <td className="py-5 px-4 border-b border-gray-200 text-sm text-center text-gray-700">
+                          Tasks
+                        </button>
+                      </td>
+                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
                       <button
-                        onClick={() => handleRowClick(project)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRowClick(project);
+                          }}
                         className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
                       >
                         Details
                       </button>
                     </td>
-                    <td className="py-5 px-4 border-b border-gray-200 text-sm text-center text-gray-700">
-                      <a
-                        href={`/ceo/projects/${project.id}/records`}
-                        className="px-3 py-1 text-purple-600 border-2 border-purple-400 rounded hover:bg-purple-50"
-                      >
-                        Records
-                      </a>
-                    </td>
                   </tr>
-                ))
-              )}
+                  );
+                })}
             </tbody>
           </table>
+          ) : (
+            <div className="flex justify-center items-center h-full">
+              <div className="text-center">
+                <p className="text-gray-500 text-lg">No projects found.</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -589,12 +713,6 @@ const ProjectsTable = () => {
         />
       </div>
 
-      <AddProjectModal
-        open={isAddModalOpen}
-        onOpenChange={setIsAddModalOpen}
-        onSuccess={handleProjectAdded}
-      />
-
       <ProjectModals
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
@@ -603,7 +721,38 @@ const ProjectsTable = () => {
         isDeleteDialogOpen={isDeleteDialogOpen}
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
         confirmDelete={confirmDelete}
+        handleViewTasks={handleViewTasks}
       />
+
+      <AddProjectModal
+        open={isAddModalOpen}
+        onOpenChange={setIsAddModalOpen}
+        onSuccess={handleProjectAdded}
+      />
+
+      {showTasksModal && selectedTasksProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
+          <div className="bg-white rounded-lg p-6 max-w-3xl min-h-[600px] w-full relative shadow-xl">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={() => {
+                setShowTasksModal(false);
+                refetch();
+              }}
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold mb-4">Tasks for {selectedTasksProject.name}</h2>
+            <ProjectTaskManager
+              project={selectedTasksProject}
+              onUpdate={(updatedTasks) => {
+                setSelectedTasksProject((prev: any) => ({ ...prev, tasks: updatedTasks }));
+                // Optionally, update the main table if needed
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

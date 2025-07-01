@@ -228,6 +228,7 @@ const SalaryWorkers = () => {
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
         confirmDelete={confirmDelete}
         workerType="salary-worker"
+        isDeleting={deleteWorkerMutation.isPending}
       />
     </div>
   );

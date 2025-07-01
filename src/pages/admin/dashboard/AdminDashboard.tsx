@@ -36,8 +36,6 @@ const fetchFinancialData = async () => {
 // Helper to determine if a key is monetary
 const isMonetary = (key: string) => {
   const excluded = [
-    'active_assets',
-    'deprecated_assets',
     'sales_count',
   ];
   if (excluded.includes(key.toLowerCase())) return false;
@@ -65,7 +63,9 @@ const AdminDashboard = () => {
       }))
     : [];
   const workersCards = data?.workers
-    ? Object.entries(data.workers).map(([key, value]) => ({
+    ? Object.entries(data.workers)
+        .filter(([key]) => !['contractors_count', 'salary_workers_count', 'all_contractors_count'].includes(key))
+        .map(([key, value]) => ({
         key: `workers-${key}`,
         title: key.replace(/_/g, " "),
         value: Number(value) || 0,
@@ -73,7 +73,9 @@ const AdminDashboard = () => {
       }))
     : [];
   const paidCards = data?.paid
-    ? Object.entries(data.paid).map(([key, value]) => ({
+    ? Object.entries(data.paid)
+        .filter(([key]) => !['weekly_total_paid'].includes(key))
+        .map(([key, value]) => ({
         key: `paid-${key}`,
         title: key.replace(/_/g, " "),
         value: Number(value) || 0,
@@ -85,48 +87,32 @@ const AdminDashboard = () => {
     ...financialHealthCards,
     ...workersCards,
     ...paidCards,
-  ];
+  ].sort((a, b) => {
+    // Priority items that should appear first
+    const priorityItems = [
+      'yearly total paid',
+      'active salary workers count',
+      'all active contractors count',
+      'salary',
+      'active',
+      'contractors'
+    ];
+    
+    const aTitle = a.title.toLowerCase();
+    const bTitle = b.title.toLowerCase();
+    
+    const aIsPriority = priorityItems.some(item => aTitle.includes(item));
+    const bIsPriority = priorityItems.some(item => bTitle.includes(item));
+    
+    // Special case: yearly total paid should come before total expenses
+    if (aTitle.includes('yearly total paid') && bTitle.includes('total expenses')) return -1;
+    if (bTitle.includes('yearly total paid') && aTitle.includes('total expenses')) return 1;
+    
+    if (aIsPriority && !bIsPriority) return -1;
+    if (!aIsPriority && bIsPriority) return 1;
+    return 0;
+  });
   const visibleCards = showAllCards ? allCards : allCards.slice(0, defaultVisibleCount);
-
-  // Split into two categories
-  const category1Cards = financialHealthCards;
-  const category2Cards = [...workersCards, ...paidCards];
-
-  // Helper to render a group with heading, with optional slice
-  const renderCardGroup = (heading: string, cards: any[], start: number, end: number) => {
-    const groupCards = cards.slice(start, end);
-    return groupCards.length ? (
-      <div className="mb-4">
-        <h4 className="text-xs font-semibold text-gray-500 mb-1 pl-1 uppercase tracking-wide">{heading}</h4>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 p-2">
-          {groupCards.map(card => (
-            <AdminDashboardCard key={card.key} title={card.title} value={card.value} currency={card.currency} />
-          ))}
-        </div>
-      </div>
-    ) : null;
-  };
-
-  // Helper to get visible cards per group for the first N cards
-  function getVisibleGroupSlices(groups: any[][], max: number) {
-    let remaining = max;
-    const slices = [];
-    for (const group of groups) {
-      if (remaining <= 0) {
-        slices.push([0, 0]);
-        continue;
-      }
-      const take = Math.min(group.length, remaining);
-      slices.push([0, take]);
-      remaining -= take;
-    }
-    return slices;
-  }
-
-  // Swap the order so Workers & Paid Data comes first
-  const groups = [category2Cards, category1Cards];
-  const groupNames = ['Workers & Paid Data', 'Financial Health'];
-  const groupSlices = showAllCards ? groups.map(g => [0, g.length]) : getVisibleGroupSlices(groups, defaultVisibleCount);
 
   if (isLoading) return <SkeletonLoader />;
   if (error) return <p>Error loading data</p>;
@@ -153,7 +139,11 @@ const AdminDashboard = () => {
 
       {/* Card grid for all data */}
       <div className="mb-6">
-        {groups.map((group, i) => renderCardGroup(groupNames[i], group, groupSlices[i][0], groupSlices[i][1]))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 p-2">
+          {visibleCards.map(card => (
+            <AdminDashboardCard key={card.key} title={card.title} value={card.value} currency={card.currency} />
+          ))}
+        </div>
         {allCards.length > defaultVisibleCount && (
           <div className="flex justify-center mb-4">
             <button

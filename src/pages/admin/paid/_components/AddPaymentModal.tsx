@@ -76,8 +76,43 @@ const AddPaymentModal = ({
           ),
         ]);
 
-        setContractors(contractorRes.data.results.contractor);
-        setSalaryWorkers(salaryRes.data.results.workers);
+        // Debug the response structure
+        console.log("Full Contractor response:", contractorRes.data);
+        console.log("Full Salary worker response:", salaryRes.data);
+        console.log("Contractor results:", contractorRes.data.results);
+        console.log("Salary worker results:", salaryRes.data.results);
+
+        // Handle different possible data structures
+        let contractorData = [];
+        let salaryWorkerData = [];
+
+        // Try to extract contractor data
+        if (contractorRes.data.results?.contractor) {
+          contractorData = contractorRes.data.results.contractor;
+        } else if (contractorRes.data.contractor) {
+          contractorData = contractorRes.data.contractor;
+        } else if (contractorRes.data.results) {
+          contractorData = Array.isArray(contractorRes.data.results) ? contractorRes.data.results : [];
+        } else if (Array.isArray(contractorRes.data)) {
+          contractorData = contractorRes.data;
+        }
+
+        // Try to extract salary worker data
+        if (salaryRes.data.results?.workers) {
+          salaryWorkerData = salaryRes.data.results.workers;
+        } else if (salaryRes.data.workers) {
+          salaryWorkerData = salaryRes.data.workers;
+        } else if (salaryRes.data.results) {
+          salaryWorkerData = Array.isArray(salaryRes.data.results) ? salaryRes.data.results : [];
+        } else if (Array.isArray(salaryRes.data)) {
+          salaryWorkerData = salaryRes.data;
+        }
+
+        console.log("Processed contractor data:", contractorData);
+        console.log("Processed salary worker data:", salaryWorkerData);
+
+        setContractors(contractorData);
+        setSalaryWorkers(salaryWorkerData);
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("Failed to fetch contractors and salary workers");
@@ -201,16 +236,40 @@ const AddPaymentModal = ({
               >
                 <option value="">-- Select --</option>
                 {formData.recipientType === "contractor"
-                  ? contractors.map((contractor: any) => (
-                      <option key={contractor.id} value={contractor.id}>
-                        {contractor.first_name} {contractor.last_name}
-                      </option>
-                    ))
-                  : salaryWorkers.map((worker: any) => (
-                      <option key={worker.id} value={worker.id}>
-                        {worker.first_name} {worker.last_name}
-                      </option>
-                    ))}
+                  ? contractors.map((contractor: any, index: number) => {
+                      // Debug each contractor object
+                      console.log(`Contractor ${index}:`, contractor);
+                      
+                      // Handle different possible name field structures
+                      const firstName = contractor.first_name || contractor.firstName || contractor.name || contractor.full_name || "";
+                      const lastName = contractor.last_name || contractor.lastName || contractor.surname || "";
+                      const fullName = `${firstName} ${lastName}`.trim() || contractor.name || contractor.full_name || `Contractor ${contractor.id || index}`;
+                      
+                      console.log(`Contractor ${index} name:`, { firstName, lastName, fullName });
+                      
+                      return (
+                        <option key={contractor.id || index} value={contractor.id}>
+                          {fullName}
+                        </option>
+                      );
+                    })
+                  : salaryWorkers.map((worker: any, index: number) => {
+                      // Debug each worker object
+                      console.log(`Worker ${index}:`, worker);
+                      
+                      // Handle different possible name field structures
+                      const firstName = worker.first_name || worker.firstName || worker.name || worker.full_name || "";
+                      const lastName = worker.last_name || worker.lastName || worker.surname || "";
+                      const fullName = `${firstName} ${lastName}`.trim() || worker.name || worker.full_name || `Worker ${worker.id || index}`;
+                      
+                      console.log(`Worker ${index} name:`, { firstName, lastName, fullName });
+                      
+                      return (
+                        <option key={worker.id || index} value={worker.id}>
+                          {fullName}
+                        </option>
+                      );
+                    })}
               </select>
             </div>
           </div>

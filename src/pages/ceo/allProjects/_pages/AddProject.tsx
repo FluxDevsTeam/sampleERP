@@ -117,14 +117,26 @@ const AddProject = () => {
     start_date: new Date().toISOString().split("T")[0],
     deadline: "",
     date_delivered: "",
-    is_delivered: false,
-    archived: false,
     customer_detail: "placeholder",
     selling_price: "",
     logistics: "0",
     service_charge: "0",
     note: "",
   });
+
+  const [allItems, setAllItems] = useState([{ item: '', price: '', quantity: '1' }]);
+
+  const handleAllItemChange = (idx: number, field: 'item' | 'price' | 'quantity', value: string) => {
+    setAllItems((prev) => prev.map((row, i) => i === idx ? { ...row, [field]: value } : row));
+  };
+
+  const handleAddAllItem = () => {
+    setAllItems((prev) => [...prev, { item: '', price: '', quantity: '1' }]);
+  };
+
+  const handleRemoveAllItem = (idx: number) => {
+    setAllItems((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   // Handle image file change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -173,13 +185,6 @@ const AddProject = () => {
     }));
   };
 
-  const handleCheckboxChange = (name: string, checked: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-  };
-
   const handleCustomerChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -209,9 +214,7 @@ const AddProject = () => {
       status: formData.status,
       start_date: formData.start_date,
       deadline: formData.deadline || null,
-      date_delivered: formData.is_delivered ? formData.date_delivered : null,
-      is_delivered: formData.is_delivered,
-      archived: formData.archived,
+      date_delivered: null,
       customer: parseInt(formData.customer_detail),
       selling_price: formData.selling_price,
       logistics: formData.logistics || "0",
@@ -225,6 +228,11 @@ const AddProject = () => {
         formDataToSubmit.append(key, value.toString());
       }
     });
+
+    // Append all_items as JSON string if not empty
+    if (allItems.length > 0 && allItems.some(row => row.item && row.price)) {
+      formDataToSubmit.append('all_items', JSON.stringify(allItems.filter(row => row.item && row.price).map(row => ({ ...row, quantity: row.quantity || '1' }))));
+    }
 
     // Append invoice image if present
     if (invoiceImage) {
@@ -442,7 +450,6 @@ const AddProject = () => {
                   type="date"
                   value={formData.date_delivered}
                   onChange={handleChange}
-                  disabled={!formData.is_delivered}
                 />
               </div>
             </div>
@@ -502,27 +509,37 @@ const AddProject = () => {
               </p>
             </div>
 
-            <div className="flex flex-col space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="is_delivered"
-                  checked={formData.is_delivered}
-                  onCheckedChange={(checked) =>
-                    handleCheckboxChange("is_delivered", checked as boolean)
-                  }
-                />
-                <Label htmlFor="is_delivered">Project is delivered</Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="archived"
-                  checked={formData.archived}
-                  onCheckedChange={(checked) =>
-                    handleCheckboxChange("archived", checked as boolean)
-                  }
-                />
-                <Label htmlFor="archived">Archive this project</Label>
+            {/* All Items Section */}
+            <div className="space-y-2">
+              <Label>All Items</Label>
+              <div className="space-y-2">
+                {allItems.map((row, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <Input
+                      placeholder="Item"
+                      value={row.item}
+                      onChange={e => handleAllItemChange(idx, 'item', e.target.value)}
+                      className="w-1/3"
+                    />
+                    <Input
+                      placeholder="Price"
+                      type="number"
+                      value={row.price}
+                      onChange={e => handleAllItemChange(idx, 'price', e.target.value)}
+                      className="w-1/3"
+                    />
+                    <Input
+                      placeholder="Quantity"
+                      type="number"
+                      min="1"
+                      value={row.quantity}
+                      onChange={e => handleAllItemChange(idx, 'quantity', e.target.value)}
+                      className="w-1/4"
+                    />
+                    <Button type="button" variant="destructive" size="sm" onClick={() => handleRemoveAllItem(idx)} disabled={allItems.length === 1}>Remove</Button>
+                  </div>
+                ))}
+                <Button type="button" variant="outline" size="sm" onClick={handleAddAllItem}>Add Item</Button>
               </div>
             </div>
           </CardContent>

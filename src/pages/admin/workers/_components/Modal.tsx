@@ -43,6 +43,7 @@ interface ModalsProps {
   setIsDeleteDialogOpen: (open: boolean) => void;
   confirmDelete: () => void;
   workerType: "salary-worker" | "contractor";
+  isDeleting?: boolean;
 }
 
 const Modals: React.FC<ModalsProps> = ({
@@ -54,6 +55,7 @@ const Modals: React.FC<ModalsProps> = ({
   setIsDeleteDialogOpen,
   confirmDelete,
   workerType,
+  isDeleting,
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -117,7 +119,7 @@ const Modals: React.FC<ModalsProps> = ({
               <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
                 Edit
               </Button>
-              <Button variant="destructive" onClick={handleDelete}>
+              <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
                 Delete
               </Button>
               <Button variant="outline" onClick={handleViewRecords}>

@@ -95,6 +95,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   const [errorDetails, setErrorDetails] = useState<ApiErrorResponse>({});
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
+  const [allItems, setAllItems] = useState<{ item: string; price: string; quantity: string }[]>([]);
 
   const {
     data: project,
@@ -177,6 +178,10 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
 
       if (project.invoice_image) {
         setCurrentInvoiceImage(project.invoice_image);
+      }
+
+      if (project && Array.isArray((project as any).all_items)) {
+        setAllItems((project as any).all_items.map((row: any) => ({ item: row.item || '', price: row.price || '', quantity: row.quantity ? String(row.quantity) : '1' })));
       }
     }
   }, [project]);
@@ -276,6 +281,18 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
     setFormData((prev) => ({ ...prev, customer_detail: value }));
   };
 
+  const handleAllItemChange = (idx: number, field: 'item' | 'price' | 'quantity', value: string) => {
+    setAllItems((prev) => prev.map((row, i) => i === idx ? { ...row, [field]: value } : row));
+  };
+
+  const handleAddAllItem = () => {
+    setAllItems((prev) => [...prev, { item: '', price: '', quantity: '1' }]);
+  };
+
+  const handleRemoveAllItem = (idx: number) => {
+    setAllItems((prev) => prev.filter((_, i) => i !== idx));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -309,6 +326,10 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
     });
 
     if (invoiceImage) formDataToSubmit.append("invoice_image", invoiceImage);
+
+    if (allItems.length > 0 && allItems.some(row => row.item && row.price)) {
+      formDataToSubmit.append('all_items', JSON.stringify(allItems.filter(row => row.item && row.price).map(row => ({ ...row, quantity: row.quantity || '1' }))));
+    }
 
     updateProjectMutation.mutate(formDataToSubmit);
   };
@@ -571,6 +592,39 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                       />
                       <Label htmlFor="archived">Archive this project</Label>
                     </div>
+                  </div>
+                </div>
+                {/* All Items Section */}
+                <div className="space-y-2">
+                  <Label>All Items</Label>
+                  <div className="space-y-2">
+                    {allItems.map((row, idx) => (
+                      <div key={idx} className="flex gap-2 items-center">
+                        <Input
+                          placeholder="Item"
+                          value={row.item}
+                          onChange={e => handleAllItemChange(idx, 'item', e.target.value)}
+                          className="w-1/3"
+                        />
+                        <Input
+                          placeholder="Price"
+                          type="number"
+                          value={row.price}
+                          onChange={e => handleAllItemChange(idx, 'price', e.target.value)}
+                          className="w-1/3"
+                        />
+                        <Input
+                          placeholder="Quantity"
+                          type="number"
+                          min="1"
+                          value={row.quantity}
+                          onChange={e => handleAllItemChange(idx, 'quantity', e.target.value)}
+                          className="w-1/4"
+                        />
+                        <Button type="button" variant="destructive" size="sm" onClick={() => handleRemoveAllItem(idx)} disabled={allItems.length === 1}>Remove</Button>
+                      </div>
+                    ))}
+                    <Button type="button" variant="outline" size="sm" onClick={handleAddAllItem}>Add Item</Button>
                   </div>
                 </div>
               </div>

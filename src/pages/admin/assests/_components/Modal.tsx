@@ -21,6 +21,7 @@ interface ModalsProps {
   handleDelete: () => void
   confirmDelete: () => void
   isCEO: boolean
+  isDeleting?: boolean
 }
 
 const Modals = ({ 
@@ -31,7 +32,8 @@ const Modals = ({
   setIsDeleteDialogOpen, 
   handleDelete, 
   confirmDelete, 
-  isCEO 
+  isCEO, 
+  isDeleting 
 }: ModalsProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
@@ -93,7 +95,7 @@ const Modals = ({
                 </Button>
               )}
               {isCEO && (
-                <Button variant="destructive" onClick={handleDelete}>
+                <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
                   Delete
                 </Button>
               )}

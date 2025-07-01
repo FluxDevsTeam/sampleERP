@@ -18,11 +18,8 @@ const AddWorkerPage: React.FC = () => {
   const from = location.state?.from;
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [selectedWorker, setSelectedWorker] = useState("");
-  const [date, setDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
-  });
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     title: "",
@@ -59,6 +56,7 @@ const AddWorkerPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const response = await fetch(
         `https://backend.kidsdesigncompany.com/api/product/${id}/salary/`,
@@ -70,7 +68,6 @@ const AddWorkerPage: React.FC = () => {
           },
           body: JSON.stringify({
             salary_worker: selectedWorker,
-            date: date,
           }),
         }
       );
@@ -93,6 +90,8 @@ const AddWorkerPage: React.FC = () => {
         message: "Failed to add worker",
         type: "error",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -212,25 +211,15 @@ const AddWorkerPage: React.FC = () => {
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Date
-            </label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            />
-          </div>
-
           <div className="flex justify-end">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500"
+              disabled={isSubmitting}
+              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Add worker
+              {isSubmitting ? "Adding..." : "Add worker"}
             </button>
           </div>
         </form>

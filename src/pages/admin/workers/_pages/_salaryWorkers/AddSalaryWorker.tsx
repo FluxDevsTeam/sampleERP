@@ -59,6 +59,7 @@ const AddSalaryWorker = () => {
     e.preventDefault();
     setIsPending(true);
     try {
+      const accessToken = localStorage.getItem("accessToken");
       const data = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         if (value !== undefined && value !== null) data.append(key, value as string);
@@ -66,7 +67,10 @@ const AddSalaryWorker = () => {
       if (image) data.append("image", image);
       if (agreementFormImage) data.append("agreement_form_image", agreementFormImage);
       await axios.post("https://backend.kidsdesigncompany.com/api/salary-workers/", data, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          "Content-Type": "multipart/form-data",
+          Authorization: `JWT ${accessToken}`,
+        },
       });
       queryClient.invalidateQueries({ queryKey: ["salary-workers"], refetchType: "active" });
       toast.success("Salary worker added successfully!");
@@ -109,7 +113,7 @@ const AddSalaryWorker = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email (optional)</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 name="email"

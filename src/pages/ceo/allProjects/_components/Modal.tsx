@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,8 +19,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
-import EditProjectModal from "./EditProjectModal"; 
+import EditProjectModal from "./EditProjectModal";
+import relativeTime from 'dayjs/plugin/relativeTime';
+import dayjs from 'dayjs';
+import axios from 'axios';
+import AllItemsManager from './AllItemsManager';
 
+dayjs.extend(relativeTime);
 
 interface Product {
   id: number;
@@ -63,6 +68,12 @@ interface Calculations {
   final_profit: number;
 }
 
+interface Task {
+  title: string;
+  checked: boolean;
+  subtasks?: { title: string; checked: boolean }[];
+}
+
 interface Project {
   id: number;
   name: string;
@@ -99,15 +110,20 @@ interface Project {
   other_productions: {
     total_cost: number;
     total_budget: number;
-    other_productions: Array<{ id: number; name: string; cost: string | null }>;
+    other_productions: Array<{
+      id: number;
+      name: string;
+      cost: string | null;
+      budget: string | null;
+    }>;
   };
   selling_price: string;
   logistics: string;
   service_charge: string;
   note: string | null;
   calculations: Calculations;
+  tasks?: Task[];
 }
-
 
 interface ProjectModalsProps {
   isModalOpen: boolean;
@@ -117,6 +133,7 @@ interface ProjectModalsProps {
   isDeleteDialogOpen: boolean;
   setIsDeleteDialogOpen: (open: boolean) => void;
   confirmDelete: () => void;
+  handleViewTasks: (project: Project) => void;
 }
 
 const ProjectModals: React.FC<ProjectModalsProps> = ({
@@ -127,15 +144,45 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   isDeleteDialogOpen,
   setIsDeleteDialogOpen,
   confirmDelete,
+  handleViewTasks,
 }) => {
   const navigate = useNavigate();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
-  const userRole = typeof window !== 'undefined' ? localStorage.getItem('user_role') : null;
+  const userRole =
+    typeof window !== "undefined" ? localStorage.getItem("user_role") : null;
+  const [isEditStatusModalOpen, setIsEditStatusModalOpen] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [newStatus, setNewStatus] = useState(selectedProject?.status || "");
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [showAllItemsManager, setShowAllItemsManager] = useState(false);
+  const [localTasks, setLocalTasks] = useState<Task[]>(selectedProject?.tasks || []);
+
+  useEffect(() => {
+    setLocalTasks(selectedProject?.tasks || []);
+  }, [selectedProject, isModalOpen]);
+
+  if (!selectedProject) {
+    return null;
+  }
 
   const handleViewOtherProductionRecords = () => {
     if (selectedProject?.id) {
-      navigate(`/ceo/projects/${selectedProject.id}/records`);
+      const basePath =
+        userRole === "ceo"
+          ? "/ceo"
+          : userRole === "factory_manager"
+          ? "/factory-manager"
+          : userRole === "project_manager"
+          ? "/project-manager"
+          : userRole === "storekeeper"
+          ? "/store-keeper"
+          : userRole === "admin"
+          ? "/admin"
+          : "/ceo";
+
+      navigate(`${basePath}/projects/${selectedProject.id}/records`);
     }
   };
 
@@ -144,291 +191,624 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
     setIsModalOpen(false);
   };
 
+  const handleEditClick = () => {
+    setNewStatus(selectedProject.status);
+    setIsEditStatusModalOpen(true);
+  };
+
+  const handleStatusSave = async () => {
+    setStatusLoading(true);
+    try {
+      const token = localStorage.getItem('accessToken');
+      const payload: Record<string, any> = { status: newStatus };
+      if (newStatus === 'delivered') {
+        payload['is_delivered'] = true;
+        payload['date_delivered'] = dayjs().format('YYYY-MM-DD');
+      }
+      await axios.patch(
+        `https://backend.kidsdesigncompany.com/api/project/${selectedProject.id}/`,
+        payload,
+        { headers: { Authorization: `JWT ${token}` } }
+      );
+      setIsEditStatusModalOpen(false);
+      window.location.reload(); // Or refetch project data if you have a query
+    } catch (err) {
+      alert('Failed to update status');
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
+  // Calculate totals from frontend
+  const totalProductsSellingPrice =
+    selectedProject.products?.products?.reduce(
+      (acc, product) => acc + parseFloat(product.selling_price || '0'),
+      0
+    ) || 0;
+
+  const totalSoldItemsCost =
+    selectedProject.sold_items?.sold_items?.reduce(
+      (acc, item) => acc + parseFloat(item.cost_price || '0'),
+      0
+    ) || 0;
+  const totalSoldItemsSelling =
+    selectedProject.sold_items?.sold_items?.reduce(
+      (acc, item) => acc + parseFloat(item.selling_price || '0'),
+      0
+    ) || 0;
+
+  const totalSoldItemsTotalPrice =
+    selectedProject.sold_items?.sold_items?.reduce(
+      (acc, item) => acc + item.total_price,
+      0
+    ) || 0;
+
+  const totalExpensesAmount =
+    selectedProject.expenses?.expenses?.reduce(
+      (acc, expense) => acc + parseFloat(expense.amount || '0'),
+      0
+    ) || 0;
+
+  const totalOtherProductionsBudget =
+    selectedProject.other_productions?.other_productions?.reduce(
+      (acc, production) => acc + parseFloat(production.budget || '0'),
+      0
+    ) || 0;
+  const totalOtherProductionsCost =
+    selectedProject.other_productions?.other_productions?.reduce(
+      (acc, production) => acc + parseFloat(production.cost || '0'),
+      0
+    ) || 0;
+
+  const formatNumber = (num: number) => {
+    return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  // Calculate total for All Items
+  const allItemsTotal = Array.isArray(selectedProject.all_items)
+    ? selectedProject.all_items.reduce((acc, item) => acc + (parseFloat(item.price || '0') * (parseInt(item.quantity || '1', 10) || 1)), 0)
+    : 0;
+
+  // --- Time Remaining and Timeframe logic to match ProjectsTable.tsx ---
+  const getTimeRemainingInfo = (project: any) => {
+    const { deadline, status, date_delivered, is_delivered } = project;
+    if (
+      status === "delivered" ||
+      status === "cancelled" ||
+      date_delivered ||
+      is_delivered
+    ) {
+      return { text: "-", color: "" };
+    }
+    if (!deadline) {
+      return { text: "N/A", color: "" };
+    }
+    const today = dayjs();
+    const deadlineDate = dayjs(deadline);
+    const days = deadlineDate.diff(today, "day");
+    const dayText = Math.abs(days) === 1 ? "day" : "days";
+    const color = days < 0 ? "text-red-500" : "";
+    return { text: `${days} ${dayText}`, color };
+  };
+  const timeRemainingInfo = getTimeRemainingInfo(selectedProject);
+  let timeframeDisplay = "N/A";
+  if (
+    selectedProject.status === "delivered" ||
+    selectedProject.status === "cancelled" ||
+    selectedProject.date_delivered ||
+    selectedProject.is_delivered
+  ) {
+    timeframeDisplay = "-";
+  } else if (selectedProject.timeframe) {
+    timeframeDisplay = `${selectedProject.timeframe} ${selectedProject.timeframe === 1 ? "day" : "days"}`;
+  }
+
+  // Update handler to use localTasks and update UI immediately
+  const handleTaskCompletionToggle = async (taskIdx: number, subIdx?: number) => {
+    if (!selectedProject) return;
+    const updatedTasks = [...localTasks];
+    if (typeof subIdx === 'number') {
+      if (updatedTasks[taskIdx].subtasks && updatedTasks[taskIdx].subtasks![subIdx]) {
+        updatedTasks[taskIdx].subtasks![subIdx].checked = !updatedTasks[taskIdx].subtasks![subIdx].checked;
+        // After toggling, check if all subtasks are checked
+        const allChecked = updatedTasks[taskIdx].subtasks!.every(sub => sub.checked);
+        updatedTasks[taskIdx].checked = allChecked;
+      }
+    } else {
+      updatedTasks[taskIdx].checked = !updatedTasks[taskIdx].checked;
+      // If toggling the main task, also toggle all subtasks to match
+      if (updatedTasks[taskIdx].subtasks && Array.isArray(updatedTasks[taskIdx].subtasks)) {
+        updatedTasks[taskIdx].subtasks = updatedTasks[taskIdx].subtasks!.map(sub => ({
+          ...sub,
+          checked: updatedTasks[taskIdx].checked
+        }));
+      }
+    }
+    setLocalTasks(updatedTasks); // Update local state for immediate UI feedback
+    // Send PATCH to backend
+    try {
+      const token = localStorage.getItem('accessToken');
+      await axios.patch(
+        `https://backend.kidsdesigncompany.com/api/project/${selectedProject.id}/`,
+        { tasks: JSON.stringify(updatedTasks) },
+        { headers: { Authorization: `JWT ${token}` } }
+      );
+    } catch (err) {
+      alert('Failed to update task completion');
+    }
+  };
+
   return (
     <>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-7xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
+            <div className="flex justify-between items-start">
+              <div>
             <DialogTitle>Project Details</DialogTitle>
             <DialogDescription>
               View details for the selected project.
             </DialogDescription>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={handleViewOtherProductionRecords}
+                >
+                  Records
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleEditClick}
+                >
+                  Edit Status
+                </Button>
+                {/* Only CEO can see Full Edit and Delete buttons */}
+                {userRole === "ceo" && (
+                  <>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditModalOpen(true)}
+                    >
+                      Full Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      className=""
+                      onClick={handleDelete}
+                    >
+                      Delete
+                    </Button>
+                  </>
+                )}
+                <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+                  Close
+                </Button>
+              </div>
+            </div>
           </DialogHeader>
+
           {selectedProject && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-4">
-              {/* Left Column: Basic Info, Note, Invoice, Products, Sold Items */}
-              <div className="space-y-4">
-                {/* Basic Info */}
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Name:</span>
-                  <span className="col-span-2">{selectedProject.name}</span>
+            <div className="space-y-6">
+              {/* Project Info Section */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-black-400 mb-4">
+                  Project Info
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+                  {/* Project Name Card */}
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Project Name</span>
+                    <p className="text-sm text-black mt-1">{selectedProject.name}</p>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Customer:</span>
-                  <span className="col-span-2">{selectedProject.customer_detail.name}</span>
+                  {/* Project ID Card */}
+                  {/* <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Project ID</span>
+                    <p className="text-sm text-black mt-1">{selectedProject.id}</p>
+                  </div> */}
+                  {/* Customer Card */}
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Customer</span>
+                    <p className="text-sm text-black mt-1">{selectedProject.customer_detail?.name}</p>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Status:</span>
-                  <span className="col-span-2 capitalize">{selectedProject.status}</span>
+                  {/* Status Card */}
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Status</span>
+                    <p className="text-sm text-black mt-1">{selectedProject.status}</p>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Selling Price:</span>
-                  <span className="col-span-2">₦{selectedProject.selling_price}</span>
+                  {/* Start Date Card */}
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Start Date</span>
+                    <p className="text-sm text-black mt-1">{dayjs(selectedProject.start_date).format("MMM D, YYYY")}</p>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Production Cost:</span>
-                  <span className="col-span-2">₦{selectedProject.products.total_production_cost}</span>
+                  {/* Deadline Card */}
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Deadline</span>
+                    <p className="text-sm text-black mt-1">{selectedProject.deadline ? dayjs(selectedProject.deadline).format("MMM D, YYYY") : "-"}</p>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Logistics:</span>
-                  <span className="col-span-2">₦{selectedProject.logistics}</span>
+                  {/* Date Delivered Card */}
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Date Delivered</span>
+                    <p className="text-sm text-black mt-1">{selectedProject.date_delivered ? dayjs(selectedProject.date_delivered).format("MMM D, YYYY") : "-"}</p>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Service Charge:</span>
-                  <span className="col-span-2">₦{selectedProject.service_charge}</span>
+                  {/* Time Remaining Card */}
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Time Remaining</span>
+                    <p className={`text-sm mt-1 ${timeRemainingInfo.color}`}>{timeRemainingInfo.text}</p>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Start Date:</span>
-                  <span className="col-span-2">{selectedProject.start_date}</span>
+                  {/* Timeframe Card */}
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Timeframe</span>
+                    <p className="text-sm text-black mt-1">{timeframeDisplay}</p>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Deadline:</span>
-                  <span className="col-span-2">{selectedProject.deadline || "Not set"}</span>
+                  {/* Selling Price Card */}
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Selling Price</span>
+                    <p className="text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.selling_price || '0'))}</p>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Date Delivered:</span>
-                  <span className="col-span-2">{selectedProject.date_delivered || "Not set"}</span>
+                  {/* Logistics Card */}
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Logistics</span>
+                    <p className="text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.logistics || '0'))}</p>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Timeframe (days):</span>
-                  <span className="col-span-2">{selectedProject.timeframe ?? "-"}</span>
+                  {/* Service Charge Card */}
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Service Charge</span>
+                    <p className="text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.service_charge || '0'))}</p>
                 </div>
-                {/* Invoice Image */}
+                  {/* Archived Card */}
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Archived</span>
+                    <p className="text-sm text-black mt-1">{selectedProject.archived ? 'Yes' : 'No'}</p>
+                  </div>
+                  {/* Invoice Image Card */}
                 {selectedProject.invoice_image && (
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <span className="font-medium">Invoice Image:</span>
-                    <span className="col-span-2">
-                      <img
-                        src={selectedProject.invoice_image}
-                        alt="Invoice"
-                        className="max-h-32 rounded shadow cursor-pointer hover:opacity-80"
-                        onClick={() => setShowImageModal(true)}
-                      />
-                    </span>
+                    <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                      <span className="text-xs text-blue-600 font-medium">Invoice</span>
+                      <Button variant="link" className="p-0 h-auto text-sm text-blue-500 block mt-1" onClick={() => setShowImageModal(true)}>
+                        View Invoice
+                      </Button>
                   </div>
                 )}
-                {/* Note */}
+                  {/* Note Card */}
                 {selectedProject.note && (
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <span className="font-medium">Note:</span>
-                    <span className="col-span-2">{selectedProject.note}</span>
+                    <div className="md:col-span-7 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                      <span className="text-xs text-blue-600 font-medium">Note</span>
+                      <p className="text-sm text-black whitespace-pre-wrap mt-1">{selectedProject.note}</p>
                   </div>
                 )}
-                {/* Products */}
-                <div>
-                  <span className="font-semibold block mb-1 text-blue-900">Products:</span>
-                  {selectedProject.products?.products?.length ? (
-                    <table className="w-full text-sm border mb-2">
-                      <thead>
-                        <tr className="bg-blue-100">
-                          <th className="p-1 border text-blue-900">Name</th>
-                          <th className="p-1 border text-blue-900">Selling Price</th>
-                          <th className="p-1 border text-blue-900">Progress (%)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedProject.products.products.map((prod) => (
-                          <tr key={prod.id}>
-                            <td className="p-1 border text-black">{prod.name}</td>
-                            <td className="p-1 border text-black">₦{prod.selling_price}</td>
-                            <td className="p-1 border text-black">{prod.progress}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <span className="text-red-700">No products</span>
-                  )}
-                  <div className="text-xs text-blue-900 mt-1">
-                    Total Project Selling Price: ₦{selectedProject.products.total_project_selling_price} | Total Production Cost: ₦{selectedProject.products.total_production_cost} | Total Profit: ₦{selectedProject.products.total_profit}
-                  </div>
-                </div>
-                {/* Sold Items */}
-                <div>
-                  <span className="font-semibold block mb-1 text-green-900">Sold Items:</span>
-                  {selectedProject.sold_items?.sold_items?.length ? (
-                    <table className="w-full text-sm border mb-2">
-                      <thead>
-                        <tr className="bg-green-100">
-                          <th className="p-1 border text-green-900">Name</th>
-                          <th className="p-1 border text-green-900">Quantity</th>
-                          <th className="p-1 border text-green-900">Cost Price</th>
-                          <th className="p-1 border text-green-900">Selling Price</th>
-                          <th className="p-1 border text-green-900">Total Price</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedProject.sold_items.sold_items.map((item) => (
-                          <tr key={item.id}>
-                            <td className="p-1 border text-black">{item.name}</td>
-                            <td className="p-1 border text-black">{item.quantity}</td>
-                            <td className="p-1 border text-black">₦{item.cost_price}</td>
-                            <td className="p-1 border text-black">₦{item.selling_price}</td>
-                            <td className="p-1 border text-black">₦{item.total_price}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <span className="text-red-700">No sold items</span>
-                  )}
-                  <div className="text-xs text-black mt-1 font-semibold">
-                    Total Cost Price: ₦{selectedProject.sold_items.total_cost_price_sold_items} | Total Selling Price: ₦{selectedProject.sold_items.total_selling_price_sold_items}
-                  </div>
                 </div>
               </div>
-              {/* Right Column: Expenses, Other Productions, Calculations */}
-              <div className="space-y-6">
-                {/* Expenses */}
-                <div>
-                  <span className="font-semibold block mb-1 text-red-900">Expenses:</span>
-                  {selectedProject.expenses?.expenses?.length ? (
-                    <table className="w-full text-sm border mb-2">
-                      <thead>
-                        <tr className="bg-red-100">
-                          <th className="p-1 border text-red-900">Name</th>
-                          <th className="p-1 border text-red-900">Amount</th>
+
+              {/* Calculations Section */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-black-400 mb-4">
+                  Financials
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                  {Object.entries(selectedProject.calculations).map(
+                    ([key, value]) => (
+                      <div
+                        key={key}
+                        className="bg-white p-3 rounded-lg shadow-sm border border-gray-200"
+                      >
+                        <span className="text-xs text-blue-600 font-medium">
+                          {key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </span>
+                        <p className="text-sm text-black mt-1">
+                          ₦{typeof value === "number" ? formatNumber(value) : value}
+                        </p>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Tables Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* All Items Table */}
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="text-md font-semibold text-gray-700">
+                      All Items
+                    </h4>
+                    <button 
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        setTimeout(() => setShowAllItemsManager(true), 300);
+                      }}
+                      className="px-3 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500 transition-colors"
+                    >
+                      + Item
+                    </button>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead className="bg-blue-400 text-white">
+                        <tr>
+                          <th className="p-2 text-left">Item</th>
+                          <th className="p-2 text-left">Price</th>
+                          <th className="p-2 text-left">Quantity</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {selectedProject.expenses.expenses.map((exp, idx) => (
-                          <tr key={idx}>
-                            <td className="p-1 border text-black">{exp.name}</td>
-                            <td className="p-1 border text-black">₦{exp.amount}</td>
+                        {Array.isArray(selectedProject.all_items) && selectedProject.all_items.length > 0 ? (
+                          selectedProject.all_items.map((item: any, idx: number) => (
+                            <tr key={idx} className="border-b border-gray-200">
+                              <td className="p-2 text-left">{item.item}</td>
+                              <td className="p-2 text-left">₦{formatNumber(parseFloat(item.price || '0'))}</td>
+                              <td className="p-2 text-left">{item.quantity || 1}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td className="p-2 text-left" colSpan={3}>No items found</td>
                           </tr>
-                        ))}
+                        )}
                       </tbody>
+                      <tfoot className="bg-gray-100">
+                        <tr className="font-semibold">
+                          <td className="p-2 text-left">Total</td>
+                          <td className="p-2 text-left">₦{formatNumber(allItemsTotal)}</td>
+                          <td className="p-2 text-left"></td>
+                        </tr>
+                      </tfoot>
                     </table>
-                  ) : (
-                    <span className="text-red-700">No expenses</span>
-                  )}
-                  <div className="text-xs text-red-900 mt-1">
-                    Total Expenses: ₦{selectedProject.expenses.total_expenses}
                   </div>
                 </div>
-                {/* Other Productions */}
-                <div>
-                  <span className="font-semibold block mb-1 text-purple-900">Other Productions:</span>
-                  {selectedProject.other_productions?.other_productions?.length ? (
-                    <table className="w-full text-sm border mb-2">
-                      <thead>
-                        <tr className="bg-purple-100">
-                          <th className="p-1 border text-purple-900">Name</th>
-                          <th className="p-1 border text-purple-900">Cost</th>
+                {/* Tasks Table */}
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="text-md font-semibold text-gray-700">Tasks</h4>
+                    <button 
+                      onClick={() => {
+                        if (selectedProject) {
+                          setIsModalOpen(false);
+                          setTimeout(() => handleViewTasks(selectedProject), 300);
+                        }
+                      }}
+                      className="px-3 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500 transition-colors"
+                      disabled={!selectedProject}
+                    >
+                      + Task
+                    </button>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead className="bg-blue-400 text-white">
+                        <tr>
+                          <th className="p-2 text-left">Task</th>
+                          <th className="p-2 text-left">Completed</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {selectedProject.other_productions.other_productions.map((op) => (
-                          <tr key={op.id}>
-                            <td className="p-1 border text-black">{op.name}</td>
-                            <td className="p-1 border text-black">₦{op.cost ?? '-'} </td>
+                        {Array.isArray(localTasks) && localTasks.length > 0 ? (
+                          localTasks.map((task, idx) => (
+                            task ? (
+                              <React.Fragment key={idx}>
+                                <tr className="border-b border-gray-200">
+                                  <td className="p-2 text-left font-medium">{task?.title}</td>
+                                  <td className="p-2 text-left">
+                                    <input type="checkbox" checked={task?.checked} onChange={() => task && handleTaskCompletionToggle(idx)} />
+                            </td>
+                                </tr>
+                                {Array.isArray(task.subtasks) ? task.subtasks.map((sub, subIdx) => (
+                                  sub ? (
+                                    <tr key={subIdx} className="border-b border-gray-100">
+                                      <td className="p-2 pl-8 text-left text-gray-700 flex items-center gap-2">
+                                        <span className="inline-block w-2 h-2 rounded-full bg-blue-400"></span>
+                                        <span>{sub.title}</span>
+                            </td>
+                                      <td className="p-2 text-left">
+                                        <input type="checkbox" checked={sub.checked} onChange={() => sub && handleTaskCompletionToggle(idx, subIdx)} />
+                            </td>
+                                    </tr>
+                                  ) : null
+                                )) : null}
+                              </React.Fragment>
+                            ) : null
+                          ))
+                        ) : (
+                          <tr>
+                            <td className="p-2 text-left" colSpan={2}>No tasks found</td>
                           </tr>
-                        ))}
+                        )}
                       </tbody>
                     </table>
-                  ) : (
-                    <span className="text-red-700">No other productions</span>
-                  )}
-                  <div className="text-xs text-purple-900 mt-1">
-                    Total Cost: ₦{selectedProject.other_productions.total_cost} | Total Budget: ₦{selectedProject.other_productions.total_budget}
                   </div>
                 </div>
-                {/* Calculations */}
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                  <span className="font-bold text-lg text-blue-900 block mb-3">Calculations</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
-                    <div className="font-semibold text-blue-900">Total Raw Material Cost:</div>
-                    <div className="text-black">₦{selectedProject.calculations.total_raw_material_cost}</div>
-                    <div className="font-semibold text-blue-900">Total Artisan Cost:</div>
-                    <div className="text-black">₦{selectedProject.calculations.total_artisan_cost}</div>
-                    <div className="font-semibold text-blue-900">Total Overhead Cost:</div>
-                    <div className="text-black">₦{selectedProject.calculations.total_overhead_cost}</div>
-                    <div className="font-semibold text-blue-900">Total Products Cost:</div>
-                    <div className="text-black">₦{selectedProject.calculations.total_products_cost}</div>
-                    <div className="font-semibold text-blue-900">Total Product Selling Price:</div>
-                    <div className="text-black">₦{selectedProject.calculations.total_product_selling_price}</div>
-                    <div className="font-semibold text-blue-900">Product Profit:</div>
-                    <div className="text-black">₦{selectedProject.calculations.product_profit}</div>
-                    <div className="font-semibold text-blue-900">Total Cost Price Sold Items:</div>
-                    <div className="text-black">₦{selectedProject.calculations.total_cost_price_sold_items}</div>
-                    <div className="font-semibold text-blue-900">Total Selling Price Sold Items:</div>
-                    <div className="text-black">₦{selectedProject.calculations.total_selling_price_sold_items}</div>
-                    <div className="font-semibold text-blue-900">Shop Items Profit:</div>
-                    <div className="text-black">₦{selectedProject.calculations.shop_items_profit}</div>
-                    <div className="font-semibold text-blue-900">Money Left for Expenses:</div>
-                    <div className="text-black">₦{selectedProject.calculations.money_left_for_expensis}</div>
-                    <div className="font-semibold text-blue-900">Money Left (with logistics/service):</div>
-                    <div className="text-black">₦{selectedProject.calculations.money_left_for_expensis_with_logistics_and_service_charge}</div>
-                    <div className="font-semibold text-blue-900">Total Other Productions Budget:</div>
-                    <div className="text-black">₦{selectedProject.calculations.total_other_productions_budget}</div>
-                    <div className="font-semibold text-blue-900">Total Other Productions Cost:</div>
-                    <div className="text-black">₦{selectedProject.calculations.total_other_productions_cost}</div>
-                    <div className="font-semibold text-blue-900">Total Expenses:</div>
-                    <div className="text-black">₦{selectedProject.calculations.total_expensis}</div>
-                    <div className="font-semibold text-blue-900">Total Money Spent:</div>
-                    <div className="text-black">₦{selectedProject.calculations.total_money_spent}</div>
-                    <div className="font-semibold text-blue-900">Total Paid:</div>
-                    <div className="text-black">₦{selectedProject.calculations.total_paid}</div>
-                    <div className="font-semibold text-blue-900">Final Profit:</div>
-                    <div className="text-black">₦{selectedProject.calculations.final_profit}</div>
+                {/* Products Table */}
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                  <h4 className="text-md font-semibold text-gray-700 mb-2">
+                    Products
+                  </h4>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead className="bg-blue-400 text-white">
+                        <tr>
+                          <th className="p-2 text-left">Name</th>
+                          <th className="p-2 text-left">Selling Price</th>
+                          <th className="p-2 text-left">Progress (%)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedProject.products?.products?.length > 0 ? (
+                          selectedProject.products.products.map((product) => (
+                            <tr
+                              key={product.id}
+                              className="border-b border-gray-200"
+                            >
+                              <td className="p-2 text-left">{product.name}</td>
+                              <td className="p-2 text-left">
+                                ₦{formatNumber(parseFloat(product.selling_price))}
+                            </td>
+                              <td className="p-2 text-left">{product.progress}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td className="p-2 text-left" colSpan={3}>No data found</td>
+                          </tr>
+                        )}
+                      </tbody>
+                      <tfoot className="bg-gray-100">
+                        <tr className="font-semibold">
+                          <td className="p-2 text-left">Total</td>
+                          <td className="p-2 text-left">
+                            ₦{formatNumber(totalProductsSellingPrice)}
+                          </td>
+                          <td className="p-2 text-left"></td>
+                        </tr>
+                      </tfoot>
+                    </table>
                   </div>
                 </div>
+
+                {/* Sold Items Table */}
+                {selectedProject.sold_items?.sold_items?.length > 0 && (
+                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <h4 className="text-md font-semibold text-gray-700 mb-2">
+                      Sold Items
+                    </h4>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm">
+                        <thead className="bg-blue-400 text-white">
+                          <tr>
+                            <th className="p-2 text-left">Name</th>
+                            <th className="p-2 text-left">Quantity</th>
+                            <th className="p-2 text-left">Cost Price</th>
+                            <th className="p-2 text-left">Selling Price</th>
+                            <th className="p-2 text-left">Total Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          {selectedProject.sold_items.sold_items.map(
+                            (item) => (
+                              <tr
+                                key={item.id}
+                                className="border-b border-gray-200"
+                              >
+                                <td className="p-2 text-left">{item.name}</td>
+                                <td className="p-2 text-left">{item.quantity}</td>
+                                <td className="p-2 text-left">
+                                  ₦{formatNumber(parseFloat(item.cost_price))}
+                                </td>
+                                <td className="p-2 text-left">
+                                  ₦{formatNumber(parseFloat(item.selling_price))}
+                              </td>
+                                <td className="p-2 text-left">
+                                  ₦{formatNumber(item.total_price)}
+                              </td>
+                            </tr>
+                          )
+                        )}
+                      </tbody>
+                        <tfoot className="bg-gray-100 ">
+                          <tr className="font-semibold">
+                            <td className="p-2 text-left">Total</td>
+                            <td className="p-2 text-left"></td>
+                            <td className="p-2 text-left">₦{formatNumber(totalSoldItemsCost)}</td>
+                            <td className="p-2 text-left">₦{formatNumber(totalSoldItemsSelling)}</td>
+                            <td className="p-2  text-left">₦{formatNumber(totalSoldItemsTotalPrice)}</td>
+                          </tr>
+                        </tfoot>
+                    </table>
+                    </div>
+                    </div>
+                )}
+
+                {/* Expenses Table */}
+                {selectedProject.expenses?.expenses?.length > 0 && (
+                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <h4 className="text-md font-semibold text-gray-700 mb-2">
+                      Expenses
+                    </h4>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm">
+                        <thead className="bg-blue-400 text-white">
+                          <tr>
+                            <th className="p-2 text-left">Name</th>
+                            <th className="p-2 text-left">Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedProject.expenses.expenses.map(
+                            (expense, index) => (
+                              <tr
+                                key={index}
+                                className="border-b border-gray-200"
+                              >
+                                <td className="p-2 text-left">{expense.name}</td>
+                                <td className="p-2 text-left">
+                                  ₦{formatNumber(parseFloat(expense.amount))}
+                                </td>
+                              </tr>
+                            )
+                          )}
+                        </tbody>
+                        <tfoot className="bg-gray-100">
+                          <tr className="font-semibold">
+                            <td className="p-2 text-left">Total</td>
+                            <td className="p-2 text-left">₦{formatNumber(totalExpensesAmount)}</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    </div>
+                )}
+
+                {/* Other Productions Table */}
+                {selectedProject.other_productions?.other_productions?.length > 0 && (
+                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <h4 className="text-md font-semibold text-gray-700 mb-2">
+                      Other Productions
+                    </h4>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm">
+                        <thead className="bg-blue-400 text-white">
+                          <tr>
+                            <th className="p-2 text-left">Name</th>
+                            <th className="p-2 text-left">Budget</th>
+                            <th className="p-2 text-left">Cost</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedProject.other_productions.other_productions.map(
+                            (production) => (
+                              <tr
+                                key={production.id}
+                                className="border-b border-gray-200"
+                              >
+                                <td className="p-2 text-left">
+                                  {production.name}
+                                </td>
+                                <td className="p-2 text-left">
+                                  {production.budget ? `₦${formatNumber(parseFloat(production.budget))}` : '-'}
+                                </td>
+                                <td className="p-2 text-left">
+                                  {production.cost ? `₦${formatNumber(parseFloat(production.cost))}` : '-'}
+                                </td>
+                              </tr>
+                            )
+                          )}
+                        </tbody>
+                        <tfoot className="bg-gray-100">
+                          <tr className="font-semibold">
+                            <td className="p-2 text-left">Total</td>
+                            <td className="p-2 text-left">₦{formatNumber(totalOtherProductionsBudget)}</td>
+                            <td className="p-2 text-left">₦{formatNumber(totalOtherProductionsCost)}</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
-          <DialogFooter>
-            <div className="flex justify-around items-center w-full">
-              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-                Close
-              </Button>
-              {userRole === 'ceo' && (
-                <>
-                  <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
-                    Edit
-                  </Button>
-                  <Button variant="destructive" onClick={handleDelete}>
-                    Delete
-                  </Button>
-                </>
-              )}
-              <Button variant="outline" onClick={handleViewOtherProductionRecords}>
-                Records
-              </Button>
-            </div>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Large Invoice Image Modal */}
-      {selectedProject?.invoice_image && (
-        <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
-          <DialogContent className="flex flex-col items-center justify-center bg-black bg-opacity-90 max-w-3xl">
-            <button
-              className="self-end mb-2 px-4 py-2 bg-white text-black rounded hover:bg-gray-200"
-              onClick={() => setShowImageModal(false)}
-            >
-              Close
-            </button>
-            <img
-              src={selectedProject.invoice_image}
-              alt="Invoice Large"
-              className="max-h-[80vh] w-auto rounded shadow-lg border-4 border-white"
-            />
-          </DialogContent>
-        </Dialog>
-      )}
-
-      {/* Edit Project Modal */}
       {selectedProject && (
         <EditProjectModal
           open={isEditModalOpen}
@@ -438,21 +818,139 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
         />
       )}
 
-      {/* Delete Confirmation Dialog */}
+      {selectedProject && selectedProject.invoice_image && (
+        <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Invoice Image</DialogTitle>
+            </DialogHeader>
+            <img
+              src={selectedProject.invoice_image}
+              alt="Invoice"
+              className="max-w-full h-auto rounded-lg"
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. It will permanently delete the project.
+              This action cannot be undone. This will permanently delete the
+              project and all its related data.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Confirm</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>
+              Confirm
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Status Modal */}
+      <Dialog open={isEditStatusModalOpen} onOpenChange={setIsEditStatusModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Project Status</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700">Status</label>
+            <select
+              className="w-full border rounded p-2"
+              value={newStatus}
+              onChange={e => setNewStatus(e.target.value)}
+            >
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="delivered">Delivered</option>
+              {/* Add more statuses as needed */}
+            </select>
+            <Button onClick={handleStatusSave} disabled={statusLoading}>
+              {statusLoading ? 'Saving...' : 'Save'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Item Modal */}
+      <Dialog open={isAddItemModalOpen} onOpenChange={setIsAddItemModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Item</DialogTitle>
+            <DialogDescription>
+              Add a new item to the project.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Item Name</label>
+              <input type="text" className="w-full border rounded p-2" placeholder="Enter item name" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Price</label>
+              <input type="number" className="w-full border rounded p-2" placeholder="Enter price" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Quantity</label>
+              <input type="number" className="w-full border rounded p-2" placeholder="Enter quantity" />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setIsAddItemModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={() => setIsAddItemModalOpen(false)}>
+                Add Item
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Task Modal */}
+      <Dialog open={isAddTaskModalOpen} onOpenChange={setIsAddTaskModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Task</DialogTitle>
+            <DialogDescription>
+              Add a new task to the project.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Task Title</label>
+              <input type="text" className="w-full border rounded p-2" placeholder="Enter task title" />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setIsAddTaskModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={() => setIsAddTaskModalOpen(false)}>
+                Add Task
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {showAllItemsManager && selectedProject && (
+        <AllItemsManager
+          project={selectedProject}
+          onUpdate={(updatedItems) => {
+            selectedProject.all_items = updatedItems as any;
+          }}
+          onClose={() => {
+            setShowAllItemsManager(false);
+            setIsModalOpen(true);
+          }}
+        />
+      )}
     </>
   );
 };

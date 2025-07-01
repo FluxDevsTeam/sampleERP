@@ -13,13 +13,16 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 // import { Accordion } from "rsuite";
 import Modal from "../../shop/shop-components/Modal";
+import axios from "axios";
 
 interface TableData {
   Product: string;
-  "Linked Projects": string;
-  Price: string;
+  "Linked Project": string;
+  "Selling price": string;
+  Quantity: string | number;
   Progress: JSX.Element;
   Details: JSX.Element;
+  Tasks: JSX.Element;
   [key: string]: string | number | JSX.Element;
 }
 
@@ -28,7 +31,9 @@ const ProductsTable: React.FC = () => {
     "Product",
     "Linked Project",
     "Selling price",
+    "Quantity",
     "Progress",
+    "Tasks",
     "Details",
   ];
   // TABLE DATA
@@ -78,6 +83,10 @@ const ProductsTable: React.FC = () => {
 
   // RAW MATERIALS Usdc
   const [rawMaterials, setRawMaterials] = useState<any[]>([]);
+
+  // TASKS MODAL
+  const [showTasksModal, setShowTasksModal] = useState(false);
+  const [selectedTasksProduct, setSelectedTasksProduct] = useState<any | null>(null);
 
   const fetchProducts = async () => {
     try {
@@ -145,6 +154,15 @@ const ProductsTable: React.FC = () => {
           ),
           "Linked Project": item.linked_project?.name || "-",
           "Selling price": `₦${item.selling_price}`,
+          Quantity: item.quantity || "-",
+          Tasks: (
+            <button
+              onClick={() => handleViewTasks(item)}
+              className="px-2 py-1 text-blue-500 border border-blue-400 rounded hover:bg-blue-50"
+            >
+              View Tasks
+            </button>
+          ),
           Details: (
             <button
               onClick={() => handleViewDetails(item)}
@@ -582,6 +600,11 @@ const ProductsTable: React.FC = () => {
     await deleteProduct();
   };
 
+  const handleViewTasks = (product: any) => {
+    setSelectedTasksProduct(product);
+    setShowTasksModal(true);
+  };
+
   return (
     <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
       <h1
@@ -964,78 +987,83 @@ const ProductsTable: React.FC = () => {
         </div>
       )}
 
-      {/* Contractors Modal */}
-      {showContractorsModal && (
+      {/* contractors modal */}
+      {showContractorsModal && selectedProduct && (
         <div
           className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150] ${
             modalConfig.isOpen ? "hidden" : ""
-          }`}
+          } ${showEditContractorModal ? "blur-sm" : ""}`}
         >
-          <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg text-blue-400 font-bold">Contractors for {selectedProduct.name}</h3>
+          <div className="bg-white rounded-2xl p-20 w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
+            <div className="flex flex-col items-center w-full mb-6">
+              <h3 className="text-2xl pb-10 font-bold text-blue-400 text-center">Contractors for <span className="font-extrabold text-3xl">{selectedProduct.name}</span></h3>
               <button
                 onClick={() => setShowContractorsModal(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="absolute top-6 right-8 text-gray-500 hover:text-gray-700 text-3xl font-bold"
+                aria-label="Close"
               >
                 <FontAwesomeIcon icon={faXmark} />
               </button>
             </div>
 
-            <button
-              onClick={() =>
-                navigate(`/product/add-contractor/${selectedProduct.id}`)
-              }
-              className="bg-blue-400 text-white p-1 px-[10px] mb-3 rounded-lg hover:bg-blue-500 transition-colors"
-            >
-              <FontAwesomeIcon icon={faPlus} className="text-xs" />
-            </button>
+            <div className="w-full">
+              <div className="flex justify-start mb-4">
+                <button
+                  onClick={() => {
+                    navigate(`/product/add-contractor/${selectedProduct.id}`, {
+                      state: { from: "contractorsModal", returnTo: "contractors" },
+                    });
+                  }}
+                  className="px-4 py-2 text-lg bg-blue-400 rounded-lg text-white font-semibold hover:bg-blue-500 flex items-center gap-2 shadow"
+                >
+                  <FontAwesomeIcon icon={faPlus} /> Add Contractor
+                </button>
+              </div>
 
-            <div className="space-y-4">
-              {selectedProduct.contractors &&
-              selectedProduct.contractors.length > 0 ? (
-                selectedProduct.contractors.map(
-                  (contractor: any, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-md shadow-md"
-                    >
-                      <div>
-                        <p className="font-semibold text-gray-20">
-                          {contractor.linked_contractor?.first_name}{" "}
-                          {contractor.linked_contractor?.last_name}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Date:{" "}
-                          {new Date(contractor.date).toLocaleDateString(
-                            "en-GB"
-                          )}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Cost: ₦{contractor.cost || "-"}
-                        </p>
-                      </div>
-                      <div className="grid">
-                        <button
-                          onClick={() => handleDeleteContractor(contractor.id)}
-                          className="text-red-400 hover:text-red-600 p-2"
-                        >
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
-                        <button
-                          onClick={() => handleEditContractor(contractor)}
-                          className="text-blue-400 hover:text-blue-600 p-2"
-                        >
-                          <FontAwesomeIcon icon={faPencil} />
-                        </button>
-                      </div>
-                    </div>
-                  )
-                )
+              {selectedProduct?.contractors?.length > 0 ? (
+                <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[12px]">
+                  <thead>
+                    <tr className="bg-blue-100 text-blue-700">
+                      <th className="py-1 px-2 text-left font-bold">#</th>
+                      <th className="py-1 px-2 text-left font-bold">Name</th>
+                      <th className="py-1 px-2 text-left font-bold">Date</th>
+                      <th className="py-1 px-2 text-left font-bold">Cost</th>
+                      <th className="py-1 px-2 text-left font-bold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedProduct.contractors.map((contractor: any, index: number) => (
+                      <tr key={index} className="border-b">
+                        <td className="py-1 px-2">{index + 1}</td>
+                        <td className="py-1 px-2">
+                          {contractor.linked_contractor?.first_name} {contractor.linked_contractor?.last_name}
+                        </td>
+                        <td className="py-1 px-2">
+                          {new Date(contractor.date).toLocaleDateString("en-GB")}
+                        </td>
+                        <td className="py-1 px-2">₦{contractor.cost || "-"}</td>
+                        <td className="py-1 px-2">
+                          <button
+                            onClick={() => handleEditContractor(contractor)}
+                            className="p-1 px-2 text-blue-400 rounded border border-blue-400 font-bold mr-2 text-xs"
+                          >
+                            <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteContractor(contractor.id)}
+                            className="p-1 px-2 text-red-400 rounded border border-red-400 font-bold text-xs"
+                          >
+                            <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               ) : (
-                <p className="text-center italic text-gray-500">
-                  No contractors attached
-                </p>
+                <div className="w-full flex flex-col items-center">
+                  <p className="italic text-gray-500 mb-4">No contractors attached</p>
+                </div>
               )}
             </div>
           </div>
@@ -1049,66 +1077,74 @@ const ProductsTable: React.FC = () => {
             modalConfig.isOpen ? "hidden" : ""
           } ${showEditWorkerModal ? "blur-sm" : ""}`}
         >
-          <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg text-blue-400 font-bold">Workers for {selectedProduct.name}</h3>
+          <div className="bg-white rounded-2xl p-20 w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
+            <div className="flex flex-col items-center w-full mb-6">
+              <h3 className="text-2xl pb-10 font-bold text-blue-400 text-center">Salary Workers for <span className="font-extrabold text-3xl">{selectedProduct.name}</span></h3>
               <button
                 onClick={() => setShowWorkersModal(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="absolute top-6 right-8 text-gray-500 hover:text-gray-700 text-3xl font-bold"
+                aria-label="Close"
               >
                 <FontAwesomeIcon icon={faXmark} />
               </button>
             </div>
 
-            <button
-              onClick={() => {
-                navigate(`/product/add-worker/${selectedProduct.id}`, {
-                  state: { from: "workersModal", returnTo: "workers" },
-                });
-              }}
-              className="bg-blue-400 text-white p-1 px-[10px] mb-3 rounded-lg hover:bg-blue-500 transition-colors"
-            >
-              <FontAwesomeIcon icon={faPlus} className="text-xs" />
-            </button>
+            <div className="w-full">
+              <div className="flex justify-start mb-4">
+                <button
+                  onClick={() => {
+                    navigate(`/product/add-worker/${selectedProduct.id}`, {
+                      state: { from: "workersModal", returnTo: "workers" },
+                    });
+                  }}
+                  className="px-4 py-2 text-lg bg-green-400 rounded-lg text-white font-semibold hover:bg-green-500 flex items-center gap-2 shadow"
+                >
+                  <FontAwesomeIcon icon={faPlus} /> Add Worker
+                </button>
+              </div>
 
-            <div className="space-y-4">
               {selectedProduct?.salary_workers?.length > 0 ? (
-                selectedProduct.salary_workers.map(
-                  (worker: any, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-md shadow-md"
-                    >
-                      <div>
-                        <p className="font-semibold text-gray-20">
-                          {worker.linked_salary_worker?.first_name}{" "}
-                          {worker.linked_salary_worker?.last_name}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Date: {worker.date}
-                        </p>
-                      </div>
-                      <div className="grid">
-                        <button
-                          onClick={() => handleDeleteWorker(worker.id)}
-                          className="text-red-400 hover:text-red-600 p-2"
-                        >
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
-                        <button
-                          onClick={() => handleEditWorker(worker)}
-                          className="text-blue-400 hover:text-blue-600 p-2"
-                        >
-                          <FontAwesomeIcon icon={faPencil} />
-                        </button>
-                      </div>
-                    </div>
-                  )
-                )
+                <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[12px]">
+                  <thead>
+                    <tr className="bg-green-100 text-green-700">
+                      <th className="py-1 px-2 text-left font-bold">#</th>
+                      <th className="py-1 px-2 text-left font-bold">Name</th>
+                      <th className="py-1 px-2 text-left font-bold">Date</th>
+                      <th className="py-1 px-2 text-left font-bold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedProduct.salary_workers.map((worker: any, index: number) => (
+                      <tr key={index} className="border-b">
+                        <td className="py-1 px-2">{index + 1}</td>
+                        <td className="py-1 px-2">
+                          {worker.linked_salary_worker?.first_name} {worker.linked_salary_worker?.last_name}
+                        </td>
+                        <td className="py-1 px-2">
+                          {new Date(worker.date).toLocaleDateString("en-GB")}
+                        </td>
+                        <td className="py-1 px-2">
+                          <button
+                            onClick={() => handleEditWorker(worker)}
+                            className="p-1 px-2 text-blue-400 rounded border border-blue-400 font-bold mr-2 text-xs"
+                          >
+                            <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteWorker(worker.id)}
+                            className="p-1 px-2 text-red-400 rounded border border-red-400 font-bold text-xs"
+                          >
+                            <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               ) : (
-                <p className="text-center italic text-gray-500">
-                  No workers attached
-                </p>
+                <div className="w-full flex flex-col items-center">
+                  <p className="italic text-gray-500 mb-4">No workers attached</p>
+                </div>
               )}
             </div>
           </div>
@@ -1487,6 +1523,167 @@ const ProductsTable: React.FC = () => {
         message={modalConfig.message}
         type={modalConfig.type}
       />
+
+      {/* Tasks Modal */}
+      {showTasksModal && selectedTasksProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg p-6 max-w-lg w-full relative shadow-xl">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={() => setShowTasksModal(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold mb-4">Tasks for {selectedTasksProduct.name}</h2>
+            <TaskManager
+              product={selectedTasksProduct}
+              onUpdate={(updatedTasks) => {
+                setSelectedTasksProduct((prev: any) => ({ ...prev, tasks: updatedTasks }));
+                // Optionally, update the main table if needed
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// --- TaskManager component ---
+const TaskManager: React.FC<{ product: any; onUpdate: (tasks: any[]) => void }> = ({ product, onUpdate }) => {
+  const [tasks, setTasks] = React.useState<any[]>(product.tasks || []);
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  // Add Task
+  const handleAddTask = () => {
+    setTasks((prev) => [...prev, { title: "", checked: false, subtasks: [] }]);
+  };
+  // Edit Task
+  const handleTaskChange = (idx: number, field: "title" | "checked", value: any) => {
+    setTasks((prev) => prev.map((task, i) => i === idx ? { ...task, [field]: value } : task));
+  };
+  // Delete Task
+  const handleRemoveTask = (idx: number) => {
+    setTasks((prev) => prev.filter((_, i) => i !== idx));
+  };
+  // Add Subtask
+  const handleAddSubtask = (taskIdx: number) => {
+    setTasks((prev) => prev.map((task, i) =>
+      i === taskIdx ? { ...task, subtasks: [...(task.subtasks || []), { title: "", checked: false }] } : task
+    ));
+  };
+  // Edit Subtask
+  const handleSubtaskChange = (taskIdx: number, subIdx: number, field: "title" | "checked", value: any) => {
+    setTasks((prev) => prev.map((task, i) =>
+      i === taskIdx
+        ? { ...task, subtasks: (task.subtasks || []).map((sub: any, j: number) => j === subIdx ? { ...sub, [field]: value } : sub) }
+        : task
+    ));
+  };
+  // Delete Subtask
+  const handleRemoveSubtask = (taskIdx: number, subIdx: number) => {
+    setTasks((prev) => prev.map((task, i) =>
+      i === taskIdx ? { ...task, subtasks: (task.subtasks || []).filter((_: any, j: number) => j !== subIdx) } : task
+    ));
+  };
+  // Save to backend
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      await axios.patch(
+        `https://backend.kidsdesigncompany.com/api/product/${product.id}/`,
+        { tasks: JSON.stringify(tasks) },
+        { headers: { Authorization: `JWT ${token}` } }
+      );
+      onUpdate(tasks);
+    } catch (err) {
+      alert("Failed to save tasks");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-2">
+        <span className="font-semibold text-lg">Task List</span>
+        <button
+          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+          onClick={handleAddTask}
+        >
+          + Add Task
+        </button>
+      </div>
+      <div className="space-y-4 max-h-80 overflow-y-auto pr-2">
+        {tasks.length === 0 && <div className="text-gray-400 text-center">No tasks yet.</div>}
+        {tasks.map((task, idx) => (
+          <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <input
+                type="checkbox"
+                checked={task.checked}
+                onChange={e => handleTaskChange(idx, "checked", e.target.checked)}
+                className="accent-blue-500 w-4 h-4"
+              />
+              <input
+                className="font-semibold text-base border-b-2 border-blue-200 focus:border-blue-500 outline-none bg-transparent flex-1 px-2 py-1"
+                value={task.title}
+                placeholder="Task title"
+                onChange={e => handleTaskChange(idx, "title", e.target.value)}
+              />
+              <button
+                className="ml-2 px-2 py-1 bg-red-400 text-white rounded text-xs hover:bg-red-500"
+                onClick={() => handleRemoveTask(idx)}
+              >
+                Delete
+              </button>
+            </div>
+            <div className="ml-6">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-xs text-gray-600">Subtasks</span>
+                <button
+                  className="px-2 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500"
+                  onClick={() => handleAddSubtask(idx)}
+                >
+                  + Add Subtask
+                </button>
+              </div>
+              {(task.subtasks || []).length === 0 && <div className="text-gray-300 text-xs">No subtasks</div>}
+              {(task.subtasks || []).map((sub: any, subIdx: number) => (
+                <div key={subIdx} className="flex items-center gap-2 mb-1">
+                  <input
+                    type="checkbox"
+                    checked={sub.checked}
+                    onChange={e => handleSubtaskChange(idx, subIdx, "checked", e.target.checked)}
+                    className="accent-blue-400 w-4 h-4"
+                  />
+                  <input
+                    className="text-sm border-b border-blue-100 focus:border-blue-400 outline-none bg-transparent flex-1 px-2 py-1"
+                    value={sub.title}
+                    placeholder="Subtask title"
+                    onChange={e => handleSubtaskChange(idx, subIdx, "title", e.target.value)}
+                  />
+                  <button
+                    className="ml-2 px-2 py-1 bg-red-200 text-red-700 rounded text-xs hover:bg-red-300"
+                    onClick={() => handleRemoveSubtask(idx, subIdx)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-end mt-4">
+        <button
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-60"
+          onClick={handleSave}
+          disabled={isSaving}
+        >
+          {isSaving ? "Saving..." : "Save Changes"}
+        </button>
+      </div>
     </div>
   );
 };

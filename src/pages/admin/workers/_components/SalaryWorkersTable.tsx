@@ -197,6 +197,14 @@ const SalaryWorkersTable = ({
                       View
                     </button>
                   </td>
+                  <td className="py-4 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    <button
+                      onClick={() => navigate(`/admin/salary-workers/${worker.id}/records`)}
+                      className="px-3 py-1 text-green-400 border-2 border-green-400 rounded hover:bg-green-300 hover:text-white transition-colors"
+                    >
+                      Record
+                    </button>
+                  </td>
                 </tr>
               ))
             )}

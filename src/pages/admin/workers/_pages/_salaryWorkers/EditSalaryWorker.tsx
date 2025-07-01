@@ -45,7 +45,12 @@ const EditSalaryWorker = () => {
   useEffect(() => {
     const fetchSalaryWorker = async () => {
       try {
-        const response = await axios.get(`https://backend.kidsdesigncompany.com/api/salary-workers/${id}/`);
+        const accessToken = localStorage.getItem("accessToken");
+        const response = await axios.get(`https://backend.kidsdesigncompany.com/api/salary-workers/${id}/`, {
+          headers: {
+            Authorization: `JWT ${accessToken}`,
+          },
+        });
         const normalized = {
           ...response.data,
           date_joined: response.data.date_joined ? response.data.date_joined.slice(0, 10) : "",
@@ -94,6 +99,7 @@ const EditSalaryWorker = () => {
     e.preventDefault();
     setIsPending(true);
     try {
+      const accessToken = localStorage.getItem("accessToken");
       const data = new FormData();
       // Only append changed fields
       Object.entries(formData).forEach(([key, value]) => {
@@ -104,7 +110,10 @@ const EditSalaryWorker = () => {
       if (image) data.append("image", image);
       if (agreementFormImage) data.append("agreement_form_image", agreementFormImage);
       await axios.patch(`https://backend.kidsdesigncompany.com/api/salary-workers/${id}/`, data, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          "Content-Type": "multipart/form-data",
+          Authorization: `JWT ${accessToken}`,
+        },
       });
       queryClient.invalidateQueries({ queryKey: ["salary-workers"], refetchType: "active" });
       toast.success("Salary worker updated successfully!");
@@ -135,7 +144,7 @@ const EditSalaryWorker = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email (optional)</Label>
+              <Label htmlFor="email">Email</Label>
               <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} />
             </div>
 

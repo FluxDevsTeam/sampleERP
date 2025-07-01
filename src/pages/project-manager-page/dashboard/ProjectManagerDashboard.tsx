@@ -333,7 +333,7 @@ const ProjectManagerDashboard = () => {
         {allCards.length > defaultVisibleCount && (
           <div className="flex justify-center mb-4">
             <button
-              className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-transform duration-200 focus:outline-none"
+              className="flex items-center justify-center w-10 h-10 bg-blue-400 text-white rounded-full shadow-lg hover:bg-blue-400 transition-transform duration-200 focus:outline-none"
               onClick={() => setShowAllCards(v => !v)}
               title={showAllCards ? 'Show Less' : 'Show More'}
               aria-label={showAllCards ? 'Show Less' : 'Show More'}

@@ -7,6 +7,7 @@ import {
   faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import Modal from "@/pages/shop/Modal";
+import SearchablePaginatedMultiSelectDropdown from './SearchablePaginatedMultiSelectDropdown';
 
 interface QuotationItem {
   name: string;
@@ -52,6 +53,7 @@ const AddQuotation: React.FC = () => {
     message: "",
     type: "success" as "success" | "error",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -82,7 +84,7 @@ const AddQuotation: React.FC = () => {
       try {
         const [contractorsRes, workersRes] = await Promise.all([
           fetch(
-            "https://backend.kidsdesigncompany.com/api/contractors/", {
+            "https://backend.kidsdesigncompany.com/api/contractors/?is_still_active=true", {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
@@ -91,7 +93,7 @@ const AddQuotation: React.FC = () => {
             }
           ),
           fetch(
-            "https://backend.kidsdesigncompany.com/api/salary-workers/", {
+            "https://backend.kidsdesigncompany.com/api/salary-workers/?is_still_active=true", {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
@@ -108,8 +110,11 @@ const AddQuotation: React.FC = () => {
         const contractorsData = await contractorsRes.json();
         const workersData = await workersRes.json();
 
-        setContractors(contractorsData.results.contractor);
-        setWorkers(workersData.results.workers);
+        console.log('Contractors API response:', contractorsData);
+        console.log('Workers API response:', workersData);
+
+        setContractors(contractorsData.results.contractor || []);
+        setWorkers(workersData.results.workers || []);
       } catch (error) {
         console.error("Error:", error);
         setContractors([]);
@@ -130,14 +135,11 @@ const AddQuotation: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    // Create the properly structured data
     const quotationData: QuotationData = {
       department,
-      quotation: quotationItems.map((item) => ({
-        name: item.name,
-        quantity: item.quantity,
-      })),
+      quotation: quotationItems.filter((item) => item.name.trim() !== ""),
       contractor: selectedContractors,
       salary_worker: selectedWorkers,
     };
@@ -191,6 +193,8 @@ const AddQuotation: React.FC = () => {
           error instanceof Error ? error.message : "Failed to add quotation",
         type: "error",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -252,7 +256,7 @@ const AddQuotation: React.FC = () => {
                     newItems[index].name = e.target.value;
                     setQuotationItems(newItems);
                   }}
-                  className="flex-1 rounded-md border border-gray-300 px-3 py-2"
+                  className="flex-1 rounded-md border border-gray-300 px-3 py-2 placeholder-black-100"
                   required
                 />
                 <input
@@ -265,7 +269,7 @@ const AddQuotation: React.FC = () => {
                       e.target.value === "" ? 0 : parseInt(e.target.value, 10);
                     setQuotationItems(newItems);
                   }}
-                  className="w-24 rounded-md border border-gray-300 px-3 py-2"
+                  className="w-24 rounded-md border border-gray-300 px-3 py-2 placeholder-black-100"
                   min="0"
                   required
                 />
@@ -292,56 +296,39 @@ const AddQuotation: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700">
               Contractors
             </label>
-            <select
-              multiple
-              value={selectedContractors.map(String)}
-              onChange={(e) =>
-                setSelectedContractors(
-                  Array.from(e.target.selectedOptions, (option) =>
-                    Number(option.value)
-                  )
-                )
-              }
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            >
-              {contractors.map((contractor) => (
-                <option key={contractor.id} value={contractor.id}>
-                  {contractor.first_name} {contractor.last_name}
-                </option>
-              ))}
-            </select>
+            <SearchablePaginatedMultiSelectDropdown
+              endpoint="https://backend.kidsdesigncompany.com/api/contractors/"
+              label="Contractors"
+              selectedValues={selectedContractors}
+              onChange={setSelectedContractors}
+              resultsKey="results.contractor"
+              dataMapper={(data) => (Array.isArray(data) ? data.map((c) => ({ id: c.id, name: `${c.first_name} ${c.last_name}` })) : [])}
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Salary Workers
             </label>
-            <select
-              multiple
-              value={selectedWorkers.map(String)}
-              onChange={(e) =>
-                setSelectedWorkers(
-                  Array.from(e.target.selectedOptions, (option) =>
-                    Number(option.value)
-                  )
-                )
-              }
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            >
-              {workers.map((worker) => (
-                <option key={worker.id} value={worker.id}>
-                  {worker.first_name} {worker.last_name}
-                </option>
-              ))}
-            </select>
+            <SearchablePaginatedMultiSelectDropdown
+              endpoint="https://backend.kidsdesigncompany.com/api/salary-workers/"
+              label="Salary Workers"
+              selectedValues={selectedWorkers}
+              onChange={setSelectedWorkers}
+              resultsKey="results.workers"
+              dataMapper={(data) => (Array.isArray(data) ? data.map((w) => ({ id: w.id, name: `${w.first_name} ${w.last_name}` })) : [])}
+            />
           </div>
 
           <div className="flex justify-end">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500"
+              disabled={isSubmitting}
+              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Submit Quotation
+              {isSubmitting ? "Submitting..." : "Submit Quotation"}
             </button>
           </div>
         </form>

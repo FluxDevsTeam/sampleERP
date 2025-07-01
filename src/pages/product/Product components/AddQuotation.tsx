@@ -228,7 +228,7 @@ const AddQuotation: React.FC = () => {
                   newItems[index].name = e.target.value;
                   setQuotationItems(newItems);
                 }}
-                className="flex-1 p-2 border rounded"
+                className="flex-1 p-2 border rounded placeholder-black-400"
                 required
               />
               <input
@@ -241,7 +241,7 @@ const AddQuotation: React.FC = () => {
                     e.target.value === "" ? 0 : parseInt(e.target.value, 10);
                   setQuotationItems(newItems);
                 }}
-                className="w-24 p-2 border rounded"
+                className="w-24 p-2 border rounded placeholder-black"
                 min="0"
                 required
               />

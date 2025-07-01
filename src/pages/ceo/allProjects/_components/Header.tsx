@@ -41,7 +41,7 @@ const Header = () => {
 
   const summaryItems = [
     { label: "All Time Projects", value: data.all_time_projects_count },
-    { label: "All Projects", value: data.all_projects_count },
+    { label: "All Active Projects", value: data.all_projects_count },
     { label: "Completed Projects", value: data.completed_projects_count },
     { label: "Ongoing Projects", value: data.ongoing_projects_count },
     { label: "Average Progress", value: `${data.average_progress}%` },

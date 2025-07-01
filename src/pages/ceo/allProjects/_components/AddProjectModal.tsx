@@ -65,6 +65,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
+  const [allItems, setAllItems] = useState([{ item: '', price: '', quantity: '1' }]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -72,8 +73,6 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
     start_date: new Date().toISOString().split("T")[0],
     deadline: "",
     date_delivered: "",
-    is_delivered: false,
-    archived: false,
     customer_detail: "placeholder",
     selling_price: "",
     logistics: "0",
@@ -119,8 +118,6 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
       start_date: new Date().toISOString().split("T")[0],
       deadline: "",
       date_delivered: "",
-      is_delivered: false,
-      archived: false,
       customer_detail: "placeholder",
       selling_price: "",
       logistics: "0",
@@ -131,6 +128,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
     setImagePreview(null);
     setFormError("");
     setErrorDetails({});
+    setAllItems([{ item: '', price: '', quantity: '1' }]);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,12 +170,20 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCheckboxChange = (name: string, checked: boolean) => {
-    setFormData((prev) => ({ ...prev, [name]: checked }));
-  };
-
   const handleCustomerChange = (value: string) => {
     setFormData((prev) => ({ ...prev, customer_detail: value }));
+  };
+
+  const handleAllItemChange = (idx: number, field: 'item' | 'price' | 'quantity', value: string) => {
+    setAllItems((prev) => prev.map((row, i) => i === idx ? { ...row, [field]: value } : row));
+  };
+
+  const handleAddAllItem = () => {
+    setAllItems((prev) => [...prev, { item: '', price: '', quantity: '1' }]);
+  };
+
+  const handleRemoveAllItem = (idx: number) => {
+    setAllItems((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -198,9 +204,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
       status: formData.status,
       start_date: formData.start_date,
       deadline: formData.deadline || null,
-      date_delivered: formData.is_delivered ? formData.date_delivered : null,
-      is_delivered: formData.is_delivered,
-      archived: formData.archived,
+      date_delivered: null,
       customer: parseInt(formData.customer_detail),
       selling_price: formData.selling_price,
       logistics: formData.logistics || "0",
@@ -213,6 +217,10 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
     });
 
     if (invoiceImage) formDataToSubmit.append("invoice_image", invoiceImage);
+
+    if (allItems.length > 0 && allItems.some(row => row.item && row.price)) {
+      formDataToSubmit.append('all_items', JSON.stringify(allItems.filter(row => row.item && row.price).map(row => ({ ...row, quantity: row.quantity || '1' }))));
+    }
 
     try {
       const token = localStorage.getItem("accessToken");
@@ -333,24 +341,6 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                       rows={3}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="invoice_image">Invoice Image (optional)</Label>
-                    <Input
-                      id="invoice_image"
-                      type="file"
-                      accept="image/jpeg,image/png,image/gif,application/pdf"
-                      onChange={handleImageChange}
-                      className="cursor-pointer"
-                    />
-                    {invoiceImage && (
-                      <p className="text-sm text-green-600 mt-2">
-                        {invoiceImage.name} selected
-                      </p>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB
-                    </p>
-                  </div>
                 </div>
                 {/* Right column */}
                 <div className="space-y-4">
@@ -424,26 +414,57 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                       />
                     </div>
                   </div>
-                  <div className="flex flex-col space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="is_delivered"
-                        checked={formData.is_delivered}
-                        onCheckedChange={(checked) =>
-                          handleCheckboxChange("is_delivered", checked as boolean)
-                        }
+                  <div className="space-y-2">
+                    <Label htmlFor="invoice_image">Invoice Image (optional)</Label>
+                    <Input
+                      id="invoice_image"
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,application/pdf"
+                      onChange={handleImageChange}
+                      className="cursor-pointer"
+                    />
+                    {invoiceImage && (
+                      <p className="text-sm text-green-600 mt-2">
+                        {invoiceImage.name} selected
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB
+                    </p>
+                  </div>
+                </div>
+                {/* All Items and Tasks Sections side by side */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
+                  <div className="space-y-2">
+                    <Label>All Items (Optional)</Label>
+                    <div className="space-y-2">
+                      {allItems.map((row, idx) => (
+                        <div key={idx} className="flex gap-2 items-center">
+                          <Input
+                            placeholder="Item"
+                            value={row.item}
+                            onChange={e => handleAllItemChange(idx, 'item', e.target.value)}
+                            className="w-1/3"
+                          />
+                          <Input
+                            placeholder="Price"
+                            type="number"
+                            value={row.price}
+                            onChange={e => handleAllItemChange(idx, 'price', e.target.value)}
+                            className="w-1/3"
+                          />
+                          <Input
+                            placeholder="Quantity"
+                            type="number"
+                            min="1"
+                            value={row.quantity}
+                            onChange={e => handleAllItemChange(idx, 'quantity', e.target.value)}
+                            className="w-1/4"
                       />
-                      <Label htmlFor="is_delivered">Project is delivered</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="archived"
-                        checked={formData.archived}
-                        onCheckedChange={(checked) =>
-                          handleCheckboxChange("archived", checked as boolean)
-                        }
-                      />
-                      <Label htmlFor="archived">Archive this project</Label>
+                          <Button type="button" variant="destructive" size="sm" onClick={() => handleRemoveAllItem(idx)} disabled={allItems.length === 1}>Remove</Button>
+                        </div>
+                      ))}
+                      <Button type="button" variant="outline" size="sm" onClick={handleAddAllItem}>Add Item</Button>
                     </div>
                   </div>
                 </div>

@@ -228,7 +228,7 @@ const OtherProductionRecords = () => {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link to={`/ceo/projects`}>Back to Projects</Link>
+            <Link to={`/project-manager/projects`}>Back to Projects</Link>
           </Button>
           <Button onClick={() => setIsAddDialogOpen(true)}>
             Add New Record

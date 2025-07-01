@@ -385,8 +385,8 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
               </ul>
             )}
           </div>
-          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["expenses"] })} className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">Filter</Button>
-          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["expenses"] }); }} className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors">Clear</Button>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["expenses"] })} disabled={isLoading} className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors">Filter</Button>
+          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["expenses"] }); }} disabled={isLoading} className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors">Clear</Button>
         </div>
       </div>
       <div className={`overflow-x-auto pb-8 ${isTableModalOpen || isViewModalOpen || isEditModalOpen || isDeleteDialogOpen || isAddModalOpen ? 'blur-md' : ''}`}>
@@ -511,7 +511,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
                 </Button>
               )}
               {isceo && (
-                <Button variant="destructive" onClick={handleDelete}>
+                <Button variant="destructive" onClick={handleDelete} disabled={deleteExpenseMutation.isPending}>
                   Delete
                 </Button>
               )}

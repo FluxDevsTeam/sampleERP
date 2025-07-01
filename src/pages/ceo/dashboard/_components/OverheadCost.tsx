@@ -27,6 +27,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Helper for comma formatting
+const formatNumber = (num: string | number) => {
+  const n = typeof num === 'string' ? parseFloat(num) : num;
+  if (isNaN(n)) return num;
+  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+
 export default function OverheadCost() {
   const queryClient = useQueryClient();
   const { register, handleSubmit, reset } = useForm<{
@@ -76,7 +83,7 @@ export default function OverheadCost() {
       <h2 className="text-xl font-bold mb-1">Overhead Cost</h2>
       <p className="mb-2">
         Current Base Cost:{" "}
-        <strong>₦{data?.overhead_cost_base ?? "N/A"}</strong>
+        <strong>₦{data?.overhead_cost_base ? formatNumber(data.overhead_cost_base) : "N/A"}</strong>
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

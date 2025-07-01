@@ -257,7 +257,7 @@ const WorkersTable = ({
                 Close
               </Button>
               {isCEO && (
-                <Button variant="destructive" onClick={handleDelete}>
+                <Button variant="destructive" onClick={handleDelete} disabled={deleteWorkerMutation.isPending}>
                   Delete
                 </Button>
               )}

@@ -227,6 +227,7 @@ const Contractors = () => {
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
         confirmDelete={confirmDelete}
         workerType="contractor"
+        isDeleting={deleteContractorMutation.isPending}
       />
     </div>
   );

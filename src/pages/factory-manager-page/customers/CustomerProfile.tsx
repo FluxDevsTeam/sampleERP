@@ -153,6 +153,25 @@ const CustomerProfile = () => {
     return new Intl.NumberFormat('en-US').format(number);
   };
 
+  // Calculate totals for Shop Items
+  let totalCostPrice = 0, totalSellingPrice = 0, totalTotalPrice = 0;
+  if (customer.customer_details.shop_item && customer.customer_details.shop_item.length > 0) {
+    customer.customer_details.shop_item.forEach((proj) => {
+      totalCostPrice += Number(proj.cost_price) || 0;
+      totalSellingPrice += Number(proj.selling_price) || 0;
+      totalTotalPrice += Number(proj.total_price) || 0;
+    });
+  }
+
+  // Calculate totals for Projects
+  let totalPaid = 0, totalBalance = 0;
+  if (customer.customer_details.project && customer.customer_details.project.length > 0) {
+    customer.customer_details.project.forEach((proj) => {
+      totalPaid += Number(proj.paid) || 0;
+      totalBalance += Number(proj.balance) || 0;
+    });
+  }
+
   return (
     <div className="mx-20 my-10">
       {/* Customer Summary */}
@@ -287,14 +306,22 @@ const CustomerProfile = () => {
             customer.customer_details.project.map((proj) => (
             <tr key={proj.id}>
               <td className="py-4 px-2 border border-gray-300 capitalize">{proj.name}</td>
-              <td className="py-4 px-2 border border-gray-300 capitalize">{proj.paid}</td>
-              <td className="py-4 px-2 border border-gray-300 capitalize">{proj.balance}</td>
+              <td className="py-4 px-2 border border-gray-300 capitalize">₦{formatNumberWithCommas(Number(proj.paid))}</td>
+              <td className={`py-4 px-2 border border-gray-300 capitalize ${Number(proj.balance) <= 0 ? 'text-red-600' : ''}`}>₦{formatNumberWithCommas(Number(proj.balance))}</td>
             </tr>
               ))
             ) : (
               <p>No projects available.</p>
             )
           }
+          {/* Total Row */}
+          {customer.customer_details.project && customer.customer_details.project.length > 0 && (
+            <tr className="bg-gray-100 font-bold">
+              <td className="py-4 px-2 border border-gray-300 text-left">Total</td>
+              <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalPaid)}</td>
+              <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalBalance)}</td>
+            </tr>
+          )}
         </tbody>
       </table>
       
@@ -302,6 +329,7 @@ const CustomerProfile = () => {
       <table className="table-auto border-collapse border border-gray-300 w-full bg-white">
         <thead>
           <tr className="bg-[#F4F6F9] font-black text-left">
+            <th className="py-4 px-2 border border-gray-300">Name</th>
             <th className="py-4 px-2 border border-gray-300">Quantity</th>
             <th className="py-4 px-2 border border-gray-300">Cost Price</th>
             <th className="py-4 px-2 border border-gray-300">Selling Price</th>
@@ -312,16 +340,26 @@ const CustomerProfile = () => {
           {customer.customer_details.shop_item && customer.customer_details.shop_item.length > 0 ? (
             customer.customer_details.shop_item.map((proj) => (
             <tr key={proj.id}>
-              <td className="py-4 px-2 border border-gray-300 capitalize">{proj.quantity}</td>
-              <td className="py-4 px-2 border border-gray-300">{proj.cost_price}</td>
-              <td className="py-4 px-2 border border-gray-300">{proj.selling_price}</td>
-              <td className="py-4 px-2 border border-gray-300">{proj.total_price}</td>
+                <td className="py-4 px-2 border border-gray-300 capitalize">{proj.name || '-'}</td>
+                <td className="py-4 px-2 border border-gray-300 capitalize">{formatNumberWithCommas(Number(proj.quantity))}</td>
+                <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(Number(proj.cost_price))}</td>
+                <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(Number(proj.selling_price))}</td>
+                <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(Number(proj.total_price))}</td>
             </tr>
               ))
             ) : (
-              <p className="capitalize">No item available.</p>
-            )
-          }
+            <tr><td className="capitalize text-center py-4 px-2 border border-gray-300" colSpan={5}>No item available.</td></tr>
+          )}
+          {/* Total Row */}
+          {customer.customer_details.shop_item && customer.customer_details.shop_item.length > 0 && (
+            <tr className="bg-gray-100 font-bold">
+              <td className="py-4 px-2 border border-gray-300 text-left">Total</td>
+              <td className="py-4 px-2 border border-gray-300"></td>
+              <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalCostPrice)}</td>
+              <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalSellingPrice)}</td>
+              <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalTotalPrice)}</td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
