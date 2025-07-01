@@ -568,6 +568,7 @@ export function getSidebarForRole(role: string | null | undefined) {
     case 'ceo':
       return sidebarLink;
     case 'admin':
+    case 'accountant':
       return adminSidebarLink;
     case 'project_manager':
       return projectManagerSidebarLink;

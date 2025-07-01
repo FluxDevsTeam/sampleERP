@@ -47,6 +47,7 @@ const roleOptions = [
   "ceo",
   "admin",
   "storekeeper",
+  "accountant",
 ];
 
 interface User {

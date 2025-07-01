@@ -94,6 +94,8 @@ import Shop from "./pages/shop/shop.tsx";
 import Product from "./pages/product/product.tsx";
 import EditRecordRemovedItem from "./pages/store-keeper-page/record rm added/record rm added components/EditRecordAddedItem.tsx";
 
+import AccountantDashboard from "./pages/accountant/AccountantDashboard";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -682,7 +684,7 @@ const router = createBrowserRouter([
   {
     path: "/admin",
     element: (
-      <ProtectedRoute allowedRoles={["admin", "ceo", "factory_manager", "project_manager"]}>
+      <ProtectedRoute allowedRoles={["admin", "ceo", "factory_manager", "project_manager", "accountant"]}>
         <AdminLayout />
       </ProtectedRoute>
     ),
@@ -818,7 +820,27 @@ const router = createBrowserRouter([
   {
     path: "/product/*",
     element: <Product />
-  }
+  },
+
+  // ACCOUNTANT ROUTES
+  {
+    path: "/accountant",
+    element: (
+      <ProtectedRoute allowedRoles={["accountant", "ceo", "admin", "factory_manager", "project_manager"]}>
+        <AccountantDashboard />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <AccountantDashboard />,
+      },
+      {
+        path: "dashboard",
+        element: <AccountantDashboard />,
+      },
+    ],
+  },
 ]);
 
 const App = () => {

@@ -54,6 +54,9 @@ const Signin = () => {
           case "admin":
             navigate("/admin/dashboard");
             break;
+          case "accountant":
+            navigate("/accountant/dashboard");
+            break;
           case "factory_manager":
             navigate("/factory-manager/dashboard");
             break;
