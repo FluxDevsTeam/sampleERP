@@ -14,6 +14,7 @@ import {
   faArrowDown,
   faChevronDown,
   faChevronUp,
+  faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/pages/AuthPages/AuthContext";
@@ -21,6 +22,7 @@ import { useAuth } from "@/pages/AuthPages/AuthContext";
 import Modal from "@/pages/shop/Modal";
 import SearchablePaginatedProjectDropdown from "./SearchablePaginatedProjectDropdown";
 import DashboardCard from "../../factory-manager-page/dashboard/DashboardCard";
+import ProductTaskManager from "./Product Components/ProductTaskManager";
 
 interface TableData {
   id: number;
@@ -30,6 +32,7 @@ interface TableData {
   Quantity: string | number;
   Progress: JSX.Element;
   Details: JSX.Element;
+  Task: JSX.Element;
   Quotation: JSX.Element;
   [key: string]: string | number | JSX.Element;
 }
@@ -43,10 +46,14 @@ const ProductsTable: React.FC = () => {
     "Quantity",
     "Progress",
     "Details",
+    "Task",
     "Quotation",
   ];
   // TABLE DATA
   const [tableData, setTableData] = useState<TableData[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // LOADING
   const [loading, setLoading] = useState<boolean>(true);
@@ -88,10 +95,6 @@ const ProductsTable: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // PAGINATION
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
   // SUCCESS AND ERROR MODAL
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
@@ -132,6 +135,13 @@ const ProductsTable: React.FC = () => {
 
   // Add state for expanded image at the top of the component
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
+
+  // Add missing state for setShowTasksModal
+  const [showTasksModal, setShowTasksModal] = useState(false);
+  const [selectedTasksProduct, setSelectedTasksProduct] = useState<any | null>(null);
+
+  // Add local state for tasks in the ProductsTable component
+  const [localTasks, setLocalTasks] = useState<any[]>([]);
 
   // Get user role on component mount
   useEffect(() => {
@@ -183,7 +193,7 @@ const ProductsTable: React.FC = () => {
   };
 
   const fetchProducts = async () => {
-    let url = `https://backend.kidsdesigncompany.com/api/product/`;
+    let url = `https://backend.kidsdesigncompany.com/api/product/?page=${currentPage}&page_size=${itemsPerPage}`;
     const params = new URLSearchParams();
     if (searchQuery) {
       params.append('search', searchQuery);
@@ -195,11 +205,10 @@ const ProductsTable: React.FC = () => {
       params.append('project', selectedProject);
     }
     if (params.toString()) {
-      url += `?${params.toString()}`;
+      url += `&${params.toString()}`;
     }
     try {
       setLoading(true);
-
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -207,98 +216,66 @@ const ProductsTable: React.FC = () => {
           Authorization: `JWT ${localStorage.getItem("accessToken")}`,
         },
       });
-
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
-
       const data = await response.json();
-      console.log(data);
-
-      const updatedTableData: TableData[] = data.results.map((item: any) => {
-        return {
-          id: item.id,
-        
-          Product: (
-            <div className="items-center">
-              <p
-                className="cursor-pointer"
-                onClick={(e) => {
-                  const parentDiv = e.currentTarget.parentElement;
-                  const buttons = parentDiv?.querySelectorAll("button");
-                  buttons?.forEach((button) => {
-                    button.classList.toggle("hidden");
-                  });
-                }}
-              >
-                {item.name}
-              </p>
-              <button
-                onClick={() =>
-                  navigate(
-                    `/project-manager/add-contractor/${item.id}`
-                  )
-                }
-                className="hidden my-2 border-blue-400 border-[2px] px-2 rounded-lg"
-              >
-                <FontAwesomeIcon
-                  icon={faPlus}
-                  className="text-blue-400 text-xs mr-1"
-                />
-                <span>contractor</span>
-              </button>{" "}
-              <br />
-              <button
-                onClick={() =>
-                  navigate(`/project-manager/add-worker/${item.id}`)
-                }
-                className="hidden border-blue-400 border-[2px] px-2 rounded-lg"
-              >
-                <FontAwesomeIcon
-                  icon={faPlus}
-                  className="text-blue-400 text-xs mr-1"
-                />
-                <span>worker</span>
-              </button>
+      const updatedTableData: TableData[] = data.results.map((item: any) => ({
+        id: item.id,
+        Product: (
+          <div className="items-center">
+            <p>{item.name}</p>
+          </div>
+        ),
+        "Linked Project": item.linked_project?.name || "-",
+        "Selling price": `₦${Number(item.selling_price).toLocaleString()}`,
+        Quantity: item.quantity || "-",
+        Details: (
+          <button
+            onClick={() => handleViewDetails(item)}
+            className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+          >
+            View
+          </button>
+        ),
+        Task: (
+          <button
+            onClick={() => {
+              setShowProductDetailsModal(false);
+              setSelectedProduct(null);
+              setSelectedTasksProduct(item);
+              setShowTasksModal(true);
+            }}
+            className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
+          >
+            Task
+          </button>
+        ),
+        Progress: (
+          <div className="w-full bg-gray-200 rounded-full h-3 relative">
+            <div
+              className={`bg-blue-400 h-3 rounded-full`}
+              style={{ width: `${item.progress}%` }}
+            ></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className={`text-green-200 text-xs font-semibold ${item.progress > 59 ? "text-white" : ""}`}>{item.progress}%</span>
             </div>
-          ),
-          "Linked Project": item.linked_project?.name || "-",
-          "Selling price": `₦${Number(item.selling_price).toLocaleString()}`,
-          Quantity: item.quantity || "-",
-          Details: (
-            <button
-              onClick={() => handleViewDetails(item)}
-              className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
-            >
-              View
-            </button>
-          ),
-          Progress: (
-            <div className="w-full bg-gray-200 rounded-full h-3 relative">
-              <div
-                className={`bg-blue-400 h-3 rounded-full`}
-                style={{ width: `${item.progress}%` }}
-              ></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className={`text-green-200 text-xs font-semibold ${item.progress > 59 ? "text-white" : ""}`}>{item.progress}%</span>
-              </div>
-            </div>
-          ),
-          Quotation: (
-            <button
-              onClick={() => {
-                setSelectedProduct(item);
-                setShowQuotationModal(true);
-              }}
-              className="px-3 py-1 text-green-400 border-2 border-green-400 rounded hover:bg-green-50"
-            >
-              Quotation
-            </button>
-          ),
-        };
-      });
-
+          </div>
+        ),
+        Quotation: (
+          <button
+            onClick={() => {
+              setSelectedProduct(item);
+              setShowQuotationModal(true);
+            }}
+            className="px-3 py-1 border-2 border-blue-400 text-blue-400 bg-white rounded hover:bg-blue-400 hover:text-white transition-colors"
+          >
+            Quotation
+          </button>
+        ),
+      }));
       setTableData(updatedTableData);
+      setTotalCount(data.count);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -308,13 +285,10 @@ const ProductsTable: React.FC = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [searchQuery, ordering, selectedProject]);
+  }, [currentPage, searchQuery, ordering, selectedProject]);
 
-  // Calculate pagination values
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(tableData.length / itemsPerPage);
+  const currentItems = tableData;
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -785,6 +759,75 @@ const ProductsTable: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Fix types in calculateTaskProgress
+  function calculateTaskProgress(tasks: { checked: boolean; subtasks?: { checked: boolean }[] }[] = []) {
+    if (!Array.isArray(tasks) || tasks.length === 0) return 0;
+    let total = 0;
+    let completed = 0;
+    tasks.forEach((task: { checked: boolean; subtasks?: { checked: boolean }[] }) => {
+      total += 1;
+      if (task.checked) completed += 1;
+      if (Array.isArray(task.subtasks)) {
+        total += task.subtasks.length;
+        completed += task.subtasks.filter((sub: { checked: boolean }) => sub.checked).length;
+      }
+    });
+    return total === 0 ? 0 : Math.round((completed / total) * 100);
+  }
+
+  // Sync localTasks with selectedProduct.tasks when product detail modal opens
+  useEffect(() => {
+    if (showProductDetailsModal && selectedProduct) {
+      let loadedTasks = selectedProduct.tasks;
+      if (typeof loadedTasks === 'string') {
+        try {
+          loadedTasks = JSON.parse(loadedTasks);
+        } catch {
+          loadedTasks = [];
+        }
+      }
+      setLocalTasks(Array.isArray(loadedTasks) ? loadedTasks : []);
+    }
+  }, [showProductDetailsModal, selectedProduct]);
+
+  // Handler for toggling task/subtask completion
+  const handleTaskCompletionToggle = async (taskIdx: number, subIdx?: number) => {
+    if (!selectedProduct) return;
+    const updatedTasks = [...localTasks];
+    if (typeof subIdx === 'number') {
+      if (updatedTasks[taskIdx].subtasks && updatedTasks[taskIdx].subtasks[subIdx]) {
+        updatedTasks[taskIdx].subtasks[subIdx].checked = !updatedTasks[taskIdx].subtasks[subIdx].checked;
+        // After toggling, check if all subtasks are checked
+        const allChecked = updatedTasks[taskIdx].subtasks.every((sub: any) => sub.checked);
+        updatedTasks[taskIdx].checked = allChecked;
+      }
+    } else {
+      updatedTasks[taskIdx].checked = !updatedTasks[taskIdx].checked;
+      // If toggling the main task, also toggle all subtasks to match
+      if (updatedTasks[taskIdx].subtasks && Array.isArray(updatedTasks[taskIdx].subtasks)) {
+        updatedTasks[taskIdx].subtasks = updatedTasks[taskIdx].subtasks.map((sub: any) => ({
+          ...sub,
+          checked: updatedTasks[taskIdx].checked
+        }));
+      }
+    }
+    setLocalTasks(updatedTasks); // Update local state for immediate UI feedback
+    // Send PATCH to backend
+    try {
+      const token = localStorage.getItem('accessToken');
+      await fetch(`https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `JWT ${token}`
+        },
+        body: JSON.stringify({ tasks: updatedTasks })
+      });
+    } catch (err) {
+      alert('Failed to update task completion');
+    }
+  };
+
   return (
     <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
       <h1
@@ -833,7 +876,7 @@ const ProductsTable: React.FC = () => {
               <div className="flex items-center space-x-4">
                 {/* Sort by Dropdown */}
                 {/* Project Filter Dropdown */}
-                <div className="w-56">
+                <div className="w-56 flex items-center gap-2">
                   <SearchablePaginatedProjectDropdown
                     endpoint="https://backend.kidsdesigncompany.com/api/project/?ordering=-start_date"
                     onChange={(value) => {
@@ -843,6 +886,17 @@ const ProductsTable: React.FC = () => {
                     selectedValue={selectedProject}
                     selectedName={projects.find((p) => String(p.id) === selectedProject)?.name || ""}
                   />
+                  {selectedProject && (
+                    <button
+                      onClick={() => {
+                        setSelectedProject("");
+                        setCurrentPage(1);
+                      }}
+                      className="ml-2 px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-xs"
+                    >
+                      Clear
+                    </button>
+                  )}
                 </div>
                 <select
                   value={ordering}
@@ -899,28 +953,37 @@ const ProductsTable: React.FC = () => {
       <div
         className={`flex justify-center items-center mb-28 gap-2
          ${showContractorsModal ? "hidden" : ""} 
-         ${showWorkersModal ? "hidden" : ""} `}
+         ${showWorkersModal ? "hidden" : ""}`}
       >
         <button
-          onClick={() => handlePageChange(1)}
+          onClick={() => setCurrentPage(1)}
           disabled={currentPage === 1}
           className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
           <FontAwesomeIcon icon={faAnglesLeft} />
         </button>
         <button
-          onClick={() => handlePageChange(currentPage - 1)}
+          onClick={() => setCurrentPage(currentPage - 1)}
           disabled={currentPage === 1}
           className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-
         <span className="mx-4">
           Page {currentPage} of {totalPages || 1}
         </span>
-
-        <button onClick={() => handlePageChange(currentPage + 1)}>
+        <button
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faArrowRight} />
+        </button>
+        <button
+          onClick={() => setCurrentPage(totalPages)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
           <FontAwesomeIcon icon={faAnglesRight} />
         </button>
       </div>
@@ -965,28 +1028,39 @@ const ProductsTable: React.FC = () => {
                       </div>
                 {/* Action Buttons Row */}
                 <div className="flex gap-4 justify-end mb-8">
-                      <button
+                  <button
                     onClick={() => setShowContractorsModal(true)}
-                    className="px-4 py-2 bg-blue-400 text-white rounded-lg font-semibold shadow hover:bg-blue-500 transition-colors"
+                    className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
                   >
                     View Contractors
-                      </button>
-                        <button
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowProductDetailsModal(false);
+                      setSelectedProduct(null);
+                      setSelectedTasksProduct(selectedProduct);
+                      setShowTasksModal(true);
+                    }}
+                    className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
+                  >
+                    Task
+                  </button>
+                  <button
                     onClick={() => setShowWorkersModal(true)}
-                    className="px-4 py-2 bg-blue-400 text-white rounded-lg font-semibold shadow hover:bg-blue-500 transition-colors"
-                        >
+                    className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
+                  >
                     View Salary Workers
-                        </button>
-                        <button
+                  </button>
+                  <button
                     onClick={() => setShowQuotationModal(true)}
-                    className="px-4 py-2 bg-purple-500 text-white rounded-lg font-semibold shadow hover:bg-purple-600 transition-colors"
-                        >
+                    className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
+                  >
                     View Quotation
-                        </button>
-                      </div>
+                  </button>
+                </div>
               </>
             )}
-            <div className="flex flex-col md:flex-row gap-8">
+            <div className="flex flex-col md:flex-row gap-1">
               {/* LEFT: Details */}
               <div className="flex-1">
               {/* other prodict details */}
@@ -1044,7 +1118,7 @@ const ProductsTable: React.FC = () => {
                 </div>
               </div>
               {/* RIGHT: Progress and Images */}
-              <div className="flex flex-col items-center md:w-1/3 w-full">
+              <div className="flex flex-col items-center md:w-1/2 w-full">
                 {/* Progress Bar */}
                 <div className="text-sm text-gray-20 mb-3 w-full">
                   <span className="font-bold">Progress rate:</span>
@@ -1053,13 +1127,13 @@ const ProductsTable: React.FC = () => {
                       <div className="flex-grow">
                         <span className="text-xs text-gray-500">
                           {selectedProduct.progress}% complete
-                  </span>
+                        </span>
                         <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
                           <div
                             className="bg-blue-400 h-2.5 rounded-full"
                             style={{ width: `${selectedProduct.progress}%` }}
                           ></div>
-                  </div>
+                        </div>
                       </div>
                       {userRole !== "shopkeeper" && userRole !== "storekeeper" && (
                         <button
@@ -1071,8 +1145,8 @@ const ProductsTable: React.FC = () => {
                         >
                           Edit
                         </button>
-                    )}
-                  </div>
+                      )}
+                    </div>
                   ) : (
                     <div className="mt-2">
                       <div className="flex justify-between items-center mb-2">
@@ -1102,9 +1176,7 @@ const ProductsTable: React.FC = () => {
                         min="0"
                         max="100"
                         value={currentProgress}
-                        onChange={(e) =>
-                          setCurrentProgress(Number(e.target.value))
-                        }
+                        onChange={(e) => setCurrentProgress(Number(e.target.value))}
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                       />
                     </div>
@@ -1128,6 +1200,62 @@ const ProductsTable: React.FC = () => {
                       onClick={() => setExpandedImage(selectedProduct.images)}
                     />
                   )}
+                </div>
+                {/* Task Table under Progress rate */}
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mt-6 w-full">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="text-md font-semibold text-gray-700">Tasks</h4>
+                    <button
+                      onClick={() => {
+                        setShowProductDetailsModal(false);
+                        setSelectedProduct(null);
+                        setSelectedTasksProduct(selectedProduct);
+                        setShowTasksModal(true);
+                      }}
+                      className="px-3 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500 transition-colors"
+                      disabled={!selectedProduct}
+                    >
+                      + Task
+                    </button>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead className="bg-blue-400 text-white">
+                        <tr>
+                          <th className="p-2 text-left">Task</th>
+                          <th className="p-2 text-left">Completed</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Array.isArray(localTasks) && localTasks.length > 0 ? (
+                          localTasks.map((task: any, idx: number) => (
+                            task ? (
+                              <React.Fragment key={idx}>
+                                <tr className="border-b border-gray-200">
+                                  <td className="p-2 text-left font-medium">{task?.title}</td>
+                                  <td className="p-2 text-left">
+                                    <input type="checkbox" checked={task?.checked} onChange={() => handleTaskCompletionToggle(idx)} />
+                                  </td>
+                                </tr>
+                                {Array.isArray(task.subtasks) && task.subtasks.length > 0 && task.subtasks.map((sub: any, subIdx: number) => (
+                                  <tr key={subIdx} className="border-b border-gray-100">
+                                    <td className="p-2 pl-8 text-left text-black-600">• {sub.title}</td>
+                                    <td className="p-2 text-left">
+                                      <input type="checkbox" checked={sub.checked} onChange={() => handleTaskCompletionToggle(idx, subIdx)} />
+                                    </td>
+                                  </tr>
+                                ))}
+                              </React.Fragment>
+                            ) : null
+                          ))
+                        ) : (
+                          <tr>
+                            <td className="p-2 text-left" colSpan={2}>No tasks found</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1626,6 +1754,26 @@ const ProductsTable: React.FC = () => {
         message={modalConfig.message}
         type={modalConfig.type}
       />
+
+      {showTasksModal && selectedTasksProduct && (
+        <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg p-6 max-w-2xl min-h-[400px] w-full relative shadow-xl border-2 border-blue-400">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={() => setShowTasksModal(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold mb-4">Tasks for {selectedTasksProduct.name}</h2>
+            <ProductTaskManager
+              product={selectedTasksProduct}
+              onUpdate={(updatedTasks) => {
+                setSelectedTasksProduct((prev: any) => ({ ...prev, tasks: updatedTasks }));
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

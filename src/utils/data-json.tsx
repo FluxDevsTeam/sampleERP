@@ -196,6 +196,44 @@ export const sidebarLink: SidebarProps[] = [
   },
   {
     id: nanoid(),
+    text: "Accountant",
+    isDropdown: true,
+    icon: <FontAwesomeIcon icon={faCalculator} className="text-lg" />,
+    dropdownItems: [
+      {
+        id: nanoid(),
+        text: "Dashboard",
+        href: "/accountant/dashboard",
+        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Assets",
+        href: "/accountant/assets",
+        icon: <FontAwesomeIcon icon={faBuilding} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Expenses",
+        href: "/accountant/expenses",
+        icon: <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Paid",
+        href: "/accountant/paid",
+        icon: <FontAwesomeIcon icon={faCheckCircle} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Workers",
+        href: "/accountant/workers",
+        icon: <FontAwesomeIcon icon={faUsers} className="text-lg" />,
+      },
+    ],
+  },
+  {
+    id: nanoid(),
     text: "Shop",
     isDropdown: true,
     icon: <FontAwesomeIcon icon={faStore} className="text-lg" />,

@@ -275,6 +275,11 @@ const CustomerProfile = () => {
                       </button>
                     </>
                   )}
+                  <div className="flex justify-center">
+                    <Link to="/factory-manager/customers" className="bg-blue-200 text-white hover:text-white hover:no-underline hover:bg-gray-20 px-4 py-2 rounded-lg">
+                      Back to Customers
+                    </Link>
+                  </div>
                 </div>
               </>
             )}
@@ -285,13 +290,8 @@ const CustomerProfile = () => {
 
         {/* Centering the Link */}
       </div>
+ 
 
-      <div className="flex justify-center">
-        <Link to="/factory-manager/customers" className="bg-blue-200 text-white hover:text-white hover:no-underline hover:bg-gray-20 px-4 py-2 rounded-lg">
-          Back to Customers
-        </Link>
-      </div>
-      
       <h3 className="mb-6 mt-14 font-bold text-[24px] text-[#0178A3]">Projects</h3>
       <table className="table-auto border-collapse border border-gray-300 w-full bg-white mb-14">
         <thead>

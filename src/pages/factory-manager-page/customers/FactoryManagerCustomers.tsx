@@ -158,7 +158,7 @@ const FactoryManagerCustomers = () => {
       </div>
 
       <div className="flex justify-between items-center mb-6">
-        <button onClick={() => setShowModal(true)} className="bg-[#232595b3] text-white flex items-center gap-3 px-4 py-1 rounded-lg">
+        <button onClick={() => setShowModal(true)} className="bg-blue-400 hover:bg-blue-500 text-white flex items-center gap-3 px-4 py-1 rounded-lg">
           <span className="font-extrabold text-[30px]">+</span>
           <span className="text-[16px]"> Create Customer</span>
         </button>
@@ -170,14 +170,14 @@ const FactoryManagerCustomers = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="border p-2 rounded-lg"
           />
-          <button onClick={handleSearch} className="bg-blue-600 text-white px-4 py-2 rounded-lg">Search</button>
+          <button onClick={handleSearch} className="bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded-lg">Search</button>
           <button onClick={clearSearch} className="bg-gray-500 text-white px-4 py-2 rounded-lg">Clear</button>
         </div>
       </div>
 
       {showModal && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="bg-white p-4 rounded-lg shadow-lg max-w-sm w-full mx-auto">
             <h2 className="text-xl font-bold mb-4">Add New Customer</h2>
             <input type="text" name="name" placeholder="Name" value={newCustomer.name} onChange={handleInputChange} className="border p-2 w-full mb-2" />
             <input type="email" name="email" placeholder="Email" value={newCustomer.email} onChange={handleInputChange} className="border p-2 w-full mb-2" />
@@ -196,28 +196,39 @@ const FactoryManagerCustomers = () => {
         </div>
       )}
 
-      <table className="table-auto border-collapse border border-gray-300 w-full bg-white">
-        <thead>
-          <tr className="bg-[#F4F6F9] font-black text-left">
-            <th className="py-4 px-2 border border-gray-300">Name</th>
-            <th className="py-4 px-2 border border-gray-300">Email</th>
-            <th className="py-4 px-2 border border-gray-300">Phone</th>
-            <th className="py-4 px-2 border border-gray-300">Location</th>
-            <th className="py-4 px-2 border border-gray-300">Year Joined</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customers.map((customer: any) => (
-            <tr key={customer.id} onClick={() => navigate(`/factory-manager/customers/${customer.id}`)} className="cursor-pointer hover:bg-gray-100">
-              <td className="py-4 px-2 border border-gray-300 capitalize">{customer.name}</td>
-              <td className="py-4 px-2 border border-gray-300">{customer.email}</td>
-              <td className="py-4 px-2 border border-gray-300">{customer.phone_number}</td>
-              <td className="py-4 px-2 border border-gray-300">{customer.address}</td>
-              <td className="py-4 px-2 border border-gray-300">{formatDate(customer.created_at)}</td>
+      <div className="overflow-x-auto pb-6">
+        <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+          <thead>
+            <tr className="bg-blue-400 text-white">
+              <th className="py-4 px-4 text-left text-sm font-semibold">Name</th>
+              <th className="py-4 px-4 text-left text-sm font-semibold">Email</th>
+              <th className="py-4 px-4 text-left text-sm font-semibold">Phone</th>
+              <th className="py-4 px-4 text-left text-sm font-semibold">Location</th>
+              <th className="py-4 px-4 text-left text-sm font-semibold w-28">Year Joined</th>
+              <th className="py-4 px-4 text-left text-sm font-semibold">Details</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {customers.map((customer: any) => (
+              <tr key={customer.id} className="hover:bg-gray-100">
+                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700 capitalize border-r border-gray-200">{customer.name}</td>
+                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700 border-r border-gray-200">{customer.email}</td>
+                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700 border-r border-gray-200">{customer.phone_number}</td>
+                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700 border-r border-gray-200">{customer.address}</td>
+                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700 w-24 border-r border-gray-200">{formatDate(customer.created_at)}</td>
+                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700 text-center">
+                  <button
+                    onClick={() => navigate(`/factory-manager/customers/${customer.id}`)}
+                    className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded hover:bg-blue-50 transition-colors"
+                  >
+                    Details
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <div className="flex justify-center items-center mt-6">
         <button 

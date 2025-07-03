@@ -26,8 +26,21 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
 
   // Function to toggle dropdown
   const toggleDropdown = (id: string) => {
-    setOpenDropdowns(prev => 
-      prev.includes(id) 
+    // If sidebar is closed, open it first
+    if (!isSidebarOpen) {
+      toggleSidebar();
+      // Delay opening the dropdown until after sidebar is open (for smooth UX)
+      setTimeout(() => {
+        setOpenDropdowns(prev =>
+          prev.includes(id)
+            ? prev.filter(dropdownId => dropdownId !== id)
+            : [...prev, id]
+        );
+      }, 300); // match sidebar transition duration
+      return;
+    }
+    setOpenDropdowns(prev =>
+      prev.includes(id)
         ? prev.filter(dropdownId => dropdownId !== id)
         : [...prev, id]
     );

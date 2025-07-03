@@ -51,6 +51,7 @@ import AddWorkerPage from "./pages/project-manager-page/product/Product Componen
 import EditProduct from "./pages/project-manager-page/product/Product Components/EditProduct";
 import AddQuotation from "./pages/project-manager-page/product/Product Components/AddQuotation";
 import EditQuotation from "./pages/project-manager-page/product/Product Components/EditQuotation";
+import ProductTaskPage from "./pages/project-manager-page/product/ProductTaskPage";
 
 import { StoreKeeperLayout } from "./pages/store-keeper-page";
 import StoreKeeperDashboard from "./pages/store-keeper-page/dashboard/StoreKeeperDashboard";
