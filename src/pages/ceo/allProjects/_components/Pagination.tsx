@@ -56,13 +56,13 @@ const PaginationComponent: React.FC<PaginationProps> = ({
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className="mt-6 mb-4">
-      <div className="flex justify-center items-center space-x-2">
+    <div className="mt-4 sm:mt-6 mb-4">
+      <div className="flex justify-center items-center space-x-1 sm:space-x-2">
         {/* Previous button */}
         <button
           onClick={() => hasPreviousPage && handlePageChange(currentPage - 1)}
           disabled={!hasPreviousPage}
-          className="px-3 py-1 border rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-2 sm:px-3 py-1 border rounded-md text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Previous
         </button>
@@ -71,14 +71,14 @@ const PaginationComponent: React.FC<PaginationProps> = ({
         <div className="flex items-center">
           {pageNumbers.map((page, index) =>
             page === "..." ? (
-              <span key={`ellipsis-${index}`} className="px-2 text-sm">
+              <span key={`ellipsis-${index}`} className="px-1 sm:px-2 text-xs sm:text-sm">
                 ...
               </span>
             ) : (
               <button
                 key={page}
                 onClick={() => handlePageChange(page as number)}
-                className={`w-8 h-8 mx-1 flex items-center justify-center rounded-md text-sm ${
+                className={`w-7 h-7 sm:w-8 sm:h-8 mx-0.5 sm:mx-1 flex items-center justify-center rounded-md text-xs sm:text-sm ${
                   currentPage === page
                     ? "bg-neutral-900 text-white"
                     : "border hover:bg-gray-100"
@@ -94,7 +94,7 @@ const PaginationComponent: React.FC<PaginationProps> = ({
         <button
           onClick={() => hasNextPage && handlePageChange(currentPage + 1)}
           disabled={!hasNextPage}
-          className="px-3 py-1 border rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-2 sm:px-3 py-1 border rounded-md text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Next
         </button>

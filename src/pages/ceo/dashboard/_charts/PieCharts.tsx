@@ -209,20 +209,20 @@ const PieCharts = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 p-3 sm:p-4 lg:p-6">
       {/* Yearly Expenses Card */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-blue-50 p-4 border-b border-blue-100">
-          <h2 className="text-xl font-bold text-neutral-800 text-center">
+        <div className="bg-blue-50 p-3 sm:p-4 border-b border-blue-100">
+          <h2 className="text-lg sm:text-xl font-bold text-neutral-800 text-center">
             Annual Expense Distribution
           </h2>
-          <p className="text-center text-blue-600 font-medium mt-1">
+          <p className="text-center text-blue-600 font-medium mt-1 text-sm sm:text-base">
             Total: ₦ {yearTotal.toLocaleString()}
           </p>
         </div>
 
-        <div className="p-4 bg-[#f5f7fa]">
-          <ResponsiveContainer width="100%" height={400}>
+        <div className="p-3 sm:p-4 bg-[#f5f7fa]">
+          <ResponsiveContainer width="100%" height={300} className="sm:h-[350px] lg:h-[400px]">
             <PieChart>
               <Pie
                 data={yearData}
@@ -248,11 +248,11 @@ const PieCharts = () => {
           </ResponsiveContainer>
 
           {/* Top categories summary */}
-          <div className="mt-4 border-t border-gray-100 pt-4">
-            <h3 className="font-medium text-gray-700 mb-2">
+          <div className="mt-3 sm:mt-4 border-t border-gray-100 pt-3 sm:pt-4">
+            <h3 className="font-medium text-gray-700 mb-2 text-sm sm:text-base">
               Top Expense Categories
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               {yearData.slice(0, 3).map((category, index) => (
                 <div key={index} className="flex justify-between items-center">
                   <div className="flex items-center">
@@ -260,9 +260,9 @@ const PieCharts = () => {
                       className="w-3 h-3 rounded-full mr-2"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     ></div>
-                    <span className="text-neutral-800">{category.name}</span>
+                    <span className="text-neutral-800 text-sm sm:text-base">{category.name}</span>
                   </div>
-                  <span className="font-medium">
+                  <span className="font-medium text-sm sm:text-base">
                     {formatValue(category.value)}
                   </span>
                 </div>
@@ -274,17 +274,17 @@ const PieCharts = () => {
 
       {/* Monthly Expenses Card */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-blue-50 p-4 border-b border-blue-100">
-          <h2 className="text-xl font-bold text-neutral-800 text-center">
+        <div className="bg-blue-50 p-3 sm:p-4 border-b border-blue-100">
+          <h2 className="text-lg sm:text-xl font-bold text-neutral-800 text-center">
             Monthly Expense Distribution
           </h2>
-          <p className="text-center text-neutral-600 font-medium mt-1">
+          <p className="text-center text-neutral-600 font-medium mt-1 text-sm sm:text-base">
             Total: ₦ {monthTotal.toLocaleString()}
           </p>
         </div>
 
-        <div className="p-4 bg-[#f5f7fa] h-full">
-          <ResponsiveContainer width="100%" height={400}>
+        <div className="p-3 sm:p-4 bg-[#f5f7fa] h-full">
+          <ResponsiveContainer width="100%" height={300} className="sm:h-[350px] lg:h-[400px]">
             <PieChart>
               <Pie
                 data={monthData}
@@ -310,11 +310,11 @@ const PieCharts = () => {
           </ResponsiveContainer>
 
           {/* Top categories summary */}
-          <div className="mt-4 border-t border-gray-100 pt-4">
-            <h3 className="font-medium text-gray-700 mb-2">
+          <div className="mt-3 sm:mt-4 border-t border-gray-100 pt-3 sm:pt-4">
+            <h3 className="font-medium text-gray-700 mb-2 text-sm sm:text-base">
               Top Expense Categories
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               {monthData.slice(0, 3).map((category, index) => (
                 <div key={index} className="flex justify-between items-center">
                   <div className="flex items-center">
@@ -322,9 +322,9 @@ const PieCharts = () => {
                       className="w-3 h-3 rounded-full mr-2"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     ></div>
-                    <span className="text-neutral-800">{category.name}</span>
+                    <span className="text-neutral-800 text-sm sm:text-base">{category.name}</span>
                   </div>
-                  <span className="font-medium">
+                  <span className="font-medium text-sm sm:text-base">
                     {formatValue(category.value)}
                   </span>
                 </div>

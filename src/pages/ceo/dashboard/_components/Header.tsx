@@ -101,9 +101,9 @@ const DataCard = ({
   const isNumber = typeof value === "number";
   const isPercent = typeof value === "string" && value.trim().endsWith("%");
   return (
-    <div className="p-4 border rounded-lg shadow-md flex flex-col items-center justify-center">
-      <div className="text-base font-medium text-center mb-1">{label}</div>
-      <div className="text-lg font-semibold text-blue-400">
+    <div className="p-3 sm:p-4 border rounded-lg shadow-md flex flex-col items-center justify-center min-h-[80px] sm:min-h-[100px]">
+      <div className="text-xs sm:text-sm lg:text-base font-medium text-center mb-1 leading-tight">{label}</div>
+      <div className="text-sm sm:text-base lg:text-lg font-semibold text-blue-400 text-center">
         {isNumber ? "₦" : ""}
         {isNumber ? value.toLocaleString("en-NG") : value}
     </div>
@@ -156,41 +156,65 @@ const Header = () => {
     setOpenSection(section);
   };
 
-  if (isLoading) return <p className="p-6">Loading dashboard data...</p>;
+  if (isLoading) return <p className="p-4 sm:p-6">Loading dashboard data...</p>;
   if (error)
     return (
-      <p className="p-6 text-red-500">Error: {(error as Error).message}</p>
+      <p className="p-4 sm:p-6 text-red-500">Error: {(error as Error).message}</p>
     );
-  if (!data) return <p className="p-6">No dashboard data available</p>;
+  if (!data) return <p className="p-4 sm:p-6">No dashboard data available</p>;
 
   return (
-    <div className="p-6">
+    <div className="p-3 sm:p-4 lg:p-6">
       {/* Collapsible Section Headers Row */}
-      <div className={`flex gap-4 mb-4 py-2  whitespace-nowrap w-full ${isSidebarOpen ? 'lg:grid lg:grid-cols-6 lg:gap-3 lg:overflow-visible' : ''}`}>
-        <button className={`shrink-0 max-w-xs flex items-center justify-between ml-1 px-2 py-8 rounded-xl shadow bg-blue-50/60 hover:bg-blue-100 transition font-semibold text-blue-700 ${openSection === 'key' ? 'ring-2 ring-blue-400 rounded-full' : ''} ${isSidebarOpen ? 'lg:max-w-none' : ''}`} onClick={() => handleSectionClick('key')}>
-          Key Business Metrics {openSection === 'key' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 lg:gap-4 mb-4 py-2 overflow-x-auto">
+        <button 
+          className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-blue-50/60 hover:bg-blue-100 transition font-semibold text-blue-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'key' ? 'ring-2 ring-blue-400' : ''}`} 
+          onClick={() => handleSectionClick('key')}
+        >
+          <span className="truncate">Key Business Metrics</span>
+          {openSection === 'key' ? <MdExpandLess size={20} className="ml-2 flex-shrink-0" /> : <MdExpandMore size={20} className="ml-2 flex-shrink-0" />}
         </button>
-        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-green-50/60 hover:bg-green-100 transition font-semibold text-green-700 ${openSection === 'income' ? 'ring-2 ring-green-400 rounded-full' : ''} ${isSidebarOpen ? 'lg:max-w-none' : ''}`} onClick={() => handleSectionClick('income')}>
-          Income Breakdown {openSection === 'income' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+        <button 
+          className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-green-50/60 hover:bg-green-100 transition font-semibold text-green-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'income' ? 'ring-2 ring-green-400' : ''}`} 
+          onClick={() => handleSectionClick('income')}
+        >
+          <span className="truncate">Income Breakdown</span>
+          {openSection === 'income' ? <MdExpandLess size={20} className="ml-2 flex-shrink-0" /> : <MdExpandMore size={20} className="ml-2 flex-shrink-0" />}
         </button>
-        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-teal-50/60 hover:bg-teal-100 transition font-semibold text-teal-700 ${openSection === 'expense' ? 'ring-2 ring-teal-400 rounded-full' : ''} ${isSidebarOpen ? 'lg:max-w-none' : ''}`} onClick={() => handleSectionClick('expense')}>
-          Expense Breakdown {openSection === 'expense' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+        <button 
+          className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-teal-50/60 hover:bg-teal-100 transition font-semibold text-teal-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'expense' ? 'ring-2 ring-teal-400' : ''}`} 
+          onClick={() => handleSectionClick('expense')}
+        >
+          <span className="truncate">Expense Breakdown</span>
+          {openSection === 'expense' ? <MdExpandLess size={20} className="ml-2 flex-shrink-0" /> : <MdExpandMore size={20} className="ml-2 flex-shrink-0" />}
         </button>
-        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-purple-50/60 hover:bg-purple-100 transition font-semibold text-purple-700 ${openSection === 'asset' ? 'ring-2 ring-purple-400 rounded-full' : ''} ${isSidebarOpen ? 'lg:max-w-none' : ''}`} onClick={() => handleSectionClick('asset')}>
-          Asset & Store Analysis {openSection === 'asset' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+        <button 
+          className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-purple-50/60 hover:bg-purple-100 transition font-semibold text-purple-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'asset' ? 'ring-2 ring-purple-400' : ''}`} 
+          onClick={() => handleSectionClick('asset')}
+        >
+          <span className="truncate">Asset & Store Analysis</span>
+          {openSection === 'asset' ? <MdExpandLess size={20} className="ml-2 flex-shrink-0" /> : <MdExpandMore size={20} className="ml-2 flex-shrink-0" />}
         </button>
-        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-yellow-50/60 hover:bg-yellow-100 transition font-semibold text-yellow-700 ${openSection === 'customer' ? 'ring-2 ring-yellow-400 rounded-full' : ''} ${isSidebarOpen ? 'lg:max-w-none' : ''}`} onClick={() => handleSectionClick('customer')}>
-          Customers & Workers {openSection === 'customer' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+        <button 
+          className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-yellow-50/60 hover:bg-yellow-100 transition font-semibold text-yellow-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'customer' ? 'ring-2 ring-yellow-400' : ''}`} 
+          onClick={() => handleSectionClick('customer')}
+        >
+          <span className="truncate">Customers & Workers</span>
+          {openSection === 'customer' ? <MdExpandLess size={20} className="ml-2 flex-shrink-0" /> : <MdExpandMore size={20} className="ml-2 flex-shrink-0" />}
         </button>
-        <button className={`shrink-0 max-w-xs flex items-center justify-between px-2 py-8 rounded-xl shadow bg-gray-50/60 hover:bg-gray-100 transition font-semibold text-gray-700 ${openSection === 'additional' ? 'ring-2 ring-gray-400 rounded-full' : ''} ${isSidebarOpen ? 'lg:max-w-none' : ''}`} onClick={() => handleSectionClick('additional')}>
-          Additional Metrics {openSection === 'additional' ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
+        <button 
+          className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-gray-50/60 hover:bg-gray-100 transition font-semibold text-gray-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'additional' ? 'ring-2 ring-gray-400' : ''}`} 
+          onClick={() => handleSectionClick('additional')}
+        >
+          <span className="truncate">Additional Metrics</span>
+          {openSection === 'additional' ? <MdExpandLess size={20} className="ml-2 flex-shrink-0" /> : <MdExpandMore size={20} className="ml-2 flex-shrink-0" />}
         </button>
       </div>
 
       {/* Collapsible Section Content */}
       {openSection === 'key' && (
-        <section className="mb-8 bg-blue-50/60 rounded-2xl shadow p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <section className="mb-6 sm:mb-8 bg-blue-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
             <DataCard label="This Year Total Income" value={data.key_metrics.total_income_year} />
             <DataCard label="This Year Total Expenses" value={data.key_metrics.total_expenses_year} />
             <DataCard label="This Year Total Profit" value={data.key_metrics.total_profit_year} />
@@ -201,10 +225,10 @@ const Header = () => {
         </section>
       )}
       {openSection === 'income' && (
-        <section className="mb-8 bg-green-50/60 rounded-2xl shadow p-6">
-          <div className="mb-6">
-            <h4 className="font-semibold text-green-700 mb-2">Monthly Income Breakdown</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <section className="mb-6 sm:mb-8 bg-green-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
+          <div className="mb-4 sm:mb-6">
+            <h4 className="font-semibold text-green-700 mb-2 text-sm sm:text-base">Monthly Income Breakdown</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
               <DataCard label="Projects" value={data.income_breakdown_month.projects} />
               <DataCard label="Non-Shop Projects" value={data.income_breakdown_month.no_shop_projects} />
               <DataCard label="Shop Sales" value={data.income_breakdown_month.shop_sales} />
@@ -214,8 +238,8 @@ const Header = () => {
             </div>
           </div>
           <div>
-            <h4 className="font-semibold text-green-700 mb-2">Yearly Income Breakdown</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <h4 className="font-semibold text-green-700 mb-2 text-sm sm:text-base">Yearly Income Breakdown</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
               <DataCard label="Projects" value={data.income_breakdown_year.projects} />
               <DataCard label="Non-Shop Projects" value={data.income_breakdown_year.no_shop_projects} />
               <DataCard label="Shop Sales" value={data.income_breakdown_year.shop_sales} />
@@ -227,10 +251,10 @@ const Header = () => {
         </section>
       )}
       {openSection === 'expense' && (
-        <section className="mb-8 bg-teal-50/60 rounded-2xl shadow p-6">
-          <div className="mb-6">
-            <h4 className="font-semibold text-teal-700 mb-2">Monthly Expense Breakdown</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <section className="mb-6 sm:mb-8 bg-teal-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
+          <div className="mb-4 sm:mb-6">
+            <h4 className="font-semibold text-teal-700 mb-2 text-sm sm:text-base">Monthly Expense Breakdown</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
               <DataCard label="Salaries" value={data.expense_breakdown_month.salaries} />
               <DataCard label="Contractors" value={data.expense_breakdown_month.contractors} />
               <DataCard label="Raw Materials" value={data.expense_breakdown_month.raw_materials} />
@@ -241,8 +265,8 @@ const Header = () => {
             </div>
           </div>
           <div>
-            <h4 className="font-semibold text-teal-700 mb-2">Yearly Expense Breakdown</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <h4 className="font-semibold text-teal-700 mb-2 text-sm sm:text-base">Yearly Expense Breakdown</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
               <DataCard label="Salaries" value={data.expense_breakdown_year.salaries} />
               <DataCard label="Contractors" value={data.expense_breakdown_year.contractors} />
               <DataCard label="Raw Materials" value={data.expense_breakdown_year.raw_materials} />
@@ -255,8 +279,8 @@ const Header = () => {
         </section>
       )}
       {openSection === 'asset' && (
-        <section className="mb-8 bg-purple-50/60 rounded-2xl shadow p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <section className="mb-6 sm:mb-8 bg-purple-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
             <DataCard label="Active Assets" value={data.asset_analysis.active_assets} />
             <DataCard label="Deprecated Assets" value={data.asset_analysis.deprecated_assets} />
             <DataCard label="Current Assets Value" value={data.key_metrics.current_assets_value} />
@@ -267,8 +291,8 @@ const Header = () => {
         </section>
       )}
       {openSection === 'customer' && (
-        <section className="mb-8 bg-yellow-50/60 rounded-2xl shadow p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <section className="mb-6 sm:mb-8 bg-yellow-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
             <DataCard label="All Customers" value={data.customers.all_customers_count} />
             <DataCard label="Active Customers" value={data.customers.active_customers_count} />
             <DataCard label="Owing Customers" value={data.customers.owing_customers_count} />
@@ -279,8 +303,8 @@ const Header = () => {
         </section>
       )}
       {openSection === 'additional' && (
-        <section className="mb-8 bg-gray-50/60 rounded-2xl shadow p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <section className="mb-6 sm:mb-8 bg-gray-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
             <DataCard label="Active Contractors" value={data.additional_metrics.active_contractors} />
             <DataCard label="Inventory Items" value={data.additional_metrics.inventory_items} />
             <DataCard label="Raw Materials" value={data.additional_metrics.raw_materials_types} />

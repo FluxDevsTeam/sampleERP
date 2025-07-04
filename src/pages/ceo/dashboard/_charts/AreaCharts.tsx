@@ -65,12 +65,12 @@ const AreaChartComponent = () => {
 
   const renderChart = ({ data, title, color, id }: ChartProps) => (
     <div
-      className="backdrop-blur-md bg-white/60 border border-blue-200 rounded-3xl shadow-2xl p-10 relative overflow-hidden w-full"
-      style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)', marginBottom: 40 }}
+      className="backdrop-blur-md bg-white/60 border border-blue-200 rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-10 relative overflow-hidden w-full"
+      style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)', marginBottom: 20 }}
     >
       <div className="absolute inset-0 pointer-events-none" style={{background: 'linear-gradient(135deg, rgba(59,130,246,0.10) 0%, rgba(168,85,247,0.10) 100%)'}}></div>
-      <h3 className="text-3xl font-extrabold mb-8 text-blue-700 text-center tracking-wide relative z-10">{title}</h3>
-      <div style={{ height: "380px" }} className="relative z-10">
+      <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold mb-4 sm:mb-6 lg:mb-8 text-blue-700 text-center tracking-wide relative z-10">{title}</h3>
+      <div style={{ height: "280px" }} className="relative z-10 sm:h-[320px] lg:h-[380px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}
@@ -85,17 +85,17 @@ const AreaChartComponent = () => {
             </defs>
             <XAxis
               dataKey="month"
-              tick={{ fontSize: 13, fontWeight: 500, fill: '#3730a3' }}
+              tick={{ fontSize: 11, fontWeight: 500, fill: '#3730a3' }}
               angle={-30}
               dy={10}
               height={60}
               axisLine={{ stroke: '#6366f1', strokeWidth: 2 }}
             />
             <YAxis
-              tick={{ fontSize: 13, fontWeight: 500, fill: '#3730a3' }}
+              tick={{ fontSize: 11, fontWeight: 500, fill: '#3730a3' }}
               tickFormatter={(value: number) => `₦${value.toLocaleString()}`}
               axisLine={{ stroke: '#6366f1', strokeWidth: 2 }}
-              width={100}
+              width={80}
             />
             <CartesianGrid strokeDasharray="6 6" stroke="#e0e7ef" />
             <Tooltip
@@ -133,9 +133,10 @@ const AreaChartComponent = () => {
         flexDirection: "column",
         alignItems: "center",
         gap: "20px",
-        padding: "30px",
+        padding: "15px",
         width: "100%",
       }}
+      className="sm:gap-6 sm:p-6 lg:p-8"
     >
       {renderChart({
         data: profitData,

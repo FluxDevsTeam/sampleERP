@@ -559,17 +559,17 @@ const ProjectsTable = () => {
           <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
               <thead className="bg-gray-50 hidden md:table-header-group">
               <tr>
-                  <th className="py-4 px-4 text-left text-sm font-semibold">Project Name</th>
-                  {/* <th className="py-4 px-4 text-left text-sm font-semibold">Customer</th> */}
-                  <th className="py-4 px-4 text-left text-sm font-semibold">Status</th>
-                  <th className="py-4 px-4 text-left text-sm font-semibold">Progress</th>
-                  <th className="py-4 px-4 text-left text-sm font-semibold">Start Date</th>
-                  <th className="py-4 px-4 text-left text-sm font-semibold">Deadline</th>
-                  <th className="py-4 px-4 text-left text-sm font-semibold">Date Delivered</th>
-                  <th className="py-4 px-1 w-16 text-left text-sm font-semibold">Timeframe</th>
-                  <th className="py-4 px-1 w-20 text-left text-sm font-semibold">Time Remaining</th>
-                  <th className="py-4 px-4 text-left text-sm font-semibold">Tasks</th>
-                  <th className="py-4 px-4 text-left text-sm font-semibold">Details</th>
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Project Name</th>
+                  {/* <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Customer</th> */}
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Status</th>
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Progress</th>
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Start Date</th>
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Deadline</th>
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Date Delivered</th>
+                  <th className="py-3 sm:py-4 px-1 w-16 text-left text-xs sm:text-sm font-semibold">Timeframe</th>
+                  <th className="py-3 sm:py-4 px-1 w-20 text-left text-xs sm:text-sm font-semibold">Time Remaining</th>
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Tasks</th>
+                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -580,7 +580,7 @@ const ProjectsTable = () => {
                     key={project.id}
                       className="cursor-pointer hover:bg-gray-50 md:table-row flex flex-col md:flex-row"
                   >
-                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
                         <span className="font-semibold md:hidden">
                           Project Name:{" "}
                         </span>
@@ -599,12 +599,12 @@ const ProjectsTable = () => {
                             : project.customer_detail.name}
                         </span>
                       </td> */}
-                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
                         <span className="font-semibold md:hidden">
                           Status:{" "}
                         </span>
                         <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          className={`px-1 sm:px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             project.status === "in progress"
                               ? "bg-yellow-100 text-yellow-800"
                               : project.status === "completed"
@@ -619,7 +619,7 @@ const ProjectsTable = () => {
                           {project.status}
                         </span>
                     </td>
-                    <td className="py-5 px-4 border-b border-gray-200 text-sm text-center text-gray-700">
+                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700">
                       <div className="w-full bg-gray-200 rounded-full h-1">
                         <div
                             className="bg-lime-600 h-1 rounded-full"
@@ -628,23 +628,23 @@ const ProjectsTable = () => {
                             }}
                         ></div>
                       </div>
-                      <p className="text-sm mt-1">
+                      <p className="text-xs sm:text-sm mt-1">
                         {project.products.progress || 0}%
                       </p>
                     </td>
-                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
                         <span className="font-semibold md:hidden">
                           Start Date:{" "}
                         </span>
                         {project.start_date}
                       </td>
-                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
                         <span className="font-semibold md:hidden">
                           Deadline:{" "}
                         </span>
                         {project.deadline || "Not set"}
                       </td>
-                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
                         <span className="font-semibold md:hidden">
                           Date Delivered:{" "}
                         </span>
@@ -652,7 +652,7 @@ const ProjectsTable = () => {
                           ? new Date(project.date_delivered).toLocaleDateString()
                           : "N/A"}
                     </td>
-                      <td className="py-5 px-1 w-16 border-b border-gray-200 text-sm text-left text-gray-700">
+                      <td className="py-3 sm:py-5 px-1 w-16 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
                         <span className="font-semibold md:hidden">
                           Timeframe: {' '}
                         </span>
@@ -663,32 +663,32 @@ const ProjectsTable = () => {
                           : "N/A"}
                     </td>
                       <td
-                        className={`py-5 px-1 w-20 border-b border-gray-200 text-sm text-left ${timeRemainingInfo.color}`}
+                        className={`py-3 sm:py-5 px-1 w-20 border-b border-gray-200 text-xs sm:text-sm text-left ${timeRemainingInfo.color}`}
                       >
                         <span className="font-semibold md:hidden">
                           Time Remaining: {' '}
                         </span>
                         {timeRemainingInfo.text}
                       </td>
-                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-center">
+                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center">
                         <button
                           onClick={e => { 
                             e.stopPropagation(); 
                             handleViewTasks(project); 
                             setScrollToLastTaskTrigger(prev => prev + 1);
                           }}
-                          className="px-2 py-1 text-blue-400 border border-blue-300 rounded hover:bg-blue-50"
+                          className="px-1 sm:px-2 py-1 text-blue-400 border border-blue-300 rounded hover:bg-blue-50 text-xs sm:text-sm"
                         >
                           Tasks
                         </button>
                       </td>
-                      <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
+                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
                       <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleRowClick(project);
                           }}
-                        className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+                        className="px-2 sm:px-3 py-1 text-blue-400 border-2 border-blue-400 rounded text-xs sm:text-sm"
                       >
                         Details
                       </button>

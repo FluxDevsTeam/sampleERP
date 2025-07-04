@@ -28,7 +28,7 @@ const FormInput = ({
     <div className="w-full space-y-2">
       <label
         htmlFor={name}
-        className={clsx("text-base font-medium text-black-950", labelClassName)}
+        className={clsx("text-sm sm:text-base font-medium text-black-950", labelClassName)}
       >
         {label}
       </label>
@@ -40,7 +40,7 @@ const FormInput = ({
         placeholder={placeholder}
         required={required}
         className={clsx(
-          "w-full outline-none focus:outline-none bg-white rounded-lg py-2.5 px-2",
+          "w-full outline-none focus:outline-none bg-white rounded-lg py-2 sm:py-2.5 px-2 text-sm sm:text-base",
           inputClassName
         )}
       />

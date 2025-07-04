@@ -129,11 +129,11 @@ const MonthlyTrendsCharts = () => {
   }));
 
   return (
-    <div className="w-full px-4">
+    <div className="w-full px-2 sm:px-4">
       <div className="flex flex-col w-full">
-        <div className="flex-1 bg-gradient-to-br from-[#e0f2ff] to-[#f5f7fa] rounded-2xl shadow-2xl p-8 border border-blue-100 relative overflow-hidden">
-          <h2 className="text-2xl font-bold mb-6 text-blue-700 text-center tracking-wide z-10">Monthly Income & Expenses</h2>
-          <ResponsiveContainer width="100%" height={440}>
+        <div className="flex-1 bg-gradient-to-br from-[#e0f2ff] to-[#f5f7fa] rounded-2xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-blue-100 relative overflow-hidden">
+          <h2 className="text-lg sm:text-xl lg:text-2xl font-bold mb-4 sm:mb-6 text-blue-700 text-center tracking-wide z-10">Monthly Income & Expenses</h2>
+          <ResponsiveContainer width="100%" height={300} className="sm:h-[350px] lg:h-[440px]">
             <BarChart
               data={groupedData}
               margin={{ top: 30, right: 40, left: 40, bottom: 80 }}
@@ -146,14 +146,14 @@ const MonthlyTrendsCharts = () => {
                 angle={-30}
                 textAnchor="end"
                 height={90}
-                tick={{ fontSize: 16, fontWeight: 600, fill: '#374151' }}
+                tick={{ fontSize: 12, fontWeight: 600, fill: '#374151' }}
                 axisLine={{ stroke: '#b3c2d1', strokeWidth: 2 }}
               />
               <YAxis
                 tickFormatter={(value) => `₦${value.toLocaleString()}`}
-                tick={{ fontSize: 16, fontWeight: 600, fill: '#374151' }}
+                tick={{ fontSize: 12, fontWeight: 600, fill: '#374151' }}
                 axisLine={{ stroke: '#b3c2d1', strokeWidth: 2 }}
-                width={90}
+                width={70}
               />
               <Tooltip
                 wrapperStyle={{ borderRadius: 14, boxShadow: '0 4px 16px rgba(0,0,0,0.10)' }}
@@ -162,10 +162,10 @@ const MonthlyTrendsCharts = () => {
               />
               <Legend
                 iconType="circle"
-                wrapperStyle={{ fontSize: 16, fontWeight: 700, color: '#2563eb', paddingBottom: 12 }}
+                wrapperStyle={{ fontSize: 14, fontWeight: 700, color: '#2563eb', paddingBottom: 12 }}
               />
-              <Bar dataKey="income" name="Income" fill="url(#incomeGradient)" barSize={40} radius={0} isAnimationActive={true} />
-              <Bar dataKey="expenses" name="Expenses" fill="url(#expensesGradient)" barSize={40} radius={0} isAnimationActive={true} />
+              <Bar dataKey="income" name="Income" fill="url(#incomeGradient)" barSize={30} radius={0} isAnimationActive={true} />
+              <Bar dataKey="expenses" name="Expenses" fill="url(#expensesGradient)" barSize={30} radius={0} isAnimationActive={true} />
               <defs>
                 <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#2563eb" stopOpacity={0.95} />
