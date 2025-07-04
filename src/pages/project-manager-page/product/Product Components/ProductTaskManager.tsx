@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import axios from "axios";
 import { FiMinus } from "react-icons/fi";
 
 interface ProductTaskManagerProps {
   product: any;
   onUpdate: (tasks: any[]) => void;
+  scrollToLastTaskTrigger?: number;
+  onProductUpdate?: (updatedProduct: any) => void;
 }
 
-const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpdate }) => {
+const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpdate, scrollToLastTaskTrigger, onProductUpdate }) => {
   const [tasks, setTasks] = React.useState<any[]>([]);
   const [isSaving, setIsSaving] = React.useState(false);
   const [saveStatus, setSaveStatus] = React.useState<'idle' | 'saving' | 'saved'>('idle');
@@ -16,6 +18,18 @@ const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpda
   const initialLoad = React.useRef(true);
   const [pendingSave, setPendingSave] = React.useState(false);
   const [userTyped, setUserTyped] = React.useState(false);
+
+  // Ref for last task
+  const lastTaskRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to last task when trigger changes
+  useEffect(() => {
+    if (typeof scrollToLastTaskTrigger === 'number' && tasks.length > 0) {
+      setTimeout(() => {
+        lastTaskRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [scrollToLastTaskTrigger, tasks.length]);
 
   React.useEffect(() => {
     let loadedTasks = product.tasks;
@@ -56,24 +70,46 @@ const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpda
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tasks, userTyped]);
 
-  const saveTasks = async () => {
-    if (!dirty) return;
+  // 1. Progress calculation function
+  function calculateProgress(tasks: any[]): number {
+    if (!Array.isArray(tasks) || tasks.length === 0) return 0;
+    let total = 0;
+    for (const task of tasks) {
+      if (Array.isArray(task.subtasks) && task.subtasks.length > 0) {
+        // Task progress is the fraction of checked subtasks
+        const completed = task.subtasks.filter((sub: any) => sub.checked).length;
+        total += completed / task.subtasks.length;
+      } else {
+        // Task progress is 1 if checked, 0 if not
+        total += task.checked ? 1 : 0;
+      }
+    }
+    return Math.round((total / tasks.length) * 100);
+  }
+
+  // 2. Update saveTasks to also PATCH progress
+  const saveTasks = async (customTasks?: any[]) => {
+    const tasksToSave = customTasks || tasks;
     // Filter out empty tasks and empty subtasks
-    const filteredTasks = tasks
+    const filteredTasks = tasksToSave
       .filter(task => task.title && task.title.trim() !== "")
       .map(task => ({
         ...task,
         subtasks: (task.subtasks || []).filter((sub: any) => sub.title && sub.title.trim() !== "")
       }));
+    const newProgress = calculateProgress(filteredTasks);
     try {
       const token = localStorage.getItem("accessToken");
-      await axios.patch(
+      const response = await axios.patch(
         `https://backend.kidsdesigncompany.com/api/product/${product.id}/`,
-        { tasks: filteredTasks },
+        { tasks: JSON.stringify(filteredTasks), progress: newProgress },
         { headers: { Authorization: `JWT ${token}` } }
       );
       setSaveStatus('saved');
       onUpdate(filteredTasks);
+      if (onProductUpdate && response && response.data) {
+        onProductUpdate(response.data);
+      }
       setTimeout(() => setSaveStatus('idle'), 800);
       setDirty(false);
     } catch (err) {
@@ -94,19 +130,23 @@ const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpda
   // Edit Task
   const handleTaskChange = (idx: number, field: "title" | "checked", value: any) => {
     setUserTyped(true);
-    setTasks((prev) => prev.map((task, i) => {
-      if (i !== idx) return task;
-      if (field === "checked") {
-        // If toggling the main task, also toggle all subtasks to match
-        return {
-          ...task,
-          checked: value,
-          subtasks: (task.subtasks || []).map((sub: any) => ({ ...sub, checked: value })),
-        };
-      }
-      // Otherwise, just update the field
-      return { ...task, [field]: value };
-    }));
+    setTasks((prev) => {
+      const updated = prev.map((task, i) => {
+        if (i !== idx) return task;
+        if (field === "checked") {
+          // If toggling the main task, also toggle all subtasks to match
+          return {
+            ...task,
+            checked: value,
+            subtasks: (task.subtasks || []).map((sub: any) => ({ ...sub, checked: value })),
+          };
+        }
+        // Otherwise, just update the field
+        return { ...task, [field]: value };
+      });
+      // Do NOT call saveTasks here; let the debounced effect handle it
+      return updated;
+    });
   };
   // Delete Task
   const handleRemoveTask = (idx: number) => {
@@ -122,22 +162,26 @@ const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpda
   // Edit Subtask
   const handleSubtaskChange = (taskIdx: number, subIdx: number, field: "title" | "checked", value: any) => {
     setUserTyped(true);
-    setTasks((prev) => prev.map((task, i) => {
-      if (i !== taskIdx) return task;
-      const updatedSubtasks = (task.subtasks || []).map((sub: any, j: number) =>
-        j === subIdx ? { ...sub, [field]: value } : sub
-      );
-      let checked = task.checked;
-      if (field === "checked") {
-        // If all subtasks are checked, check the parent task
-        if (updatedSubtasks.length > 0 && updatedSubtasks.every((sub: any) => sub.checked)) {
-          checked = true;
-        } else {
-          checked = false;
+    setTasks((prev) => {
+      const updated = prev.map((task, i) => {
+        if (i !== taskIdx) return task;
+        const updatedSubtasks = (task.subtasks || []).map((sub: any, j: number) =>
+          j === subIdx ? { ...sub, [field]: value } : sub
+        );
+        let checked = task.checked;
+        if (field === "checked") {
+          // If all subtasks are checked, check the parent task
+          if (updatedSubtasks.length > 0 && updatedSubtasks.every((sub: any) => sub.checked)) {
+            checked = true;
+          } else {
+            checked = false;
+          }
         }
-      }
-      return { ...task, subtasks: updatedSubtasks, checked };
-    }));
+        return { ...task, subtasks: updatedSubtasks, checked };
+      });
+      // Do NOT call saveTasks here; let the debounced effect handle it
+      return updated;
+    });
   };
   // Delete Subtask
   const handleRemoveSubtask = (taskIdx: number, subIdx: number) => {
@@ -145,8 +189,22 @@ const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpda
       i === taskIdx ? { ...task, subtasks: (task.subtasks || []).filter((_: any, j: number) => j !== subIdx) } : task
     ));
   };
+
+  // Calculate progress percentage
+  const progress = calculateProgress(tasks);
+
   return (
     <div className="max-w-2xl min-h-[400px] mx-auto">
+      {/* Progress Bar */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-sm font-medium text-blue-700">Progress</span>
+          <span className="text-xs font-semibold text-blue-700">{progress}%</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div className="bg-blue-400 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
+        </div>
+      </div>
       <div className="flex items-center justify-between mb-6 border-b pb-4">
         <span className="font-bold text-2xl text-black-200 tracking-tight">Task List</span>
         <div className="flex-1 flex justify-center">
@@ -167,7 +225,11 @@ const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpda
       <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2">
         {(!Array.isArray(tasks) || tasks.length === 0) && <div className="text-black-200 text-center text-lg py-12">No tasks yet.</div>}
         {Array.isArray(tasks) && tasks.map((task, idx) => (
-          <div key={idx} className="bg-white border border-gray-200 rounded-xl p-5 shadow-md group transition-all hover:shadow-lg">
+          <div
+            key={idx}
+            className="bg-white border border-gray-200 rounded-xl p-5 shadow-md group transition-all hover:shadow-lg"
+            ref={idx === tasks.length - 1 ? lastTaskRef : undefined}
+          >
             <div className="flex items-center gap-3 mb-3">
               <input
                 type="checkbox"
@@ -207,7 +269,7 @@ const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpda
                       type="checkbox"
                       checked={sub.checked}
                       onChange={e => handleSubtaskChange(idx, subIdx, "checked", e.target.checked)}
-                      className="accent-blue-400 w-3 h-3 rounded border-2 border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all"
+                      className="accent-blue-400 w-4 h-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all"
                     />
                     <input
                       className="text-base border-b border-transparent focus:border-blue-400 outline-none bg-transparent flex-1 px-2 py-1 text-black-200 placeholder-black-200 transition-all"

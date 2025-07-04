@@ -179,6 +179,7 @@ const ProjectsTable = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [showTasksModal, setShowTasksModal] = useState(false);
   const [selectedTasksProject, setSelectedTasksProject] = useState<Project | null>(null);
+  const [scrollToLastTaskTrigger, setScrollToLastTaskTrigger] = useState(0);
 
   const { data, error, isLoading, refetch } =
     useQuery<PaginatedProjectsResponse>({
@@ -671,7 +672,11 @@ const ProjectsTable = () => {
                       </td>
                       <td className="py-5 px-4 border-b border-gray-200 text-sm text-center">
                         <button
-                          onClick={e => { e.stopPropagation(); handleViewTasks(project); }}
+                          onClick={e => { 
+                            e.stopPropagation(); 
+                            handleViewTasks(project); 
+                            setScrollToLastTaskTrigger(prev => prev + 1);
+                          }}
                           className="px-2 py-1 text-blue-400 border border-blue-300 rounded hover:bg-blue-50"
                         >
                           Tasks
@@ -749,6 +754,7 @@ const ProjectsTable = () => {
                 setSelectedTasksProject((prev: any) => ({ ...prev, tasks: updatedTasks }));
                 // Optionally, update the main table if needed
               }}
+              scrollToLastTaskTrigger={scrollToLastTaskTrigger}
             />
           </div>
         </div>

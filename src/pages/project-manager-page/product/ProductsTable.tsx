@@ -1,4 +1,4 @@
-import React, { useEffect, useState, JSX, useRef } from "react";
+import React, { useEffect, useState, JSX, useRef, useLayoutEffect } from "react";
 import { ThreeDots } from "react-loader-spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -45,9 +45,9 @@ const ProductsTable: React.FC = () => {
     "Selling price",
     "Quantity",
     "Progress",
-    "Details",
     "Task",
     "Quotation",
+    "Details",
   ];
   // TABLE DATA
   const [tableData, setTableData] = useState<TableData[]>([]);
@@ -143,6 +143,16 @@ const ProductsTable: React.FC = () => {
   // Add local state for tasks in the ProductsTable component
   const [localTasks, setLocalTasks] = useState<any[]>([]);
 
+  // Add scrollToLastTaskTrigger state
+  const [scrollToLastTaskTrigger, setScrollToLastTaskTrigger] = useState(0);
+
+  // Add ref for modal scrollable content and scroll position
+  const modalContentRef = useRef<HTMLDivElement | null>(null);
+  const modalScrollTopRef = useRef(0);
+
+  // Add modal loading state
+  const [modalLoading, setModalLoading] = useState(false);
+
   // Get user role on component mount
   useEffect(() => {
     const role = localStorage.getItem("user_role");
@@ -230,27 +240,6 @@ const ProductsTable: React.FC = () => {
         "Linked Project": item.linked_project?.name || "-",
         "Selling price": `₦${Number(item.selling_price).toLocaleString()}`,
         Quantity: item.quantity || "-",
-        Details: (
-          <button
-            onClick={() => handleViewDetails(item)}
-            className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
-          >
-            View
-          </button>
-        ),
-        Task: (
-          <button
-            onClick={() => {
-              setShowProductDetailsModal(false);
-              setSelectedProduct(null);
-              setSelectedTasksProduct(item);
-              setShowTasksModal(true);
-            }}
-            className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
-          >
-            Task
-          </button>
-        ),
         Progress: (
           <div className="w-full bg-gray-200 rounded-full h-3 relative">
             <div
@@ -262,6 +251,25 @@ const ProductsTable: React.FC = () => {
             </div>
           </div>
         ),
+        Task: (
+          <button
+            onClick={async () => {
+              setShowProductDetailsModal(false);
+              setSelectedProduct(null);
+              setShowTasksModal(true);
+              setModalLoading(true);
+              const latest = await fetchProductById(item.id);
+              if (latest) {
+                setSelectedTasksProduct(latest);
+              }
+              setModalLoading(false);
+              setScrollToLastTaskTrigger((prev) => prev + 1);
+            }}
+            className="px-3 py-1 border-2 border-blue-400 text-blue-400 bg-white rounded hover:bg-blue-400 hover:text-white transition-colors"
+          >
+            Task
+          </button>
+        ),
         Quotation: (
           <button
             onClick={() => {
@@ -271,6 +279,14 @@ const ProductsTable: React.FC = () => {
             className="px-3 py-1 border-2 border-blue-400 text-blue-400 bg-white rounded hover:bg-blue-400 hover:text-white transition-colors"
           >
             Quotation
+          </button>
+        ),
+        Details: (
+          <button
+            onClick={() => handleViewDetails(item)}
+            className="px-3 py-1 border-2 border-blue-400 text-blue-400 bg-white rounded hover:bg-blue-400 hover:text-white transition-colors"
+          >
+            View
           </button>
         ),
       }));
@@ -427,9 +443,15 @@ const ProductsTable: React.FC = () => {
     }
   };
 
-  const handleViewDetails = (product: any) => {
-    setSelectedProduct(product);
+  const handleViewDetails = async (product: any) => {
     setShowProductDetailsModal(true);
+    setModalLoading(true);
+    setSelectedProduct(null);
+    const latest = await fetchProductById(product.id);
+    if (latest) {
+      setSelectedProduct(latest);
+    }
+    setModalLoading(false);
     setShowWorkersModal(false);
   };
 
@@ -759,22 +781,6 @@ const ProductsTable: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Fix types in calculateTaskProgress
-  function calculateTaskProgress(tasks: { checked: boolean; subtasks?: { checked: boolean }[] }[] = []) {
-    if (!Array.isArray(tasks) || tasks.length === 0) return 0;
-    let total = 0;
-    let completed = 0;
-    tasks.forEach((task: { checked: boolean; subtasks?: { checked: boolean }[] }) => {
-      total += 1;
-      if (task.checked) completed += 1;
-      if (Array.isArray(task.subtasks)) {
-        total += task.subtasks.length;
-        completed += task.subtasks.filter((sub: { checked: boolean }) => sub.checked).length;
-      }
-    });
-    return total === 0 ? 0 : Math.round((completed / total) * 100);
-  }
-
   // Sync localTasks with selectedProduct.tasks when product detail modal opens
   useEffect(() => {
     if (showProductDetailsModal && selectedProduct) {
@@ -793,6 +799,10 @@ const ProductsTable: React.FC = () => {
   // Handler for toggling task/subtask completion
   const handleTaskCompletionToggle = async (taskIdx: number, subIdx?: number) => {
     if (!selectedProduct) return;
+    // Record scroll position before update
+    if (modalContentRef.current) {
+      modalScrollTopRef.current = modalContentRef.current.scrollTop;
+    }
     const updatedTasks = [...localTasks];
     if (typeof subIdx === 'number') {
       if (updatedTasks[taskIdx].subtasks && updatedTasks[taskIdx].subtasks[subIdx]) {
@@ -812,24 +822,93 @@ const ProductsTable: React.FC = () => {
       }
     }
     setLocalTasks(updatedTasks); // Update local state for immediate UI feedback
+    // Calculate progress
+    let total = 0;
+    for (const task of updatedTasks) {
+      if (Array.isArray(task.subtasks) && task.subtasks.length > 0) {
+        const completed = task.subtasks.filter((sub: any) => sub.checked).length;
+        total += completed / task.subtasks.length;
+      } else {
+        total += task.checked ? 1 : 0;
+      }
+    }
+    const progress = updatedTasks.length > 0 ? Math.round((total / updatedTasks.length) * 100) : 0;
     // Send PATCH to backend
     try {
       const token = localStorage.getItem('accessToken');
-      await fetch(`https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/`, {
+      const response = await fetch(`https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `JWT ${token}`
         },
-        body: JSON.stringify({ tasks: updatedTasks })
+        body: JSON.stringify({ tasks: JSON.stringify(updatedTasks), progress })
       });
+      if (response.ok) {
+        const updatedProduct = await response.json();
+        syncProductState(updatedProduct);
+      } else {
+        alert('Failed to update task completion');
+      }
     } catch (err) {
       alert('Failed to update task completion');
     }
   };
 
+  const syncProductState = (updatedProduct: any) => {
+    setSelectedProduct((prev: any) => prev && prev.id === updatedProduct.id ? { ...prev, ...updatedProduct } : prev);
+    setSelectedTasksProduct((prev: any) => prev && prev.id === updatedProduct.id ? { ...prev, ...updatedProduct } : prev);
+    if (selectedProduct && selectedProduct.id === updatedProduct.id) {
+      setLocalTasks(updatedProduct.tasks);
+    }
+    setTableData((prevTableData) =>
+      prevTableData.map((product) =>
+        product.id === updatedProduct.id
+          ? { ...product, Progress: (
+              <div className="w-full bg-gray-200 rounded-full h-3 relative">
+                <div
+                  className={`bg-blue-400 h-3 rounded-full`}
+                  style={{ width: `${updatedProduct.progress}%` }}
+                ></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className={`text-green-200 text-xs font-semibold ${updatedProduct.progress > 59 ? "text-white" : ""}`}>{updatedProduct.progress}%</span>
+                </div>
+              </div>
+            ) }
+          : product
+      )
+    );
+  };
+
+  // Restore scroll position after localTasks changes
+  useLayoutEffect(() => {
+    if (modalContentRef.current) {
+      modalContentRef.current.scrollTop = modalScrollTopRef.current;
+    }
+  }, [localTasks]);
+
+  // Add a helper to fetch a single product by id
+  const fetchProductById = async (id: number) => {
+    try {
+      const response = await fetch(`https://backend.kidsdesigncompany.com/api/product/${id}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `JWT ${localStorage.getItem('accessToken')}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch product');
+      return await response.json();
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  };
+
   return (
     <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
+      {/* Blur only the background content when showTasksModal is true */}
+      <div className={showTasksModal ? "blur-sm" : ""}>
       <h1
         style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
         className="font-semibold py-5 mt-2"
@@ -872,6 +951,18 @@ const ProductsTable: React.FC = () => {
                 >
                   <FontAwesomeIcon icon={faSearch} />
                 </button>
+                  {searchTerm && (
+                    <button
+                      onClick={() => {
+                        setSearchTerm("");
+                        setSearchQuery("");
+                      }}
+                      className="ml-2 w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 shadow hover:bg-red-100 hover:text-red-500 hover:scale-110 transition-all duration-200"
+                      aria-label="Clear search"
+                    >
+                      <FontAwesomeIcon icon={faXmark} size="lg" />
+                    </button>
+                  )}
               </div>
               <div className="flex items-center space-x-4">
                 {/* Sort by Dropdown */}
@@ -987,9 +1078,9 @@ const ProductsTable: React.FC = () => {
           <FontAwesomeIcon icon={faAnglesRight} />
         </button>
       </div>
-
-      {/*   PRODUCT DETAILS MODAL   */}
-      {showProductDetailsModal && selectedProduct && (
+      </div>
+      {/* Render all modals outside the blurred content so they stay sharp */}
+      {showProductDetailsModal && (
         <div
           className={`fixed overflow-scroll inset-0 flex items-center justify-center z-[100] 
             ${confirmDelete ? "blur-sm" : ""}
@@ -1001,298 +1092,337 @@ const ProductsTable: React.FC = () => {
             className="absolute overflow-scroll inset-0 bg-black opacity-50"
             onClick={() => setShowProductDetailsModal(false)}
           ></div>
-          <div className="bg-white overflow-scroll rounded-2xl p-10 max-h-[90vh] max-w-5xl w-full mx-4 border-2 border-blue-400 shadow-2xl relative z-[100]">
-            {/* NAME */}
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-20">
-                {selectedProduct.name}
-              </h2>
-              <button
-                onClick={() => setShowProductDetailsModal(false)}
-                className="text-gray-500 hover:text-gray-700 focus:outline-none"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Calculation Cards */}
-            {selectedProduct.calculations && (
+          <div
+            ref={modalContentRef}
+            className="bg-white overflow-scroll rounded-2xl p-10 max-h-[90vh] max-w-5xl w-full mx-4 border-2 border-blue-400 shadow-2xl relative z-[100]"
+          >
+            {modalLoading || !selectedProduct ? (
+              <div className="flex flex-col items-center justify-center h-96">
+                <ThreeDots visible={true} height="80" width="80" color="#60A5FA" radius="9" ariaLabel="three-dots-loading" />
+              </div>
+            ) : (
               <>
-                <div className="w-full mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                  <DashboardCard title="Total raw material cost" value={Number(selectedProduct.calculations.total_raw_material_cost) || 0} currency="₦" />
-                  <DashboardCard title="Total production cost" value={Number(selectedProduct.calculations.total_production_cost) || 0} currency="₦" />
-                  <DashboardCard title="Total overhead Cost" value={Number(selectedProduct.calculations.total_overhead_cost) || 0} currency="₦" />
-                  <DashboardCard title="Quantity" value={Number(selectedProduct.calculations.quantity) || 0} />
-                  <DashboardCard title="Profit" value={Number(selectedProduct.calculations.profit) || 0} currency="₦" />
-                  <DashboardCard title="Profit per item" value={Number(selectedProduct.calculations.profit_per_item) || 0} currency="₦" />
+                {/* NAME */}
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-gray-20">
+                    {selectedProduct.name}
+                  </h2>
+                  <button
+                    onClick={() => setShowProductDetailsModal(false)}
+                    className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Calculation Cards */}
+                {selectedProduct.calculations && (
+                  <>
+                    <div className="w-full mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                      <DashboardCard title="Total raw material cost" value={Number(selectedProduct.calculations.total_raw_material_cost) || 0} currency="₦" />
+                      <DashboardCard title="Total production cost" value={Number(selectedProduct.calculations.total_production_cost) || 0} currency="₦" />
+                      <DashboardCard title="Total overhead Cost" value={Number(selectedProduct.calculations.total_overhead_cost) || 0} currency="₦" />
+                      <DashboardCard title="Quantity" value={Number(selectedProduct.calculations.quantity) || 0} />
+                      <DashboardCard title="Profit" value={Number(selectedProduct.calculations.profit) || 0} currency="₦" />
+                      <DashboardCard title="Profit per item" value={Number(selectedProduct.calculations.profit_per_item) || 0} currency="₦" />
+                    </div>
+                    {/* Action Buttons Row */}
+                    <div className="flex gap-4 justify-end mb-8">
+                      <button
+                        onClick={() => {
+                          setShowProductDetailsModal(false);
+                          setSelectedProduct(null);
+                          setSelectedTasksProduct(selectedProduct);
+                          setShowTasksModal(true);
+                        }}
+                        className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
+                      >
+                        Task
+                      </button>
+                      <button
+                        onClick={() => setShowContractorsModal(true)}
+                        className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
+                      >
+                        View Contractors
+                      </button>
+                      <button
+                        onClick={() => setShowWorkersModal(true)}
+                        className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
+                      >
+                        View Salary Workers
+                      </button>
+                      <button
+                        onClick={() => setShowQuotationModal(true)}
+                        className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
+                      >
+                        View Quotation
+                      </button>
+                      {user?.role === 'ceo' && (
+                        <>
+                          <button
+                            onClick={() =>
+                              navigate(
+                                `/project-manager/edit-product/${selectedProduct.id}`
+                              )
+                            }
+                            className="p-2 pr-3 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
+                          >
+                            <FontAwesomeIcon
+                              className="mr-1 text-xs text-blue-400"
+                              icon={faPencil}
+                            />
+                            <span>Update</span>
+                          </button>
+                          <button
+                            onClick={() => confirmDeleteProduct(selectedProduct.id)}
+                            className="p-2 pr-3 text-red-400 rounded-lg border-2 border-red-400 font-bold"
+                          >
+                            <FontAwesomeIcon
+                              className="mr-1 text-xs text-red-400"
+                              icon={faTrash}
+                            />
+                            <span>Delete</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </>
+                )}
+                <div className="flex flex-col md:flex-row gap-1">
+                  {/* LEFT: Details */}
+                  <div className="flex-1">
+                  {/* other prodict details */}
+                  <div>
+                    {/* COLOUR */}
+                    <p className="text-sm text-gray-20 mb-3">
+                      <span className="font-semibold">Colour:</span>{" "}
+                      {selectedProduct.colour || "No colour available"}
+                    </p>
+
+                    {/* DESIGN */}
+                    <p className="text-sm text-gray-20 mb-3">
+                      <span className="font-semibold">Design:</span>{" "}
+                      {selectedProduct.design || "No design added"}
+                    </p>
+
+                    {/* SELLINg PRICE */}
+                    <p className="text-sm text-gray-20 mb-3">
+                      <span className="font-semibold">Selling price:</span> ₦
+                      {selectedProduct.selling_price || "No selling price added"}
+                    </p>
+
+                    {/* DIMENSIONS */}
+                    <p className="text-sm text-gray-20 mb-3">
+                      <span className="font-semibold">Dimensions:</span>{" "}
+                      {`${selectedProduct.dimensions}${" "}cm` ||
+                        "no dimensions added"}
+                    </p>
+
+                    {/* OVERHEAD COST */}
+                    <p className="text-sm text-gray-20 mb-3">
+                      <span className="font-semibold">Overhead cost:</span>{" "}
+                      {selectedProduct.overhead_cost || "no overhead cost added"}
+                    </p>
+
+                    {/* Overhead cost base at creation:*/}
+                    <p className="text-sm text-gray-20 mb-3">
+                      <span className="font-semibold">
+                        Overhead cost base at creation:
+                      </span>{" "}
+                      {selectedProduct.overhead_cost_base_at_creation}
+                    </p>
+
+                    {/* PRODUCTION NOTE */}
+                    <p className="text-sm text-gray-20 mb-3">
+                      <span className="font-semibold">Production note:</span>{" "}
+                      {selectedProduct.production_note}
+                    </p>
+
+                    {/* LINKED PROJECTS */}
+                    <p className="text-sm text-gray-20 mb-3">
+                      <span className="font-semibold">Linked Project:</span>{" "}
+                      {selectedProduct.linked_project?.name}
+                    </p>
+                    </div>
+                  </div>
+                  {/* RIGHT: Progress and Images */}
+                  <div className="flex flex-col items-center md:w-1/2 w-full">
+                    {/* Progress Bar */}
+                    <div className="text-sm text-gray-20 mb-3 w-full">
+                      <span className="font-bold">Progress rate:</span>
+                      {!editingProgress ? (
+                        <div className="flex items-center mt-1">
+                          <div className="flex-grow">
+                            <span className="text-xs text-gray-500">
+                              {selectedProduct.progress}% complete
+                            </span>
+                            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+                              <div
+                                className="bg-blue-400 h-2.5 rounded-full"
+                                style={{ width: `${selectedProduct.progress}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                          {userRole !== "shopkeeper" && userRole !== "storekeeper" && (
+                            <button
+                              onClick={() => {
+                                setCurrentProgress(selectedProduct.progress);
+                                setEditingProgress(true);
+                              }}
+                              className="ml-4 px-3 py-1 text-sm bg-blue-400 text-white rounded-lg"
+                            >
+                              Edit
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="mt-2">
+                          <div className="flex justify-between items-center mb-2">
+                            <label className="text-sm text-black-600">
+                              Set Progress: {currentProgress}%
+                            </label>
+                            <div>
+                              <button
+                                onClick={handleUpdateProgress}
+                                disabled={isUpdatingProgress}
+                                className={`px-3 py-1 text-sm bg-blue-400 text-white rounded-lg mr-2 ${
+                                  isUpdatingProgress ? "opacity-50 cursor-not-allowed" : ""
+                                }`}
+                              >
+                                {isUpdatingProgress ? "Saving..." : "Save"}
+                              </button>
+                              <button
+                                onClick={() => setEditingProgress(false)}
+                                className="px-3 py-1 text-sm bg-gray-300 text-black rounded-lg"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={currentProgress}
+                            onChange={(e) => setCurrentProgress(Number(e.target.value))}
+                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                          />
+                        </div>
+                      )}
+                    </div>
+                    {/* Thumbnails for Sketch and Image */}
+                    <div className="flex gap-4 mb-4">
+                      {selectedProduct.sketch && (
+                        <img
+                          src={selectedProduct.sketch}
+                          alt={`${selectedProduct.name} sketch`}
+                          className="w-24 h-24 object-cover rounded shadow cursor-pointer border border-gray-200 hover:scale-105 transition-transform"
+                          onClick={() => setExpandedImage(selectedProduct.sketch)}
+                        />
+                      )}
+                      {selectedProduct.images && (
+                        <img
+                          src={selectedProduct.images}
+                          alt={`${selectedProduct.name} image`}
+                          className="w-24 h-24 object-cover rounded shadow cursor-pointer border border-gray-200 hover:scale-105 transition-transform"
+                          onClick={() => setExpandedImage(selectedProduct.images)}
+                        />
+                      )}
+                    </div>
+                    {/* Task Table under Progress rate */}
+                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mt-6 w-full">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="text-md font-semibold text-gray-700">Tasks</h4>
+                        <button
+                          onClick={() => {
+                            setShowProductDetailsModal(false);
+                            setSelectedProduct(null);
+                            setSelectedTasksProduct(selectedProduct);
+                            setShowTasksModal(true);
+                          }}
+                          className="px-3 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500 transition-colors"
+                          disabled={!selectedProduct}
+                        >
+                          + Task
+                        </button>
                       </div>
-                {/* Action Buttons Row */}
-                <div className="flex gap-4 justify-end mb-8">
-                  <button
-                    onClick={() => setShowContractorsModal(true)}
-                    className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
-                  >
-                    View Contractors
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowProductDetailsModal(false);
-                      setSelectedProduct(null);
-                      setSelectedTasksProduct(selectedProduct);
-                      setShowTasksModal(true);
-                    }}
-                    className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
-                  >
-                    Task
-                  </button>
-                  <button
-                    onClick={() => setShowWorkersModal(true)}
-                    className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
-                  >
-                    View Salary Workers
-                  </button>
-                  <button
-                    onClick={() => setShowQuotationModal(true)}
-                    className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
-                  >
-                    View Quotation
-                  </button>
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full text-sm">
+                          <thead className="bg-blue-400 text-white">
+                            <tr>
+                              <th className="p-2 text-left">Task</th>
+                              <th className="p-2 text-left">Completed</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {Array.isArray(localTasks) && localTasks.length > 0 ? (
+                              localTasks.map((task: any, idx: number) => (
+                                task ? (
+                                  <React.Fragment key={task.id || task.title || idx}>
+                                    <tr className="border-b border-gray-200">
+                                      <td className="p-2 text-left font-medium">{task?.title}</td>
+                                      <td className="p-2 text-left">
+                                        <input type="checkbox" checked={task?.checked} onChange={e => { e.stopPropagation(); handleTaskCompletionToggle(idx); }} />
+                                      </td>
+                                    </tr>
+                                    {Array.isArray(task.subtasks) && task.subtasks.length > 0 && task.subtasks.map((sub: any, subIdx: number) => (
+                                      <tr key={sub.id || sub.title || `${idx}-${subIdx}`} className="border-b border-gray-100">
+                                        <td className="p-2 pl-8 text-left text-black-600">• {sub.title}</td>
+                                        <td className="p-2 text-left">
+                                          <input type="checkbox" checked={sub.checked} onChange={e => { e.stopPropagation(); handleTaskCompletionToggle(idx, subIdx); }} />
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </React.Fragment>
+                                ) : null
+                              ))
+                            ) : (
+                              <tr>
+                                <td className="p-2 text-left" colSpan={2}>No tasks found</td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Product detail EDIT AND DELETE ICONS */}
+                <div className="mt-6 flex items-center justify-between">
+                  <div className="flex space-x-2">
+                    {user?.role === 'ceo' && (
+                      <>
+                        <button
+                          onClick={() =>
+                            navigate(
+                              `/project-manager/edit-product/${selectedProduct.id}`
+                            )
+                          }
+                          className="p-2 pr-3 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
+                        >
+                          <FontAwesomeIcon
+                            className="mr-1 text-xs text-blue-400"
+                            icon={faPencil}
+                          />
+                          <span>Update</span>
+                        </button>
+                        <button
+                          onClick={() => confirmDeleteProduct(selectedProduct.id)}
+                          className="p-2 pr-3 text-red-400 rounded-lg border-2 border-red-400 font-bold"
+                        >
+                          <FontAwesomeIcon
+                            className="mr-1 text-xs text-red-400"
+                            icon={faTrash}
+                          />
+                          <span>Delete</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </>
             )}
-            <div className="flex flex-col md:flex-row gap-1">
-              {/* LEFT: Details */}
-              <div className="flex-1">
-              {/* other prodict details */}
-              <div>
-                {/* COLOUR */}
-                <p className="text-sm text-gray-20 mb-3">
-                  <span className="font-semibold">Colour:</span>{" "}
-                  {selectedProduct.colour || "No colour available"}
-                </p>
-
-                {/* DESIGN */}
-                <p className="text-sm text-gray-20 mb-3">
-                  <span className="font-semibold">Design:</span>{" "}
-                  {selectedProduct.design || "No design added"}
-                </p>
-
-                {/* SELLINg PRICE */}
-                <p className="text-sm text-gray-20 mb-3">
-                  <span className="font-semibold">Selling price:</span> ₦
-                  {selectedProduct.selling_price || "No selling price added"}
-                </p>
-
-                {/* DIMENSIONS */}
-                <p className="text-sm text-gray-20 mb-3">
-                  <span className="font-semibold">Dimensions:</span>{" "}
-                  {`${selectedProduct.dimensions}${" "}cm` ||
-                    "no dimensions added"}
-                </p>
-
-                {/* OVERHEAD COST */}
-                <p className="text-sm text-gray-20 mb-3">
-                  <span className="font-semibold">Overhead cost:</span>{" "}
-                  {selectedProduct.overhead_cost || "no overhead cost added"}
-                </p>
-
-                {/* Overhead cost base at creation:*/}
-                <p className="text-sm text-gray-20 mb-3">
-                  <span className="font-semibold">
-                    Overhead cost base at creation:
-                  </span>{" "}
-                  {selectedProduct.overhead_cost_base_at_creation}
-                </p>
-
-                {/* PRODUCTION NOTE */}
-                <p className="text-sm text-gray-20 mb-3">
-                  <span className="font-semibold">Production note:</span>{" "}
-                  {selectedProduct.production_note}
-                </p>
-
-                {/* LINKED PROJECTS */}
-                <p className="text-sm text-gray-20 mb-3">
-                  <span className="font-semibold">Linked Project:</span>{" "}
-                  {selectedProduct.linked_project?.name}
-                </p>
-                </div>
-              </div>
-              {/* RIGHT: Progress and Images */}
-              <div className="flex flex-col items-center md:w-1/2 w-full">
-                {/* Progress Bar */}
-                <div className="text-sm text-gray-20 mb-3 w-full">
-                  <span className="font-bold">Progress rate:</span>
-                  {!editingProgress ? (
-                    <div className="flex items-center mt-1">
-                      <div className="flex-grow">
-                        <span className="text-xs text-gray-500">
-                          {selectedProduct.progress}% complete
-                        </span>
-                        <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                          <div
-                            className="bg-blue-400 h-2.5 rounded-full"
-                            style={{ width: `${selectedProduct.progress}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                      {userRole !== "shopkeeper" && userRole !== "storekeeper" && (
-                        <button
-                          onClick={() => {
-                            setCurrentProgress(selectedProduct.progress);
-                            setEditingProgress(true);
-                          }}
-                          className="ml-4 px-3 py-1 text-sm bg-blue-400 text-white rounded-lg"
-                        >
-                          Edit
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="mt-2">
-                      <div className="flex justify-between items-center mb-2">
-                        <label className="text-sm text-black-600">
-                          Set Progress: {currentProgress}%
-                        </label>
-                        <div>
-                          <button
-                            onClick={handleUpdateProgress}
-                            disabled={isUpdatingProgress}
-                            className={`px-3 py-1 text-sm bg-blue-400 text-white rounded-lg mr-2 ${
-                              isUpdatingProgress ? "opacity-50 cursor-not-allowed" : ""
-                            }`}
-                          >
-                            {isUpdatingProgress ? "Saving..." : "Save"}
-                          </button>
-                          <button
-                            onClick={() => setEditingProgress(false)}
-                            className="px-3 py-1 text-sm bg-gray-300 text-black rounded-lg"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={currentProgress}
-                        onChange={(e) => setCurrentProgress(Number(e.target.value))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                      />
-                    </div>
-                  )}
-                </div>
-                {/* Thumbnails for Sketch and Image */}
-                <div className="flex gap-4 mb-4">
-                  {selectedProduct.sketch && (
-                    <img
-                      src={selectedProduct.sketch}
-                      alt={`${selectedProduct.name} sketch`}
-                      className="w-24 h-24 object-cover rounded shadow cursor-pointer border border-gray-200 hover:scale-105 transition-transform"
-                      onClick={() => setExpandedImage(selectedProduct.sketch)}
-                    />
-                  )}
-                  {selectedProduct.images && (
-                    <img
-                      src={selectedProduct.images}
-                      alt={`${selectedProduct.name} image`}
-                      className="w-24 h-24 object-cover rounded shadow cursor-pointer border border-gray-200 hover:scale-105 transition-transform"
-                      onClick={() => setExpandedImage(selectedProduct.images)}
-                    />
-                  )}
-                </div>
-                {/* Task Table under Progress rate */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mt-6 w-full">
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className="text-md font-semibold text-gray-700">Tasks</h4>
-                    <button
-                      onClick={() => {
-                        setShowProductDetailsModal(false);
-                        setSelectedProduct(null);
-                        setSelectedTasksProduct(selectedProduct);
-                        setShowTasksModal(true);
-                      }}
-                      className="px-3 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500 transition-colors"
-                      disabled={!selectedProduct}
-                    >
-                      + Task
-                    </button>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full text-sm">
-                      <thead className="bg-blue-400 text-white">
-                        <tr>
-                          <th className="p-2 text-left">Task</th>
-                          <th className="p-2 text-left">Completed</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {Array.isArray(localTasks) && localTasks.length > 0 ? (
-                          localTasks.map((task: any, idx: number) => (
-                            task ? (
-                              <React.Fragment key={idx}>
-                                <tr className="border-b border-gray-200">
-                                  <td className="p-2 text-left font-medium">{task?.title}</td>
-                                  <td className="p-2 text-left">
-                                    <input type="checkbox" checked={task?.checked} onChange={() => handleTaskCompletionToggle(idx)} />
-                                  </td>
-                                </tr>
-                                {Array.isArray(task.subtasks) && task.subtasks.length > 0 && task.subtasks.map((sub: any, subIdx: number) => (
-                                  <tr key={subIdx} className="border-b border-gray-100">
-                                    <td className="p-2 pl-8 text-left text-black-600">• {sub.title}</td>
-                                    <td className="p-2 text-left">
-                                      <input type="checkbox" checked={sub.checked} onChange={() => handleTaskCompletionToggle(idx, subIdx)} />
-                                    </td>
-                                  </tr>
-                                ))}
-                              </React.Fragment>
-                            ) : null
-                          ))
-                        ) : (
-                          <tr>
-                            <td className="p-2 text-left" colSpan={2}>No tasks found</td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Product detail EDIT AND DELETE ICONS */}
-            <div className="mt-6 flex items-center justify-between">
-              <div className="flex space-x-2">
-                {user?.role === 'ceo' && (
-                  <>
-                    <button
-                      onClick={() =>
-                        navigate(
-                          `/project-manager/edit-product/${selectedProduct.id}`
-                        )
-                      }
-                      className="p-2 pr-3 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
-                    >
-                      <FontAwesomeIcon
-                        className="mr-1 text-xs text-blue-400"
-                        icon={faPencil}
-                      />
-                      <span>Update</span>
-                    </button>
-                    <button
-                      onClick={() => confirmDeleteProduct(selectedProduct.id)}
-                      className="p-2 pr-3 text-red-400 rounded-lg border-2 border-red-400 font-bold"
-                    >
-                      <FontAwesomeIcon
-                        className="mr-1 text-xs text-red-400"
-                        icon={faTrash}
-                      />
-                      <span>Delete</span>
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       )}
@@ -1755,22 +1885,28 @@ const ProductsTable: React.FC = () => {
         type={modalConfig.type}
       />
 
-      {showTasksModal && selectedTasksProduct && (
-        <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black bg-opacity-30">
-          <div className="bg-white rounded-lg p-6 max-w-2xl min-h-[400px] w-full relative shadow-xl border-2 border-blue-400">
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              onClick={() => setShowTasksModal(false)}
-            >
+      {/* Task Modal rendered outside the blurred content so it stays sharp */}
+      {showTasksModal && (
+        <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black bg-opacity-30" onClick={() => setShowTasksModal(false)}>
+          <div className="bg-white rounded-lg p-6 max-w-2xl min-h-[400px] w-full relative shadow-xl border-2 border-blue-400" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-700" onClick={() => setShowTasksModal(false)}>
               ✕
             </button>
-            <h2 className="text-xl font-bold mb-4">Tasks for {selectedTasksProduct.name}</h2>
-            <ProductTaskManager
-              product={selectedTasksProduct}
-              onUpdate={(updatedTasks) => {
-                setSelectedTasksProduct((prev: any) => ({ ...prev, tasks: updatedTasks }));
-              }}
-            />
+            {modalLoading || !selectedTasksProduct ? (
+              <div className="flex flex-col items-center justify-center h-60">
+                <ThreeDots visible={true} height="80" width="80" color="#60A5FA" radius="9" ariaLabel="three-dots-loading" />
+              </div>
+            ) : (
+              <>
+                <h2 className="text-xl font-bold mb-4">Tasks for {selectedTasksProduct.name}</h2>
+                <ProductTaskManager
+                  product={selectedTasksProduct}
+                  onUpdate={() => {}}
+                  onProductUpdate={syncProductState}
+                  scrollToLastTaskTrigger={scrollToLastTaskTrigger}
+                />
+              </>
+            )}
           </div>
         </div>
       )}

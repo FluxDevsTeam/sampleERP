@@ -1,14 +1,14 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import axios from "axios";
 import { FiMinus } from "react-icons/fi";
 
-interface ProjectTaskManagerProps {
-  project: any;
+interface ProductTaskManagerProps {
+  product: any;
   onUpdate: (tasks: any[]) => void;
-  scrollToLastTaskTrigger?: number;
+  onProductUpdate?: (updatedProduct: any) => void;
 }
 
-const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpdate, scrollToLastTaskTrigger }) => {
+const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpdate, onProductUpdate }) => {
   const [tasks, setTasks] = React.useState<any[]>([]);
   const [isSaving, setIsSaving] = React.useState(false);
   const [saveStatus, setSaveStatus] = React.useState<'idle' | 'saving' | 'saved'>('idle');
@@ -18,20 +18,8 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
   const [pendingSave, setPendingSave] = React.useState(false);
   const [userTyped, setUserTyped] = React.useState(false);
 
-  // Ref for last task
-  const lastTaskRef = useRef<HTMLDivElement>(null);
-
-  // Scroll to last task when trigger changes
-  useEffect(() => {
-    if (typeof scrollToLastTaskTrigger === 'number' && tasks.length > 0) {
-      setTimeout(() => {
-        lastTaskRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
-    }
-  }, [scrollToLastTaskTrigger, tasks.length]);
-
   React.useEffect(() => {
-    let loadedTasks = project.tasks;
+    let loadedTasks = product.tasks;
     if (typeof loadedTasks === 'string') {
       try {
         loadedTasks = JSON.parse(loadedTasks);
@@ -40,13 +28,29 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
       }
     }
     setTasks(Array.isArray(loadedTasks) ? loadedTasks : []);
+    console.log('[ProductTaskManager] setTasks from props', loadedTasks);
     initialLoad.current = true;
     setDirty(false);
     setSaveStatus('idle');
     setPendingSave(false);
-  }, [project.tasks]);
+  }, [product.tasks]);
 
-  // Auto-save effect
+  // Progress calculation function (keep product logic)
+  function calculateProgress(tasks: any[]): number {
+    if (!Array.isArray(tasks) || tasks.length === 0) return 0;
+    let total = 0;
+    for (const task of tasks) {
+      if (Array.isArray(task.subtasks) && task.subtasks.length > 0) {
+        const completed = task.subtasks.filter((sub: any) => sub.checked).length;
+        total += completed / task.subtasks.length;
+      } else {
+        total += task.checked ? 1 : 0;
+      }
+    }
+    return Math.round((total / tasks.length) * 100);
+  }
+
+  // Auto-save effect (CEO logic)
   React.useEffect(() => {
     if (initialLoad.current) {
       initialLoad.current = false;
@@ -60,6 +64,7 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
       setPendingSave(false);
       setSaveStatus('saving');
       setIsSaving(true);
+      console.log('[ProductTaskManager] Auto-save triggered', tasks);
       saveTasks();
       setTimeout(() => setSaveStatus('idle'), 900);
     }, 1000);
@@ -69,6 +74,7 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tasks, userTyped]);
 
+  // Save tasks and progress
   const saveTasks = async () => {
     if (!dirty) return;
     // Filter out empty tasks and empty subtasks
@@ -78,15 +84,20 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
         ...task,
         subtasks: (task.subtasks || []).filter((sub: any) => sub.title && sub.title.trim() !== "")
       }));
+    const newProgress = calculateProgress(filteredTasks);
+    console.log('[ProductTaskManager] saveTasks PATCH', { tasks: filteredTasks, progress: newProgress });
     try {
       const token = localStorage.getItem("accessToken");
-      await axios.patch(
-        `https://backend.kidsdesigncompany.com/api/project/${project.id}/`,
-        { tasks: filteredTasks },
+      const response = await axios.patch(
+        `https://backend.kidsdesigncompany.com/api/product/${product.id}/`,
+        { tasks: filteredTasks, progress: newProgress },
         { headers: { Authorization: `JWT ${token}` } }
       );
       setSaveStatus('saved');
       onUpdate(filteredTasks);
+      if (onProductUpdate && response && response.data) {
+        onProductUpdate(response.data);
+      }
       setTimeout(() => setSaveStatus('idle'), 800);
       setDirty(false);
     } catch (err) {
@@ -120,6 +131,7 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
       // Otherwise, just update the field
       return { ...task, [field]: value };
     }));
+    console.log('[ProductTaskManager] handleTaskChange', idx, field, value);
   };
   // Delete Task
   const handleRemoveTask = (idx: number) => {
@@ -151,6 +163,7 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
       }
       return { ...task, subtasks: updatedSubtasks, checked };
     }));
+    console.log('[ProductTaskManager] handleSubtaskChange', taskIdx, subIdx, field, value);
   };
   // Delete Subtask
   const handleRemoveSubtask = (taskIdx: number, subIdx: number) => {
@@ -158,35 +171,8 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
       i === taskIdx ? { ...task, subtasks: (task.subtasks || []).filter((_: any, j: number) => j !== subIdx) } : task
     ));
   };
-
-  // Calculate progress percentage
-  function calculateProgress(tasks: any[]): number {
-    if (!Array.isArray(tasks) || tasks.length === 0) return 0;
-    let total = 0;
-    for (const task of tasks) {
-      if (Array.isArray(task.subtasks) && task.subtasks.length > 0) {
-        const completed = task.subtasks.filter((sub: any) => sub.checked).length;
-        total += completed / task.subtasks.length;
-      } else {
-        total += task.checked ? 1 : 0;
-      }
-    }
-    return Math.round((total / tasks.length) * 100);
-  }
-  const progress = calculateProgress(tasks);
-
   return (
     <div className="max-w-2xl min-h-[400px] mx-auto">
-      {/* Progress Bar */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-sm font-medium text-blue-700">Progress</span>
-          <span className="text-xs font-semibold text-blue-700">{progress}%</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2.5">
-          <div className="bg-blue-400 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
-        </div>
-      </div>
       <div className="flex items-center justify-between mb-6 border-b pb-4">
         <span className="font-bold text-2xl text-black-200 tracking-tight">Task List</span>
         <div className="flex-1 flex justify-center">
@@ -207,11 +193,7 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
       <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2">
         {(!Array.isArray(tasks) || tasks.length === 0) && <div className="text-black-200 text-center text-lg py-12">No tasks yet.</div>}
         {Array.isArray(tasks) && tasks.map((task, idx) => (
-          <div
-            key={idx}
-            className="bg-white border border-gray-200 rounded-xl p-5 shadow-md group transition-all hover:shadow-lg"
-            ref={idx === tasks.length - 1 ? lastTaskRef : undefined}
-          >
+          <div key={idx} className="bg-white border border-gray-200 rounded-xl p-5 shadow-md group transition-all hover:shadow-lg">
             <div className="flex items-center gap-3 mb-3">
               <input
                 type="checkbox"
@@ -277,4 +259,4 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
   );
 };
 
-export default ProjectTaskManager; 
+export default ProductTaskManager; 

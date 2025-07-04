@@ -346,6 +346,22 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
     }
   };
 
+  // Calculate progress for localTasks
+  const calculateProgress = (tasks) => {
+    if (!Array.isArray(tasks) || tasks.length === 0) return 0;
+    let total = 0;
+    for (const task of tasks) {
+      if (Array.isArray(task.subtasks) && task.subtasks.length > 0) {
+        const completed = task.subtasks.filter((sub) => sub.checked).length;
+        total += completed / task.subtasks.length;
+      } else {
+        total += task.checked ? 1 : 0;
+      }
+    }
+    return Math.round((total / tasks.length) * 100);
+  };
+  const progress = calculateProgress(localTasks);
+
   return (
     <>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -566,8 +582,17 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                 </div>
                 {/* Tasks Table */}
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                  <div className="flex justify-between items-center mb-2">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2 gap-2">
                     <h4 className="text-md font-semibold text-gray-700">Tasks</h4>
+                    <div className="flex-1 flex flex-col items-center justify-center">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-blue-400">Progress:</span>
+                        <span className="text-xs font-semibold text-blue-400">{progress}%</span>
+                      </div>
+                      <div className="w-40 bg-gray-200 rounded-full h-2.5">
+                        <div className="bg-blue-400 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
+                      </div>
+                    </div>
                     <button 
                       onClick={() => {
                         if (selectedProject) {
