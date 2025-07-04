@@ -236,18 +236,26 @@ const Table: React.FC<TableProps> = ({ headers }) => {
                 </tr>
               </thead>
               <tbody>
-                {currentItems.map((row, index) => (
-                  <tr key={index} className="hover:bg-gray-100">
-                    {headers.map((header) => (
-                      <td
-                        key={`${index}-${header}`}
-                        className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700"
-                      >
-                        {row[header]}
-                      </td>
-                    ))}
+                {currentItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={headers.length} className="text-center py-6 text-gray-500">
+                      No items found.
+                    </td>
                   </tr>
-                ))}
+                ) : (
+                  currentItems.map((row, index) => (
+                    <tr key={index} className="hover:bg-gray-100">
+                      {headers.map((header) => (
+                        <td
+                          key={`${index}-${header}`}
+                          className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700"
+                        >
+                          {row[header]}
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

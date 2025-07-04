@@ -183,37 +183,45 @@ const AssetsTable = ({
             </tr>
           </thead>
           <tbody className="">
-            {assets.map((asset) => (
-              <tr
-                key={asset.id}
-                className="hover:bg-gray-100"
-              >
-                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                  {asset.name}
-                </td>
-                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                  ₦ {new Intl.NumberFormat('en-NG', { useGrouping: true }).format(asset.value)}
-                </td>
-                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                  {asset.expected_lifespan}
-                </td>
-                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium`}
-                  >
-                    {asset.is_still_available ? "Yes" : "No"}
-                  </span>
-                </td>
-                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                  <button
-                    onClick={() => handleRowClick(asset)}
-                    className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
-                  >
-                    View
-                  </button>
+            {assets.length === 0 ? (
+              <tr>
+                <td colSpan={headers.length} className="text-center py-6 text-gray-500">
+                  No assets found.
                 </td>
               </tr>
-            ))}
+            ) : (
+              assets.map((asset) => (
+                <tr
+                  key={asset.id}
+                  className="hover:bg-gray-100"
+                >
+                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    {asset.name}
+                  </td>
+                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    ₦ {new Intl.NumberFormat('en-NG', { useGrouping: true }).format(asset.value)}
+                  </td>
+                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    {asset.expected_lifespan}
+                  </td>
+                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium`}
+                    >
+                      {asset.is_still_available ? "Yes" : "No"}
+                    </span>
+                  </td>
+                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    <button
+                      onClick={() => handleRowClick(asset)}
+                      className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
