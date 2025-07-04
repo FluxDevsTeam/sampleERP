@@ -16,6 +16,7 @@ const CustomerProfile = () => {
   const [editedEmail, setEditedEmail] = useState("");
   const [editedPhone, setEditedPhone] = useState("");
   const [editedAddress, setEditedAddress] = useState("");
+  const [editedCreatedAt, setEditedCreatedAt] = useState("");
   const [updateLoading, setUpdateLoading] = useState(false);
   const navigate = useNavigate();
   const [updateError, setUpdateError] = useState<string | null>(null);
@@ -52,7 +53,8 @@ const CustomerProfile = () => {
         setEditedName(data.customer_details.name);
         setEditedEmail(data.customer_details.email);
         setEditedPhone(data.customer_details.phone_number);
-        setEditedAddress(data.customer_details.address)
+        setEditedAddress(data.customer_details.address);
+        setEditedCreatedAt(data.customer_details.created_at);
       } catch (err) {
         console.error("Error fetching customer:", err);
         setError("Error loading customer profile.");
@@ -84,6 +86,7 @@ const CustomerProfile = () => {
             email: editedEmail,
             phone_number: editedPhone,
             address: editedAddress,
+            created_at: editedCreatedAt,
           }),
         }
       );
@@ -235,6 +238,13 @@ const CustomerProfile = () => {
                   value={editedAddress}
                   onChange={(e) => setEditedAddress(e.target.value)}
                 />
+                <label className="text-sm font-medium text-gray-700">Created Date:</label>
+                <input
+                  type="date"
+                  className="border p-2 rounded w-full"
+                  value={editedCreatedAt ? new Date(editedCreatedAt).toISOString().split('T')[0] : ""}
+                  onChange={(e) => setEditedCreatedAt(e.target.value)}
+                />
                 <div className="flex gap-3 mt-2">
                   <button
                     className="bg-green-200 text-white px-4 py-2 rounded-lg flex items-center"
@@ -257,6 +267,7 @@ const CustomerProfile = () => {
                 <p>{customer.customer_details.email}</p>
                 <p>{customer.customer_details.phone_number}</p>
                 <p>Address: {customer.customer_details.address || "N/A"}</p>
+                <p>Created: {new Date(customer.customer_details.created_at).toLocaleDateString()}</p>
                 <div className="flex items-center gap-2 mt-2">
                   {userRole === 'ceo' && (
                     <>

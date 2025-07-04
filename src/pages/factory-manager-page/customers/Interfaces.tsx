@@ -7,6 +7,7 @@ export interface Project {
   
   export interface ShopItem {
     id: number;
+    name: string;
     quantity: string;
     cost_price: string;
     selling_price: string;

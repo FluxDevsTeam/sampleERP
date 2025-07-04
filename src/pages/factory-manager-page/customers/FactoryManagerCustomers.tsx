@@ -21,10 +21,13 @@ const FactoryManagerCustomers = () => {
     email: "",
     phone_number: "",
     address: "",
+    created_at: new Date().toISOString().split('T')[0],
   });
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isFormValid, setIsFormValid] = useState(false);
+
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -36,6 +39,10 @@ const FactoryManagerCustomers = () => {
     const { name, email, phone_number, address } = newCustomer;
     setIsFormValid(name.trim() !== '' && email.trim() !== '' && phone_number.trim() !== '' && address.trim() !== '');
   }, [newCustomer]);
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem('user_role'));
+  }, []);
 
   const addCustomer = async () => {
     setSaving(true);
@@ -59,7 +66,7 @@ const FactoryManagerCustomers = () => {
       setCustomers([...customers, addedCustomer]); // Update UI
       setTotalCustomers((prev) => prev + 1); // Update Count
       setShowModal(false); // Close Modal
-      setNewCustomer({ name: "", email: "", phone_number: "", address: "" }); // Reset Form
+      setNewCustomer({ name: "", email: "", phone_number: "", address: "", created_at: new Date().toISOString().split('T')[0] }); // Reset Form
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setSaveError("Error adding customer.");
@@ -183,7 +190,18 @@ const FactoryManagerCustomers = () => {
             <input type="email" name="email" placeholder="Email" value={newCustomer.email} onChange={handleInputChange} className="border p-2 w-full mb-2" />
             <input type="tel" name="phone_number" placeholder="Phone Number" value={newCustomer.phone_number} onChange={handleInputChange} className="border p-2 w-full mb-2" />
             <input type="text" name="address" placeholder="Address" value={newCustomer.address} onChange={handleInputChange} className="border p-2 w-full mb-2" />
-
+            {userRole === 'ceo' && (
+              <>
+                <label className="text-sm font-medium text-gray-700">Created Date:</label>
+                <input 
+                  type="date" 
+                  name="created_at" 
+                  value={newCustomer.created_at} 
+                  onChange={handleInputChange} 
+                  className="border p-2 w-full mb-2" 
+                />
+              </>
+            )}
             {saveError && <p className="text-red-500">{saveError}</p>}
 
             <div className="flex justify-between mt-4">
