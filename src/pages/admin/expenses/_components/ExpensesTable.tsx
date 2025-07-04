@@ -390,73 +390,85 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
         </div>
       </div>
       <div className={`overflow-x-auto pb-8 ${isTableModalOpen || isViewModalOpen || isEditModalOpen || isDeleteDialogOpen || isAddModalOpen ? 'blur-md' : ''}`}>
-        {data?.daily_data?.map((day) => (
-          <div
-            key={day.date}
-            className="bg-white shadow-md rounded-lg overflow-auto mb-6"
-          >
+        {(!data?.daily_data || data.daily_data.length === 0) ? (
+          <div className="text-center text-gray-500 py-8">No expenses found.</div>
+        ) : (
+          data.daily_data.map((day) => (
             <div
-              className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-300 hover:text-blue-20 w-full"
-              onClick={() => toggleCollapse(day.date)}
+              key={day.date}
+              className="bg-white shadow-md rounded-lg overflow-auto mb-6"
             >
-              <div className="flex items-center space-x-2">
-                <FontAwesomeIcon
-                  icon={collapsed[day.date] ? faChevronDown : faChevronUp}
-                />
-                <h3
-                  className="text-lg font-semibold"
+              <div
+                className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-300 hover:text-blue-20 w-full"
+                onClick={() => toggleCollapse(day.date)}
+              >
+                <div className="flex items-center space-x-2">
+                  <FontAwesomeIcon
+                    icon={collapsed[day.date] ? faChevronDown : faChevronUp}
+                  />
+                  <h3
+                    className="text-lg font-semibold"
+                    style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
+                  >
+                    {formatDate(day.date)}
+                  </h3>
+                </div>
+                <p
+                  className="font-bold"
                   style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
                 >
-                  {formatDate(day.date)}
-                </h3>
+                  Total: ₦{formatNumber(day.daily_total)}
+                </p>
               </div>
-              <p
-                className="font-bold"
-                style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
-              >
-                Total: ₦{formatNumber(day.daily_total)}
-              </p>
-            </div>
 
-            {!collapsed[day.date] && (
-              <table className="min-w-full overflow-auto">
-                <thead className="bg-gray-800">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Date</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Name</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Category</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Linked Project</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Linked Shop Item</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Amount</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Quantity</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Details</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {day.entries.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm">{new Date(entry.date).toLocaleDateString()}</td>
-                      <td className="px-4 py-3 text-sm font-medium">{entry.name}</td>
-                      <td className="px-4 py-3 text-sm">{entry.expense_category?.name || "N/A"}</td>
-                      <td className="px-4 py-3 text-sm">{entry.linked_project?.name || "N/A"}</td>
-                      <td className="px-4 py-3 text-sm">{entry.sold_item?.name || "N/A"}</td>
-                      <td className="px-4 py-3 text-sm font-medium">₦ {formatNumber(entry.amount)}</td>
-                      <td className="px-4 py-3 text-sm">{entry.quantity}</td>
-                      <td className="px-4 py-3 text-sm">
-                        <button
-                          onClick={() => handleRowClick(entry)}
-                          className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
-                        >
-                          View
-                        </button>
-                      </td>
+              {!collapsed[day.date] && (
+                <table className="min-w-full overflow-auto">
+                  <thead className="bg-gray-800">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Date</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Name</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Category</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Linked Project</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Linked Shop Item</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Amount</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Quantity</th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Details</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        ))}
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {day.entries.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="text-center py-6 text-gray-500">
+                          No expenses for this day.
+                        </td>
+                      </tr>
+                    ) : (
+                      day.entries.map((entry) => (
+                        <tr key={entry.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm">{new Date(entry.date).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 text-sm font-medium">{entry.name}</td>
+                          <td className="px-4 py-3 text-sm">{entry.expense_category?.name || "N/A"}</td>
+                          <td className="px-4 py-3 text-sm">{entry.linked_project?.name || "N/A"}</td>
+                          <td className="px-4 py-3 text-sm">{entry.sold_item?.name || "N/A"}</td>
+                          <td className="px-4 py-3 text-sm font-medium">₦ {formatNumber(entry.amount)}</td>
+                          <td className="px-4 py-3 text-sm">{entry.quantity}</td>
+                          <td className="px-4 py-3 text-sm">
+                            <button
+                              onClick={() => handleRowClick(entry)}
+                              className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+                            >
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          ))
+        )}
       </div>
 
       {/* View Expense Modal */}

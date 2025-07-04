@@ -269,6 +269,8 @@ const SoldTable: React.FC = () => {
               ariaLabel="three-dots-loading"
             />
           </div>
+        ) : soldData.length === 0 ? (
+          <div className="text-center text-gray-500 py-8">No sold items found.</div>
         ) : (
           <div className="space-y-6 ">
             <div className="flex justify-between items-center mb-4">

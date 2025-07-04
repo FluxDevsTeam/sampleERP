@@ -152,36 +152,44 @@ const WorkersTable = ({
             </tr>
           </thead>
           <tbody className="">
-            {workers.map((worker) => (
-              <tr
-                key={worker.id}
-                className="hover:bg-gray-100"
-              >
-                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                  {worker.name}
-                </td>
-                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                  {worker.status}
-                </td>
-                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                  {new Date(worker.start_date).toLocaleDateString()}
-                </td>
-                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                  {'salary_amount' in worker ? `₦ ${formatNumber(worker.salary_amount)}` : 'N/A'}
-                </td>
-                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                  {'contract_value' in worker ? `₦ ${formatNumber(worker.contract_value)}` : 'N/A'}
-                </td>
-                <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                  <button
-                    onClick={() => handleRowClick(worker)}
-                    className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
-                  >
-                    View
-                  </button>
+            {workers.length === 0 ? (
+              <tr>
+                <td colSpan={headers.length} className="text-center py-6 text-gray-500">
+                  No workers found.
                 </td>
               </tr>
-            ))}
+            ) : (
+              workers.map((worker) => (
+                <tr
+                  key={worker.id}
+                  className="hover:bg-gray-100"
+                >
+                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    {worker.name}
+                  </td>
+                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    {worker.status}
+                  </td>
+                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    {new Date(worker.start_date).toLocaleDateString()}
+                  </td>
+                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    {'salary_amount' in worker ? `₦ ${formatNumber(worker.salary_amount)}` : 'N/A'}
+                  </td>
+                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    {'contract_value' in worker ? `₦ ${formatNumber(worker.contract_value)}` : 'N/A'}
+                  </td>
+                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                    <button
+                      onClick={() => handleRowClick(worker)}
+                      className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

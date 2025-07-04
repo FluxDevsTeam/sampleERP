@@ -305,69 +305,81 @@ const RemovedTable: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {removedData?.daily_data?.map((dayData: any) => (
-            <div key={dayData.date} className="bg-white shadow-md rounded-lg overflow-hidden">
-              <div
-                className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-200"
-                onClick={() => toggleDate(dayData.date)}
-              >
-                <div className="flex items-center space-x-2">
-                  <FontAwesomeIcon
-                    icon={openSections.includes(dayData.date) ? faChevronUp : faChevronDown}
-                    className="text-blue-400"
-                  />
-                  <h2 className="text-lg font-semibold text-gray-700">
-                    {formatDate(dayData.date)}
-                  </h2>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold text-gray-700">
-                    Total: {formatCurrency(dayData.daily_total)}
-                  </p>
-                </div>
-              </div>
-              {openSections.includes(dayData.date) && (
-                <div className="transition-max-height duration-500 ease-in-out overflow-hidden">
-                  <div className="p-4">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Name</th>
-                          <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Quantity</th>
-                          <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Cost Per Unit</th>
-                          <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Total Price</th>
-                          <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Product</th>
-                          <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Progress</th>
-                          {userRole === 'ceo' && <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Actions</th>}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {dayData.entries.map((entry: any) => (
-                          <tr key={entry.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-3 text-sm cursor-pointer hover:text-blue-600">{entry.name}</td>
-                            <td className="px-4 py-3 text-sm">{entry.quantity}</td>
-                            <td className="px-4 py-3 text-sm">{formatCurrency(entry.price)}</td>
-                            <td className="px-4 py-3 text-sm">{formatCurrency(parseFloat(entry.price) * parseFloat(entry.quantity))}</td>
-                            <td className="px-4 py-3 text-sm">{entry.product_its_used.name || "—"}</td>
-                            <td className="px-4 py-3 text-sm">{entry.product_its_used.progress}%</td>
-                            {userRole === 'ceo' && (
-                              <td className="flex justify-evenly px-4 py-3 text-sm text-blue-600">
-                                <>
-                                  <FontAwesomeIcon onClick={() => handleEdit(entry.id)} className="pr-2 cursor-pointer hover:text-blue-500" icon={faPen} />
-                                  <FontAwesomeIcon onClick={() => handleDeleteClick(entry.id)} className="cursor-pointer text-red-400" icon={faTrash} />
-                                </>
-                              </td>
-                            )}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+          {removedData?.daily_data?.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">No removed items found.</div>
+          ) : (
+            removedData?.daily_data?.map((dayData: any) => (
+              <div key={dayData.date} className="bg-white shadow-md rounded-lg overflow-hidden">
+                <div
+                  className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-200"
+                  onClick={() => toggleDate(dayData.date)}
+                >
+                  <div className="flex items-center space-x-2">
+                    <FontAwesomeIcon
+                      icon={openSections.includes(dayData.date) ? faChevronUp : faChevronDown}
+                      className="text-blue-400"
+                    />
+                    <h2 className="text-lg font-semibold text-gray-700">
+                      {formatDate(dayData.date)}
+                    </h2>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-gray-700">
+                      Total: {formatCurrency(dayData.daily_total)}
+                    </p>
                   </div>
                 </div>
-              )}
+                {openSections.includes(dayData.date) && (
+                  <div className="transition-max-height duration-500 ease-in-out overflow-hidden">
+                    <div className="p-4">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Name</th>
+                            <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Quantity</th>
+                            <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Cost Per Unit</th>
+                            <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Total Price</th>
+                            <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Product</th>
+                            <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Progress</th>
+                            {userRole === 'ceo' && <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Actions</th>}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {dayData.entries.length === 0 ? (
+                            <tr>
+                              <td colSpan={userRole === 'ceo' ? 7 : 6} className="text-center py-6 text-gray-500">
+                                No removed items for this day.
+                              </td>
+                            </tr>
+                          ) : (
+                            dayData.entries.map((entry: any) => (
+                              <tr key={entry.id} className="hover:bg-gray-50">
+                                <td className="px-4 py-3 text-sm cursor-pointer hover:text-blue-600">{entry.name}</td>
+                                <td className="px-4 py-3 text-sm">{entry.quantity}</td>
+                                <td className="px-4 py-3 text-sm">{formatCurrency(entry.price)}</td>
+                                <td className="px-4 py-3 text-sm">{formatCurrency(parseFloat(entry.price) * parseFloat(entry.quantity))}</td>
+                                <td className="px-4 py-3 text-sm">{entry.product_its_used.name || "—"}</td>
+                                <td className="px-4 py-3 text-sm">{entry.product_its_used.progress}%</td>
+                                {userRole === 'ceo' && (
+                                  <td className="flex justify-evenly px-4 py-3 text-sm text-blue-600">
+                                    <>
+                                      <FontAwesomeIcon onClick={() => handleEdit(entry.id)} className="pr-2 cursor-pointer hover:text-blue-500" icon={faPen} />
+                                      <FontAwesomeIcon onClick={() => handleDeleteClick(entry.id)} className="cursor-pointer text-red-400" icon={faTrash} />
+                                    </>
+                                  </td>
+                                )}
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
 
-            </div>
-          ))}
+              </div>
+            ))
+          )}
         </div>
       )}
 
