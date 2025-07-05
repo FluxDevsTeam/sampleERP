@@ -16,18 +16,20 @@ interface AddAssetModalProps {
   onClose: () => void;
 }
 
-const initialFormData: AssetData = {
+const initialFormData: AssetData & { date_added?: string; note?: string } = {
   name: "",
   value: 0,
   expected_lifespan: "",
   is_still_available: true,
+  date_added: new Date().toISOString().split('T')[0],
+  note: "",
 };
 
 const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useCreateAsset();
 
-  const [formData, setFormData] = useState<AssetData>(initialFormData);
+  const [formData, setFormData] = useState<AssetData & { date_added?: string; note?: string }>(initialFormData);
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -97,6 +99,17 @@ const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
                 required
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="date_added">Date Added</Label>
+              <Input
+                id="date_added"
+                name="date_added"
+                type="date"
+                value={formData.date_added || ""}
+                onChange={handleChange}
+                required
+              />
+            </div>
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -107,6 +120,16 @@ const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
                 className="h-4 w-4"
               />
               <Label htmlFor="is_still_available">Available</Label>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="note">Note (optional)</Label>
+              <Input
+                id="note"
+                name="note"
+                value={formData.note || ""}
+                onChange={handleChange}
+                placeholder="Enter a note (optional)"
+              />
             </div>
           </CardContent>
           <CardFooter className="flex justify-between mt-4">

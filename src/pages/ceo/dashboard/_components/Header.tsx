@@ -166,7 +166,7 @@ const Header = () => {
   return (
     <div className="p-3 sm:p-4 lg:p-6">
       {/* Collapsible Section Headers Row */}
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 lg:gap-4 mb-4 py-2 overflow-x-auto">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 lg:gap-4 mb-4 px-2 py-2 overflow-x-auto">
         <button 
           className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-blue-50/60 hover:bg-blue-100 transition font-semibold text-blue-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'key' ? 'ring-2 ring-blue-400' : ''}`} 
           onClick={() => handleSectionClick('key')}

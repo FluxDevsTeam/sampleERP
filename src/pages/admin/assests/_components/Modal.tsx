@@ -10,6 +10,9 @@ interface Asset {
   value: number
   expected_lifespan: string
   is_still_available: boolean
+  date_added?: string
+  end_date?: string
+  note?: string
 }
 
 interface ModalsProps {
@@ -80,6 +83,18 @@ const Modals = ({
                     <span className="text-red-600">Not Available</span>
                   )}
                 </span>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">Date Added:</span>
+                <span className="col-span-2">{selectedAsset.date_added ? new Date(selectedAsset.date_added).toLocaleDateString() : "-"}</span>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">End Date:</span>
+                <span className="col-span-2">{selectedAsset.end_date ? new Date(selectedAsset.end_date).toLocaleDateString() : "-"}</span>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <span className="font-medium">Note:</span>
+                <span className="col-span-2">{selectedAsset.note ? selectedAsset.note : "-"}</span>
               </div>
             </div>
           )}

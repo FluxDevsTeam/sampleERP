@@ -35,6 +35,8 @@ const EditAsset = () => {
     value: "",
     expected_lifespan: "",
     is_still_available: true,
+    date_added: "",
+    end_date: "",
   })
 
   // Loading and error states
@@ -59,6 +61,8 @@ const EditAsset = () => {
         value: asset.value?.toString() || "",
         expected_lifespan: asset.expected_lifespan || "",
         is_still_available: asset.is_still_available || false,
+        date_added: asset.date_added ? asset.date_added : "",
+        end_date: asset.end_date ? asset.end_date : "",
       })
     }
   }, [asset])
@@ -106,7 +110,7 @@ const EditAsset = () => {
     setFormError("")
 
     // Validate form
-    if (!formData.name || !formData.value || !formData.expected_lifespan) {
+    if (!formData.name || !formData.value || !formData.expected_lifespan || !formData.date_added) {
       setFormError("Please fill out all required fields")
       setIsSubmitting(false)
       return
@@ -118,6 +122,8 @@ const EditAsset = () => {
       value: parseFloat(formData.value),
       expected_lifespan: formData.expected_lifespan,
       is_still_available: formData.is_still_available,
+      date_added: formData.date_added,
+      end_date: formData.end_date || undefined,
     }
 
     updateAssetMutation.mutate(assetData)
@@ -180,6 +186,29 @@ const EditAsset = () => {
                 onChange={handleChange}
                 placeholder="Enter expected lifespan"
                 required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="date_added">Date Added</Label>
+              <Input
+                id="date_added"
+                name="date_added"
+                type="date"
+                value={formData.date_added}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="end_date">End Date (optional)</Label>
+              <Input
+                id="end_date"
+                name="end_date"
+                type="date"
+                value={formData.end_date}
+                onChange={handleChange}
               />
             </div>
             

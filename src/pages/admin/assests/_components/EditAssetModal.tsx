@@ -47,6 +47,9 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
     value: "",
     expected_lifespan: "",
     is_still_available: true,
+    date_added: "",
+    end_date: "",
+    note: "",
   });
 
   // Loading and error states
@@ -61,6 +64,9 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
         value: asset.value?.toString() || "",
         expected_lifespan: asset.expected_lifespan || "",
         is_still_available: asset.is_still_available || false,
+        date_added: asset.date_added ? asset.date_added : "",
+        end_date: asset.end_date ? asset.end_date : "",
+        note: asset.note ? asset.note : "",
       });
     }
   }, [asset, isOpen]);
@@ -108,7 +114,7 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
     setFormError("");
 
     // Validate form
-    if (!formData.name || !formData.value || !formData.expected_lifespan) {
+    if (!formData.name || !formData.value || !formData.expected_lifespan || !formData.date_added) {
       setFormError("Please fill out all required fields");
       setIsSubmitting(false);
       return;
@@ -120,6 +126,9 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
       value: parseFloat(formData.value),
       expected_lifespan: formData.expected_lifespan,
       is_still_available: formData.is_still_available,
+      date_added: formData.date_added,
+      end_date: formData.end_date || undefined,
+      note: formData.note || undefined,
     };
 
     updateAssetMutation.mutate(assetData);
@@ -133,6 +142,9 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
         value: asset.value?.toString() || "",
         expected_lifespan: asset.expected_lifespan || "",
         is_still_available: asset.is_still_available || false,
+        date_added: asset.date_added ? asset.date_added : "",
+        end_date: asset.end_date ? asset.end_date : "",
+        note: asset.note ? asset.note : "",
       });
     }
     setIsSubmitting(false);
@@ -141,7 +153,7 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-screen overflow-y-auto">
         <Card>
           <CardHeader>
             <CardTitle>Edit Asset</CardTitle>
@@ -208,6 +220,40 @@ const EditAssetModal = ({ asset, isOpen, onClose }: EditAssetModalProps) => {
                 <Label htmlFor="is_still_available">
                   Asset is still available
                 </Label>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="date_added">Date Added</Label>
+                <Input
+                  id="date_added"
+                  name="date_added"
+                  type="date"
+                  value={formData.date_added}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="end_date">End Date (optional)</Label>
+                <Input
+                  id="end_date"
+                  name="end_date"
+                  type="date"
+                  value={formData.end_date}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="note">Note (optional)</Label>
+                <Input
+                  id="note"
+                  name="note"
+                  value={formData.note}
+                  onChange={handleChange}
+                  placeholder="Enter a note (optional)"
+                />
               </div>
             </CardContent>
 

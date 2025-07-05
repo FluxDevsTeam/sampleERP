@@ -208,7 +208,7 @@ const AssetsTable = ({
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium`}
                     >
-                      {asset.is_still_available ? "Yes" : "No"}
+                      {asset.is_still_available ? "Available" : "Unavailable"}
                     </span>
                   </td>
                   <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
