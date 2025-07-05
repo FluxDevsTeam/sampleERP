@@ -34,6 +34,7 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
   const [workerId, setWorkerId] = useState<string | null>(null);
   const [selectedWorkerName, setSelectedWorkerName] = useState<string | null>(null);
   const [initialWorkerType, setInitialWorkerType] = useState<"salary" | "contractor">("salary");
+  const [date, setDate] = useState<string>("");
 
   const queryClient = useQueryClient();
 
@@ -55,11 +56,12 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
         setSelectedWorkerName(null);
         setInitialWorkerType("salary"); // Default if no worker detail
       }
+      setDate(entry.date || "");
     }
   }, [isOpen, entry]);
 
   const editPaidEntryMutation = useMutation({
-    mutationFn: async (updatedEntry: { id: number; amount: string; salary?: number | null; contract?: number | null }) => {
+    mutationFn: async (updatedEntry: { id: number; amount: string; salary?: number | null; contract?: number | null; date?: string }) => {
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.put(
         `https://backend.kidsdesigncompany.com/api/paid/${updatedEntry.id}/`,
@@ -91,7 +93,7 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
       return;
     }
 
-    const payload: { id: number; amount: string; salary?: number | null; contract?: number | null } = {
+    const payload: { id: number; amount: string; salary?: number | null; contract?: number | null; date?: string } = {
       id: entry.id,
       amount,
     };
@@ -108,6 +110,10 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
     } else {
       payload.contract = parseInt(workerId);
     }
+    if (date) {
+      payload.date = date;
+    }
+    console.log('EditPaidModal payload:', payload);
     editPaidEntryMutation.mutate(payload);
   };
 
@@ -184,6 +190,17 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
               dataMapper={workerType === "salary" ? salaryWorkersMapper : contractorsMapper}
               selectedValue={workerId}
               selectedName={selectedWorkerName}
+            />
+          </div>
+          <div className="items-center gap-4">
+            <Label htmlFor="date" className="text-right">Date</Label>
+            <Input
+              id="date"
+              type="date"
+              value={date}
+              onChange={e => setDate(e.target.value)}
+              className="p-2 border rounded w-full"
+              required
             />
           </div>
           <DialogFooter>

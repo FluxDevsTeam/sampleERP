@@ -30,11 +30,13 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
   const [workerType, setWorkerType] = useState<"salary" | "contractor">("salary");
   const [workerId, setWorkerId] = useState<string | null>(null);
   const [selectedWorkerName, setSelectedWorkerName] = useState<string | null>(null);
+  const [date, setDate] = useState<string>("");
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
 
   const addPaidEntryMutation = useMutation({
-    mutationFn: async (newEntry: { amount: string; salary?: number; contract?: number }) => {
+    mutationFn: async (newEntry: { amount: string; salary?: number; contract?: number; date?: string }) => {
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.post(
         "https://backend.kidsdesigncompany.com/api/paid/",
@@ -70,7 +72,7 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
       return;
     }
 
-    const payload: { amount: string; salary?: number; contract?: number } = {
+    const payload: { amount: string; salary?: number; contract?: number; date?: string } = {
       amount,
     };
     if (workerType === "salary") {
@@ -78,6 +80,10 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
     } else {
       payload.contract = parseInt(workerId);
     }
+    if (userRole === 'ceo' && date) {
+      payload.date = date;
+    }
+    console.log('AddPaidModal payload:', payload);
     addPaidEntryMutation.mutate(payload);
   };
 
@@ -109,9 +115,8 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
   const workerResultsKey = workerType === "salary" ? "results.workers" : "results.contractor";
 
   useEffect(() => {
-    if (isOpen) {
-    }
-  }, [isOpen]);
+    setUserRole(localStorage.getItem('user_role'));
+  }, []);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -162,6 +167,19 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
               selectedName={selectedWorkerName}
             />
           </div>
+          {userRole === 'ceo' && (
+            <div className="items-center gap-4">
+              <Label htmlFor="date" className="text-right">Date</Label>
+              <Input
+                id="date"
+                type="date"
+                value={date}
+                onChange={e => setDate(e.target.value)}
+                className="p-2 border rounded w-full"
+                required
+              />
+            </div>
+          )}
           <DialogFooter>
             <Button type="submit" disabled={addPaidEntryMutation.isPending || !workerId}>
               {addPaidEntryMutation.isPending ? "Adding..." : "Add Entry"}

@@ -74,6 +74,7 @@ interface ExpenseFormData {
   selectedType: string;
   category: number | null;
   description: string;
+  date?: string;
 }
 
 interface AddPaymentModalProps {
@@ -104,7 +105,14 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
     selectedType: "",
     category: null,
     description: "",
+    date: "",
   });
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  // Set user role on mount
+  useState(() => {
+    setUserRole(localStorage.getItem('user_role'));
+  }, []);
 
   const addExpenseMutation = useMutation({
     mutationFn: async (newExpense: ExpenseFormData) => {
@@ -124,6 +132,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
           newExpense.selectedType === "shop" && newExpense.selectedItem
             ? Number(newExpense.selectedItem)
             : null,
+        date: newExpense.date || undefined,
       };
 
       console.log("Sending data to API:", formattedData);
@@ -156,6 +165,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
         selectedType: "",
         category: null,
         description: "",
+        date: "",
       });
       if (onSuccess) onSuccess();
     },
@@ -310,6 +320,22 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
               setFormData((prev) => ({ ...prev, category: categoryId }))
             }
           />
+
+          {/* Add date field for CEO only */}
+          {userRole === 'ceo' && (
+            <div className="space-y-2">
+              <Label htmlFor="date">Date</Label>
+              <Input
+                id="date"
+                name="date"
+                type="date"
+                value={formData.date || ""}
+                onChange={e => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                className="w-full"
+                required
+              />
+            </div>
+          )}
 
           <DialogFooter>
             <Button

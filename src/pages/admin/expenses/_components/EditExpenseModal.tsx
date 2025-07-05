@@ -24,6 +24,7 @@ interface ExpenseFormData {
   selectedType: string;
   selectedItem: string | null;
   category: number | null;
+  date?: string;
 }
 
 interface Project {
@@ -149,6 +150,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
     selectedType: "",
     selectedItem: null,
     category: null,
+    date: "",
   });
 
   useEffect(() => {
@@ -175,6 +177,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
         selectedType,
         selectedItem,
         category: expense.category?.id || null,
+        date: expense.date ? expense.date : "",
       });
     }
   }, [expense]);
@@ -190,6 +193,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
         category: data.category,
         project: data.selectedType === "project" && data.selectedItem ? Number(data.selectedItem) : null,
         shop: data.selectedType === "shop" && data.selectedItem ? Number(data.selectedItem) : null,
+        date: data.date || undefined,
       };
 
       if (data.selectedType === "other") {
@@ -374,6 +378,19 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                 onChange={(e) => handleInputChange(e.target.name, e.target.value)}
                 className="w-full"
                 />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="date">Date</Label>
+              <Input
+                id="date"
+                name="date"
+                type="date"
+                value={formData.date || ""}
+                onChange={(e) => handleInputChange(e.target.name, e.target.value)}
+                className="w-full"
+                required
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">

@@ -272,13 +272,13 @@ const CustomerProfile = () => {
                   {userRole === 'ceo' && (
                     <>
                       <button
-                        className="bg-[#30ff6be3] hover:bg-[#1f9733] text-white px-4 py-2 rounded-lg flex justify-center items-center"
+                        className="bg-white border border-[#30ff6be3] text-[#1f9733] hover:bg-[#e6fbe9] px-4 py-2 rounded-lg flex justify-center items-center"
                         onClick={() => setIsEditing(true)}
                       >
                         <FaEdit className="mr-2" /> Edit
                       </button>
                       <button
-                        className="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg flex justify-center items-center"
+                        className="bg-white border border-red-700 text-red-700 hover:bg-red-50 px-4 py-2 rounded-lg flex justify-center items-center"
                         onClick={handleDelete}
                         disabled={deleteLoading}
                       >
@@ -287,7 +287,7 @@ const CustomerProfile = () => {
                     </>
                   )}
                   <div className="flex justify-center">
-                    <Link to="/factory-manager/customers" className="bg-blue-200 text-white hover:text-white hover:no-underline hover:bg-gray-20 px-4 py-2 rounded-lg">
+                    <Link to="/factory-manager/customers" className="bg-white border border-blue-400 text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:no-underline px-4 py-2 rounded-lg">
                       Back to Customers
                     </Link>
                   </div>
