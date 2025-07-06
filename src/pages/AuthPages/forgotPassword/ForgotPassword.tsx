@@ -29,11 +29,11 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20 p-6 border border-gray-300 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-center">Forgot Password</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-[300px] sm:max-w-md mx-auto mt-10 sm:mt-16 md:mt-20 p-4 sm:p-6 border border-gray-300 rounded-lg shadow-lg">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">Forgot Password</h2>
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700">
             Email:
           </label>
           <input
@@ -42,18 +42,18 @@ const ForgotPassword = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm"
           />
         </div>
         <button
           type="submit"
-          className="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="w-full px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-xs sm:text-sm"
         >
           Send Reset Link
         </button>
       </form>
       {message && (
-        <p className="mt-4 text-center text-green-600">{message}</p>
+        <p className="mt-3 sm:mt-4 text-center text-green-600 text-xs sm:text-sm">{message}</p>
       )}
     </div>
   );

@@ -11,7 +11,7 @@ const DashboardData = (DashboardData: DashboardDataProps) => {
   // Format the digits with thousand separators, handling null or undefined values
   const formattedDigits = (DashboardData.digits ?? 0).toLocaleString();
   return (
-    <div className="bg-white shadow-2xl grid items-center py-6 pl-3">
+    <div className="bg-white shadow-2xl grid items-center py-3 sm:py-6 pl-2 sm:pl-3">
       <p className="text-xs font-semibold"
         style={{ fontSize: "clamp(12px, 3vw, 16px)" }}
         >{DashboardData.info}</p>

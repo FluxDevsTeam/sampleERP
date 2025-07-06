@@ -122,7 +122,7 @@ const CategoryTable: React.FC<TableProps> = ({ headers }) => {
                   {headers.map((header) => (
                     <th
                       key={header}
-                      className="py-4 px-4 text-left text-sm font-semibold"
+                      className="py-2 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold"
                     >
                       {header}
                     </th>
@@ -132,7 +132,7 @@ const CategoryTable: React.FC<TableProps> = ({ headers }) => {
               <tbody>
                 {currentItems.length === 0 ? (
                   <tr>
-                    <td colSpan={headers.length} className="text-center py-6 text-gray-500">
+                    <td colSpan={headers.length} className="text-center py-6 text-gray-500 text-sm">
                       No categories found.
                     </td>
                   </tr>
@@ -142,7 +142,7 @@ const CategoryTable: React.FC<TableProps> = ({ headers }) => {
                       {headers.map((header) => (
                         <td
                           key={`${index}-${header}`}
-                          className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700"
+                          className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700"
                         >
                           {renderCellContent(header, row[header])}
                         </td>
@@ -154,37 +154,37 @@ const CategoryTable: React.FC<TableProps> = ({ headers }) => {
             </table>
 
             {/* Updated Pagination Controls */}
-            <div className="flex justify-center items-center mt-4 gap-2">
+            <div className="flex justify-center items-center mt-4 gap-1 sm:gap-2">
               <button
                 onClick={() => handlePageChange(1)}
                 disabled={currentPage === 1}
-                className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+                className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
               >
                 <FontAwesomeIcon icon={faAnglesLeft} />
               </button>
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+                className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
               >
                 <FontAwesomeIcon icon={faArrowLeft} />
               </button>
 
-              <span className="mx-4">
+              <span className="mx-2 sm:mx-4 text-xs sm:text-sm">
                 Page {currentPage} of {totalPages}
               </span>
 
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+                className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
               >
                 <FontAwesomeIcon icon={faArrowRight} />
               </button>
               <button
                 onClick={() => handlePageChange(totalPages)}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+                className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
               >
                 <FontAwesomeIcon icon={faAnglesRight} />
               </button>

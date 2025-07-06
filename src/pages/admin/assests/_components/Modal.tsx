@@ -54,29 +54,29 @@ const Modals = ({
     <>
       {/* Asset Details Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[95vw] max-w-md mx-auto p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle>Asset Details</DialogTitle>
-            <DialogDescription>View details for the selected asset.</DialogDescription>
+            <DialogTitle className="text-lg sm:text-xl">Asset Details</DialogTitle>
+            <DialogDescription className="text-sm">View details for the selected asset.</DialogDescription>
           </DialogHeader>
 
           {selectedAsset && (
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Name:</span>
-                <span className="col-span-2">{selectedAsset.name}</span>
+            <div className="grid gap-3 sm:gap-4 py-3 sm:py-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                <span className="font-medium text-sm sm:text-base">Name:</span>
+                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedAsset.name}</span>
               </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Value:</span>
-                <span className="col-span-2">NGN{selectedAsset.value}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                <span className="font-medium text-sm sm:text-base">Value:</span>
+                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">NGN{selectedAsset.value}</span>
               </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Expected Lifespan:</span>
-                <span className="col-span-2">{selectedAsset.expected_lifespan}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                <span className="font-medium text-sm sm:text-base">Expected Lifespan:</span>
+                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedAsset.expected_lifespan}</span>
               </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Status:</span>
-                <span className="col-span-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                <span className="font-medium text-sm sm:text-base">Status:</span>
+                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">
                   {selectedAsset.is_still_available ? (
                     <span className="text-black">Available</span>
                   ) : (
@@ -84,33 +84,33 @@ const Modals = ({
                   )}
                 </span>
               </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Date Added:</span>
-                <span className="col-span-2">{selectedAsset.date_added ? new Date(selectedAsset.date_added).toLocaleDateString() : "-"}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                <span className="font-medium text-sm sm:text-base">Date Added:</span>
+                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedAsset.date_added ? new Date(selectedAsset.date_added).toLocaleDateString() : "-"}</span>
               </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">End Date:</span>
-                <span className="col-span-2">{selectedAsset.end_date ? new Date(selectedAsset.end_date).toLocaleDateString() : "-"}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                <span className="font-medium text-sm sm:text-base">End Date:</span>
+                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedAsset.end_date ? new Date(selectedAsset.end_date).toLocaleDateString() : "-"}</span>
               </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Note:</span>
-                <span className="col-span-2">{selectedAsset.note ? selectedAsset.note : "-"}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                <span className="font-medium text-sm sm:text-base">Note:</span>
+                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedAsset.note ? selectedAsset.note : "-"}</span>
               </div>
             </div>
           )}
 
           <DialogFooter>
-            <div className="flex justify-around items-center w-full">
-              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+            <div className="flex flex-col sm:flex-row justify-around items-center w-full gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setIsModalOpen(false)} className="w-full sm:w-auto text-sm">
                 Close
               </Button>
               {isCEO && (
-                <Button variant="outline" onClick={handleEditClick}>
+                <Button variant="outline" onClick={handleEditClick} className="w-full sm:w-auto text-sm">
                   Edit
                 </Button>
               )}
               {isCEO && (
-                <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+                <Button variant="destructive" onClick={handleDelete} disabled={isDeleting} className="w-full sm:w-auto text-sm">
                   Delete
                 </Button>
               )}

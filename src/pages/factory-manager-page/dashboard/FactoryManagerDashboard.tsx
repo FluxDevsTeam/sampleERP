@@ -205,7 +205,7 @@ const FactoryManagerDashboard = () => {
 
   return (
     <div>
-      <div className="p-4">
+      <div className="p-2 sm:p-4">
         {/* Grouped card sections, only first 2 rows by default */}
         {groups.map((group, i) => renderCardGroup(groupNames[i], group, groupSlices[i][0], groupSlices[i][1]))}
         {allCards.length > defaultVisibleCount && (
@@ -230,8 +230,8 @@ const FactoryManagerDashboard = () => {
           </div>
         )}
       </div>
-      <div className="p-4">
-        <h2 className="text-lg font-bold mb-8">Financial Overview</h2>
+      <div className="p-2 sm:p-4">
+        <h2 className="text-base sm:text-lg font-bold mb-4 sm:mb-8">Financial Overview</h2>
         <PieChartComponent data={expenseBreakdown} />
         <BarChartComponent />
       </div>

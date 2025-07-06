@@ -108,38 +108,38 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <label className="block mb-1">{label}:</label>
+      <label className="block mb-1 text-xs sm:text-sm">{label}:</label>
       <div className="relative">
         <input
           type="text"
           value={inputValue}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
-          className="w-full border rounded p-2"
+          className="w-full border rounded p-1.5 sm:p-2 text-xs sm:text-sm"
         />
         <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} />
+          <FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} className="text-xs sm:text-sm" />
         </span>
       </div>
       {isOpen && (
-        <div className="absolute z-10 w-full bg-white border rounded mt-1 max-h-60 overflow-y-auto">
+        <div className="absolute z-10 w-full bg-white border rounded mt-1 max-h-48 sm:max-h-60 overflow-y-auto">
           <ul>
             {items.map((item) => (
               <li
                 key={item.id}
                 onClick={() => handleSelect(item)}
-                className="p-2 hover:bg-gray-200 cursor-pointer"
+                className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
               >
                 {item.name}
               </li>
             ))}
           </ul>
-          <div className="flex justify-between p-2">
+          <div className="flex justify-between p-1.5 sm:p-2">
             <button
               type="button"
               onClick={() => prevUrl && fetchData(prevUrl)}
               disabled={!prevUrl}
-              className="px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+              className="px-2 sm:px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50 text-xs sm:text-sm"
             >
               Previous
             </button>
@@ -147,7 +147,7 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
               type="button"
               onClick={() => nextUrl && fetchData(nextUrl)}
               disabled={!nextUrl}
-              className="px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+              className="px-2 sm:px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50 text-xs sm:text-sm"
             >
               Next
             </button>

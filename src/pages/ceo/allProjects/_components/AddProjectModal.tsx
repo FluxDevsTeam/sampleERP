@@ -286,9 +286,9 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl w-[95vw] sm:w-full mx-4 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Project</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">Add New Project</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <Card className="border-none shadow-none">
@@ -301,21 +301,21 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                 </Alert>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Left column */}
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Project Name</Label>
+                    <Label htmlFor="name" className="text-sm sm:text-base">Project Name</Label>
                     <Input
                       id="name"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className={errorDetails.name ? "border-red-500" : ""}
+                      className={`text-sm sm:text-base ${errorDetails.name ? "border-red-500" : ""}`}
                     />
                     {errorDetails.name && (
-                      <p className="text-sm text-red-500">
+                      <p className="text-xs sm:text-sm text-red-500">
                         {errorDetails.name.join(", ")}
                       </p>
                     )}
@@ -332,21 +332,22 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="note">Note (optional)</Label>
+                    <Label htmlFor="note" className="text-sm sm:text-base">Note (optional)</Label>
                     <Textarea
                       id="note"
                       name="note"
                       value={formData.note}
                       onChange={handleChange}
                       rows={3}
+                      className="text-sm sm:text-base"
                     />
                   </div>
                 </div>
                 {/* Right column */}
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="start_date">Start Date</Label>
+                      <Label htmlFor="start_date" className="text-sm sm:text-base">Start Date</Label>
                       <Input
                         id="start_date"
                         name="start_date"
@@ -354,28 +355,29 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                         value={formData.start_date}
                         onChange={handleChange}
                         required
-                        className={errorDetails.start_date ? "border-red-500" : ""}
+                        className={`text-sm sm:text-base ${errorDetails.start_date ? "border-red-500" : ""}`}
                       />
                       {errorDetails.start_date && (
-                        <p className="text-sm text-red-500">
+                        <p className="text-xs sm:text-sm text-red-500">
                           {errorDetails.start_date.join(", ")}
                         </p>
                       )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="deadline">Deadline (optional)</Label>
+                      <Label htmlFor="deadline" className="text-sm sm:text-base">Deadline (optional)</Label>
                       <Input
                         id="deadline"
                         name="deadline"
                         type="date"
                         value={formData.deadline}
                         onChange={handleChange}
+                        className="text-sm sm:text-base"
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="selling_price">Selling Price (₦)</Label>
+                      <Label htmlFor="selling_price" className="text-sm sm:text-base">Selling Price (₦)</Label>
                       <Input
                         id="selling_price"
                         name="selling_price"
@@ -383,48 +385,50 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                         value={formData.selling_price}
                         onChange={handleChange}
                         required
-                        className={errorDetails.selling_price ? "border-red-500" : ""}
+                        className={`text-sm sm:text-base ${errorDetails.selling_price ? "border-red-500" : ""}`}
                       />
                       {errorDetails.selling_price && (
-                        <p className="text-sm text-red-500">
+                        <p className="text-xs sm:text-sm text-red-500">
                           {errorDetails.selling_price.join(", ")}
                         </p>
                       )}
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="logistics">Logistics Cost (optional)</Label>
+                      <Label htmlFor="logistics" className="text-sm sm:text-base">Logistics Cost (optional)</Label>
                       <Input
                         id="logistics"
                         name="logistics"
                         type="number"
                         value={formData.logistics}
                         onChange={handleChange}
+                        className="text-sm sm:text-base"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="service_charge">Service Charge (optional)</Label>
+                      <Label htmlFor="service_charge" className="text-sm sm:text-base">Service Charge (optional)</Label>
                       <Input
                         id="service_charge"
                         name="service_charge"
                         type="number"
                         value={formData.service_charge}
                         onChange={handleChange}
+                        className="text-sm sm:text-base"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="invoice_image">Invoice Image (optional)</Label>
+                    <Label htmlFor="invoice_image" className="text-sm sm:text-base">Invoice Image (optional)</Label>
                     <Input
                       id="invoice_image"
                       type="file"
                       accept="image/jpeg,image/png,image/gif,application/pdf"
                       onChange={handleImageChange}
-                      className="cursor-pointer"
+                      className="cursor-pointer text-sm sm:text-base"
                     />
                     {invoiceImage && (
-                      <p className="text-sm text-green-600 mt-2">
+                      <p className="text-xs sm:text-sm text-green-600 mt-2">
                         {invoiceImage.name} selected
                       </p>
                     )}
@@ -434,24 +438,24 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                   </div>
                 </div>
                 {/* All Items and Tasks Sections side by side */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:col-span-2">
                   <div className="space-y-2">
-                    <Label>All Items (Optional)</Label>
+                    <Label className="text-sm sm:text-base">All Items (Optional)</Label>
                     <div className="space-y-2">
                       {allItems.map((row, idx) => (
-                        <div key={idx} className="flex gap-2 items-center">
+                        <div key={idx} className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                           <Input
                             placeholder="Item"
                             value={row.item}
                             onChange={e => handleAllItemChange(idx, 'item', e.target.value)}
-                            className="w-1/3"
+                            className="w-full sm:w-1/3 text-sm sm:text-base"
                           />
                           <Input
                             placeholder="Price"
                             type="number"
                             value={row.price}
                             onChange={e => handleAllItemChange(idx, 'price', e.target.value)}
-                            className="w-1/3"
+                            className="w-full sm:w-1/3 text-sm sm:text-base"
                           />
                           <Input
                             placeholder="Quantity"
@@ -459,26 +463,27 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                             min="1"
                             value={row.quantity}
                             onChange={e => handleAllItemChange(idx, 'quantity', e.target.value)}
-                            className="w-1/4"
+                            className="w-full sm:w-1/4 text-sm sm:text-base"
                       />
-                          <Button type="button" variant="destructive" size="sm" onClick={() => handleRemoveAllItem(idx)} disabled={allItems.length === 1}>Remove</Button>
+                          <Button type="button" variant="destructive" size="sm" onClick={() => handleRemoveAllItem(idx)} disabled={allItems.length === 1} className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2">Remove</Button>
                         </div>
                       ))}
-                      <Button type="button" variant="outline" size="sm" onClick={handleAddAllItem}>Add Item</Button>
+                      <Button type="button" variant="outline" size="sm" onClick={handleAddAllItem} className="text-xs sm:text-sm">Add Item</Button>
                     </div>
                   </div>
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex justify-between pt-6">
+            <CardFooter className="flex flex-col sm:flex-row justify-between pt-4 sm:pt-6 gap-3 sm:gap-0">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
+                className="w-full sm:w-auto text-sm sm:text-base"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isPending}>
+              <Button type="submit" disabled={isPending} className="w-full sm:w-auto text-sm sm:text-base">
                 {isPending ? "Saving..." : "Create Project"}
               </Button>
             </CardFooter>

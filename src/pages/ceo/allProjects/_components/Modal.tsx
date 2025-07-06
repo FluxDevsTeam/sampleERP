@@ -347,12 +347,12 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   };
 
   // Calculate progress for localTasks
-  const calculateProgress = (tasks) => {
+  const calculateProgress = (tasks: Task[]) => {
     if (!Array.isArray(tasks) || tasks.length === 0) return 0;
     let total = 0;
     for (const task of tasks) {
       if (Array.isArray(task.subtasks) && task.subtasks.length > 0) {
-        const completed = task.subtasks.filter((sub) => sub.checked).length;
+        const completed = task.subtasks.filter((sub: { checked: boolean }) => sub.checked).length;
         total += completed / task.subtasks.length;
       } else {
         total += task.checked ? 1 : 0;
@@ -365,25 +365,27 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   return (
     <>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-7xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-7xl w-[95vw] sm:w-full mx-4 max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <div className="flex justify-between items-start">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
               <div>
-            <DialogTitle>Project Details</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg sm:text-xl">Project Details</DialogTitle>
+            <DialogDescription className="text-sm sm:text-base">
               View details for the selected project.
             </DialogDescription>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                 <Button
                   variant="outline"
                   onClick={handleViewOtherProductionRecords}
+                  className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
                 >
                   Records
                 </Button>
                 <Button
                   variant="outline"
                   onClick={handleEditClick}
+                  className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
                 >
                   Edit Status
                 </Button>
@@ -393,19 +395,20 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                     <Button
                       variant="outline"
                       onClick={() => setIsEditModalOpen(true)}
+                      className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
                     >
                       Full Edit
                     </Button>
                     <Button
                       variant="destructive"
-                      className=""
+                      className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
                       onClick={handleDelete}
                     >
                       Delete
                     </Button>
                   </>
                 )}
-                <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+                <Button variant="outline" onClick={() => setIsModalOpen(false)} className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2">
                   Close
                 </Button>
               </div>
@@ -413,113 +416,108 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
           </DialogHeader>
 
           {selectedProject && (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Project Info Section */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold text-black-400 mb-4">
+              <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                <h3 className="text-base sm:text-lg font-semibold text-black-400 mb-3 sm:mb-4">
                   Project Info
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4">
                   {/* Project Name Card */}
-                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Project Name</span>
-                    <p className="text-sm text-black mt-1">{selectedProject.name}</p>
+                    <p className="text-xs sm:text-sm text-black mt-1">{selectedProject.name}</p>
                 </div>
-                  {/* Project ID Card */}
-                  {/* <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                    <span className="text-xs text-blue-600 font-medium">Project ID</span>
-                    <p className="text-sm text-black mt-1">{selectedProject.id}</p>
-                  </div> */}
                   {/* Customer Card */}
-                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Customer</span>
-                    <p className="text-sm text-black mt-1">{selectedProject.customer_detail?.name}</p>
+                    <p className="text-xs sm:text-sm text-black mt-1">{selectedProject.customer_detail?.name}</p>
                 </div>
                   {/* Status Card */}
-                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Status</span>
-                    <p className="text-sm text-black mt-1">{selectedProject.status}</p>
+                    <p className="text-xs sm:text-sm text-black mt-1">{selectedProject.status}</p>
                 </div>
                   {/* Start Date Card */}
-                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Start Date</span>
-                    <p className="text-sm text-black mt-1">{dayjs(selectedProject.start_date).format("MMM D, YYYY")}</p>
+                    <p className="text-xs sm:text-sm text-black mt-1">{dayjs(selectedProject.start_date).format("MMM D, YYYY")}</p>
                 </div>
                   {/* Deadline Card */}
-                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Deadline</span>
-                    <p className="text-sm text-black mt-1">{selectedProject.deadline ? dayjs(selectedProject.deadline).format("MMM D, YYYY") : "-"}</p>
+                    <p className="text-xs sm:text-sm text-black mt-1">{selectedProject.deadline ? dayjs(selectedProject.deadline).format("MMM D, YYYY") : "-"}</p>
                 </div>
                   {/* Date Delivered Card */}
-                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Date Delivered</span>
-                    <p className="text-sm text-black mt-1">{selectedProject.date_delivered ? dayjs(selectedProject.date_delivered).format("MMM D, YYYY") : "-"}</p>
+                    <p className="text-xs sm:text-sm text-black mt-1">{selectedProject.date_delivered ? dayjs(selectedProject.date_delivered).format("MMM D, YYYY") : "-"}</p>
                 </div>
                   {/* Time Remaining Card */}
-                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Time Remaining</span>
-                    <p className={`text-sm mt-1 ${timeRemainingInfo.color}`}>{timeRemainingInfo.text}</p>
+                    <p className={`text-xs sm:text-sm mt-1 ${timeRemainingInfo.color}`}>{timeRemainingInfo.text}</p>
                 </div>
                   {/* Timeframe Card */}
-                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Timeframe</span>
-                    <p className="text-sm text-black mt-1">{timeframeDisplay}</p>
+                    <p className="text-xs sm:text-sm text-black mt-1">{timeframeDisplay}</p>
                 </div>
                   {/* Selling Price Card */}
-                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Selling Price</span>
-                    <p className="text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.selling_price || '0'))}</p>
+                    <p className="text-xs sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.selling_price || '0'))}</p>
                 </div>
                   {/* Logistics Card */}
-                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Logistics</span>
-                    <p className="text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.logistics || '0'))}</p>
+                    <p className="text-xs sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.logistics || '0'))}</p>
                 </div>
                   {/* Service Charge Card */}
-                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Service Charge</span>
-                    <p className="text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.service_charge || '0'))}</p>
+                    <p className="text-xs sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.service_charge || '0'))}</p>
                 </div>
                   {/* Archived Card */}
-                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Archived</span>
-                    <p className="text-sm text-black mt-1">{selectedProject.archived ? 'Yes' : 'No'}</p>
+                    <p className="text-xs sm:text-sm text-black mt-1">{selectedProject.archived ? 'Yes' : 'No'}</p>
                   </div>
                   {/* Invoice Image Card */}
                 {selectedProject.invoice_image && (
-                    <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                       <span className="text-xs text-blue-600 font-medium">Invoice</span>
-                      <Button variant="link" className="p-0 h-auto text-sm text-blue-500 block mt-1" onClick={() => setShowImageModal(true)}>
+                      <Button variant="link" className="p-0 h-auto text-xs sm:text-sm text-blue-500 block mt-1" onClick={() => setShowImageModal(true)}>
                         View Invoice
                       </Button>
                   </div>
                 )}
                   {/* Note Card */}
                 {selectedProject.note && (
-                    <div className="md:col-span-7 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <div className="sm:col-span-2 lg:col-span-7 bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                       <span className="text-xs text-blue-600 font-medium">Note</span>
-                      <p className="text-sm text-black whitespace-pre-wrap mt-1">{selectedProject.note}</p>
+                      <p className="text-xs sm:text-sm text-black whitespace-pre-wrap mt-1">{selectedProject.note}</p>
                   </div>
                 )}
                 </div>
               </div>
 
               {/* Calculations Section */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold text-black-400 mb-4">
+              <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                <h3 className="text-base sm:text-lg font-semibold text-black-400 mb-3 sm:mb-4">
                   Financials
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
                   {Object.entries(selectedProject.calculations).map(
                     ([key, value]) => (
                       <div
                         key={key}
-                        className="bg-white p-3 rounded-lg shadow-sm border border-gray-200"
+                        className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200"
                       >
                         <span className="text-xs text-blue-600 font-medium">
                           {key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                   </span>
-                        <p className="text-sm text-black mt-1">
+                        <p className="text-xs sm:text-sm text-black mt-1">
                           ₦{typeof value === "number" ? formatNumber(value) : value}
                         </p>
                       </div>
@@ -529,11 +527,11 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
               </div>
 
               {/* Tables Section */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* All Items Table */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
                   <div className="flex justify-between items-center mb-2">
-                    <h4 className="text-md font-semibold text-gray-700">
+                    <h4 className="text-sm sm:text-md font-semibold text-gray-700">
                       All Items
                     </h4>
                     <button 
@@ -541,42 +539,35 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                         setIsModalOpen(false);
                         setTimeout(() => setShowAllItemsManager(true), 300);
                       }}
-                      className="px-3 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500 transition-colors"
+                      className="px-2 sm:px-3 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500 transition-colors"
                     >
                       + Item
                     </button>
                   </div>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full text-sm">
+                    <table className="min-w-full text-xs sm:text-sm">
                       <thead className="bg-blue-400 text-white">
                         <tr>
-                          <th className="p-2 text-left">Item</th>
-                          <th className="p-2 text-left">Price</th>
-                          <th className="p-2 text-left">Quantity</th>
+                          <th className="p-1 sm:p-2 text-left">Item</th>
+                          <th className="p-1 sm:p-2 text-left">Price</th>
+                          <th className="p-1 sm:p-2 text-left">Quantity</th>
                         </tr>
                       </thead>
                       <tbody>
                         {Array.isArray(selectedProject.all_items) && selectedProject.all_items.length > 0 ? (
                           selectedProject.all_items.map((item: any, idx: number) => (
                             <tr key={idx} className="border-b border-gray-200">
-                              <td className="p-2 text-left">{item.item}</td>
-                              <td className="p-2 text-left">₦{formatNumber(parseFloat(item.price || '0'))}</td>
-                              <td className="p-2 text-left">{item.quantity || 1}</td>
+                              <td className="p-1 sm:p-2 text-left">{item.item}</td>
+                              <td className="p-1 sm:p-2 text-left">₦{formatNumber(parseFloat(item.price || '0'))}</td>
+                              <td className="p-1 sm:p-2 text-left">{item.quantity || 1}</td>
                             </tr>
                           ))
                         ) : (
                           <tr>
-                            <td className="p-2 text-left" colSpan={3}>No items found</td>
+                            <td colSpan={3} className="p-2 text-center text-gray-500">No items found</td>
                           </tr>
                         )}
                       </tbody>
-                      <tfoot className="bg-gray-100">
-                        <tr className="font-semibold">
-                          <td className="p-2 text-left">Total</td>
-                          <td className="p-2 text-left">₦{formatNumber(allItemsTotal)}</td>
-                          <td className="p-2 text-left"></td>
-                        </tr>
-                      </tfoot>
                     </table>
                   </div>
                 </div>

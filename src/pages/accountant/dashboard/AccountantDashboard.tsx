@@ -138,26 +138,26 @@ const AccountantDashboard = () => {
 
   return (
     <GlobalLayout data={sidebar}>
-      <div className="p-6 space-y-6">
+      <div className="p-3 sm:p-6 space-y-4 sm:space-y-6">
         {/* <Header /> */}
 
         {/* Card grid for all data */}
-        <div className="mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 p-2">
+        <div className="mb-4 sm:mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-5 p-1 sm:p-2">
             {visibleCards.map(card => (
               <AccountantDashboardCard key={card.key} title={card.title} value={card.value} currency={card.currency} />
             ))}
           </div>
           {allCards.length > defaultVisibleCount && (
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-3 sm:mb-4">
               <button
-                className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-transform duration-200 focus:outline-none"
+                className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-transform duration-200 focus:outline-none"
                 onClick={() => setShowAllCards(v => !v)}
                 title={showAllCards ? 'Show Less' : 'Show More'}
                 aria-label={showAllCards ? 'Show Less' : 'Show More'}
               >
                 <svg
-                  className={`w-6 h-6 transform transition-transform duration-300 ${showAllCards ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 sm:w-6 sm:h-6 transform transition-transform duration-300 ${showAllCards ? 'rotate-180' : ''}`}
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
@@ -172,13 +172,13 @@ const AccountantDashboard = () => {
         </div>
 
         {/* Two charts in a row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Expense Category Breakdown */}
           <div>
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">
               Expense Category Breakdown
             </h2>
-            <ResponsiveContainer width="100%" height={350}>
+            <ResponsiveContainer width="100%" height={300} className="sm:h-[350px]">
               <PieChart>
                 <Pie
                   data={expenseCategoryBreakdown}
@@ -186,8 +186,8 @@ const AccountantDashboard = () => {
                   nameKey="category"
                   cx="50%"
                   cy="50%"
-                  outerRadius={100}
-                  innerRadius={50}
+                  outerRadius={80}
+                  innerRadius={40}
                   label={({ name, value }) => `${name} (${value}%)`}
                 >
                   {expenseCategoryBreakdown.map((_entry: any, index: number) => (
@@ -204,17 +204,17 @@ const AccountantDashboard = () => {
           </div>
           {/* Monthly Expense Trend */}
           <div>
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">
               Monthly Expense Trend
             </h2>
-            <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={monthlyExpenseTrend} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <ResponsiveContainer width="100%" height={300} className="sm:h-[350px]">
+              <LineChart data={monthlyExpenseTrend} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="amount" stroke="#8884d8" activeDot={{ r: 8 }} />
+                <Line type="monotone" dataKey="amount" stroke="#8884d8" activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -222,9 +222,9 @@ const AccountantDashboard = () => {
 
         {/* Top Categories Bar Chart */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Top Categories</h2>
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={topCategories} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Top Categories</h2>
+          <ResponsiveContainer width="100%" height={300} className="sm:h-[350px]">
+            <BarChart data={topCategories} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="category" />
               <YAxis />

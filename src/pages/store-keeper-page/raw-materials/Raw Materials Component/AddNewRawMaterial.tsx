@@ -121,23 +121,23 @@ const AddNewRawMaterial = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
       <div
-        className={`max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 ${
+        className={`max-w-2xl mx-auto bg-white rounded-lg shadow-md p-4 sm:p-6 ${
           showSuccessModal || showErrorModal ? "hidden" : ""
         }`}
       >
-        <div className="flex items-center mb-6">
+        <div className="flex items-center mb-4 sm:mb-6">
           <button
             onClick={() => navigate("/store-keeper/raw-materials")}
-            className="mr-4 text-gray-20 hover:text-gray-600"
+            className="mr-3 sm:mr-4 text-gray-20 hover:text-gray-600"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-20">Add Raw Material</h1>
+          <h1 className="text-lg sm:text-2xl font-bold text-gray-20">Add Raw Material</h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Name
@@ -147,32 +147,32 @@ const AddNewRawMaterial = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base"
               required
             />
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2 sm:gap-0">
               <label className="block text-sm font-medium text-gray-700">
                 Category
               </label>
-              <div className="flex space-x-2">
+              <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
                 <button
                   type="button"
                   onClick={() => navigate("/store-keeper/raw-materials/add-category")}
-                  className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center font-medium shadow-sm"
+                  className="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center font-medium shadow-sm"
                 >
-                  <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                  <FontAwesomeIcon icon={faPlus} className="mr-1 sm:mr-2" />
                   Add Category
                 </button>
                 <button
                   type="button"
                   onClick={handleDeleteCategory}
                   disabled={!formData.category || loading}
-                  className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center font-medium shadow-sm"
+                  className="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center font-medium shadow-sm"
                 >
-                  <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                  <FontAwesomeIcon icon={faTrash} className="mr-1 sm:mr-2" />
                   Delete Category
                 </button>
               </div>
@@ -197,7 +197,7 @@ const AddNewRawMaterial = () => {
               name="quantity"
               value={formData.quantity}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base"
               required
             />
           </div>
@@ -211,7 +211,7 @@ const AddNewRawMaterial = () => {
               name="unit"
               value={formData.unit}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base"
               required
             />
           </div>
@@ -225,7 +225,7 @@ const AddNewRawMaterial = () => {
               name="price"
               value={formData.price}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base"
               required
             />
           </div>
@@ -238,7 +238,7 @@ const AddNewRawMaterial = () => {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base"
               rows={4}
             />
           </div>
@@ -257,7 +257,7 @@ const AddNewRawMaterial = () => {
                   onChange={handleChange}
                   className="form-radio"
                 />
-                <span className="ml-2">Yes</span>
+                <span className="ml-2 text-sm sm:text-base">Yes</span>
               </label>
               <label className="inline-flex items-center">
                 <input
@@ -268,7 +268,7 @@ const AddNewRawMaterial = () => {
                   onChange={handleChange}
                   className="form-radio"
                 />
-                <span className="ml-2">No</span>
+                <span className="ml-2 text-sm sm:text-base">No</span>
               </label>
             </div>
           </div>
@@ -281,7 +281,7 @@ const AddNewRawMaterial = () => {
               type="file"
               name="image"
               onChange={handleFileChange}
-              className="mt-1 block w-full"
+              className="mt-1 block w-full text-sm sm:text-base"
               accept="image/*"
             />
           </div>
@@ -290,7 +290,7 @@ const AddNewRawMaterial = () => {
             <button
               type="submit"
               disabled={submitLoading}
-              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+              className={`px-3 sm:px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 text-sm sm:text-base ${
                 submitLoading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >

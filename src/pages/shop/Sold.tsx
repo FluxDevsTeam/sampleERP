@@ -72,14 +72,14 @@ export const Sold = () => {
     }, []);
 
   return (
-    <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
+    <div className="wrapper w-full sm:w-11/12 mx-auto my-0 pl-1 pt-2">
       <h1
         style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-        className="font-semibold py-5 mt-2"
+        className="font-semibold py-3 sm:py-5 mt-2"
       >
         Sold Summary
       </h1>
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-11">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 mb-8 sm:mb-11">
         <InventoryData info="Non project sales for this month" digits={thisMonthNonProjectSales} trend="up"></InventoryData>
         <InventoryData info="This month profit" digits={thisMonthProfit} trend="up"></InventoryData>
         <InventoryData info="Project sales for this month" digits={thisMonthProjectSales} trend="up"></InventoryData>
@@ -90,7 +90,7 @@ export const Sold = () => {
       <div>
         <h1
           style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-          className="font-semibold py-5 mt-2"
+          className="font-semibold py-3 sm:py-5 mt-2"
         >
           Sold Items
         </h1>

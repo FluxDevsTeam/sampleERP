@@ -326,8 +326,8 @@ const ProjectManagerDashboard = () => {
   const groupSlices = showAllCards ? groups.map(g => [0, g.length]) : getVisibleGroupSlices(groups, defaultVisibleCount);
 
   return (
-    <div className="w-11/12 mx-auto mt-6 pl-1 pt-2">
-      <div className="mb-16">
+    <div className="w-full sm:w-11/12 mx-auto mt-3 sm:mt-6 pl-1 pt-2">
+      <div className="mb-8 sm:mb-16">
         {/* Grouped card sections, only first 2 rows by default */}
         {groups.map((group, i) => renderCardGroup(groupNames[i], group, groupSlices[i][0], groupSlices[i][1]))}
         {allCards.length > defaultVisibleCount && (
@@ -352,11 +352,11 @@ const ProjectManagerDashboard = () => {
               </div>
         )}
 
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 p-4 bg-gray-50">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 p-2 sm:p-4 bg-gray-50">
           {/* Income Chart */}
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4 text-gray-700">Monthly Income</h2>
-            <div className="h-[350px]">
+          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-md border border-gray-200">
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">Monthly Income</h2>
+            <div className="h-[250px] sm:h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={incomeData} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -370,9 +370,9 @@ const ProjectManagerDashboard = () => {
           </div>
 
           {/* Expenses Chart */}
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4 text-gray-700">Monthly Expenses</h2>
-            <div className="h-[350px]">
+          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-md border border-gray-200">
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">Monthly Expenses</h2>
+            <div className="h-[250px] sm:h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={expensesData} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -386,9 +386,9 @@ const ProjectManagerDashboard = () => {
           </div>
 
           {/* Profit Chart */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4 text-gray-700">Monthly Profit</h2>
-            <div className="h-[400px]">
+          <div className="lg:col-span-2 bg-white p-3 sm:p-6 rounded-lg shadow-md border border-gray-200">
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">Monthly Profit</h2>
+            <div className="h-[300px] sm:h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={profitData} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />

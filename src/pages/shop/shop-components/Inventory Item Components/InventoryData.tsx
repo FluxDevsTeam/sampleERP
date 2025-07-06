@@ -1,5 +1,3 @@
-
-
 interface InventoryDataProps {
   info: string;
   digits: number;
@@ -10,7 +8,7 @@ const InventoryData = (InventoryData: InventoryDataProps) => {
   return (
     
     <div>
-      <div className="bg-white rounded pl-6 py-5 shadow grid items-center h-full">
+      <div className="bg-white rounded pl-3 sm:pl-6 py-3 sm:py-5 shadow grid items-center h-full">
         <p
           style={{ fontSize: "clamp(14px, 3vw, 28px)" }}
           className="text-blue-400 font-bold"

@@ -86,21 +86,21 @@ const Signin = () => {
 
   return (
     <AuthLayout>
-      <section className="w-full h-fit overflow-auto px-4 py-6 space-y-4 bg-green-900 shadow-xl rounded-2xl">
+      <section className="w-full h-fit overflow-auto px-3 sm:px-4 py-4 sm:py-6 space-y-3 sm:space-y-4 bg-green-900 shadow-xl rounded-xl sm:rounded-2xl">
         <div className="w-full flex space-y-1 flex-col items-center">
           <img
             src={Logo}
             alt="logo"
-            className="w-[139px] h-[57px] object-contain"
+            className="w-[100px] h-[40px] sm:w-[120px] sm:h-[50px] md:w-[139px] md:h-[57px] object-contain"
           />
           <FormHeader header="Login" />
         </div>
 
         {error && (
-          <div className="text-red-500 text-center font-medium">{error}</div>
+          <div className="text-red-500 text-center font-medium text-xs sm:text-sm">{error}</div>
         )}
 
-        <form onSubmit={handleSubmit} className="max-w-[408px] w-full mx-auto space-y-4">
+        <form onSubmit={handleSubmit} className="max-w-[350px] sm:max-w-[380px] md:max-w-[408px] w-full mx-auto space-y-3 sm:space-y-4">
           <FormInput
             name="email"
             type="email"
@@ -120,10 +120,10 @@ const Signin = () => {
             />
           </div>
 
-          <div className="flex flex-col items-center w-full space-y-4">
+          <div className="flex flex-col items-center w-full space-y-3 sm:space-y-4">
             <Button
               type="submit"
-              className="bg-blue-400 text-white w-[278px] font-semibold text-sm py-2"
+              className="bg-blue-400 text-white w-full max-w-[250px] sm:max-w-[278px] font-semibold text-xs sm:text-sm py-1.5 sm:py-2"
               disabled={loading}
             >
               {loading ? "Logging in..." : "Login"}

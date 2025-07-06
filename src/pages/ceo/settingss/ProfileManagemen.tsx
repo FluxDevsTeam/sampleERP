@@ -199,42 +199,59 @@ const ProfileManagement = () => {
   };
 
   const handleCreateRoleChange = (value: string) => {
-    setCreateFormData((prev) => ({ ...prev, roles: [value] }));
+    setCreateFormData((prev) => ({
+      ...prev,
+      roles: [value],
+    }));
   };
 
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreateError("");
+    setIsCreating(true);
+
     if (createPassword !== createVerifyPassword) {
       setCreateError("Passwords do not match");
+      setIsCreating(false);
       return;
     }
-    if (!createFormData.roles[0]) {
-      setCreateError("Please select a role");
+
+    if (createPassword.length < 8) {
+      setCreateError("Password must be at least 8 characters long");
+      setIsCreating(false);
       return;
     }
-    setIsCreating(true);
+
     try {
-      const result = await signup({
+      const userData = {
         ...createFormData,
         password: createPassword,
         verify_password: createVerifyPassword,
+      };
+
+      await signup(userData);
+      setIsCreateModalOpen(false);
+      setCreateFormData({
+        first_name: "",
+        last_name: "",
+        email: "",
+        phone_number: "",
+        roles: [""]
       });
-      if (!result.success) {
-        setCreateError(result.error || "Signup failed");
-      } else {
-        toast.success("Profile successfully created");
-        setIsCreateModalOpen(false);
-        setCreateFormData({ first_name: "", last_name: "", email: "", phone_number: "", roles: [""] });
-        setCreatePassword("");
-        setCreateVerifyPassword("");
-        refetch();
-      }
-    } catch (err) {
-      setCreateError("An unexpected error occurred");
+      setCreatePassword("");
+      setCreateVerifyPassword("");
+      refetch();
+      toast.success("Profile created successfully!");
+    } catch (error: any) {
+      console.error("Create error:", error);
+      setCreateError(error.response?.data?.message || "Failed to create profile");
     } finally {
       setIsCreating(false);
     }
+  };
+
+  const formatRoleName = (role: string): string => {
+    return role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
   if (isLoading)
@@ -257,57 +274,43 @@ const ProfileManagement = () => {
       </div>
     );
 
-  const formatRoleName = (role: string): string => {
-    return role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase());
-  };
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-neutral-800">Profile Management</h1>
-        <Button onClick={() => setIsCreateModalOpen(true)} className="bg-blue-400 text-white">Create New Profile</Button>
+    <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-8 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-800">Profile Management</h1>
+        <Button onClick={() => setIsCreateModalOpen(true)} className="bg-blue-400 text-white text-sm sm:text-base px-3 sm:px-4 py-2">Create New Profile</Button>
       </div>
 
-      <div className="rounded-md border my-5">
+      <div className="rounded-md border my-4 sm:my-5 overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              {/* <TableHead>ID</TableHead> */}
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Roles</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-xs sm:text-sm">Name</TableHead>
+              <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Email</TableHead>
+              <TableHead className="text-xs sm:text-sm hidden md:table-cell">Phone</TableHead>
+              <TableHead className="text-xs sm:text-sm">Roles</TableHead>
+              <TableHead className="text-xs sm:text-sm">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data?.results?.map((user) => (
               <TableRow key={user.id}>
-                {/* <TableCell>{user.id}</TableCell> */}
-                <TableCell>
-                  {user.first_name} {user.last_name}
-                </TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.phone_number || "-"}</TableCell>
-                <TableCell>{user.roles || "-"}</TableCell>
-                {/* <TableCell>
-                  <div
-                    className="flex gap-2 text-center flex-wrap  truncate text-ellipsis overflow-hidden
-            max-w-full px-2 py-0.5 text-xs"
-                  >
-                    {user.roles?.map((role, index) => (
-                      <Badge key={index} className="bg-gray-200 text-black">
-                        {formatRoleName(role)}
-                      </Badge>
-                    ))}
+                <TableCell className="text-xs sm:text-sm">
+                  <div>
+                    <div className="font-medium">{user.first_name} {user.last_name}</div>
+                    <div className="text-gray-500 sm:hidden text-xs">{user.email}</div>
                   </div>
-                </TableCell> */}
+                </TableCell>
+                <TableCell className="text-xs sm:text-sm hidden sm:table-cell">{user.email}</TableCell>
+                <TableCell className="text-xs sm:text-sm hidden md:table-cell">{user.phone_number || "-"}</TableCell>
+                <TableCell className="text-xs sm:text-sm">{user.roles || "-"}</TableCell>
                 <TableCell>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleEditClick(user)}
+                      className="text-xs px-2 sm:px-3 py-1 sm:py-2"
                     >
                       Edit
                     </Button>
@@ -315,6 +318,7 @@ const ProfileManagement = () => {
                       variant="destructive"
                       size="sm"
                       onClick={() => setDeleteUserId(user.id)}
+                      className="text-xs px-2 sm:px-3 py-1 sm:py-2"
                     >
                       Delete
                     </Button>
@@ -336,12 +340,12 @@ const ProfileManagement = () => {
 
       {/* Edit User Modal */}
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md w-[95vw] sm:w-full mx-4">
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">Edit User</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label
                   htmlFor="first_name"
@@ -354,6 +358,7 @@ const ProfileManagement = () => {
                   name="first_name"
                   value={formData.first_name}
                   onChange={handleChange}
+                  className="text-sm sm:text-base"
                 />
               </div>
               <div>
@@ -368,6 +373,7 @@ const ProfileManagement = () => {
                   name="last_name"
                   value={formData.last_name}
                   onChange={handleChange}
+                  className="text-sm sm:text-base"
                 />
               </div>
             </div>
@@ -381,6 +387,7 @@ const ProfileManagement = () => {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
+                className="text-sm sm:text-base"
               />
             </div>
             <div>
@@ -395,6 +402,7 @@ const ProfileManagement = () => {
                 name="phone_number"
                 value={formData.phone_number}
                 onChange={handleChange}
+                className="text-sm sm:text-base"
               />
             </div>
 
@@ -405,7 +413,7 @@ const ProfileManagement = () => {
                 value={formData.roles[0] || ""}
                 onValueChange={handleRoleChange}
               >
-                <SelectTrigger>
+                <SelectTrigger className="text-sm sm:text-base">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
@@ -418,11 +426,11 @@ const ProfileManagement = () => {
               </Select>
             </div>
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setEditingUser(null)}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2">
+            <Button variant="outline" onClick={() => setEditingUser(null)} className="text-sm sm:text-base">
               Cancel
             </Button>
-            <Button onClick={handleUpdate} disabled={isSaving}>
+            <Button onClick={handleUpdate} disabled={isSaving} className="text-sm sm:text-base">
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -441,17 +449,17 @@ const ProfileManagement = () => {
         open={!!deleteUserId}
         onOpenChange={() => setDeleteUserId(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="w-[95vw] sm:w-full mx-4">
           <AlertDialogHeader>
-            <AlertDialogTitle>
+            <AlertDialogTitle className="text-lg sm:text-xl">
               Are you sure you want to delete?
             </AlertDialogTitle>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeleteUserId(null)}>
+          <AlertDialogFooter className="flex flex-col sm:flex-row gap-2">
+            <AlertDialogCancel onClick={() => setDeleteUserId(null)} className="text-sm sm:text-base">
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>
+            <AlertDialogAction onClick={handleDelete} className="text-sm sm:text-base">
               Confirm
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -460,41 +468,41 @@ const ProfileManagement = () => {
 
       {/* Create New Profile Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md w-[95vw] sm:w-full mx-4 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Create New Profile</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">Create New Profile</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="first_name" className="block text-sm font-medium mb-1">First Name</label>
-                <Input id="first_name" name="first_name" value={createFormData.first_name} onChange={handleCreateChange} required />
+                <Input id="first_name" name="first_name" value={createFormData.first_name} onChange={handleCreateChange} required className="text-sm sm:text-base" />
               </div>
               <div>
                 <label htmlFor="last_name" className="block text-sm font-medium mb-1">Last Name</label>
-                <Input id="last_name" name="last_name" value={createFormData.last_name} onChange={handleCreateChange} required />
+                <Input id="last_name" name="last_name" value={createFormData.last_name} onChange={handleCreateChange} required className="text-sm sm:text-base" />
               </div>
             </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
-              <Input id="email" name="email" type="email" value={createFormData.email} onChange={handleCreateChange} required />
+              <Input id="email" name="email" type="email" value={createFormData.email} onChange={handleCreateChange} required className="text-sm sm:text-base" />
             </div>
             <div>
               <label htmlFor="phone_number" className="block text-sm font-medium mb-1">Phone Number</label>
-              <Input id="phone_number" name="phone_number" value={createFormData.phone_number} onChange={handleCreateChange} required />
+              <Input id="phone_number" name="phone_number" value={createFormData.phone_number} onChange={handleCreateChange} required className="text-sm sm:text-base" />
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium mb-1">Password</label>
-              <Input id="password" name="password" type="password" value={createPassword} onChange={e => setCreatePassword(e.target.value)} required />
+              <Input id="password" name="password" type="password" value={createPassword} onChange={e => setCreatePassword(e.target.value)} required className="text-sm sm:text-base" />
             </div>
             <div>
               <label htmlFor="verify_password" className="block text-sm font-medium mb-1">Confirm Password</label>
-              <Input id="verify_password" name="verify_password" type="password" value={createVerifyPassword} onChange={e => setCreateVerifyPassword(e.target.value)} required />
+              <Input id="verify_password" name="verify_password" type="password" value={createVerifyPassword} onChange={e => setCreateVerifyPassword(e.target.value)} required className="text-sm sm:text-base" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Role</label>
               <Select value={createFormData.roles[0] || ""} onValueChange={handleCreateRoleChange} required>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm sm:text-base">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
@@ -505,7 +513,7 @@ const ProfileManagement = () => {
               </Select>
             </div>
             {createError && <div className="text-red-500 text-sm text-center">{createError}</div>}
-            <Button type="submit" className="bg-blue-400 text-white w-full font-semibold text-sm py-2" disabled={isCreating}>
+            <Button type="submit" className="bg-blue-400 text-white w-full font-semibold text-sm sm:text-base py-2" disabled={isCreating}>
               {isCreating ? "Creating..." : "Create Profile"}
             </Button>
           </form>

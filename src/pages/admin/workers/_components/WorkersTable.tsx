@@ -141,10 +141,14 @@ const WorkersTable = ({
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
           <thead className="bg-blue-400 text-white">
             <tr>
-              {headers.map((header) => (
+              {headers.map((header, index) => (
                 <th
                   key={header}
-                  className="py-4 px-4 text-left text-sm font-semibold"
+                  className={`py-3 px-2 sm:py-4 sm:px-4 text-left text-xs sm:text-sm font-semibold ${
+                    index === 3 ? 'hidden sm:table-cell' : '' // Hide salary amount on mobile
+                  } ${
+                    index === 4 ? 'hidden md:table-cell' : '' // Hide contract value on mobile/tablet
+                  }`}
                 >
                   {header}
                 </th>
@@ -154,7 +158,7 @@ const WorkersTable = ({
           <tbody className="">
             {workers.length === 0 ? (
               <tr>
-                <td colSpan={headers.length} className="text-center py-6 text-gray-500">
+                <td colSpan={headers.length} className="text-center py-6 text-gray-500 text-sm">
                   No workers found.
                 </td>
               </tr>
@@ -164,25 +168,25 @@ const WorkersTable = ({
                   key={worker.id}
                   className="hover:bg-gray-100"
                 >
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     {worker.name}
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     {worker.status}
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     {new Date(worker.start_date).toLocaleDateString()}
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden sm:table-cell">
                     {'salary_amount' in worker ? `₦ ${formatNumber(worker.salary_amount)}` : 'N/A'}
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden md:table-cell">
                     {'contract_value' in worker ? `₦ ${formatNumber(worker.contract_value)}` : 'N/A'}
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     <button
                       onClick={() => handleRowClick(worker)}
-                      className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+                      className="px-2 py-1 sm:px-3 sm:py-1 text-blue-400 border-2 border-blue-400 rounded text-xs sm:text-sm"
                     >
                       View
                     </button>
@@ -206,66 +210,66 @@ const WorkersTable = ({
 
       {/* View Worker Modal */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[95vw] max-w-md mx-auto p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle>Worker Details</DialogTitle>
-            <DialogDescription>View details for the selected worker.</DialogDescription>
+            <DialogTitle className="text-lg sm:text-xl">Worker Details</DialogTitle>
+            <DialogDescription className="text-sm">View details for the selected worker.</DialogDescription>
           </DialogHeader>
 
           {selectedWorker && (
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Name:</span>
-                <span className="col-span-2">{selectedWorker.name}</span>
+            <div className="grid gap-3 sm:gap-4 py-3 sm:py-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                <span className="font-medium text-sm sm:text-base">Name:</span>
+                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedWorker.name}</span>
               </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Status:</span>
-                <span className="col-span-2">{selectedWorker.status}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                <span className="font-medium text-sm sm:text-base">Status:</span>
+                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedWorker.status}</span>
               </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="font-medium">Start Date:</span>
-                <span className="col-span-2">{new Date(selectedWorker.start_date).toLocaleDateString()}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                <span className="font-medium text-sm sm:text-base">Start Date:</span>
+                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{new Date(selectedWorker.start_date).toLocaleDateString()}</span>
               </div>
               {'end_date' in selectedWorker && selectedWorker.end_date && (
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">End Date:</span>
-                  <span className="col-span-2">{new Date(selectedWorker.end_date).toLocaleDateString()}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                  <span className="font-medium text-sm sm:text-base">End Date:</span>
+                  <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{new Date(selectedWorker.end_date).toLocaleDateString()}</span>
                 </div>
               )}
               {'salary_amount' in selectedWorker && (
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Salary Amount:</span>
-                  <span className="col-span-2">₦ {formatNumber(selectedWorker.salary_amount)}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                  <span className="font-medium text-sm sm:text-base">Salary Amount:</span>
+                  <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">₦ {formatNumber(selectedWorker.salary_amount)}</span>
                 </div>
               )}
               {'position' in selectedWorker && (
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Position:</span>
-                  <span className="col-span-2">{selectedWorker.position}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                  <span className="font-medium text-sm sm:text-base">Position:</span>
+                  <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedWorker.position}</span>
                 </div>
               )}
               {'contract_value' in selectedWorker && (
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Contract Value:</span>
-                  <span className="col-span-2">₦ {formatNumber(selectedWorker.contract_value)}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                  <span className="font-medium text-sm sm:text-base">Contract Value:</span>
+                  <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">₦ {formatNumber(selectedWorker.contract_value)}</span>
                 </div>
               )}
               {'contract_type' in selectedWorker && (
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <span className="font-medium">Contract Type:</span>
-                  <span className="col-span-2">{selectedWorker.contract_type}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
+                  <span className="font-medium text-sm sm:text-base">Contract Type:</span>
+                  <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedWorker.contract_type}</span>
                 </div>
               )}
             </div>
           )}
 
           <DialogFooter>
-            <div className="flex justify-around items-center w-full">
-              <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
+            <div className="flex flex-col sm:flex-row justify-around items-center w-full gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setIsViewModalOpen(false)} className="w-full sm:w-auto text-sm">
                 Close
               </Button>
               {isCEO && (
-                <Button variant="destructive" onClick={handleDelete} disabled={deleteWorkerMutation.isPending}>
+                <Button variant="destructive" onClick={handleDelete} disabled={deleteWorkerMutation.isPending} className="w-full sm:w-auto text-sm">
                   Delete
                 </Button>
               )}

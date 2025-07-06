@@ -229,9 +229,9 @@ const StoreKeeperDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
-      <div className="mb-16">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-20">
+    <div className="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
+      <div className="mb-8 sm:mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-12 sm:mb-20">
           <DashboardData
             info="Amount added this month"
             digits={dashboardData?.added_amount_this_month}
@@ -263,28 +263,28 @@ const StoreKeeperDashboard: React.FC = () => {
           />
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 items-center rounded-sm mb-[100px] max-md:mb-[40px]">
+        <div className="grid gap-4 sm:gap-6 md:gap-8 md:grid-cols-2 items-center rounded-sm mb-16 sm:mb-[100px] max-md:mb-[40px]">
           <AmountSoldMonthlyBarChart></AmountSoldMonthlyBarChart>
           <MonthlyAddedValueSpikedChart></MonthlyAddedValueSpikedChart>
         </div>
       </div>
 
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 mb-4 mt-4 sm:mt-8">
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 mb-3 sm:mb-4 mt-4 sm:mt-8">
           Shop Category Data
         </h1>
-        <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-between sm:items-center">
           <div className="relative w-full sm:w-64">
             <input
               type="text"
               placeholder="Search category..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:border-blue-400"
+              className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 rounded-lg border focus:outline-none focus:border-blue-400 text-sm sm:text-base"
               value={searchTermTwo}
               onChange={(e) => setSearchTermTwo(e.target.value)}
             />
             <FontAwesomeIcon
               icon={faSearch}
-              className="absolute left-3 top-3 text-gray-400"
+              className="absolute left-2 sm:left-3 top-3 text-gray-400"
             />
           </div>
         </div>
@@ -303,17 +303,17 @@ const StoreKeeperDashboard: React.FC = () => {
           />
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-md overflow-x-auto mb-28 max-md:mb-16">
+        <div className="bg-white rounded-lg shadow-md overflow-x-auto mb-20 sm:mb-28 max-md:mb-16">
           <table className="min-w-full">
             <thead>
               <tr className="bg-gradient-to-r from-blue-400 to-blue-500 text-white">
-                <th className="py-4 px-6 text-left text-sm font-semibold">
+                <th className="py-2 sm:py-4 px-3 sm:px-6 text-left text-xs sm:text-sm font-semibold">
                   Category
                 </th>
-                <th className="py-4 px-6 text-left text-sm font-semibold">
+                <th className="py-2 sm:py-4 px-3 sm:px-6 text-left text-xs sm:text-sm font-semibold">
                   Count
                 </th>
-                <th className="py-4 px-6 text-left text-sm font-semibold">
+                <th className="py-2 sm:py-4 px-3 sm:px-6 text-left text-xs sm:text-sm font-semibold">
                   Total Value
                 </th>
               </tr>
@@ -322,13 +322,13 @@ const StoreKeeperDashboard: React.FC = () => {
               {filteredTableDataTwo.map((entry, index) => {
                 return (
                   <tr key={index} className="border-b hover:bg-gray-100">
-                    <td className="py-4 px-6 text-sm text-gray-700">
+                    <td className="py-3 sm:py-4 px-3 sm:px-6 text-xs sm:text-sm text-gray-700">
                       {entry.category}
                     </td>
-                    <td className="py-4 px-6 text-sm text-gray-700">
+                    <td className="py-3 sm:py-4 px-3 sm:px-6 text-xs sm:text-sm text-gray-700">
                       {entry.materials_count}
                     </td>
-                    <td className="py-4 px-6 text-sm text-gray-700">
+                    <td className="py-3 sm:py-4 px-3 sm:px-6 text-xs sm:text-sm text-gray-700">
                       {typeof entry.total_materials_value === 'number' ? `₦${entry.total_materials_value.toLocaleString()}` : entry.total_materials_value}
                     </td>
                   </tr>
@@ -336,75 +336,32 @@ const StoreKeeperDashboard: React.FC = () => {
               })}
             </tbody>
           </table>
-          {/* <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-6 py-4 border-t gap-4">
-            <span className="text-sm text-blue-400 text-center sm:text-left">
-              Showing {indexOfFirstItem + 1} to{" "}
-              {Math.min(indexOfLastItem, tableData.length)} of{" "}
-              {tableData.length} entries
-            </span>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1}
-                className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
-              >
-                <FontAwesomeIcon icon={faAnglesLeft} />
-              </button>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
-              >
-                <FontAwesomeIcon icon={faArrowLeft} />
-              </button>
-
-              <span className="mx-4">
-                Page {currentPage} of {totalPages}
-              </span>
-
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
-              >
-                <FontAwesomeIcon icon={faArrowRight} />
-              </button>
-              <button
-                onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages}
-                className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
-              >
-                <FontAwesomeIcon icon={faAnglesRight} />
-              </button>
-            </div> */}
-          {/* </div> */}
         </div>
       )}
 
       {/* TABLE 2 */}
       {/* Header Section */}
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 mb-4 mt-4 sm:mt-8">
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 mb-3 sm:mb-4 mt-4 sm:mt-8">
           Raw Materials Categories Management
         </h1>
-        <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-between sm:items-center">
           <div className="relative w-full sm:w-64">
             <input
               type="text"
               placeholder="Search category..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:border-blue-400"
+              className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 rounded-lg border focus:outline-none focus:border-blue-400 text-sm sm:text-base"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <FontAwesomeIcon
               icon={faSearch}
-              className="absolute left-3 top-3 text-gray-400"
+              className="absolute left-2 sm:left-3 top-3 text-gray-400"
             />
           </div>
           <button
             onClick={() => navigate("/store-keeper/add-raw-material-category")}
-            className="w-fit sm:w-auto bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+            className="w-full sm:w-fit bg-blue-400 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-600 text-sm sm:text-base"
           >
             Add New Category
           </button>
@@ -427,11 +384,11 @@ const StoreKeeperDashboard: React.FC = () => {
           <table className="min-w-full">
             <thead>
               <tr className="bg-gradient-to-r from-blue-400 to-blue-500 text-white">
-                <th className="py-4 px-6 text-left text-sm font-semibold">
+                <th className="py-2 sm:py-4 px-3 sm:px-6 text-left text-xs sm:text-sm font-semibold">
                   Name
                 </th>
                 {userRole === 'ceo' && (
-                  <th className="py-4 px-6 text-left text-sm font-semibold">
+                  <th className="py-2 sm:py-4 px-3 sm:px-6 text-left text-xs sm:text-sm font-semibold">
                     Actions
                   </th>
                 )}
@@ -441,15 +398,15 @@ const StoreKeeperDashboard: React.FC = () => {
               {currentItems.map((useful) => {
                 return (
                   <tr key={useful.id}>
-                    <td className="py-4 px-6 text-sm font-medium text-gray-700 border-b">
+                    <td className="py-3 sm:py-4 px-3 sm:px-6 text-xs sm:text-sm font-medium text-gray-700 border-b">
                       {useful.name}
                     </td>
                     {userRole === 'ceo' && (
-                      <td className="px-4 py-3 text-sm text-blue-600">
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-blue-600">
                         <>
                           <button
                             onClick={() => openEditModal(useful)}
-                            className="text-blue-500 hover:text-blue-700 mr-4"
+                            className="text-blue-500 hover:text-blue-700 mr-2 sm:mr-4"
                           >
                             <FontAwesomeIcon icon={faPencil} />
                           </button>
@@ -468,44 +425,44 @@ const StoreKeeperDashboard: React.FC = () => {
             </tbody>
           </table>
             {/* pagination stuff */}
-            <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-6 py-4 border-t gap-4">
-              <span className="text-sm text-blue-400 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row justify-between items-center px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-t gap-3 sm:gap-4">
+              <span className="text-xs sm:text-sm text-blue-400 text-center sm:text-left">
                 Showing {indexOfFirstItem + 1} to{" "}
                 {Math.min(indexOfLastItem, tableData.length)} of{" "}
                 {tableData.length} entries
               </span>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 <button
                   onClick={() => handlePageChange(1)}
                   disabled={currentPage === 1}
-                  className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
+                  className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-xs sm:text-sm"
                 >
                   <FontAwesomeIcon icon={faAnglesLeft} />
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
+                  className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-xs sm:text-sm"
                 >
                   <FontAwesomeIcon icon={faArrowLeft} />
                 </button>
 
-                <span className="mx-4">
+                <span className="mx-2 sm:mx-4 text-xs sm:text-sm">
                   Page {currentPage} of {totalPages}
                 </span>
 
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
+                  className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-xs sm:text-sm"
                 >
                   <FontAwesomeIcon icon={faArrowRight} />
                 </button>
                 <button
                   onClick={() => handlePageChange(totalPages)}
                   disabled={currentPage === totalPages}
-                  className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-sm"
+                  className="px-2 sm:px-3 py-1 rounded bg-blue-500 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-colors text-xs sm:text-sm"
                 >
                   <FontAwesomeIcon icon={faAnglesRight} />
                 </button>
@@ -515,14 +472,14 @@ const StoreKeeperDashboard: React.FC = () => {
       )}
 
       {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-[90vw] sm:w-96 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium">Edit Category</h3>
+              <h3 className="text-base sm:text-lg font-medium">Edit Category</h3>
               <FontAwesomeIcon
                 icon={faXmark}
                 onClick={closeEditModal}
-                className="cursor-pointer"
+                className="cursor-pointer text-lg sm:text-xl"
               />
             </div>
             <div>
@@ -537,21 +494,21 @@ const StoreKeeperDashboard: React.FC = () => {
                 id="categoryName"
                 value={editedCategoryName}
                 onChange={(e) => setEditedCategoryName(e.target.value)}
-                className="w-full pl-4 pr-4 py-2 rounded-lg border focus:outline-none focus:border-blue-400"
+                className="w-full pl-3 sm:pl-4 pr-3 sm:pr-4 py-2 rounded-lg border focus:outline-none focus:border-blue-400 text-sm sm:text-base"
               />
             </div>
-            <div className="flex justify-end gap-4 mt-6">
+            <div className="flex justify-end gap-3 sm:gap-4 mt-4 sm:mt-6">
               <button
                 onClick={closeEditModal}
                 disabled={editLoading}
-                className="py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="py-2 px-3 sm:px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateCategory}
                 disabled={editLoading}
-                className={`py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors ${
+                className={`py-2 px-3 sm:px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm sm:text-base ${
                   editLoading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
@@ -563,32 +520,32 @@ const StoreKeeperDashboard: React.FC = () => {
       )}
 
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-[90vw] sm:w-96 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium">Confirm Deletion</h3>
+              <h3 className="text-base sm:text-lg font-medium">Confirm Deletion</h3>
               <FontAwesomeIcon
                 icon={faXmark}
                 onClick={closeDeleteModal}
-                className="cursor-pointer"
+                className="cursor-pointer text-lg sm:text-xl"
               />
             </div>
-            <p>
+            <p className="text-sm sm:text-base">
               Are you sure you want to delete the category "
               {categoryToDelete?.name}"?
             </p>
-            <div className="flex justify-end gap-4 mt-6">
+            <div className="flex justify-end gap-3 sm:gap-4 mt-4 sm:mt-6">
               <button
                 onClick={closeDeleteModal}
                 disabled={deleteLoading}
-                className="py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="py-2 px-3 sm:px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
                 disabled={deleteLoading}
-                className={`py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors ${
+                className={`py-2 px-3 sm:px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm sm:text-base ${
                   deleteLoading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >

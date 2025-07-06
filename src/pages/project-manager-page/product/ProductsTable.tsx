@@ -1014,7 +1014,7 @@ const ProductsTable: React.FC = () => {
                   {headers.map((header: string) => (
                     <th
                       key={header}
-                      className="py-4 px-4 text-left text-sm font-semibold"
+                      className="py-2 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold"
                     >
                       {header}
                     </th>
@@ -1024,7 +1024,7 @@ const ProductsTable: React.FC = () => {
               <tbody>
                 {currentItems.length === 0 ? (
                   <tr>
-                    <td colSpan={headers.length} className="text-center py-6 text-gray-500">
+                    <td colSpan={headers.length} className="text-center py-6 text-gray-500 text-sm">
                       No products found.
                     </td>
                   </tr>
@@ -1034,7 +1034,7 @@ const ProductsTable: React.FC = () => {
                       {headers.map((header) => (
                         <td
                           key={`${index}-${header}`}
-                          className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700"
+                          className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700"
                         >
                           {row[header]}
                         </td>
@@ -1050,38 +1050,38 @@ const ProductsTable: React.FC = () => {
 
       {/* Pagination Controls */}
       <div
-        className={`flex justify-center items-center mb-28 gap-2
+        className={`flex justify-center items-center mb-28 gap-1 sm:gap-2
          ${showContractorsModal ? "hidden" : ""} 
          ${showWorkersModal ? "hidden" : ""}`}
       >
         <button
           onClick={() => setCurrentPage(1)}
           disabled={currentPage === 1}
-          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+          className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
         >
           <FontAwesomeIcon icon={faAnglesLeft} />
         </button>
         <button
           onClick={() => setCurrentPage(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+          className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-        <span className="mx-4">
+        <span className="mx-2 sm:mx-4 text-xs sm:text-sm">
           Page {currentPage} of {totalPages || 1}
         </span>
         <button
           onClick={() => setCurrentPage(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+          className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
         >
           <FontAwesomeIcon icon={faArrowRight} />
         </button>
         <button
           onClick={() => setCurrentPage(totalPages)}
           disabled={currentPage === totalPages}
-          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+          className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
         >
           <FontAwesomeIcon icon={faAnglesRight} />
         </button>
@@ -1102,7 +1102,7 @@ const ProductsTable: React.FC = () => {
           ></div>
           <div
             ref={modalContentRef}
-            className="bg-white overflow-scroll rounded-2xl p-10 max-h-[90vh] max-w-5xl w-full mx-4 border-2 border-blue-400 shadow-2xl relative z-[100]"
+            className="bg-white overflow-scroll rounded-2xl p-4 sm:p-10 max-h-[90vh] max-w-5xl w-[95vw] sm:w-full mx-4 border-2 border-blue-400 shadow-2xl relative z-[100]"
           >
             {modalLoading || !selectedProduct ? (
               <div className="flex flex-col items-center justify-center h-96">
@@ -1112,12 +1112,12 @@ const ProductsTable: React.FC = () => {
               <>
                 {/* NAME */}
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold text-gray-20">
+                  <h2 className="text-lg sm:text-2xl font-bold text-gray-20">
                     {selectedProduct.name}
                   </h2>
                   <button
                     onClick={() => setShowProductDetailsModal(false)}
-                    className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                    className="text-gray-500 hover:text-gray-700 focus:outline-none text-lg sm:text-xl"
                   >
                     ✕
                   </button>
@@ -1126,7 +1126,7 @@ const ProductsTable: React.FC = () => {
                 {/* Calculation Cards */}
                 {selectedProduct.calculations && (
                   <>
-                    <div className="w-full mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    <div className="w-full mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
                       <DashboardCard title="Total raw material cost" value={Number(selectedProduct.calculations.total_raw_material_cost) || 0} currency="₦" />
                       <DashboardCard title="Total production cost" value={Number(selectedProduct.calculations.total_production_cost) || 0} currency="₦" />
                       <DashboardCard title="Total overhead Cost" value={Number(selectedProduct.calculations.total_overhead_cost) || 0} currency="₦" />
@@ -1135,7 +1135,7 @@ const ProductsTable: React.FC = () => {
                       <DashboardCard title="Profit per item" value={Number(selectedProduct.calculations.profit_per_item) || 0} currency="₦" />
                     </div>
                     {/* Action Buttons Row */}
-                    <div className="flex gap-4 justify-end mb-8">
+                    <div className="flex flex-wrap gap-2 sm:gap-4 justify-end mb-6 sm:mb-8">
                       <button
                         onClick={() => {
                           setShowProductDetailsModal(false);
@@ -1143,25 +1143,25 @@ const ProductsTable: React.FC = () => {
                           setSelectedTasksProduct(selectedProduct);
                           setShowTasksModal(true);
                         }}
-                        className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
+                        className="px-2 sm:px-4 py-1 sm:py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors text-xs sm:text-sm"
                       >
                         Task
                       </button>
                       <button
                         onClick={() => setShowContractorsModal(true)}
-                        className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
+                        className="px-2 sm:px-4 py-1 sm:py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors text-xs sm:text-sm"
                       >
                         View Contractors
                       </button>
                       <button
                         onClick={() => setShowWorkersModal(true)}
-                        className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
+                        className="px-2 sm:px-4 py-1 sm:py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors text-xs sm:text-sm"
                       >
                         View Salary Workers
                       </button>
                       <button
                         onClick={() => setShowQuotationModal(true)}
-                        className="px-4 py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors"
+                        className="px-2 sm:px-4 py-1 sm:py-2 border-2 border-blue-400 text-blue-400 bg-white rounded-lg font-semibold shadow hover:bg-blue-400 hover:text-white transition-colors text-xs sm:text-sm"
                       >
                         View Quotation
                       </button>
@@ -1173,7 +1173,7 @@ const ProductsTable: React.FC = () => {
                                 `/project-manager/edit-product/${selectedProduct.id}`
                               )
                             }
-                            className="p-2 pr-3 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
+                            className="p-1 sm:p-2 pr-2 sm:pr-3 text-blue-400 rounded-lg border-2 border-blue-400 font-bold text-xs sm:text-sm"
                           >
                             <FontAwesomeIcon
                               className="mr-1 text-xs text-blue-400"
@@ -1183,7 +1183,7 @@ const ProductsTable: React.FC = () => {
                           </button>
                           <button
                             onClick={() => confirmDeleteProduct(selectedProduct.id)}
-                            className="p-2 pr-3 text-red-400 rounded-lg border-2 border-red-400 font-bold"
+                            className="p-1 sm:p-2 pr-2 sm:pr-3 text-red-400 rounded-lg border-2 border-red-400 font-bold text-xs sm:text-sm"
                           >
                             <FontAwesomeIcon
                               className="mr-1 text-xs text-red-400"
@@ -1449,12 +1449,12 @@ const ProductsTable: React.FC = () => {
             modalConfig.isOpen ? "hidden" : ""
           } ${showEditContractorModal ? "blur-sm" : ""}`}
         >
-          <div className="bg-white rounded-2xl p-20 w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
-            <div className="flex flex-col items-center w-full mb-6">
-              <h3 className="text-2xl pb-10 font-bold text-blue-400 text-center">Contractors for <span className="font-extrabold text-3xl">{selectedProduct.name}</span></h3>
+          <div className="bg-white rounded-2xl p-4 sm:p-20 w-[95vw] sm:w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
+            <div className="flex flex-col items-center w-full mb-4 sm:mb-6">
+              <h3 className="text-lg sm:text-2xl pb-6 sm:pb-10 font-bold text-blue-400 text-center">Contractors for <span className="font-extrabold text-xl sm:text-3xl">{selectedProduct.name}</span></h3>
               <button
                 onClick={() => setShowContractorsModal(false)}
-                className="absolute top-6 right-8 text-gray-500 hover:text-gray-700 text-3xl font-bold"
+                className="absolute top-4 sm:top-6 right-4 sm:right-8 text-gray-500 hover:text-gray-700 text-xl sm:text-3xl font-bold"
                 aria-label="Close"
               >
                 <FontAwesomeIcon icon={faXmark} />
@@ -1470,7 +1470,7 @@ const ProductsTable: React.FC = () => {
                         state: { from: "contractorsModal", returnTo: "contractors" },
                       });
                     }}
-                    className="px-4 py-2 text-lg bg-blue-400 rounded-lg text-white font-semibold hover:bg-blue-500 flex items-center gap-2 shadow"
+                    className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-lg bg-blue-400 rounded-lg text-white font-semibold hover:bg-blue-500 flex items-center gap-2 shadow"
                   >
                     <FontAwesomeIcon icon={faPlus} /> Add Contractor
                   </button>
@@ -1478,54 +1478,54 @@ const ProductsTable: React.FC = () => {
               </div>
 
               {selectedProduct?.contractors?.length > 0 ? (
-                <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[12px]">
-                  <thead>
-                    <tr className="bg-blue-400 text-white">
-                      {/* <th className="py-1 px-2 text-left font-bold">#</th> */}
-                      <th className="py-1 px-2 text-left font-bold">Name</th>
-                      <th className="py-1 px-2 text-left font-bold">Date</th>
-                      <th className="py-1 px-2 text-left font-bold">Cost</th>
-                      {user?.role === 'ceo' && (
-                        <th className="py-1 px-2 text-left font-bold">Actions</th>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedProduct.contractors.map((contractor: any, index: number) => (
-                      <tr key={index} className="border-b">
-                        {/* <td className="py-1 px-2">{index + 1}</td> */}
-                        <td className="py-1 px-2">
-                          {contractor.linked_contractor?.first_name} {contractor.linked_contractor?.last_name}
-                        </td>
-                        <td className="py-1 px-2">
-                          {new Date(contractor.date).toLocaleDateString("en-GB")}
-                        </td>
-                        <td className="py-1 px-2">₦{contractor.cost || "-"}</td>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[10px] sm:text-[12px]">
+                    <thead>
+                      <tr className="bg-blue-400 text-white">
+                        <th className="py-1 px-1 sm:px-2 text-left font-bold">Name</th>
+                        <th className="py-1 px-1 sm:px-2 text-left font-bold">Date</th>
+                        <th className="py-1 px-1 sm:px-2 text-left font-bold">Cost</th>
                         {user?.role === 'ceo' && (
-                          <td className="py-1 px-2">
-                            <button
-                              onClick={() => handleEditContractor(contractor)}
-                              className="p-1 px-2 text-blue-400 rounded border border-blue-400 font-bold mr-2 text-xs"
-                            >
-                              <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteContractor(contractor.id)}
-                              disabled={isDeletingContractor}
-                              className={`p-1 px-2 text-red-400 rounded border border-red-400 font-bold text-xs ${
-                                isDeletingContractor ? "opacity-50 cursor-not-allowed" : ""
-                              }`}
-                            >
-                              {isDeletingContractor ? "Deleting..." : (
-                                <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
-                              )}
-                            </button>
-                          </td>
+                          <th className="py-1 px-1 sm:px-2 text-left font-bold">Actions</th>
                         )}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {selectedProduct.contractors.map((contractor: any, index: number) => (
+                        <tr key={index} className="border-b">
+                          <td className="py-1 px-1 sm:px-2">
+                            {contractor.linked_contractor?.first_name} {contractor.linked_contractor?.last_name}
+                          </td>
+                          <td className="py-1 px-1 sm:px-2">
+                            {new Date(contractor.date).toLocaleDateString("en-GB")}
+                          </td>
+                          <td className="py-1 px-1 sm:px-2">₦{contractor.cost || "-"}</td>
+                          {user?.role === 'ceo' && (
+                            <td className="py-1 px-1 sm:px-2">
+                              <button
+                                onClick={() => handleEditContractor(contractor)}
+                                className="p-1 px-1 sm:px-2 text-blue-400 rounded border border-blue-400 font-bold mr-1 sm:mr-2 text-xs"
+                              >
+                                <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteContractor(contractor.id)}
+                                disabled={isDeletingContractor}
+                                className={`p-1 px-1 sm:px-2 text-red-400 rounded border border-red-400 font-bold text-xs ${
+                                  isDeletingContractor ? "opacity-50 cursor-not-allowed" : ""
+                                }`}
+                              >
+                                {isDeletingContractor ? "Deleting..." : (
+                                  <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
+                                )}
+                              </button>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               ) : (
                 <div className="w-full flex flex-col items-center">
                   <p className="italic text-gray-500 mb-4">No contractors attached</p>
@@ -1543,12 +1543,12 @@ const ProductsTable: React.FC = () => {
             modalConfig.isOpen ? "hidden" : ""
           } ${showEditWorkerModal ? "blur-sm" : ""}`}
         >
-          <div className="bg-white rounded-2xl p-20 w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
-            <div className="flex flex-col items-center w-full mb-6">
-              <h3 className="text-2xl pb-10 font-bold text-blue-400 text-center">Salary Workers for <span className="font-extrabold text-3xl">{selectedProduct.name}</span></h3>
+          <div className="bg-white rounded-2xl p-4 sm:p-20 w-[95vw] sm:w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
+            <div className="flex flex-col items-center w-full mb-4 sm:mb-6">
+              <h3 className="text-lg sm:text-2xl pb-6 sm:pb-10 font-bold text-blue-400 text-center">Salary Workers for <span className="font-extrabold text-xl sm:text-3xl">{selectedProduct.name}</span></h3>
               <button
                 onClick={() => setShowWorkersModal(false)}
-                className="absolute top-6 right-8 text-gray-500 hover:text-gray-700 text-3xl font-bold"
+                className="absolute top-4 sm:top-6 right-4 sm:right-8 text-gray-500 hover:text-gray-700 text-xl sm:text-3xl font-bold"
                 aria-label="Close"
               >
                 <FontAwesomeIcon icon={faXmark} />
@@ -1564,60 +1564,62 @@ const ProductsTable: React.FC = () => {
                         state: { from: "workersModal", returnTo: "workers" },
                       });
                     }}
-                    className="px-4 py-2 text-lg bg-blue-400 rounded-lg text-white font-semibold hover:bg-blue-500 flex items-center gap-2 shadow"
+                    className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-lg bg-blue-400 rounded-lg text-white font-semibold hover:bg-blue-500 flex items-center gap-2 shadow"
                   >
                     <FontAwesomeIcon icon={faPlus} /> Add Worker
                   </button>
                 )}
               </div>
 
-              {selectedProduct?.salary_workers?.length > 0 ? (
-                <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[12px]">
-                  <thead>
-                    <tr className="bg-blue-400 text-white">
-                      {/* <th className="py-1 px-2 text-left font-bold">#</th> */}
-                      <th className="py-1 px-2 text-left font-bold">Name</th>
-                      <th className="py-1 px-2 text-left font-bold">Date</th>
-                      {user?.role === 'ceo' && (
-                        <th className="py-1 px-2 text-left font-bold">Actions</th>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedProduct.salary_workers.map((worker: any, index: number) => (
-                      <tr key={index} className="border-b">
-                        {/* <td className="py-1 px-2">{index + 1}</td> */}
-                        <td className="py-1 px-2">
-                          {worker.linked_salary_worker?.first_name} {worker.linked_salary_worker?.last_name}
-                        </td>
-                        <td className="py-1 px-2">
-                          {new Date(worker.date).toLocaleDateString("en-GB")}
-                        </td>
+              {selectedProduct?.workers?.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[10px] sm:text-[12px]">
+                    <thead>
+                      <tr className="bg-blue-400 text-white">
+                        <th className="py-1 px-1 sm:px-2 text-left font-bold">Name</th>
+                        <th className="py-1 px-1 sm:px-2 text-left font-bold">Date</th>
+                        <th className="py-1 px-1 sm:px-2 text-left font-bold">Cost</th>
                         {user?.role === 'ceo' && (
-                          <td className="py-1 px-2">
-                            <button
-                              onClick={() => handleEditWorker(worker)}
-                              className="p-1 px-2 text-blue-400 rounded border border-blue-400 font-bold mr-2 text-xs"
-                            >
-                              <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteWorker(worker.id)}
-                              disabled={isDeletingWorker}
-                              className={`p-1 px-2 text-red-400 rounded border border-red-400 font-bold text-xs ${
-                                isDeletingWorker ? "opacity-50 cursor-not-allowed" : ""
-                              }`}
-                            >
-                              {isDeletingWorker ? "Deleting..." : (
-                                <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
-                              )}
-                            </button>
-                          </td>
+                          <th className="py-1 px-1 sm:px-2 text-left font-bold">Actions</th>
                         )}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {selectedProduct.workers.map((worker: any, index: number) => (
+                        <tr key={index} className="border-b">
+                          <td className="py-1 px-1 sm:px-2">
+                            {worker.linked_worker?.first_name} {worker.linked_worker?.last_name}
+                          </td>
+                          <td className="py-1 px-1 sm:px-2">
+                            {new Date(worker.date).toLocaleDateString("en-GB")}
+                          </td>
+                          <td className="py-1 px-1 sm:px-2">₦{worker.cost || "-"}</td>
+                          {user?.role === 'ceo' && (
+                            <td className="py-1 px-1 sm:px-2">
+                              <button
+                                onClick={() => handleEditWorker(worker)}
+                                className="p-1 px-1 sm:px-2 text-blue-400 rounded border border-blue-400 font-bold mr-1 sm:mr-2 text-xs"
+                              >
+                                <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteWorker(worker.id)}
+                                disabled={isDeletingWorker}
+                                className={`p-1 px-1 sm:px-2 text-red-400 rounded border border-red-400 font-bold text-xs ${
+                                  isDeletingWorker ? "opacity-50 cursor-not-allowed" : ""
+                                }`}
+                              >
+                                {isDeletingWorker ? "Deleting..." : (
+                                  <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
+                                )}
+                              </button>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               ) : (
                 <div className="w-full flex flex-col items-center">
                   <p className="italic text-gray-500 mb-4">No workers attached</p>

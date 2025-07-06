@@ -16,18 +16,18 @@ const Header = () => {
   const financialHealth = data?.financial_health;
 
   return (
-    <div className="p-6">
-      <p className="md:text-3xl text-black font-bold py-6">Financial Health</p>
+    <div className="p-3 sm:p-6">
+      <p className="text-xl sm:text-2xl md:text-3xl text-black font-bold py-3 sm:py-6">Financial Health</p>
 
-      <div className="md:grid md:grid-cols-3 grid grid-cols-1 md:space-x-4 space-x-0 md:space-y-0 space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
         {financialHealth &&
           Object.entries(financialHealth).map(([key, value]) => (
-            <div key={key} className="p-4 border rounded-lg shadow-md">
-              <div className="flex justify-between items-center text-2xl">
-                <p className="capitalize">{key.replace(/_/g, " ")}</p>
-                <img src={Frame180 || "/placeholder.svg"} alt="header logo" />
+            <div key={key} className="p-3 sm:p-4 border rounded-lg shadow-md">
+              <div className="flex justify-between items-center text-lg sm:text-xl md:text-2xl">
+                <p className="capitalize text-sm sm:text-base md:text-lg">{key.replace(/_/g, " ")}</p>
+                <img src={Frame180 || "/placeholder.svg"} alt="header logo" className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <div className="flex space-x-8 text-sm">
+              <div className="flex space-x-4 sm:space-x-8 text-xs sm:text-sm mt-2">
                 <span className="text-green-200">
                   <MdArrowOutward />
                 </span>

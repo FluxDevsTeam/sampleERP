@@ -277,7 +277,7 @@ export const RawMaterials: React.FC = () => {
           Raw Material Summary
         </h1> */}
         <div
-          className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4 mt-2 ${
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 mt-2 ${
             showImagePreview ? "blur-sm" : ""
           } ${showModal ? "blur-md" : ""}`}
         >
@@ -296,7 +296,7 @@ export const RawMaterials: React.FC = () => {
         <div className="relative">
           <h1
             style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-            className={`font-semibold py-5 mt-2 ${
+            className={`font-semibold py-3 sm:py-5 mt-2 ${
               showImagePreview ? "blur-sm" : ""
             } ${showModal ? "blur-md" : ""}`}
           >
@@ -323,10 +323,10 @@ export const RawMaterials: React.FC = () => {
               </div>
             ) : (
               <div>
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 sm:gap-0">
                   {/* Left side: Search */}
-                  <div className="flex items-center">
-                    <div className="relative">
+                  <div className="flex items-center w-full sm:w-auto">
+                    <div className="relative flex-1 sm:flex-none">
                       <input
                         type="text"
                         placeholder="Search..."
@@ -337,13 +337,13 @@ export const RawMaterials: React.FC = () => {
                             handleSearch();
                           }
                         }}
-                        className="pl-4 pr-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full sm:w-auto pl-3 sm:pl-4 pr-3 sm:pr-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
                       />
                     </div>
                     <button
                       onClick={handleSearch}
                       disabled={searchLoading}
-                      className={`px-4 py-2 bg-blue-400 text-white rounded-r-lg hover:bg-blue-500 transition-colors border-l-0 ${
+                      className={`px-3 sm:px-4 py-2 bg-blue-400 text-white rounded-r-lg hover:bg-blue-500 transition-colors border-l-0 text-sm sm:text-base ${
                         searchLoading ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >
@@ -356,7 +356,7 @@ export const RawMaterials: React.FC = () => {
                     <button
                       onClick={handleClear}
                       disabled={searchLoading}
-                      className={`ml-2 px-3 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors ${
+                      className={`ml-2 px-2 sm:px-3 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors text-sm sm:text-base ${
                         searchLoading ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >
@@ -371,76 +371,78 @@ export const RawMaterials: React.FC = () => {
                   {/* Right side: Add button */}
                   <button
                     onClick={() => navigate("/store-keeper/add-raw-material")}
-                    className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
+                    className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-sm sm:text-base"
                   >
-                    <FontAwesomeIcon className="pr-2" icon={faPlus} />
+                    <FontAwesomeIcon className="pr-1 sm:pr-2" icon={faPlus} />
                     Add Raw Material
                   </button>
                 </div>
-                <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-                  <thead>
-                    <tr className="bg-blue-400 text-white">
-                      {tableHeaders.map((header) => (
-                        <th
-                          key={header}
-                          className="py-4 px-4 text-left text-sm font-semibold"
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentItems.map((row, index) => (
-                      <tr key={index} className="hover:bg-gray-100">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                    <thead>
+                      <tr className="bg-blue-400 text-white">
                         {tableHeaders.map((header) => (
-                          <td
-                            key={`${index}-${header}`}
-                            className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700"
+                          <th
+                            key={header}
+                            className="py-2 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold"
                           >
-                            {row[header]}
-                          </td>
+                            {header}
+                          </th>
                         ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {currentItems.map((row, index) => (
+                        <tr key={index} className="hover:bg-gray-100">
+                          {tableHeaders.map((header) => (
+                            <td
+                              key={`${index}-${header}`}
+                              className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700"
+                            >
+                              {row[header]}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
 
           {/* Updated Pagination Controls */}
-          <div className="flex justify-center items-center mb-28 gap-2">
+          <div className="flex justify-center items-center mb-20 sm:mb-28 gap-1 sm:gap-2">
             <button
               onClick={() => handlePageChange(1)}
               disabled={currentPage === 1}
-              className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+              className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
             >
               <FontAwesomeIcon icon={faAnglesLeft} />
             </button>
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+              className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
             >
               <FontAwesomeIcon icon={faArrowLeft} />
             </button>
 
-            <span className="mx-4">
+            <span className="mx-2 sm:mx-4 text-xs sm:text-sm">
               Page {currentPage} of {totalPages}
             </span>
 
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+              className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
             >
               <FontAwesomeIcon icon={faArrowRight} />
             </button>
             <button
               onClick={() => handlePageChange(totalPages)}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+              className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
             >
               <FontAwesomeIcon icon={faAnglesRight} />
             </button>
@@ -449,7 +451,7 @@ export const RawMaterials: React.FC = () => {
           {/*   PRODUCT DETAILS   */}
           {showModal && selectedProduct && (
             <div
-              className={`fixed inset-0 flex items-center justify-center z-[100] ${
+              className={`fixed inset-0 flex items-center justify-center z-[100] p-4 ${
                 confirmDelete ? "blur-sm" : ""
               } ${showImagePreview ? "blur-sm" : ""}`}
             >
@@ -457,14 +459,14 @@ export const RawMaterials: React.FC = () => {
                 className="absolute inset-0 bg-black opacity-50"
                 onClick={() => setShowModal(false)}
               ></div>
-              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 border-2 border-gray-800 shadow-lg relative z-10">
+              <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-4 border-2 border-gray-800 shadow-lg relative z-10 max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold text-gray-20">
+                  <h2 className="text-lg sm:text-2xl font-bold text-gray-20">
                     {selectedProduct.name}{" "}
                   </h2>
                   <button
                     onClick={() => setShowModal(false)}
-                    className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                    className="text-gray-500 hover:text-gray-700 focus:outline-none text-lg sm:text-xl"
                   >
                     ✕
                   </button>
@@ -492,60 +494,60 @@ export const RawMaterials: React.FC = () => {
                   />
                 )}
                 <div className="space-y-2"></div>
-                <p className="text-sm text-gray-20 mb-3">
+                <p className="text-xs sm:text-sm text-gray-20 mb-3">
                   <span className="font-semibold">Archived:</span>{" "}
                   {selectedProduct.archived ? "Yes" : "No"}
                 </p>
-                <p className="text-sm text-gray-20 mb-3">
+                <p className="text-xs sm:text-sm text-gray-20 mb-3">
                   <span className="font-semibold">Category:</span>{" "}
                   {selectedProduct.store_category?.name || "No category"}
                 </p>
-                <p className="text-sm text-gray-20 mb-3">
+                <p className="text-xs sm:text-sm text-gray-20 mb-3">
                   <span className="font-semibold">Description:</span>{" "}
                   {selectedProduct.description
                     ? selectedProduct.description
                     : "no description"}
                 </p>
-                <p className="text-sm text-gray-20 mb-3">
+                <p className="text-xs sm:text-sm text-gray-20 mb-3">
                   <span className="font-semibold">Price:</span>{" "}
                   {selectedProduct.price
                     ? `₦${Number(selectedProduct.price).toLocaleString()}`
                     : "-"}
                 </p>
-                <p className="text-sm text-gray-20 mb-3">
+                <p className="text-xs sm:text-sm text-gray-20 mb-3">
                   <span className="font-semibold">Quantity:</span>{" "}
                   {selectedProduct.quantity
                     ? Number(selectedProduct.quantity).toLocaleString()
                     : "-"}
                 </p>
-                <p className="text-sm text-gray-20 mb-3">
+                <p className="text-xs sm:text-sm text-gray-20 mb-3">
                   <span className="font-semibold">Unit:</span>{" "}
                   {selectedProduct.unit ? selectedProduct.unit : "-"}
                 </p>
 
                 {userRole === "ceo" && (
-                  <>
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-0">
                     <button
                       onClick={editItem}
-                      className="px-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold"
+                      className="px-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 sm:mr-2 font-bold text-sm sm:text-base"
                     >
                       <FontAwesomeIcon
-                        className=" text-blue-400"
+                        className="text-blue-400"
                         icon={faPencil}
                       />
                       {/* Edit details */}
                     </button>
                     <button
                       onClick={confirmDeleteItem}
-                      className="px-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
+                      className="px-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-2 sm:mt-4 font-bold text-sm sm:text-base"
                     >
                       <FontAwesomeIcon
-                        className=" text-red-400"
+                        className="text-red-400"
                         icon={faTrash}
                       />
                       {/* Delete Item */}
                     </button>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
@@ -553,27 +555,27 @@ export const RawMaterials: React.FC = () => {
 
           {/* confirmation modal */}
           {confirmDelete && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
-              <div className="bg-white rounded-lg p-6 w-96">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+              <div className="bg-white rounded-lg p-4 sm:p-6 w-[90vw] sm:w-96 max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-lg mb-4 font-medium">Confirm Deletion</h3>
+                  <h3 className="text-base sm:text-lg mb-4 font-medium">Confirm Deletion</h3>
                   <FontAwesomeIcon
                     icon={faXmark}
                     onClick={() => setConfirmDelete(false)}
-                    className="cursor-pointer"
+                    className="cursor-pointer text-lg sm:text-xl"
                   />
                 </div>
-                <p>Are you sure you want to delete this item?</p>
+                <p className="text-sm sm:text-base">Are you sure you want to delete this item?</p>
                 <div className="space-y-3 mt-4">
                   <button
                     onClick={handleConfirmDelete}
-                    className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center"
+                    className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center text-sm sm:text-base"
                   >
                     Confirm
                   </button>
                   <button
                     onClick={() => setConfirmDelete(false)}
-                    className="w-full py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors flex items-center justify-center"
+                    className="w-full py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors flex items-center justify-center text-sm sm:text-base"
                   >
                     Cancel
                   </button>
@@ -585,7 +587,7 @@ export const RawMaterials: React.FC = () => {
           {/*   IMAGE PREVIEW   */}
           {showImagePreview && selectedProduct && (
             <div
-              className="fixed inset-0 bg-opacity-90 flex items-center justify-center z-[200]"
+              className="fixed inset-0 bg-opacity-90 flex items-center justify-center z-[200] p-4"
               onClick={() => setShowImagePreview(false)}
             >
               <div className="relative max-w-4xl mx-4 rounded-lg shadow-lg">

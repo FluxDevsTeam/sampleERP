@@ -172,29 +172,29 @@ const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpda
     ));
   };
   return (
-    <div className="max-w-2xl min-h-[400px] mx-auto">
-      <div className="flex items-center justify-between mb-6 border-b pb-4">
-        <span className="font-bold text-2xl text-black-200 tracking-tight">Task List</span>
+    <div className="w-full max-w-2xl min-h-[400px] mx-auto px-2 sm:px-0">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 border-b pb-4 gap-2 sm:gap-0">
+        <span className="font-bold text-lg sm:text-2xl text-black-200 tracking-tight">Task List</span>
         <div className="flex-1 flex justify-center">
           {saveStatus === 'saving' && !pendingSave && !initialLoad.current && (
-            <span className="px-5 py-2 bg-blue-100 text-white rounded shadow text-xs">Saving...</span>
+            <span className="px-3 sm:px-5 py-1 sm:py-2 bg-blue-100 text-white rounded shadow text-xs">Saving...</span>
           )}
           {saveStatus === 'saved' && !initialLoad.current && (
-            <span className="px-3 py-1 bg-green-100 text-green-700 rounded shadow text-xs">Saved</span>
+            <span className="px-2 sm:px-3 py-1 bg-green-100 text-green-700 rounded shadow text-xs">Saved</span>
           )}
         </div>
         <button
-          className="flex items-center gap-2 px-4 py-2 bg-blue-400 text-white rounded-lg shadow hover:bg-blue-400 transition-colors text-base font-medium"
+          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-400 text-white rounded-lg shadow hover:bg-blue-400 transition-colors text-sm sm:text-base font-medium"
           onClick={handleAddTask}
         >
-          <span className="text-xl leading-none">+</span> Add Task
+          <span className="text-lg sm:text-xl leading-none">+</span> Add Task
         </button>
       </div>
-      <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2">
-        {(!Array.isArray(tasks) || tasks.length === 0) && <div className="text-black-200 text-center text-lg py-12">No tasks yet.</div>}
+      <div className="space-y-4 sm:space-y-6 max-h-[500px] overflow-y-auto pr-2">
+        {(!Array.isArray(tasks) || tasks.length === 0) && <div className="text-black-200 text-center text-base sm:text-lg py-8 sm:py-12">No tasks yet.</div>}
         {Array.isArray(tasks) && tasks.map((task, idx) => (
-          <div key={idx} className="bg-white border border-gray-200 rounded-xl p-5 shadow-md group transition-all hover:shadow-lg">
-            <div className="flex items-center gap-3 mb-3">
+          <div key={idx} className="bg-white border border-gray-200 rounded-xl p-3 sm:p-5 shadow-md group transition-all hover:shadow-lg">
+            <div className="flex items-center gap-2 sm:gap-3 mb-3">
               <input
                 type="checkbox"
                 checked={task.checked}
@@ -202,7 +202,7 @@ const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpda
                 className="accent-blue-400 w-4 h-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all"
               />
               <input
-                className="font-semibold text-lg border-b-2 border-transparent focus:border-blue-400 outline-none bg-transparent flex-1 px-2 py-1 text-black-200 placeholder-black-200 transition-all"
+                className="font-semibold text-base sm:text-lg border-b-2 border-transparent focus:border-blue-400 outline-none bg-transparent flex-1 px-2 py-1 text-black-200 placeholder-black-200 transition-all"
                 value={task.title}
                 placeholder="Task title"
                 onChange={e => handleTaskChange(idx, "title", e.target.value)}
@@ -215,11 +215,11 @@ const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpda
                 <FiMinus size={10} />
               </button>
             </div>
-            <div className="ml-8">
+            <div className="ml-6 sm:ml-8">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-medium text-black-200 tracking-wide">SubTasks</span>
                 <button
-                  className="px-3 py-1 bg-blue-400 text-white rounded-full text-xs font-semibold hover:bg-blue-400 transition-colors"
+                  className="px-2 sm:px-3 py-1 bg-blue-400 text-white rounded-full text-xs font-semibold hover:bg-blue-400 transition-colors"
                   onClick={() => handleAddSubtask(idx)}
                 >
                   + Subtask
@@ -236,7 +236,7 @@ const ProductTaskManager: React.FC<ProductTaskManagerProps> = ({ product, onUpda
                       className="accent-blue-400 w-3 h-3 rounded border-2 border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all"
                     />
                     <input
-                      className="text-base border-b border-transparent focus:border-blue-400 outline-none bg-transparent flex-1 px-2 py-1 text-black-200 placeholder-black-200 transition-all"
+                      className="text-sm sm:text-base border-b border-transparent focus:border-blue-400 outline-none bg-transparent flex-1 px-2 py-1 text-black-200 placeholder-black-200 transition-all"
                       value={sub.title}
                       placeholder="Subtask title"
                       onChange={e => handleSubtaskChange(idx, subIdx, "title", e.target.value)}

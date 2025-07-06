@@ -46,7 +46,7 @@ const RecordOfRMAdded: React.FC = () => {
         Raw Materials Added Summary
       </h1> */}
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 my-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 my-4">
         <InventoryData
           info="Monthly Added Stock"
           digits={boxData.monthly_added_material_count}
@@ -70,7 +70,7 @@ const RecordOfRMAdded: React.FC = () => {
       </div>
 
       <h1
-        className="font-semibold py-5 mt-2"
+        className="font-semibold py-3 sm:py-5 mt-2"
         style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
       >
         Addition to raw materials

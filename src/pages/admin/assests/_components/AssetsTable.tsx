@@ -172,10 +172,12 @@ const AssetsTable = ({
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
           <thead className="bg-blue-400 text-white">
             <tr>
-              {headers.map((header) => (
+              {headers.map((header, index) => (
                 <th
                   key={header}
-                  className="py-4 px-4 text-left text-sm font-semibold"
+                  className={`py-3 px-2 sm:py-4 sm:px-4 text-left text-xs sm:text-sm font-semibold ${
+                    index === 2 ? 'hidden sm:table-cell' : '' // Hide expected lifespan on mobile
+                  }`}
                 >
                   {header}
                 </th>
@@ -185,7 +187,7 @@ const AssetsTable = ({
           <tbody className="">
             {assets.length === 0 ? (
               <tr>
-                <td colSpan={headers.length} className="text-center py-6 text-gray-500">
+                <td colSpan={headers.length} className="text-center py-6 text-gray-500 text-sm">
                   No assets found.
                 </td>
               </tr>
@@ -195,26 +197,26 @@ const AssetsTable = ({
                   key={asset.id}
                   className="hover:bg-gray-100"
                 >
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     {asset.name}
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     ₦ {new Intl.NumberFormat('en-NG', { useGrouping: true }).format(asset.value)}
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden sm:table-cell">
                     {asset.expected_lifespan}
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium`}
+                      className={`inline-flex items-center px-1.5 py-0.5 sm:px-2.5 rounded-full text-xs font-medium`}
                     >
                       {asset.is_still_available ? "Available" : "Unavailable"}
                     </span>
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     <button
                       onClick={() => handleRowClick(asset)}
-                      className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+                      className="px-2 py-1 sm:px-3 sm:py-1 text-blue-400 border-2 border-blue-400 rounded text-xs"
                     >
                       View
                     </button>

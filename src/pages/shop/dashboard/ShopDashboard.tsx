@@ -50,9 +50,9 @@ const ShopDashboard = () => {
   }, []);
 
   return (
-    <div className="w-11/12 mx-auto mt-6 pl-1 pt-2">
-      <div className="mb-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-20">
+    <div className="w-full sm:w-11/12 mx-auto mt-3 sm:mt-6 pl-1 pt-2">
+      <div className="mb-8 sm:mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 mb-12 sm:mb-20">
           <DashboardData
             info="Monthly Stock Added"
             digits={dashboardData?.total_added_this_month}
@@ -95,7 +95,7 @@ const ShopDashboard = () => {
           ></DashboardData>
         </div>
 
-        <div className="grid gap-10 md:grid-cols-2 items-center rounded-sm mb-9">
+        <div className="grid gap-6 sm:gap-10 md:grid-cols-2 items-center rounded-sm mb-6 sm:mb-9">
           <AmountSoldMonthlyBarChart></AmountSoldMonthlyBarChart>
           <MonthlyAddedValueSpikedChart></MonthlyAddedValueSpikedChart>
         </div>
@@ -106,7 +106,7 @@ const ShopDashboard = () => {
 
       <h1
         style={{ fontSize: "clamp(16.5px, 3vw, 27px)" }}
-        className="font-semibold mb-5"
+        className="font-semibold mb-3 sm:mb-5"
       >
         Categories
       </h1>

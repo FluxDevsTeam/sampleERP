@@ -216,58 +216,58 @@ const RemovedTable: React.FC = () => {
   };
 
   return (
-    <div className="p-4 md:p-8 ">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-2 sm:p-4 md:p-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-8 gap-3 sm:gap-0">
         <button
           onClick={() => navigate("/store-keeper/add-removed")}
-          className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
+          className="px-3 sm:px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-sm sm:text-base w-full sm:w-auto"
         >
           <FontAwesomeIcon className="pr-2" icon={faPlus} />
           Remove Item
         </button>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           {/* Year Dropdown */}
-          <div className="relative w-24" ref={yearRef}>
-            <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
+          <div className="relative w-20 sm:w-24" ref={yearRef}>
+            <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{year || 'Year'}</span>
-              <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} />
+              <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} className="text-xs" />
             </button>
             {isYearOpen && (
               <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
-                <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Year</li>
+                <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Year</li>
                 {[...Array(10)].map((_, i) => {
                   const y = new Date().getFullYear() - i;
-                  return <li key={i} onClick={() => { setYear(y.toString()); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{y}</li>
+                  return <li key={i} onClick={() => { setYear(y.toString()); setIsYearOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{y}</li>
                 })}
               </ul>
             )}
           </div>
           {/* Month Dropdown */}
-          <div className="relative w-32" ref={monthRef}>
-            <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
+          <div className="relative w-24 sm:w-32" ref={monthRef}>
+            <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{month ? months[Number(month) - 1] : 'Month'}</span>
-              <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} />
+              <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} className="text-xs" />
             </button>
             {isMonthOpen && (
               <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
-                <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Month</li>
+                <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Month</li>
                 {months.map((m, i) => (
-                  <li key={i} onClick={() => { setMonth((i + 1).toString()); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{m}</li>
+                  <li key={i} onClick={() => { setMonth((i + 1).toString()); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{m}</li>
                 ))}
               </ul>
             )}
           </div>
           {/* Day Dropdown */}
-          <div className="relative w-24" ref={dayRef}>
-            <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
+          <div className="relative w-20 sm:w-24" ref={dayRef}>
+            <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{day || 'Day'}</span>
-              <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} />
+              <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} className="text-xs" />
             </button>
             {isDayOpen && (
               <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
-                <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Day</li>
+                <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Day</li>
                 {[...Array(31)].map((_, i) => (
-                  <li key={i} onClick={() => { setDay((i + 1).toString()); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{i + 1}</li>
+                  <li key={i} onClick={() => { setDay((i + 1).toString()); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{i + 1}</li>
                 ))}
               </ul>
             )}
@@ -275,7 +275,7 @@ const RemovedTable: React.FC = () => {
           <button 
             onClick={handleFilter} 
             disabled={filterLoading}
-            className={`p-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+            className={`p-1.5 sm:p-2 bg-blue-400 text-white rounded hover:bg-blue-500 text-xs sm:text-sm ${
               filterLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
@@ -284,7 +284,7 @@ const RemovedTable: React.FC = () => {
           <button 
             onClick={handleClear} 
             disabled={filterLoading}
-            className={`p-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 ${
+            className={`p-1.5 sm:p-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 text-xs sm:text-sm ${
               filterLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
@@ -304,14 +304,14 @@ const RemovedTable: React.FC = () => {
           />
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {removedData?.daily_data?.length === 0 ? (
             <div className="text-center text-gray-500 py-8">No removed items found.</div>
           ) : (
             removedData?.daily_data?.map((dayData: any) => (
               <div key={dayData.date} className="bg-white shadow-md rounded-lg overflow-hidden">
                 <div
-                  className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-200"
+                  className="bg-white text-blue-20 px-3 sm:px-4 py-2 border-b flex flex-col sm:flex-row sm:justify-between sm:items-center cursor-pointer hover:bg-slate-200 gap-2"
                   onClick={() => toggleDate(dayData.date)}
                 >
                   <div className="flex items-center space-x-2">
@@ -319,29 +319,29 @@ const RemovedTable: React.FC = () => {
                       icon={openSections.includes(dayData.date) ? faChevronUp : faChevronDown}
                       className="text-blue-400"
                     />
-                    <h2 className="text-lg font-semibold text-gray-700">
+                    <h2 className="text-base sm:text-lg font-semibold text-gray-700">
                       {formatDate(dayData.date)}
                     </h2>
                   </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-gray-700">
+                  <div className="text-left sm:text-right">
+                    <p className="text-base sm:text-lg font-bold text-gray-700">
                       Total: {formatCurrency(dayData.daily_total)}
                     </p>
                   </div>
                 </div>
                 {openSections.includes(dayData.date) && (
                   <div className="transition-max-height duration-500 ease-in-out overflow-hidden">
-                    <div className="p-4">
+                    <div className="p-2 sm:p-4 overflow-x-auto">
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Name</th>
-                            <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Quantity</th>
-                            <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Cost Per Unit</th>
-                            <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Total Price</th>
-                            <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Product</th>
-                            <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Progress</th>
-                            {userRole === 'ceo' && <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Actions</th>}
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Name</th>
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Qty</th>
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">Cost/Unit</th>
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Total</th>
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell">Product</th>
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Progress</th>
+                            {userRole === 'ceo' && <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Actions</th>}
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -354,16 +354,16 @@ const RemovedTable: React.FC = () => {
                           ) : (
                             dayData.entries.map((entry: any) => (
                               <tr key={entry.id} className="hover:bg-gray-50">
-                                <td className="px-4 py-3 text-sm cursor-pointer hover:text-blue-600">{entry.name}</td>
-                                <td className="px-4 py-3 text-sm">{entry.quantity}</td>
-                                <td className="px-4 py-3 text-sm">{formatCurrency(entry.price)}</td>
-                                <td className="px-4 py-3 text-sm">{formatCurrency(parseFloat(entry.price) * parseFloat(entry.quantity))}</td>
-                                <td className="px-4 py-3 text-sm">{entry.product_its_used.name || "—"}</td>
-                                <td className="px-4 py-3 text-sm">{entry.product_its_used.progress}%</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm cursor-pointer hover:text-blue-600">{entry.name}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{entry.quantity}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{formatCurrency(entry.price)}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{formatCurrency(parseFloat(entry.price) * parseFloat(entry.quantity))}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">{entry.product_its_used.name || "—"}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.product_its_used.progress}%</td>
                                 {userRole === 'ceo' && (
-                                  <td className="flex justify-evenly px-4 py-3 text-sm text-blue-600">
+                                  <td className="flex justify-evenly px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-blue-600">
                                     <>
-                                      <FontAwesomeIcon onClick={() => handleEdit(entry.id)} className="pr-2 cursor-pointer hover:text-blue-500" icon={faPen} />
+                                      <FontAwesomeIcon onClick={() => handleEdit(entry.id)} className="pr-1 sm:pr-2 cursor-pointer hover:text-blue-500" icon={faPen} />
                                       <FontAwesomeIcon onClick={() => handleDeleteClick(entry.id)} className="cursor-pointer text-red-400" icon={faTrash} />
                                     </>
                                   </td>
@@ -384,27 +384,27 @@ const RemovedTable: React.FC = () => {
       )}
 
       {confirmDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-sm">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg mb-4 font-medium">Confirm Deletion</h3>
+              <h3 className="text-base sm:text-lg mb-3 sm:mb-4 font-medium">Confirm Deletion</h3>
               <FontAwesomeIcon
                 icon={faXmark}
                 onClick={() => setConfirmDelete(false)}
                 className="cursor-pointer"
               />
             </div>
-            <p>Are you sure you want to delete this item?</p>
-            <div className="space-y-3 mt-4">
+            <p className="text-sm sm:text-base">Are you sure you want to delete this item?</p>
+            <div className="space-y-2 sm:space-y-3 mt-3 sm:mt-4">
               <button
                 onClick={handleDelete}
-                className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm sm:text-base"
               >
                 Confirm
               </button>
               <button
                 onClick={() => setConfirmDelete(false)}
-                className="w-full py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors"
+                className="w-full py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors text-sm sm:text-base"
               >
                 Cancel
               </button>
