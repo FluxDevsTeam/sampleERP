@@ -1474,7 +1474,7 @@ const ProductsTable: React.FC = () => {
                                     </tr>
                                     {Array.isArray(task.subtasks) && task.subtasks.length > 0 && task.subtasks.map((sub: any, subIdx: number) => (
                                       <tr key={sub.id || sub.title || `${idx}-${subIdx}`} className="border-b border-gray-100">
-                                        <td className="p-2 pl-8 text-left text-black-600">• {sub.title}</td>
+                                        <td className="p-2 pl-8 text-left text-blue-400">• {sub.title}</td>
                                         <td className="p-2 text-left">
                                           <input type="checkbox" checked={sub.checked} onChange={e => { e.stopPropagation(); handleTaskCompletionToggle(idx, subIdx); }} />
                                         </td>

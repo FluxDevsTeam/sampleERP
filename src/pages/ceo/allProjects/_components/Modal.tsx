@@ -386,7 +386,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   return (
     <>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="w-90% max-sm:max-w-[54vh] max-sm:min-w-[54vh] min-w-[80vh]  lg:min-w-[165vh] p-1 sm:p-6 md:p-10 overflow-y-auto max-h-[98vh]">
+        <DialogContent className="w-90% max-sm:mt-7 max-sm:max-w-[54vh] max-sm:min-w-[54vh] min-w-[80vh]  lg:min-w-[165vh] p-1 sm:p-6 md:p-10 overflow-y-auto max-h-[98vh]">
           <DialogHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start gap-4 px-2 mr-8">
               <div>
@@ -399,14 +399,24 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                 <Button
                   variant="outline"
                   onClick={handleViewOtherProductionRecords}
-                  className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
+                  className="text-xs md:text-sm px-1 md:px-3 py-1 md:py-2"
                 >
-                  Records
+                  +Records
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setTimeout(() => setShowAllItemsManager(true), 300);
+                  }}
+                  className="text-xs md:text-sm px-1 md:px-3 py-1 md:py-2"
+                >
+                  +Item
                 </Button>
                 <Button
                   variant="outline"
                   onClick={handleEditClick}
-                  className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
+                  className="text-xs md:text-sm px-1 md:px-3 py-1 md:py-2"
                 >
                   Edit Status
                 </Button>
@@ -416,13 +426,13 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                     <Button
                       variant="outline"
                       onClick={() => setIsEditModalOpen(true)}
-                      className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
+                      className="text-xs md:text-sm px-1 md:px-3 py-1 md:py-2"
                     >
                       Full Edit
                     </Button>
                     <Button
                       variant="destructive"
-                      className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
+                      className="text-xs md:text-sm px-1 md:px-3 py-1 md:py-2"
                       onClick={handleDelete}
                     >
                       Delete
@@ -437,7 +447,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
           </DialogHeader>
 
           {selectedProject && (
-            <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-4 sm:space-y-6 max-sm:mb-10">
               {/* Project Info Section */}
               <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
                 <h3 className="text-base sm:text-lg font-semibold text-black-400 mb-3 sm:mb-4">

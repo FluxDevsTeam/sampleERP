@@ -608,7 +608,7 @@ const ProjectsTable = () => {
                       </td>
                     <td className="py-2 md:py-5 px-0 sm:px-4 border-b border-gray-200 text-sm md:text-sm text-center text-gray-700 w-2/5 md:w-auto">
                         <span
-                        className={`px-2 max-sm:px-1 inline-flex text-[11px] sm:text-xs leading-5 font-semibold rounded ${
+                        className={`px-2 max-sm:px-1 inline-flex text-[11px] py-1 sm:text-xs leading-5 font-semibold rounded ${
                             project.status === "in progress"
                               ? "bg-yellow-100 text-yellow-800"
                               : project.status === "completed"
@@ -724,7 +724,8 @@ const ProjectsTable = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
           <div className="bg-white rounded-lg p-6 max-w-3xl min-h-[600px] w-full relative shadow-xl">
             <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold p-2 rounded-full bg-white shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 z-10"
+              style={{ lineHeight: 1 }}
               onClick={() => {
                 setShowTasksModal(false);
                 refetch();
