@@ -49,11 +49,47 @@ const Header = () => {
 
   return (
     <div className="p-6">
-      <p className="md:text-3xl text-black font-bold py-6">Project Overview</p>
+      {/* <p className="md:text-3xl text-black font-bold py-6">Project Overview</p> */}
 
-      <div className="md:grid md:grid-cols-5 grid grid-cols-1 md:space-x-4 space-x-0 md:space-y-0 space-y-4">
-        {summaryItems.map((item, index) => (
+      <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {summaryItems.slice(0, 3).map((item, index) => (
           <div key={index} className="bg-white rounded pl-4 py-5 shadow grid items-center h-full">
+            <p
+              style={{ fontSize: "clamp(10px, 3vw, 20px)" }}
+              className="text-blue-400 font-bold"
+            >
+              {item.label}
+            </p>
+            <p
+              style={{ fontSize: "clamp(10px, 3vw, 24px)" }}
+              className="font-medium"
+            >
+              {item.value}
+            </p>
+          </div>
+        ))}
+        {/* Desktop-only items (hidden on mobile/tablet) */}
+        {summaryItems.slice(3).map((item, index) => (
+          <div key={index + 3} className="hidden lg:block bg-white rounded pl-4 py-5 shadow grid items-center h-full">
+            <p
+              style={{ fontSize: "clamp(10px, 3vw, 20px)" }}
+              className="text-blue-400 font-bold"
+            >
+              {item.label}
+            </p>
+            <p
+              style={{ fontSize: "clamp(10px, 3vw, 24px)" }}
+              className="font-medium"
+            >
+              {item.value}
+            </p>
+          </div>
+        ))}
+      </div>
+      {/* Mobile/Tablet second row (hidden on desktop) */}
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:hidden gap-4 mt-4">
+        {summaryItems.slice(3).map((item, index) => (
+          <div key={index + 3} className="bg-white rounded pl-4 py-5 shadow grid items-center h-full">
             <p
               style={{ fontSize: "clamp(10px, 3vw, 20px)" }}
               className="text-blue-400 font-bold"

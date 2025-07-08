@@ -607,12 +607,21 @@ const ProductsTable: React.FC = () => {
 
   return (
     <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
-      <h1
-        style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-        className="font-semibold py-5 mt-2"
-      >
-        Products Management
-      </h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-center mt-2 mb-2">
+        <h1
+          style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
+          className="font-semibold py-2 m-0"
+        >
+          Products Management
+        </h1>
+        <button
+          className="flex items-center gap-2 px-4 py-2 border border-blue-400 text-blue-400 bg-transparent rounded hover:bg-blue-50 transition-colors text-xs sm:text-sm justify-self-end ml-auto sm:ml-0"
+          onClick={() => navigate("/product/add-product")}
+        >
+          <FontAwesomeIcon icon={faPlus} />
+          Add Product
+        </button>
+      </div>
 
       <div
         className={`overflow-x-auto pb-6 ${
@@ -634,13 +643,18 @@ const ProductsTable: React.FC = () => {
           </div>
         ) : (
           <div>
-            <button
-              onClick={() => navigate("/product/add-product")}
-              className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
-            >
-              <FontAwesomeIcon className="pr-2" icon={faPlus} />
-              Add Product
-            </button>
+            {/* Search, Project, Sort by controls - responsive */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
+              <input type="text" placeholder="Search products..." className="border p-2 rounded-lg text-xs sm:text-sm w-full" />
+              <select className="border p-2 rounded-lg text-xs sm:text-sm w-full">
+                <option>Project</option>
+                {/* Add project options here */}
+              </select>
+              <select className="border p-2 rounded-lg text-xs sm:text-sm w-full">
+                <option>Sort by</option>
+                {/* Add sort options here */}
+              </select>
+            </div>
             <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
               <thead>
                 <tr className="bg-blue-400 text-white">
@@ -734,7 +748,7 @@ const ProductsTable: React.FC = () => {
                 onClick={() => setShowProductDetailsModal(false)}
                 className="text-gray-500 hover:text-gray-700 focus:outline-none"
               >
-                ✕
+                <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
               </button>
             </div>
 
@@ -1002,7 +1016,7 @@ const ProductsTable: React.FC = () => {
             modalConfig.isOpen ? "hidden" : ""
           } ${showEditContractorModal ? "blur-sm" : ""}`}
         >
-          <div className="bg-white rounded-2xl p-20 w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
+          <div className="bg-white rounded-2xl p-4 sm:p-8 md:p-12 w-full max-w-xs sm:max-w-md md:max-w-2xl max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
             <div className="flex flex-col items-center w-full mb-6">
               <h3 className="text-2xl pb-10 font-bold text-blue-400 text-center">Contractors for <span className="font-extrabold text-3xl">{selectedProduct.name}</span></h3>
               <button
@@ -1010,7 +1024,7 @@ const ProductsTable: React.FC = () => {
                 className="absolute top-6 right-8 text-gray-500 hover:text-gray-700 text-3xl font-bold"
                 aria-label="Close"
               >
-                <FontAwesomeIcon icon={faXmark} />
+                <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
               </button>
             </div>
 
@@ -1029,45 +1043,47 @@ const ProductsTable: React.FC = () => {
               </div>
 
               {selectedProduct?.contractors?.length > 0 ? (
-                <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[12px]">
-                  <thead>
-                    <tr className="bg-blue-100 text-blue-700">
-                      <th className="py-1 px-2 text-left font-bold">#</th>
-                      <th className="py-1 px-2 text-left font-bold">Name</th>
-                      <th className="py-1 px-2 text-left font-bold">Date</th>
-                      <th className="py-1 px-2 text-left font-bold">Cost</th>
-                      <th className="py-1 px-2 text-left font-bold">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedProduct.contractors.map((contractor: any, index: number) => (
-                      <tr key={index} className="border-b">
-                        <td className="py-1 px-2">{index + 1}</td>
-                        <td className="py-1 px-2">
-                          {contractor.linked_contractor?.first_name} {contractor.linked_contractor?.last_name}
-                        </td>
-                        <td className="py-1 px-2">
-                          {new Date(contractor.date).toLocaleDateString("en-GB")}
-                        </td>
-                        <td className="py-1 px-2">₦{contractor.cost || "-"}</td>
-                        <td className="py-1 px-2">
-                          <button
-                            onClick={() => handleEditContractor(contractor)}
-                            className="p-1 px-2 text-blue-400 rounded border border-blue-400 font-bold mr-2 text-xs"
-                          >
-                            <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteContractor(contractor.id)}
-                            className="p-1 px-2 text-red-400 rounded border border-red-400 font-bold text-xs"
-                          >
-                            <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
-                          </button>
-                        </td>
+                <div className="overflow-x-auto mb-4">
+                  <table className="min-w-full bg-white border rounded-lg shadow text-[10px] sm:text-xs md:text-sm">
+                    <thead>
+                      <tr className="bg-blue-100 text-blue-700">
+                        <th className="py-1 px-2 text-left font-bold">#</th>
+                        <th className="py-1 px-2 text-left font-bold">Name</th>
+                        <th className="py-1 px-2 text-left font-bold">Date</th>
+                        <th className="py-1 px-2 text-left font-bold">Cost</th>
+                        <th className="py-1 px-2 text-left font-bold">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {selectedProduct.contractors.map((contractor: any, index: number) => (
+                        <tr key={index} className="border-b">
+                          <td className="py-1 px-2">{index + 1}</td>
+                          <td className="py-1 px-2">
+                            {contractor.linked_contractor?.first_name} {contractor.linked_contractor?.last_name}
+                          </td>
+                          <td className="py-1 px-2">
+                            {new Date(contractor.date).toLocaleDateString("en-GB")}
+                          </td>
+                          <td className="py-1 px-2">₦{contractor.cost || "-"}</td>
+                          <td className="py-1 px-2">
+                            <button
+                              onClick={() => handleEditContractor(contractor)}
+                              className="p-1 px-2 text-blue-400 rounded border border-blue-400 font-bold mr-2 text-xs"
+                            >
+                              <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteContractor(contractor.id)}
+                              className="p-1 px-2 text-red-400 rounded border border-red-400 font-bold text-xs"
+                            >
+                              <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               ) : (
                 <div className="w-full flex flex-col items-center">
                   <p className="italic text-gray-500 mb-4">No contractors attached</p>
@@ -1085,7 +1101,7 @@ const ProductsTable: React.FC = () => {
             modalConfig.isOpen ? "hidden" : ""
           } ${showEditWorkerModal ? "blur-sm" : ""}`}
         >
-          <div className="bg-white rounded-2xl p-20 w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
+          <div className="bg-white rounded-2xl p-4 sm:p-8 md:p-12 w-full max-w-xs sm:max-w-md md:max-w-2xl max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
             <div className="flex flex-col items-center w-full mb-6">
               <h3 className="text-2xl pb-10 font-bold text-blue-400 text-center">Salary Workers for <span className="font-extrabold text-3xl">{selectedProduct.name}</span></h3>
               <button
@@ -1093,7 +1109,7 @@ const ProductsTable: React.FC = () => {
                 className="absolute top-6 right-8 text-gray-500 hover:text-gray-700 text-3xl font-bold"
                 aria-label="Close"
               >
-                <FontAwesomeIcon icon={faXmark} />
+                <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
               </button>
             </div>
 
@@ -1112,43 +1128,45 @@ const ProductsTable: React.FC = () => {
               </div>
 
               {selectedProduct?.salary_workers?.length > 0 ? (
-                <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[12px]">
-                  <thead>
-                    <tr className="bg-green-100 text-green-700">
-                      <th className="py-1 px-2 text-left font-bold">#</th>
-                      <th className="py-1 px-2 text-left font-bold">Name</th>
-                      <th className="py-1 px-2 text-left font-bold">Date</th>
-                      <th className="py-1 px-2 text-left font-bold">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedProduct.salary_workers.map((worker: any, index: number) => (
-                      <tr key={index} className="border-b">
-                        <td className="py-1 px-2">{index + 1}</td>
-                        <td className="py-1 px-2">
-                          {worker.linked_salary_worker?.first_name} {worker.linked_salary_worker?.last_name}
-                        </td>
-                        <td className="py-1 px-2">
-                          {new Date(worker.date).toLocaleDateString("en-GB")}
-                        </td>
-                        <td className="py-1 px-2">
-                          <button
-                            onClick={() => handleEditWorker(worker)}
-                            className="p-1 px-2 text-blue-400 rounded border border-blue-400 font-bold mr-2 text-xs"
-                          >
-                            <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteWorker(worker.id)}
-                            className="p-1 px-2 text-red-400 rounded border border-red-400 font-bold text-xs"
-                          >
-                            <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
-                          </button>
-                        </td>
+                <div className="overflow-x-auto mb-4">
+                  <table className="min-w-full bg-white border rounded-lg shadow text-[10px] sm:text-xs md:text-sm">
+                    <thead>
+                      <tr className="bg-green-100 text-green-700">
+                        <th className="py-1 px-2 text-left font-bold">#</th>
+                        <th className="py-1 px-2 text-left font-bold">Name</th>
+                        <th className="py-1 px-2 text-left font-bold">Date</th>
+                        <th className="py-1 px-2 text-left font-bold">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {selectedProduct.salary_workers.map((worker: any, index: number) => (
+                        <tr key={index} className="border-b">
+                          <td className="py-1 px-2">{index + 1}</td>
+                          <td className="py-1 px-2">
+                            {worker.linked_salary_worker?.first_name} {worker.linked_salary_worker?.last_name}
+                          </td>
+                          <td className="py-1 px-2">
+                            {new Date(worker.date).toLocaleDateString("en-GB")}
+                          </td>
+                          <td className="py-1 px-2">
+                            <button
+                              onClick={() => handleEditWorker(worker)}
+                              className="p-1 px-2 text-blue-400 rounded border border-blue-400 font-bold mr-2 text-xs"
+                            >
+                              <FontAwesomeIcon className="text-xs text-blue-400" icon={faPencil} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteWorker(worker.id)}
+                              className="p-1 px-2 text-red-400 rounded border border-red-400 font-bold text-xs"
+                            >
+                              <FontAwesomeIcon className="text-xs text-red-400" icon={faTrash} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               ) : (
                 <div className="w-full flex flex-col items-center">
                   <p className="italic text-gray-500 mb-4">No workers attached</p>
@@ -1166,7 +1184,7 @@ const ProductsTable: React.FC = () => {
             modalConfig.isOpen ? "hidden" : ""
           }`}
         >
-          <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-xs sm:max-w-md md:max-w-lg max-h-[90vh] overflow-y-auto border-2 border-gray-800">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-base text-blue-400 font-bold">
                 Edit Contractor
@@ -1175,7 +1193,7 @@ const ProductsTable: React.FC = () => {
                 onClick={() => setShowEditContractorModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <FontAwesomeIcon icon={faXmark} />
+                <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
               </button>
             </div>
             <div className="space-y-4">
@@ -1244,14 +1262,14 @@ const ProductsTable: React.FC = () => {
             modalConfig.isOpen ? "hidden" : ""
           }`}
         >
-          <div className="bg-white rounded-lg p-6 w-[400px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-xs sm:max-w-md md:max-w-lg max-h-[90vh] overflow-y-auto border-2 border-gray-800">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg text-blue-400 font-bold">Update date</h3>
               <button
                 onClick={() => setShowEditWorkerModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <FontAwesomeIcon icon={faXmark} />
+                <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
               </button>
             </div>
             <div className="space-y-4">
@@ -1303,7 +1321,7 @@ const ProductsTable: React.FC = () => {
             modalConfig.isOpen ? "hidden" : ""
           }`}
         >
-          <div className="bg-white rounded-lg p-6 w-[500px] max-h-[90vh] overflow-y-auto border-2 border-gray-800">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-xs sm:max-w-md md:max-w-lg max-h-[90vh] overflow-y-auto border-2 border-gray-800">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg text-blue-400 font-bold">
                 Quotation for {selectedProduct.name}
@@ -1320,7 +1338,7 @@ const ProductsTable: React.FC = () => {
                 onClick={() => setShowQuotationModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <FontAwesomeIcon icon={faXmark} />
+                <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
               </button>
             </div>
             {quotation && quotation.length > 0 ? (
@@ -1540,7 +1558,7 @@ const ProductsTable: React.FC = () => {
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
               onClick={() => setShowTasksModal(false)}
             >
-              ✕
+              <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
             </button>
             <h2 className="text-xl font-bold mb-4">Tasks for {selectedTasksProduct.name}</h2>
             <TaskManager

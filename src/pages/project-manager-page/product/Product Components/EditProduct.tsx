@@ -259,7 +259,7 @@ const EditProduct: React.FC = () => {
           className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${modalConfig.isOpen ? "hidden" : ""}`}
           encType="multipart/form-data"
         >
-          <div>
+          <div className="col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-gray-700">
               Project
             </label>
@@ -271,60 +271,64 @@ const EditProduct: React.FC = () => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            />
+          <div className="md:col-span-2 grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Quantity
+              </label>
+              <input
+                type="number"
+                name="quantity"
+                value={formData.quantity}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                required
+                min="1"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Dimensions
-            </label>
-            <input
-              type="text"
-              name="dimensions"
-              value={formData.dimensions}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            />
+          <div className="md:col-span-2 grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Dimensions
+              </label>
+              <input
+                type="text"
+                name="dimensions"
+                value={formData.dimensions}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Colour
+              </label>
+              <input
+                type="text"
+                name="colour"
+                value={formData.colour}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Colour
-            </label>
-            <input
-              type="text"
-              name="colour"
-              value={formData.colour}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Design
-            </label>
-            <input
-              type="text"
-              name="design"
-              value={formData.design}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            />
-          </div>
-
-          <div>
+          <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700">
               Production Note
             </label>
@@ -337,97 +341,84 @@ const EditProduct: React.FC = () => {
             />
           </div>
 
-          <div>
+          <div className="col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-gray-700">
-              Progress
-            </label>
-            <input
-              type="number"
-              name="progress"
-              value={formData.progress}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              min="0"
-              max="100"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Selling Price
+              Design
             </label>
             <input
               type="text"
-              name="selling_price"
-              value={formData.selling_price}
+              name="design"
+              value={formData.design}
               onChange={handleInputChange}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Overhead Cost
-            </label>
-            <input
-              type="text"
-              name="overhead_cost"
-              value={formData.overhead_cost}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            />
+          <div className="md:col-span-2 grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Selling Price
+              </label>
+              <input
+                type="number"
+                name="selling_price"
+                value={formData.selling_price}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Overhead Cost
+              </label>
+              <input
+                type="number"
+                name="overhead_cost"
+                value={formData.overhead_cost}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                required
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Quantity
-            </label>
-            <input
-              type="number"
-              name="quantity"
-              value={formData.quantity}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-              min="1"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              New Image (optional)
-            </label>
-            <input
-              type="file"
-              name="image"
-              onChange={handleFileChange}
-              className="mt-1 block w-full"
-              accept="image/*"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              New Sketch (optional)
-            </label>
-            <input
-              type="file"
-              name="sketch"
-              onChange={handleFileChange}
-              className="mt-1 block w-full"
-              accept="image/*"
-            />
+          <div className="md:col-span-2 grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                New Image (optional)
+              </label>
+              <input
+                type="file"
+                name="image"
+                onChange={handleFileChange}
+                className="mt-1 block w-full"
+                accept="image/*"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                New Sketch (optional)
+              </label>
+              <input
+                type="file"
+                name="sketch"
+                onChange={handleFileChange}
+                className="mt-1 block w-full"
+                accept="image/*"
+              />
+            </div>
           </div>
 
           <div className="md:col-span-2 flex justify-end">
             <button
               type="submit"
-              disabled={loading || isSubmitting}
-              className={`px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-lg font-semibold shadow ${
-                loading || isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              disabled={isSubmitting}
+              className={`px-6 py-2 md:py-3 bg-blue-400 text-white rounded-lg hover:bg-blue-500 md:text-lg text-md font-semibold shadow ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              {isSubmitting ? "Updating..." : "Update Product"}
+              {isSubmitting ? "Updating Product..." : "Update Product"}
             </button>
           </div>
         </form>

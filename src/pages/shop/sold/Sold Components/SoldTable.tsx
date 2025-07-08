@@ -270,7 +270,16 @@ const SoldTable: React.FC = () => {
             />
           </div>
         ) : soldData.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">No sold items found.</div>
+          <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-pink-50 mb-4">
+              {/* Shopping bag icon */}
+              <svg className="w-8 h-8 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M5 8h14l-1.68 9.39A2 2 0 0 1 15.35 19H8.65a2 2 0 0 1-1.97-1.61L5 8zm2-3a3 3 0 0 1 6 0" stroke="currentColor" strokeWidth="2" fill="none" />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold text-gray-800 mb-1">No sold items</h2>
+            <p className="text-gray-500 mb-6 text-center max-w-xs">All your sold items will show up here. Add a new sale to get started.</p>
+          </div>
         ) : (
           <div className="space-y-6 ">
             <div className="flex justify-between items-center mb-4">
@@ -483,8 +492,9 @@ const SoldTable: React.FC = () => {
 
               <FontAwesomeIcon
                 icon={faXmark}
+                size="2x"
+                className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors"
                 onClick={() => setShowModal(false)}
-                className="cursor-pointer"
               />
             </div>
             <div className="space-y-2 sm:space-y-3">
@@ -517,8 +527,9 @@ const SoldTable: React.FC = () => {
               <h3 className="text-base sm:text-lg mb-3 sm:mb-4 font-medium">Confirm Deletion</h3>
               <FontAwesomeIcon
                 icon={faXmark}
+                size="2x"
+                className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors"
                 onClick={() => setConfirmDelete(false)}
-                className="cursor-pointer"
               />
             </div>
             <p className="text-sm sm:text-base">Are you sure you want to delete this sale record?</p>

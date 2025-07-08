@@ -83,13 +83,21 @@ const AddSalaryWorker = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <Card className="mx-auto w-full md:max-w-3xl lg:max-w-5xl">
+    <div className="container mx-auto p-4 mb-14 md:mb-4">
+      <Card className="mx-auto w-full md:max-w-3xl lg:max-w-5xl relative">
+        <button
+          type="button"
+          onClick={() => navigate("/admin/workers")}
+          className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-4xl font-bold z-10"
+          aria-label="Close"
+        >
+          &times;
+        </button>
         <CardHeader>
           <CardTitle>Add New Salary Worker</CardTitle>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="first_name">First Name</Label>
               <Input
@@ -165,6 +173,16 @@ const AddSalaryWorker = () => {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="position">Position (optional)</Label>
+              <Input
+                id="position"
+                name="position"
+                value={formData.position}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="salary">Salary</Label>
               <Input
                 id="salary"
@@ -207,7 +225,7 @@ const AddSalaryWorker = () => {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="guarantor_address">Guarantor Address (optional)</Label>
               <Input
                 id="guarantor_address"
@@ -239,7 +257,7 @@ const AddSalaryWorker = () => {
               />
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 sm:col-span-2">
               <input
                 type="checkbox"
                 id="is_still_active"

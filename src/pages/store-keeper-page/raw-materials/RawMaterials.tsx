@@ -363,7 +363,7 @@ export const RawMaterials: React.FC = () => {
                       {searchLoading ? (
                         <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
                       ) : (
-                        <FontAwesomeIcon icon={faXmark} />
+                        <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
                       )}
                     </button>
                   </div>
@@ -561,8 +561,9 @@ export const RawMaterials: React.FC = () => {
                   <h3 className="text-base sm:text-lg mb-4 font-medium">Confirm Deletion</h3>
                   <FontAwesomeIcon
                     icon={faXmark}
+                    size="2x"
+                    className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors"
                     onClick={() => setConfirmDelete(false)}
-                    className="cursor-pointer text-lg sm:text-xl"
                   />
                 </div>
                 <p className="text-sm sm:text-base">Are you sure you want to delete this item?</p>

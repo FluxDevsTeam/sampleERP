@@ -10,16 +10,14 @@ const WorkersData = (WorkersData: WorkersDataProps) => {
 
   return (
     <div>
-      <div className="bg-white rounded pl-4 py-5 shadow grid items-center h-full">
+      <div className="bg-white rounded pl-4 py-2 sm:py-5 shadow grid items-center h-full">
         <p
-          style={{ fontSize: "clamp(10px, 3vw, 20px)" }}
-          className="text-blue-400 font-bold"
+          className="text-blue-400 font-bold text-xs"
         >
           {WorkersData.info}
         </p>
         <p
-          style={{ fontSize: "clamp(10px, 3vw, 24px)" }}
-          className="font-medium "
+          className="font-medium text-base"
         >
           {WorkersData.currency? `${WorkersData.currency} ` : ''}{formattedDigits}
         </p>

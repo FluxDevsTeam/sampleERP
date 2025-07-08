@@ -164,7 +164,14 @@ const Header = () => {
   if (!data) return <p className="p-4 sm:p-6">No dashboard data available</p>;
 
   return (
-    <div className="p-3 sm:p-4 lg:p-6">
+    <div
+      className="relative z-50 p-3 sm:p-4 lg:p-6"
+      style={
+        isSidebarOpen && window.innerWidth < 1024
+          ? { marginLeft: '220px', transition: 'margin-left 0.3s' } // Adjust 220px to your sidebar width
+          : undefined
+      }
+    >
       {/* Collapsible Section Headers Row */}
       <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 lg:gap-4 mb-4 px-2 py-2 overflow-x-auto">
         <button 

@@ -222,42 +222,57 @@ const Table: React.FC<TableProps> = ({ headers }) => {
               <FontAwesomeIcon className="pr-1 sm:pr-2" icon={faPlus} />
               Add Item / Category
             </button>
-            <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-              <thead>
-                <tr className="bg-blue-400 text-white">
-                  {headers.map((header) => (
-                    <th
-                      key={header}
-                      className="py-2 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold"
-                    >
-                      {header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {currentItems.length === 0 ? (
-                  <tr>
-                    <td colSpan={headers.length} className="text-center py-6 text-gray-500 text-sm">
-                      No items found.
-                    </td>
+            {tableData.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-yellow-50 mb-4">
+                  {/* Clipboard/list icon */}
+                  <svg className="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <rect x="9" y="2" width="6" height="4" rx="1" stroke="currentColor" strokeWidth="2" fill="none" />
+                    <rect x="4" y="6" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                    <path d="M9 10h6M9 14h6" stroke="currentColor" strokeWidth="2" />
+                  </svg>
+                </div>
+                <h2 className="text-lg font-semibold text-gray-800 mb-1">No inventory items</h2>
+                <p className="text-gray-500 mb-6 text-center max-w-xs">All your inventory items will show up here. Add a new item to get started.</p>
+              </div>
+            ) : (
+              <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                <thead>
+                  <tr className="bg-blue-400 text-white">
+                    {headers.map((header) => (
+                      <th
+                        key={header}
+                        className="py-2 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold"
+                      >
+                        {header}
+                      </th>
+                    ))}
                   </tr>
-                ) : (
-                  currentItems.map((row, index) => (
-                    <tr key={index} className="hover:bg-gray-100">
-                      {headers.map((header) => (
-                        <td
-                          key={`${index}-${header}`}
-                          className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700"
-                        >
-                          {row[header]}
-                        </td>
-                      ))}
+                </thead>
+                <tbody>
+                  {currentItems.length === 0 ? (
+                    <tr>
+                      <td colSpan={headers.length} className="text-center py-6 text-gray-500 text-sm">
+                        No items found.
+                      </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    currentItems.map((row, index) => (
+                      <tr key={index} className="hover:bg-gray-100">
+                        {headers.map((header) => (
+                          <td
+                            key={`${index}-${header}`}
+                            className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700"
+                          >
+                            {row[header]}
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
       </div>

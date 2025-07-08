@@ -226,13 +226,13 @@ const OtherProductionRecords = () => {
   const records = data?.results || [];
 
   return (
-    <div className="p-6 flex flex-col h-full bg-white">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-2 sm:p-6 flex flex-col h-full bg-white">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2 sm:gap-0">
         <div>
           <h1 className="text-2xl font-bold">Other Production Records</h1>
           {/* <p className="text-gray-500">Project ID: {projectId}</p> */}
         </div>
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:flex-row sm:w-auto">
           <Button variant="outline" asChild>
             <Link to={`/project-manager/projects`}>Back to Projects</Link>
           </Button>
@@ -249,9 +249,9 @@ const OtherProductionRecords = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           {records.map((record) => (
-            <Card key={record.id} className="overflow-hidden p-2 text-sm">
+            <Card key={record.id} className="overflow-hidden p-2 sm:p-2 text-sm">
               <CardHeader className="bg-blue-50 pb-1 px-2">
                 <CardTitle className="text-base font-semibold">{record.name}</CardTitle>
               </CardHeader>

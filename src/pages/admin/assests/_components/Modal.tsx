@@ -61,56 +61,50 @@ const Modals = ({
           </DialogHeader>
 
           {selectedAsset && (
-            <div className="grid gap-3 sm:gap-4 py-3 sm:py-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Name:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedAsset.name}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Name</span>
+                <span className="text-base font-bold text-black">{selectedAsset.name}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Value:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">NGN{selectedAsset.value}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Value</span>
+                <span className="text-base font-bold text-black">₦ {selectedAsset.value?.toLocaleString("en-NG")}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Expected Lifespan:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedAsset.expected_lifespan}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Expected Lifespan</span>
+                <span className="text-base font-bold text-black">{selectedAsset.expected_lifespan}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Status:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">
-                  {selectedAsset.is_still_available ? (
-                    <span className="text-black">Available</span>
-                  ) : (
-                    <span className="text-red-600">Not Available</span>
-                  )}
-                </span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Status</span>
+                <span className="text-base font-bold text-black">{selectedAsset.is_still_available ? "Available" : "Not Available"}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Date Added:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedAsset.date_added ? new Date(selectedAsset.date_added).toLocaleDateString() : "-"}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Date Added</span>
+                <span className="text-base font-bold text-black">{selectedAsset.date_added ? new Date(selectedAsset.date_added).toLocaleDateString() : "-"}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">End Date:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedAsset.end_date ? new Date(selectedAsset.end_date).toLocaleDateString() : "-"}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">End Date</span>
+                <span className="text-base font-bold text-black">{selectedAsset.end_date ? new Date(selectedAsset.end_date).toLocaleDateString() : "-"}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Note:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedAsset.note ? selectedAsset.note : "-"}</span>
+              <div className="flex flex-col gap-1 sm:col-span-2">
+                <span className="text-xs font-semibold text-black uppercase">Note</span>
+                <span className="text-base font-bold text-black">{selectedAsset.note ? selectedAsset.note : "-"}</span>
               </div>
             </div>
           )}
 
           <DialogFooter>
-            <div className="flex flex-col sm:flex-row justify-around items-center w-full gap-2 sm:gap-0">
-              <Button variant="outline" onClick={() => setIsModalOpen(false)} className="w-full sm:w-auto text-sm">
+            <div className="flex flex-row justify-around items-center w-full gap-2">
+              <Button variant="outline" onClick={() => setIsModalOpen(false)} className="w-full text-sm">
                 Close
               </Button>
               {isCEO && (
-                <Button variant="outline" onClick={handleEditClick} className="w-full sm:w-auto text-sm">
+                <Button variant="outline" onClick={handleEditClick} className="w-full text-sm">
                   Edit
                 </Button>
               )}
               {isCEO && (
-                <Button variant="destructive" onClick={handleDelete} disabled={isDeleting} className="w-full sm:w-auto text-sm">
+                <Button variant="destructive" onClick={handleDelete} disabled={isDeleting} className="w-full text-sm">
                   Delete
                 </Button>
               )}

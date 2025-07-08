@@ -120,172 +120,88 @@ const EditContractor = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <Card className="mx-auto w-full md:max-w-3xl lg:max-w-5xl">
+    <div className="container mx-auto p-4 mb-14 md:mb-4">
+      <Card className="mx-auto w-full md:max-w-3xl lg:max-w-5xl relative">
+        {/* X Close Button */}
+        <button
+          type="button"
+          onClick={() => navigate("/admin/workers")}
+          className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-4xl font-bold z-10"
+          aria-label="Close"
+        >
+          &times;
+        </button>
         <CardHeader>
           <CardTitle>Edit Contractor</CardTitle>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* First Name (required) */}
+          <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {/* First/Last Name */}
             <div className="space-y-2">
               <Label htmlFor="first_name">First Name</Label>
-              <Input
-                id="first_name"
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-                required
-              />
+              <Input id="first_name" name="first_name" value={formData.first_name} onChange={handleChange} required />
             </div>
-            {/* Last Name (required) */}
             <div className="space-y-2">
               <Label htmlFor="last_name">Last Name</Label>
-              <Input
-                id="last_name"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                required
-              />
+              <Input id="last_name" name="last_name" value={formData.last_name} onChange={handleChange} required />
             </div>
-            {/* Email (required) */}
+            {/* Email/Phone */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
+              <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} />
             </div>
-            {/* Phone Number (optional) */}
             <div className="space-y-2">
               <Label htmlFor="phone_number">Phone Number (optional)</Label>
-              <Input
-                id="phone_number"
-                name="phone_number"
-                value={formData.phone_number}
-                onChange={handleChange}
-              />
+              <Input id="phone_number" name="phone_number" value={formData.phone_number} onChange={handleChange} />
             </div>
-            {/* Address (optional) */}
+            {/* Address/Craft */}
             <div className="space-y-2">
               <Label htmlFor="address">Address (optional)</Label>
-              <Input
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-              />
+              <Input id="address" name="address" value={formData.address} onChange={handleChange} />
             </div>
-            {/* Craft Specialty (optional) */}
             <div className="space-y-2">
               <Label htmlFor="craft_specialty">Craft Specialty (optional)</Label>
-              <Input
-                id="craft_specialty"
-                name="craft_specialty"
-                value={formData.craft_specialty}
-                onChange={handleChange}
-              />
+              <Input id="craft_specialty" name="craft_specialty" value={formData.craft_specialty} onChange={handleChange} />
             </div>
-            {/* Years of Experience (optional) */}
+            {/* Years of Experience/Date Joined/Date Left */}
             <div className="space-y-2">
               <Label htmlFor="years_of_experience">Years of Experience (optional)</Label>
-              <Input
-                id="years_of_experience"
-                name="years_of_experience"
-                type="number"
-                value={formData.years_of_experience}
-                onChange={handleChange}
-              />
+              <Input id="years_of_experience" name="years_of_experience" type="number" value={formData.years_of_experience} onChange={handleChange} />
             </div>
-            {/* Date Joined (optional) */}
             <div className="space-y-2">
               <Label htmlFor="date_joined">Date Joined (optional)</Label>
-              <Input
-                id="date_joined"
-                name="date_joined"
-                type="date"
-                value={formData.date_joined}
-                onChange={handleChange}
-              />
+              <Input id="date_joined" name="date_joined" type="date" value={formData.date_joined} onChange={handleChange} />
             </div>
-            {/* Date Left (optional) */}
             <div className="space-y-2">
               <Label htmlFor="date_left">Date Left (optional)</Label>
-              <Input
-                id="date_left"
-                name="date_left"
-                type="date"
-                value={formData.date_left}
-                onChange={handleChange}
-              />
+              <Input id="date_left" name="date_left" type="date" value={formData.date_left} onChange={handleChange} />
             </div>
-            {/* Guarantor Name (optional) */}
+            {/* Guarantor Name/Phone */}
             <div className="space-y-2">
               <Label htmlFor="guarantor_name">Guarantor Name (optional)</Label>
-              <Input
-                id="guarantor_name"
-                name="guarantor_name"
-                value={formData.guarantor_name}
-                onChange={handleChange}
-              />
+              <Input id="guarantor_name" name="guarantor_name" value={formData.guarantor_name} onChange={handleChange} />
             </div>
-            {/* Guarantor Phone Number (optional) */}
             <div className="space-y-2">
               <Label htmlFor="guarantor_phone_number">Guarantor Phone Number (optional)</Label>
-              <Input
-                id="guarantor_phone_number"
-                name="guarantor_phone_number"
-                value={formData.guarantor_phone_number}
-                onChange={handleChange}
-              />
+              <Input id="guarantor_phone_number" name="guarantor_phone_number" value={formData.guarantor_phone_number} onChange={handleChange} />
             </div>
-            {/* Guarantor Address (optional) */}
+            {/* Guarantor Address */}
             <div className="space-y-2">
               <Label htmlFor="guarantor_address">Guarantor Address (optional)</Label>
-              <Input
-                id="guarantor_address"
-                name="guarantor_address"
-                value={formData.guarantor_address}
-                onChange={handleChange}
-              />
+              <Input id="guarantor_address" name="guarantor_address" value={formData.guarantor_address} onChange={handleChange} />
             </div>
-            {/* Image (optional) */}
+            {/* Image/Agreement Form */}
             <div className="space-y-2">
               <Label htmlFor="image">Image (optional)</Label>
-              <Input
-                id="image"
-                name="image"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-              />
+              <Input id="image" name="image" type="file" accept="image/*" onChange={handleFileChange} />
             </div>
-            {/* Agreement Form Image (optional) */}
             <div className="space-y-2">
               <Label htmlFor="agreement_form_image">Agreement Form Image (optional)</Label>
-              <Input
-                id="agreement_form_image"
-                name="agreement_form_image"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-              />
+              <Input id="agreement_form_image" name="agreement_form_image" type="file" accept="image/*" onChange={handleFileChange} />
             </div>
-            {/* Is Still Active (optional) */}
+            {/* Active Checkbox */}
             <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="is_still_active"
-                name="is_still_active"
-                checked={formData.is_still_active}
-                onChange={handleChange}
-                className="h-4 w-4"
-              />
+              <input type="checkbox" id="is_still_active" name="is_still_active" checked={formData.is_still_active} onChange={handleChange} className="h-4 w-4" />
               <Label htmlFor="is_still_active">Active (optional)</Label>
             </div>
           </CardContent>

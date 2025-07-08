@@ -176,9 +176,9 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
   const progress = calculateProgress(tasks);
 
   return (
-    <div className="max-w-2xl min-h-[400px] mx-auto">
+    <div className="max-w-2xl  min-h-[500px] md:min-h-[700px] lg:min-h-[550px]  mx-auto">
       {/* Progress Bar */}
-      <div className="mb-4">
+      <div className="mb-2">
         <div className="flex items-center justify-between mb-1">
           <span className="text-sm font-medium text-blue-700">Progress</span>
           <span className="text-xs font-semibold text-blue-700">{progress}%</span>
@@ -187,7 +187,7 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
           <div className="bg-blue-400 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
         </div>
       </div>
-      <div className="flex items-center justify-between mb-6 border-b pb-4">
+      <div className="flex items-center justify-between mb-6 border-b pb-2">
         <span className="font-bold text-2xl text-black-200 tracking-tight">Task List</span>
         <div className="flex-1 flex justify-center">
           {saveStatus === 'saving' && !pendingSave && !initialLoad.current && (
@@ -198,21 +198,21 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
           )}
         </div>
         <button
-          className="flex items-center gap-2 px-4 py-2 bg-blue-400 text-white rounded-lg shadow hover:bg-blue-400 transition-colors text-base font-medium"
+          className="flex items-center gap-2 px-4 py-1 border-2 border-blue-400 text-blue-400 bg-transparent rounded-lg shadow hover:bg-blue-400 hover:text-white transition-colors text-base font-medium"
           onClick={handleAddTask}
         >
           <span className="text-xl leading-none">+</span> Add Task
         </button>
       </div>
-      <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2">
+      <div className="space-y-2 max-h-[580px] lg:max-h-[430px] max-sm:max-h-[440px]  overflow-y-auto ">
         {(!Array.isArray(tasks) || tasks.length === 0) && <div className="text-black-200 text-center text-lg py-12">No tasks yet.</div>}
         {Array.isArray(tasks) && tasks.map((task, idx) => (
           <div
             key={idx}
-            className="bg-white border border-gray-200 rounded-xl p-5 shadow-md group transition-all hover:shadow-lg"
+            className="bg-white border border-gray-200 rounded-xl p-2 shadow-md group transition-all hover:shadow-lg"
             ref={idx === tasks.length - 1 ? lastTaskRef : undefined}
           >
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-1 mb-1 md:px-5">
               <input
                 type="checkbox"
                 checked={task.checked}
@@ -220,51 +220,51 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
                 className="accent-blue-400 w-4 h-4 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all"
               />
               <input
-                className="font-semibold text-lg border-b-2 border-transparent focus:border-blue-400 outline-none bg-transparent flex-1 px-2 py-1 text-black-200 placeholder-black-200 transition-all"
+                className="font-semibold text-base md:text-lg border-b-2 border-transparent focus:border-blue-400 outline-none bg-transparent flex-1 px-2 py-1 text-black-200 placeholder-black-200 transition-all"
                 value={task.title}
                 placeholder="Task title"
                 onChange={e => handleTaskChange(idx, "title", e.target.value)}
               />
               <button
-                className="ml-2 p-1 border-2 border-red-400 text-red-400 hover:bg-red-400 hover:text-white rounded-full flex items-center justify-center opacity-70 group-hover:opacity-100 transition-all"
+                className="md:ml-2 p-1 border-2 border-red-400 text-red-400 hover:bg-red-400 hover:text-white rounded-full flex items-center justify-center opacity-70 group-hover:opacity-100 transition-all"
                 onClick={() => handleRemoveTask(idx)}
                 title="Delete Task"
               >
                 <FiMinus size={10} />
               </button>
             </div>
-            <div className="ml-8">
-              <div className="flex justify-between items-center mb-2">
+            <div className="ml-8 md:px-5">
+              <div className="flex justify-between items-center mb-0">
                 <span className="text-xs font-medium text-black-200 tracking-wide">SubTasks</span>
                 <button
-                  className="px-3 py-1 bg-blue-400 text-white rounded-full text-xs font-semibold hover:bg-blue-400 transition-colors"
+                  className="px-3 py-1 border-2 border-blue-400 text-blue-400 bg-transparent rounded-full text-xs font-semibold hover:bg-blue-400 hover:text-white transition-colors"
                   onClick={() => handleAddSubtask(idx)}
                 >
-                  + Subtask
+                  + SubTask
                 </button>
               </div>
               {(task.subtasks || []).length === 0 && <div className="text-black-200 text-xs pl-2 py-2">No subtasks</div>}
-              <ul className="space-y-2">
+              <ul className="space-y-1">
                 {(task.subtasks || []).map((sub: any, subIdx: number) => (
-                  <li key={subIdx} className="flex items-center gap-2 group/sub mb-1">
+                  <li key={subIdx} className="flex items-center gap-0 group/sub mb-1 ">
                     <input
                       type="checkbox"
                       checked={sub.checked}
                       onChange={e => handleSubtaskChange(idx, subIdx, "checked", e.target.checked)}
-                      className="accent-blue-400 w-3 h-3 rounded border-2 border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all"
+                      className="accent-blue-400 w-3 h-3 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all"
                     />
                     <input
-                      className="text-base border-b border-transparent focus:border-blue-400 outline-none bg-transparent flex-1 px-2 py-1 text-black-200 placeholder-black-200 transition-all"
+                      className="text-sm md:text-base border-b border-transparent focus:border-blue-400 outline-none bg-transparent flex-1 px-2 py-1 text-black-200 placeholder-black-200 transition-all"
                       value={sub.title}
                       placeholder="Subtask title"
                       onChange={e => handleSubtaskChange(idx, subIdx, "title", e.target.value)}
                     />
                     <button
-                      className="ml-2 p-1 border-2 border-red-400 text-red-400 hover:bg-red-400 hover:text-white rounded-full flex items-center justify-center opacity-70 group-hover/sub:opacity-100 transition-all"
+                      className="md:ml-2 ml-1 p-1 border-2 border-red-400 text-red-400 hover:bg-red-400 hover:text-white rounded-full flex items-center justify-center opacity-70 group-hover/sub:opacity-100 transition-all"
                       onClick={() => handleRemoveSubtask(idx, subIdx)}
                       title="Delete Subtask"
                     >
-                      <FiMinus size={7} />
+                      <FiMinus size={6} />
                     </button>
                   </li>
                 ))}

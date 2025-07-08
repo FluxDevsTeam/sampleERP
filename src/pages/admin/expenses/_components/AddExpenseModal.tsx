@@ -205,7 +205,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
             e.preventDefault();
             addExpenseMutation.mutate(formData);
           }}
-          className="space-y-4"
+          className="p-2 sm:p-4 space-y-4"
         >
           <div className="grid grid-cols-2 gap-4">
             <div>

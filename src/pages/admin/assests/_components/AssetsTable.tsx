@@ -169,26 +169,34 @@ const AssetsTable = ({
       <div
         className={`overflow-x-auto pb-6 ${isModalOpen || isTableModalOpen ? "blur-md" : ""}`}
       >
-        <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+        <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
           <thead className="bg-blue-400 text-white">
             <tr>
               {headers.map((header, index) => (
                 <th
                   key={header}
-                  className={`py-3 px-2 sm:py-4 sm:px-4 text-left text-xs sm:text-sm font-semibold ${
-                    index === 2 ? 'hidden sm:table-cell' : '' // Hide expected lifespan on mobile
-                  }`}
+                  className={`py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold ${index === 2 ? 'hidden sm:table-cell' : ''}`}
                 >
                   {header}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="">
+          <tbody>
             {assets.length === 0 ? (
               <tr>
-                <td colSpan={headers.length} className="text-center py-6 text-gray-500 text-sm">
-                  No assets found.
+                <td colSpan={headers.length} className="p-0">
+                  <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm m-2">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-yellow-50 mb-4">
+                      {/* Building icon */}
+                      <svg className="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                        <path d="M9 21V7M15 21V7M3 7h18" stroke="currentColor" strokeWidth="2" />
+                      </svg>
+                    </div>
+                    <h2 className="text-lg font-semibold text-gray-800 mb-1">No assets found</h2>
+                    <p className="text-gray-500 mb-6 text-center max-w-xs">All your assets will show up here. Add a new asset to get started.</p>
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -197,23 +205,23 @@ const AssetsTable = ({
                   key={asset.id}
                   className="hover:bg-gray-100"
                 >
-                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     {asset.name}
                   </td>
-                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     ₦ {new Intl.NumberFormat('en-NG', { useGrouping: true }).format(asset.value)}
                   </td>
-                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden sm:table-cell">
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden sm:table-cell">
                     {asset.expected_lifespan}
                   </td>
-                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     <span
                       className={`inline-flex items-center px-1.5 py-0.5 sm:px-2.5 rounded-full text-xs font-medium`}
                     >
                       {asset.is_still_available ? "Available" : "Unavailable"}
                     </span>
                   </td>
-                  <td className="py-3 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     <button
                       onClick={() => handleRowClick(asset)}
                       className="px-2 py-1 sm:px-3 sm:py-1 text-blue-400 border-2 border-blue-400 rounded text-xs"

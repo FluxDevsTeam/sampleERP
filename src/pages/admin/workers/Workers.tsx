@@ -107,27 +107,22 @@ const Workers = () => {
       >
         {/* Salary Analysis Section */}
         <div>
-          <h2 style={{ fontSize: "clamp(12.5px, 3vw, 24px)" }} className="font-medium py-2 mt-0 ">
+          <h2 style={{ fontSize: "clamp(12.5px, 3vw, 24px)" }} className="font-medium py-0 mt-0 ">
             Salary Analysis
           </h2>
-          <div
-            className="grid grid-cols-2 gap-4"
-          >
+          <div className="grid grid-cols-2 gap-4">
             <WorkersData info="Total Salary Workers" digits={totalSalaryWorkersCount} />
             <WorkersData info="Active Salary Workers" digits={activeSalaryWorkersCount} />
             <WorkersData info="Monthly Salary" digits={totalSalaryWorkersMonthlyPay} currency="₦ " />
             <WorkersData info="Total Salary Paid" digits={totalSalaryPaidSummary} currency="₦ " />
           </div>
         </div>
-
         {/* Contractor Analysis Section */}
         <div>
-          <h2 style={{ fontSize: "clamp(12.5px, 3vw, 24px)" }} className="font-medium py-2 mt-0 ">
+          <h2 style={{ fontSize: "clamp(12.5px, 3vw, 24px)" }} className="font-medium py-0 mt-0 ">
             Contractor Analysis
           </h2>
-          <div
-            className="grid grid-cols-2 gap-4"
-          >
+          <div className="grid grid-cols-2 gap-4">
             <WorkersData info="Total Contractors" digits={totalContractorsCount} />
             <WorkersData info="Active Contractors" digits={allActiveContractorsCount} />
             <WorkersData info="Monthly Pay" digits={totalContractorsMonthlyPay} currency="₦ " />
@@ -136,124 +131,95 @@ const Workers = () => {
         </div>
       </div>
 
-      {/* Salary Worker Section */}
-      <h1
-        style={{ fontSize: "clamp(12.5px, 3vw, 24px)" }}
-        className={`font-semibold py-1 mt-0 ${
-          isTableModalOpen ? "blur-md" : ""
-        }`}
-      >
-        Salary Worker Details
-      </h1>
-
-      <div
-        className={`flex justify-between items-center mb-3 ${
-          isTableModalOpen ? "blur-md" : ""
-        }`}
-      >
-        {/* Add Salary Worker Button */}
+      {/* Salary Worker Section Heading and Add Button Row */}
+      <div className={`flex flex-row items-center justify-between gap-2 mb-2 ${isTableModalOpen ? "blur-md" : ""}`}> 
+        <h1
+          style={{ fontSize: "clamp(12.5px, 3vw, 24px)" }}
+          className="font-semibold py-1 mt-0"
+        >
+          Salary Worker Details
+        </h1>
         <button
           onClick={() => navigate("/admin/add-worker")}
-          className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors flex items-center gap-2"
+          className="border border-blue-400 text-blue-400 bg-transparent px-2 py-2 rounded hover:bg-blue-50 text-xs sm:text-sm transition-colors flex items-center gap-2"
         >
           <FontAwesomeIcon icon={faPlus} />
           Add Salary Worker
         </button>
-        {/* Left-aligned group: Search Bar and Filters for Salary Workers */}
-        <div className="flex items-center gap-x-4">
-          {/* Search Bar */}
-          <div className="flex items-center gap-x-2">
-            <input
-              type="text"
-              placeholder="Search for salary workers..."
-              className="border p-2 rounded w-full"
-              value={salarySearchInput}
-              onChange={(e) => setSalarySearchInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSalarySearch();
-              }}
-            />
-            <button
-              onClick={handleSalarySearch}
-              className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-            >
-              Search
-            </button>
-            <button
-              onClick={handleSalaryClear}
-              className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-            >
-              Clear
-            </button>
-          </div>
+      </div>
 
-          {/* Filter Dropdown for Status */}
-          <div className="relative">
-            <button
-              onClick={() => setIsSalaryFilterOpen(!isSalaryFilterOpen)}
-              className="border p-2 rounded flex items-center"
+      {/* Search, Clear, Filter Row - always one line, right aligned, no wrap */}
+      <div className={`w-full flex flex-row flex-nowrap justify-end items-center gap-1 mb-2 overflow-x-auto ${isTableModalOpen ? "blur-md" : ""}`}> 
+        <input
+          type="text"
+          placeholder="Search for salary workers..."
+          className="border p-2 rounded text-xs w-24 sm:w-40 md:w-56 min-w-[100px]"
+          value={salarySearchInput}
+          onChange={(e) => setSalarySearchInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSalarySearch();
+          }}
+        />
+        <button
+          onClick={handleSalarySearch}
+          className="border border-blue-400 text-blue-400 bg-transparent px-2 py-2 rounded hover:bg-blue-50 text-xs transition-colors min-w-[40px] flex items-center justify-center"
+          aria-label="Search"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+          </svg>
+        </button>
+        <button
+          onClick={handleSalaryClear}
+          className="bg-gray-300 text-black px-2 py-2  rounded hover:bg-gray-400 text-xs whitespace-nowrap min-w-[60px]"
+        >
+          Clear
+        </button>
+        <div className="relative min-w-[90px]">
+          <button
+            onClick={() => setIsSalaryFilterOpen(!isSalaryFilterOpen)}
+            className="border p-2 rounded flex items-center text-xs whitespace-nowrap min-w-[90px]"
+          >
+            {salaryStatusFilter !== undefined ? `Status: ${salaryStatusFilter ? 'Active' : 'Not Active'}` : 'Filter by Status'}
+            <svg
+              className="w-4 h-4 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              {salaryStatusFilter !== undefined ? `Status: ${salaryStatusFilter ? 'Active' : 'Not Active'}` : 'Filter by Status'}
-              <svg
-                className="w-4 h-4 ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                ></path>
-              </svg>
-            </button>
-            {isSalaryFilterOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-xl z-10">
-                <div className="p-4">
-                  <label className="flex items-center cursor-pointer mb-2">
-                    <input
-                      type="radio"
-                      name="salaryStatusFilter"
-                      className="form-radio h-4 w-4 text-blue-600 mr-2"
-                      checked={salaryStatusFilter === true}
-                      onChange={() => {
-                        setSalaryStatusFilter(true);
-                        setIsSalaryFilterOpen(false);
-                      }}
-                    />
-                    <span>Active</span>
-                  </label>
-                  <label className="flex items-center cursor-pointer mb-2">
-                    <input
-                      type="radio"
-                      name="salaryStatusFilter"
-                      className="form-radio h-4 w-4 text-blue-600 mr-2"
-                      checked={salaryStatusFilter === false}
-                      onChange={() => {
-                        setSalaryStatusFilter(false);
-                        setIsSalaryFilterOpen(false);
-                      }}
-                    />
-                    <span>Not Active</span>
-                  </label>
-                  {/* Removed On Leave option */}
-                  {salaryStatusFilter !== undefined && (
-                    <button
-                      onClick={() => {
-                        setSalaryStatusFilter(undefined);
-                        setIsSalaryFilterOpen(false);
-                      }}
-                      className="text-red-500 mt-2 block"
-                    >
-                      Clear Filter
-                    </button>
-                  )}
-                </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </button>
+          {isSalaryFilterOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-xl z-10">
+              <div className="p-4">
+                <label className="flex items-center cursor-pointer mb-2">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox h-5 w-5 text-blue-600 mr-2"
+                    checked={salaryStatusFilter === true}
+                    onChange={() => setSalaryStatusFilter(salaryStatusFilter === true ? undefined : true)}
+                  />
+                  <span>Active</span>
+                </label>
+                <label className="flex items-center cursor-pointer mb-2">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox h-5 w-5 text-blue-600 mr-2"
+                    checked={salaryStatusFilter === false}
+                    onChange={() => setSalaryStatusFilter(salaryStatusFilter === false ? undefined : false)}
+                  />
+                  <span>Not Active</span>
+                </label>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -270,124 +236,115 @@ const Workers = () => {
         />
       </div>
 
-      {/* Contractor Section */}
-      <h1
-        style={{ fontSize: "clamp(12.5px, 3vw, 24px)" }}
-        className={`font-semibold py-1 mt-0 border-t border-gray-500 pt-3 mb-0 ${
-          isTableModalOpen ? "blur-md" : ""
-        }`}
-      >
-        Contractor Details
-      </h1>
-
-      <div
-        className={`flex justify-between items-center mt-3 mb-6 pt-3 ${
-          isTableModalOpen ? "blur-md" : ""
-        }`}
-      >
-        {/* Add Contractor Button */}
+      {/* Contractor Section Heading and Add Button Row */}
+      <div className={`flex flex-row items-center justify-between gap-2 mb-2 mt-6 pt-3 border-t border-gray-500 ${isTableModalOpen ? "blur-md" : ""}`}> 
+        <h1
+          style={{ fontSize: "clamp(12.5px, 3vw, 24px)" }}
+          className="font-semibold py-1 mt-0 mb-0"
+        >
+          Contractor Details
+        </h1>
         <button
           onClick={() => navigate("/admin/add-contractor")}
-          className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors flex items-center gap-2"
+          className="border border-blue-400 text-blue-400 bg-transparent px-2 py-2 rounded hover:bg-blue-50 text-xs sm:text-sm transition-colors flex items-center gap-2"
         >
           <FontAwesomeIcon icon={faPlus} />
           Add Contractor
         </button>
-        {/* Left-aligned group: Search Bar and Filters for Contractors */}
-        <div className="flex items-center gap-x-4">
-          {/* Search Bar */}
-          <div className="flex items-center gap-x-2">
-            <input
-              type="text"
-              placeholder="Search for contractors by name..."
-              className="border p-2 rounded w-full"
-              value={contractorSearchInput}
-              onChange={(e) => setContractorSearchInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleContractorSearch();
-              }}
-            />
-            <button
-              onClick={handleContractorSearch}
-              className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-            >
-              Search
-            </button>
-            <button
-              onClick={handleContractorClear}
-              className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-            >
-              Clear
-            </button>
-          </div>
+      </div>
 
-          {/* Filter Dropdown for Status */}
-          <div className="relative">
-            <button
-              onClick={() => setIsContractorFilterOpen(!isContractorFilterOpen)}
-              className="border p-2 rounded flex items-center"
+      {/* Contractor Search, Clear, Filter Row - always one line, right aligned, no wrap */}
+      <div className={`w-full flex flex-row flex-nowrap justify-end items-center gap-1 mb-2 overflow-x-auto ${isTableModalOpen ? "blur-md" : ""}`}> 
+        <input
+          type="text"
+          placeholder="Search for contractors by name..."
+          className="border p-2 rounded text-xs w-24 sm:w-40 md:w-56 min-w-[100px]"
+          value={contractorSearchInput}
+          onChange={(e) => setContractorSearchInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleContractorSearch();
+          }}
+        />
+        <button
+          onClick={handleContractorSearch}
+          className="border border-blue-400 text-blue-400 bg-transparent px-2 py-2 rounded hover:bg-blue-50 text-xs transition-colors min-w-[40px] flex items-center justify-center"
+          aria-label="Search"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+          </svg>
+        </button>
+        <button
+          onClick={handleContractorClear}
+          className="bg-gray-300 text-black px-2 py-2 rounded hover:bg-gray-400 text-xs whitespace-nowrap min-w-[60px]"
+        >
+          Clear
+        </button>
+        <div className="relative min-w-[90px]">
+          <button
+            onClick={() => setIsContractorFilterOpen(!isContractorFilterOpen)}
+            className="border p-2 rounded flex items-center text-xs whitespace-nowrap min-w-[90px]"
+          >
+            {contractorStatusFilter !== undefined ? `Status: ${contractorStatusFilter ? 'Active' : 'Not Active'}` : 'Filter by Status'}
+            <svg
+              className="w-4 h-4 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              {contractorStatusFilter !== undefined ? `Status: ${contractorStatusFilter ? 'Active' : 'Not Active'}` : 'Filter by Status'}
-              <svg
-                className="w-4 h-4 ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                ></path>
-              </svg>
-            </button>
-            {isContractorFilterOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-xl z-10">
-                <div className="p-4">
-                  <label className="flex items-center cursor-pointer mb-2">
-                    <input
-                      type="radio"
-                      name="contractorStatusFilter"
-                      className="form-radio h-4 w-4 text-blue-600 mr-2"
-                      checked={contractorStatusFilter === true}
-                      onChange={() => {
-                        setContractorStatusFilter(true);
-                        setIsContractorFilterOpen(false);
-                      }}
-                    />
-                    <span>Active</span>
-                  </label>
-                  <label className="flex items-center cursor-pointer mb-2">
-                    <input
-                      type="radio"
-                      name="contractorStatusFilter"
-                      className="form-radio h-4 w-4 text-blue-600 mr-2"
-                      checked={contractorStatusFilter === false}
-                      onChange={() => {
-                        setContractorStatusFilter(false);
-                        setIsContractorFilterOpen(false);
-                      }}
-                    />
-                    <span>Not Active</span>
-                  </label>
-                  {/* Removed On Leave option */}
-                  {contractorStatusFilter !== undefined && (
-                    <button
-                      onClick={() => {
-                        setContractorStatusFilter(undefined);
-                        setIsContractorFilterOpen(false);
-                      }}
-                      className="text-red-500 mt-2 block"
-                    >
-                      Clear Filter
-                    </button>
-                  )}
-                </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </button>
+          {isContractorFilterOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-xl z-10">
+              <div className="p-4">
+                <label className="flex items-center cursor-pointer mb-2">
+                  <input
+                    type="radio"
+                    name="contractorStatusFilter"
+                    className="form-radio h-4 w-4 text-blue-600 mr-2"
+                    checked={contractorStatusFilter === true}
+                    onChange={() => {
+                      setContractorStatusFilter(true);
+                      setIsContractorFilterOpen(false);
+                    }}
+                  />
+                  <span>Active</span>
+                </label>
+                <label className="flex items-center cursor-pointer mb-2">
+                  <input
+                    type="radio"
+                    name="contractorStatusFilter"
+                    className="form-radio h-4 w-4 text-blue-600 mr-2"
+                    checked={contractorStatusFilter === false}
+                    onChange={() => {
+                      setContractorStatusFilter(false);
+                      setIsContractorFilterOpen(false);
+                    }}
+                  />
+                  <span>Not Active</span>
+                </label>
+                {/* Removed On Leave option */}
+                {contractorStatusFilter !== undefined && (
+                  <button
+                    onClick={() => {
+                      setContractorStatusFilter(undefined);
+                      setIsContractorFilterOpen(false);
+                    }}
+                    className="text-red-500 mt-2 block"
+                  >
+                    Clear Filter
+                  </button>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 

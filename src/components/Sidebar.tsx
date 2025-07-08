@@ -26,17 +26,14 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
 
   // Function to toggle dropdown
   const toggleDropdown = (id: string) => {
-    // If sidebar is closed, open it first
+    // If sidebar is closed, open it first and open the dropdown immediately
     if (!isSidebarOpen) {
       toggleSidebar();
-      // Delay opening the dropdown until after sidebar is open (for smooth UX)
-      setTimeout(() => {
-        setOpenDropdowns(prev =>
-          prev.includes(id)
-            ? prev.filter(dropdownId => dropdownId !== id)
-            : [...prev, id]
-        );
-      }, 300); // match sidebar transition duration
+      setOpenDropdowns(prev =>
+        prev.includes(id)
+          ? prev.filter(dropdownId => dropdownId !== id)
+          : [...prev, id]
+      );
       return;
     }
     setOpenDropdowns(prev =>
@@ -134,20 +131,20 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
   return (
     <aside
       className={clsx(
-        `bg-white fixed lg:relative top-0 bottom-0 z-50 lg:z-0 h-full max-h-full overflow-hidden transition-all ease-in-out duration-500 shadow-xl lg:shadow-lg`,
+        `bg-white fixed lg:relative top-[60px] sm:top-[70px] lg:top-0 bottom-0 z-50 lg:z-0 h-full max-h-full overflow-hidden transition-all ease-in-out duration-500 shadow-xl lg:shadow-lg`,
         isSidebarOpen
           ? "lg:ml-0 lg:w-[250px] w-[280px] sm:w-[320px] left-0"
           : "lg:w-[80px] w-0 -left-full lg:left-0 lg:ml-0"
       )}
     >
-      <div className="flex flex-col h-full pt-4 pb-6 bg-gradient-to-b from-white to-gray-50/30">
+      <div className="flex flex-col h-full pt-4 md:pb-6 bg-gradient-to-b from-white to-gray-50/30">
         {/* DASHBOARD LINKS */}
         <ul className="flex flex-col flex-1 w-full px-3 space-y-2 overflow-y-auto">
           {data.map((item) => renderSidebarItem(item))}
         </ul>
         
         {/* LOGOUT */}
-        <div className={clsx("px-3 mt-6", isSidebarOpen ? "px-4" : "px-3")}> 
+        <div className={clsx("px-3 mb-20 lg:mb-4 mt-6", isSidebarOpen ? "px-4" : "px-3")}> 
            <Logout isSidebarOpen={isSidebarOpen} />
         </div>
       </div>

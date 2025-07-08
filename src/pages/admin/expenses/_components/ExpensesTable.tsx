@@ -313,17 +313,9 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
   return (
     <div className={`relative ${!data?.daily_data?.length ? 'min-h-[300px]' : ''}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 sm:gap-0">
-        {/* Add Expense Button (Left-aligned) */}
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="bg-blue-400 text-white px-3 sm:px-4 py-2 rounded hover:bg-blue-500 text-sm sm:text-base w-full sm:w-auto"
-        >
-          <FontAwesomeIcon className="pr-2" icon={faPlus} />
-          Add Expense
-        </button>
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+        <div className="flex flex-row flex-wrap items-center gap-2 w-full mb-4 justify-end ml-auto">
           {/* Year Dropdown */}
-          <div className="relative w-20 sm:w-24" ref={yearRef}>
+          <div className="relative w-14 sm:w-20" ref={yearRef}>
             <button
               onClick={() => setIsYearOpen(!isYearOpen)}
               className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm"
@@ -346,7 +338,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
             )}
           </div>
           {/* Month Dropdown */}
-          <div className="relative w-24 sm:w-32" ref={monthRef}>
+          <div className="relative w-20 sm:w-20" ref={monthRef}>
             <button
               onClick={() => setIsMonthOpen(!isMonthOpen)}
               className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm"
@@ -366,7 +358,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
             )}
           </div>
           {/* Day Dropdown */}
-          <div className="relative w-20 sm:w-24" ref={dayRef}>
+          <div className="relative w-12 sm:w-20" ref={dayRef}>
             <button
               onClick={() => setIsDayOpen(!isDayOpen)}
               className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm"
@@ -385,13 +377,25 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
               </ul>
             )}
           </div>
-          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["expenses"] })} disabled={isLoading} className="px-2 sm:px-4 py-1.5 sm:py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-xs sm:text-sm">Filter</Button>
-          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["expenses"] }); }} disabled={isLoading} className="px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-xs sm:text-sm">Clear</Button>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["expenses"] })} disabled={isLoading} className="px-2 py-1 border border-blue-400 text-blue-400 bg-transparent rounded hover:bg-blue-50 transition-colors text-xs w-14 sm:w-auto">Filter</Button>
+          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["expenses"] }); }} disabled={isLoading} className="px-2 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-xs w-14 sm:w-auto">Clear</Button>
         </div>
       </div>
       <div className={`overflow-x-auto pb-8 ${isTableModalOpen || isViewModalOpen || isEditModalOpen || isDeleteDialogOpen || isAddModalOpen ? 'blur-md' : ''}`}>
         {(!data?.daily_data || data.daily_data.length === 0) ? (
-          <div className="text-center text-gray-500 py-8">No expenses found.</div>
+          <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+              {/* SVG icon for receipt */}
+              <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2V7a2 2 0 00-2-2h-1V3.5a1.5 1.5 0 00-3 0V5H9a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold text-gray-800 mb-1">No expense records for this month</h2>
+            <p className="text-gray-500 mb-6 text-center max-w-xs">All your expense records for this month will show up here. Start by adding a new expense.</p>
+            {/* Optional: keep a single skeleton row for continuity */}
+            <div className="w-full max-w-2xl mt-4">
+            </div>
+          </div>
         ) : (
           data.daily_data.map((day) => (
             <div
@@ -482,50 +486,50 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
           </DialogHeader>
 
           {selectedEntry && (
-            <div className="grid gap-3 sm:gap-4 py-3 sm:py-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Name:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedEntry.name}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Name</span>
+                <span className="text-base font-bold text-black">{selectedEntry.name}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Amount:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">₦ {formatNumber(selectedEntry.amount)}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Amount</span>
+                <span className="text-base font-bold text-black">₦ {formatNumber(selectedEntry.amount)}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Quantity:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedEntry.quantity}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Quantity</span>
+                <span className="text-base font-bold text-black">{selectedEntry.quantity}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Category:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedEntry.expense_category?.name || "N/A"}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Category</span>
+                <span className="text-base font-bold text-black">{selectedEntry.expense_category?.name || "N/A"}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Linked Project:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedEntry.linked_project?.name || "N/A"}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Linked Project</span>
+                <span className="text-base font-bold text-black">{selectedEntry.linked_project?.name || "N/A"}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Sold Item:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{selectedEntry.sold_item?.name || "N/A"}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Sold Item</span>
+                <span className="text-base font-bold text-black">{selectedEntry.sold_item?.name || "N/A"}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Date:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{new Date(selectedEntry.date).toLocaleDateString()}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Date</span>
+                <span className="text-base font-bold text-black">{new Date(selectedEntry.date).toLocaleDateString()}</span>
               </div>
             </div>
           )}
 
           <DialogFooter>
-            <div className="flex flex-col sm:flex-row justify-around items-center w-full gap-2 sm:gap-0">
-              <Button variant="outline" onClick={() => setIsViewModalOpen(false)} className="w-full sm:w-auto text-sm">
+            <div className="grid grid-cols-3 gap-2 w-full">
+              <Button variant="outline" onClick={() => setIsViewModalOpen(false)} className="w-full text-sm">
                 Close
               </Button>
               {isceo && (
-                <Button variant="outline" onClick={handleEdit} className="w-full sm:w-auto text-sm">
+                <Button variant="outline" onClick={handleEdit} className="w-full text-sm">
                   Edit
                 </Button>
               )}
               {isceo && (
-                <Button variant="destructive" onClick={handleDelete} disabled={deleteExpenseMutation.isPending} className="w-full sm:w-auto text-sm">
+                <Button variant="destructive" onClick={handleDelete} disabled={deleteExpenseMutation.isPending} className="w-full text-sm">
                   Delete
                 </Button>
               )}

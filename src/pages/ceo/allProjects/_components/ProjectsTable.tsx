@@ -10,6 +10,8 @@ import AddProjectModal from "./AddProjectModal";
 import dayjs from "dayjs";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import ProjectTaskManager from "./ProjectTaskManager";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 interface Product {
   id: number;
@@ -180,6 +182,7 @@ const ProjectsTable = () => {
   const [showTasksModal, setShowTasksModal] = useState(false);
   const [selectedTasksProject, setSelectedTasksProject] = useState<Project | null>(null);
   const [scrollToLastTaskTrigger, setScrollToLastTaskTrigger] = useState(0);
+  const [detailsLoadingId, setDetailsLoadingId] = useState<number | null>(null);
 
   const { data, error, isLoading, refetch } =
     useQuery<PaginatedProjectsResponse>({
@@ -224,10 +227,21 @@ const ProjectsTable = () => {
     }
   };
 
-  const handleRowClick = (project: Project) => {
-    setSelectedProject(project);
+  async function handleRowClick(project: Project) {
+    setDetailsLoadingId(project.id);
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.get(`https://backend.kidsdesigncompany.com/api/project/${project.id}/`, {
+        headers: { Authorization: `JWT ${token}` }
+      });
+      setSelectedProject(response.data);
+    } catch (err) {
+      toast.error('Failed to fetch latest project data');
+      setSelectedProject(project); // fallback to stale data
+    }
     setIsModalOpen(true);
-  };
+    setDetailsLoadingId(null);
+  }
 
   const handleDelete = () => {
     setIsDeleteDialogOpen(true);
@@ -315,20 +329,21 @@ const ProjectsTable = () => {
 
   return (
     <div className="p-6 flex flex-col h-full bg-white">
-      <div className="flex justify-between items-center mb-6 gap-4">
-        <div className="flex items-center gap-x-2">
+      <div className="flex w-full justify-end mb-6">
+        <div className="grid grid-cols-1 sm:flex sm:flex-row sm:flex-wrap gap-2 sm:gap-4 w-full justify-end">
+          {/* First row on mobile: Add Project and Filter by Status */}
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row">
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+              className="bg-blue-400 text-white px-4 sm:px-6 py-2 rounded hover:bg-blue-500 whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed text-sm"
             disabled={isLoading}
           >
-            {isLoading ? 'Loading...' : 'Add Project'}
+            {isLoading ? 'Loading...' : '+ Add Project'}
           </button>
-          {/* Filter by Status Dropdown */}
-          <div className="relative ml-2">
+            <div className="relative">
             <button
               onClick={() => setShowFilterDropdown(prev => !prev)}
-              className="border p-2 rounded flex items-center whitespace-nowrap"
+                className="border p-2 rounded flex items-center whitespace-nowrap w-full justify-center text-sm"
             >
               {filterStatus ? `Status: ${filterStatus}` : 'Filter by Status'}
               <svg
@@ -504,26 +519,20 @@ const ProjectsTable = () => {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-x-4 w-full justify-end">
-          {/* Search Bar */}
-          <div className="flex items-center gap-x-2 max-w-sm w-full">
+          
+          {/* Second row on mobile: Search bar and search icon */}
+          <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-row">
+            <div className="flex gap-2">
             <input
               type="text"
-              placeholder="Search for projects by name..."
-              className="border p-2 rounded w-full"
+                placeholder="Search projects..."
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-xs sm:text-sm w-full sm:w-48"
               value={searchParams.get('search') || ''}
               onChange={e => {
                 const params = new URLSearchParams(searchParams);
                 params.set('search', e.target.value);
                 params.set('page', '1');
                 setSearchParams(params);
-              }}
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  const params = new URLSearchParams(searchParams);
-                  params.set('page', '1');
-                  setSearchParams(params);
-                }
               }}
             />
             <button
@@ -532,11 +541,11 @@ const ProjectsTable = () => {
                 params.set('page', '1');
                 setSearchParams(params);
               }}
-              className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
-              disabled={isLoading}
+                className="px-2 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-xs sm:text-sm"
             >
-              {isLoading ? 'Searching...' : 'Search'}
+                <FontAwesomeIcon icon={faSearch} />
             </button>
+              {searchParams.get('search') && (
             <button
               onClick={() => {
                 const params = new URLSearchParams(searchParams);
@@ -544,32 +553,46 @@ const ProjectsTable = () => {
                 params.set('page', '1');
                 setSearchParams(params);
               }}
-              className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 disabled:opacity-60 disabled:cursor-not-allowed"
-              disabled={isLoading}
+                  className="sm:w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 shadow hover:bg-red-100 hover:text-red-500 hover:scale-110 transition-all duration-200"
+                  aria-label="Clear search"
             >
-              {isLoading ? 'Clearing...' : 'Clear'}
+                  <FontAwesomeIcon icon={faXmark} size="lg" />
             </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
         <div className="overflow-x-auto pb-6">
-          {projects.length > 0 ? (
-          <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-              <thead className="bg-gray-50 hidden md:table-header-group">
-              <tr>
-                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Project Name</th>
-                  {/* <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Customer</th> */}
-                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Status</th>
-                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Progress</th>
-                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Start Date</th>
-                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Deadline</th>
-                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Date Delivered</th>
-                  <th className="py-3 sm:py-4 px-1 w-16 text-left text-xs sm:text-sm font-semibold">Timeframe</th>
-                  <th className="py-3 sm:py-4 px-1 w-20 text-left text-xs sm:text-sm font-semibold">Time Remaining</th>
-                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Tasks</th>
-                  <th className="py-3 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold">Details</th>
+          {projects.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                {/* SVG icon for box/project */}
+                <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                  <path d="M16 3v4M8 3v4M3 7h18" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              </div>
+              <h2 className="text-lg font-semibold text-gray-800 mb-1">No projects found</h2>
+              <p className="text-gray-500 mb-6 text-center max-w-xs">All your projects will show up here. Add a new project to get started.</p>
+            </div>
+          ) : (
+          <div className="overflow-x-auto w-full max-w-full">
+            <table className="w-full lg:min-w-[1100px] bg-white shadow-md rounded-lg text-xs sm:text-sm">
+              <thead>
+                <tr className="bg-blue-400 text-white">
+                  <th className="py-2 px-2 text-center font-bold">Project Name</th>
+                  <th className="py-2 px-2 text-center font-bold">Status</th>
+                  <th className="py-2 px-2 text-center font-bold hidden sm:table-cell">Progress</th>
+                  <th className="py-2 px-2 text-center font-bold hidden lg:table-cell">Start Date</th>
+                  <th className="py-2 px-2 text-center font-bold hidden lg:table-cell">Deadline</th>
+                  <th className="py-2 px-2 text-center font-bold hidden lg:table-cell">Date Delivered</th>
+                  <th className="py-2 px-2 text-center font-bold hidden sm:table-cell">Timeframe</th>
+                  <th className="py-2 px-2 text-center font-bold">Time Remaining</th>
+                  <th className="py-2 px-2 text-center font-bold hidden sm:table-cell">Tasks</th>
+                  <th className="py-2 px-2 text-center font-bold">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -578,33 +601,14 @@ const ProjectsTable = () => {
                   return (
                   <tr
                     key={project.id}
-                      className="cursor-pointer hover:bg-gray-50 md:table-row flex flex-col md:flex-row"
+                    className="cursor-pointer hover:bg-gray-50"
                   >
-                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
-                        <span className="font-semibold md:hidden">
-                          Project Name:{" "}
-                        </span>
+                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 w-2/5 sm:w-auto">
                         {project.name}
                       </td>
-                      {/* <td className="py-5 px-4 border-b border-gray-200 text-sm text-left text-gray-700">
-                        <span className="font-semibold md:hidden">
-                          Customer: {" "}
-                        </span>
+                    <td className="py-2 md:py-5 px-0 sm:px-4 border-b border-gray-200 text-sm md:text-sm text-center text-gray-700 w-2/5 md:w-auto">
                         <span
-                          title={project.customer_detail.name}
-                          style={{ display: 'inline-block', maxWidth: '120px', verticalAlign: 'bottom', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                        >
-                          {project.customer_detail.name.length > 10
-                            ? project.customer_detail.name.slice(0, 10) + '...'
-                            : project.customer_detail.name}
-                        </span>
-                      </td> */}
-                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
-                        <span className="font-semibold md:hidden">
-                          Status:{" "}
-                        </span>
-                        <span
-                          className={`px-1 sm:px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        className={`px-2 max-sm:px-1 inline-flex text-[11px] sm:text-xs leading-5 font-semibold rounded ${
                             project.status === "in progress"
                               ? "bg-yellow-100 text-yellow-800"
                               : project.status === "completed"
@@ -619,58 +623,33 @@ const ProjectsTable = () => {
                           {project.status}
                         </span>
                     </td>
-                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700">
+                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 hidden sm:table-cell">
                       <div className="w-full bg-gray-200 rounded-full h-1">
                         <div
                             className="bg-lime-600 h-1 rounded-full"
-                            style={{
-                              width: `${project.products.progress || 0}%`,
-                            }}
+                          style={{ width: `${project.products.progress || 0}%` }}
                         ></div>
                       </div>
                       <p className="text-xs sm:text-sm mt-1">
                         {project.products.progress || 0}%
                       </p>
                     </td>
-                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
-                        <span className="font-semibold md:hidden">
-                          Start Date:{" "}
-                        </span>
+                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 hidden lg:table-cell">
                         {project.start_date}
                       </td>
-                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
-                        <span className="font-semibold md:hidden">
-                          Deadline:{" "}
-                        </span>
+                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 hidden lg:table-cell">
                         {project.deadline || "Not set"}
                       </td>
-                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
-                        <span className="font-semibold md:hidden">
-                          Date Delivered:{" "}
-                        </span>
-                        {project.date_delivered
-                          ? new Date(project.date_delivered).toLocaleDateString()
-                          : "N/A"}
+                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 hidden lg:table-cell">
+                      {project.date_delivered || "-"}
                     </td>
-                      <td className="py-3 sm:py-5 px-1 w-16 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
-                        <span className="font-semibold md:hidden">
-                          Timeframe: {' '}
-                        </span>
-                        {project.timeframe
-                          ? `${project.timeframe} ${
-                              project.timeframe === 1 ? "day" : "days"
-                            }`
-                          : "N/A"}
+                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 hidden sm:table-cell">
+                      {project.timeframe || "-"}
                     </td>
-                      <td
-                        className={`py-3 sm:py-5 px-1 w-20 border-b border-gray-200 text-xs sm:text-sm text-left ${timeRemainingInfo.color}`}
-                      >
-                        <span className="font-semibold md:hidden">
-                          Time Remaining: {' '}
-                        </span>
-                        {timeRemainingInfo.text}
+                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 w-2/5 sm:w-auto">
+                      {getTimeRemainingInfo(project).text}
                       </td>
-                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center">
+                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center hidden sm:table-cell">
                         <button
                           onClick={e => { 
                             e.stopPropagation(); 
@@ -682,15 +661,26 @@ const ProjectsTable = () => {
                           Tasks
                         </button>
                       </td>
-                      <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-left text-gray-700">
+                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center">
                       <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRowClick(project);
-                          }}
-                        className="px-2 sm:px-3 py-1 text-blue-400 border-2 border-blue-400 rounded text-xs sm:text-sm"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          await handleRowClick(project);
+                        }}
+                        className="px-2 sm:px-3 py-1 text-blue-400 border-2 border-blue-400 rounded text-xs sm:text-sm flex items-center justify-center"
+                        disabled={detailsLoadingId === project.id}
                       >
-                        Details
+                        {detailsLoadingId === project.id ? (
+                          <span className="flex items-center gap-1">
+                            <svg className="animate-spin h-4 w-4 text-blue-400" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                            </svg>
+                            Loading...
+                          </span>
+                        ) : (
+                          'Details'
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -698,11 +688,6 @@ const ProjectsTable = () => {
                 })}
             </tbody>
           </table>
-          ) : (
-            <div className="flex justify-center items-center h-full">
-              <div className="text-center">
-                <p className="text-gray-500 text-lg">No projects found.</p>
-              </div>
             </div>
           )}
         </div>

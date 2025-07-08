@@ -148,24 +148,48 @@ const SalaryWorkersTable = ({
       <div
         className={`overflow-x-auto pb-6 ${isViewModalOpen || isTableModalOpen || isDeleteDialogOpen ? "blur-md" : ""}`}
       >
-        <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+        <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
           <thead className="bg-blue-400 text-white">
             <tr>
-              {headers.map((header) => (
-                <th
-                  key={header}
-                  className="py-4 px-4 text-left text-sm font-semibold"
-                >
-                  {header}
-                </th>
-              ))}
+              {headers.map((header, index) => {
+                // Flip the order for Record and Details columns
+                if (header === 'Details' && headers.includes('Record')) return null;
+                if (header === 'Record') {
+                  return [
+                    <th key="Record" className={`py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell`}>Record</th>,
+                    <th key="Details" className={`py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold`}>Details</th>
+                  ];
+                }
+                // Render other headers as usual
+                if (header !== 'Details') {
+                  return (
+                    <th
+                      key={header}
+                      className={`py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold ${index > 2 && index !== 5 ? 'hidden sm:table-cell' : ''}`}
+                    >
+                      {header}
+                    </th>
+                  );
+                }
+                return null;
+              })}
             </tr>
           </thead>
-          <tbody className="">
+          <tbody>
             {workers.length === 0 ? (
               <tr>
-                <td colSpan={headers.length} className="text-center py-4">
-                  No salary workers found.
+                <td colSpan={headers.length} className="p-0">
+                  <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm m-2">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-yellow-50 mb-4">
+                      {/* User icon */}
+                      <svg className="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" fill="none" />
+                        <path d="M4 20c0-4 4-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="2" />
+                      </svg>
+                    </div>
+                    <h2 className="text-lg font-semibold text-gray-800 mb-1">No salary workers found</h2>
+                    <p className="text-gray-500 mb-6 text-center max-w-xs">All your salary workers will show up here. Add a new worker to get started.</p>
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -174,35 +198,40 @@ const SalaryWorkersTable = ({
                   key={worker.id}
                   className="hover:bg-gray-100"
                 >
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                    {worker.first_name}
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
+                    <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{worker.first_name}</span>
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
-                    {worker.last_name}
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
+                    <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{worker.last_name}</span>
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  {/* Status column always visible */}
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
                     {worker.is_still_active ? 'Active' : 'Not Active'}
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  {/* Date Joined hidden on mobile */}
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden sm:table-cell">
                     {new Date(worker.date_joined).toLocaleDateString()}
                   </td>
-                  <td className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  {/* Salary Amount hidden on mobile */}
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden sm:table-cell">
                     {`₦ ${formatNumber(parseFloat(worker.salary ?? '0'))}`}
                   </td>
-                  <td className="py-4 px-4 border-b border-gray-200 text-sm text-gray-700">
-                    <button
-                      onClick={() => handleRowClick(worker)}
-                      className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
-                    >
-                      View
-                    </button>
-                  </td>
-                  <td className="py-4 px-4 border-b border-gray-200 text-sm text-gray-700">
+                  {/* Record column hidden on mobile - moved before Details */}
+                  <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden sm:table-cell">
                     <button
                       onClick={() => navigate(`/admin/salary-workers/${worker.id}/records`)}
                       className="px-3 py-1 text-green-400 border-2 border-green-400 rounded hover:bg-green-300 hover:text-white transition-colors"
                     >
                       Record
+                    </button>
+                  </td>
+                  {/* Details column always visible - moved after Record */}
+                  <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
+                    <button
+                      onClick={() => handleRowClick(worker)}
+                      className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+                    >
+                      View
                     </button>
                   </td>
                 </tr>
@@ -231,58 +260,94 @@ const SalaryWorkersTable = ({
           </DialogHeader>
 
           {selectedWorker && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-4">
-              {/* LEFT COLUMN */}
-              <div className="flex flex-col gap-4">
-                <div><span className="font-medium">First Name:</span> <span className="ml-2">{selectedWorker.first_name}</span></div>
-                <div><span className="font-medium">Last Name:</span> <span className="ml-2">{selectedWorker.last_name}</span></div>
-                <div><span className="font-medium">Email:</span> <span className="ml-2">{selectedWorker.email || 'N/A'}</span></div>
-                <div><span className="font-medium">Phone Number:</span> <span className="ml-2">{selectedWorker.phone_number || 'N/A'}</span></div>
-                <div><span className="font-medium">Address:</span> <span className="ml-2">{selectedWorker.address || 'N/A'}</span></div>
-                <div><span className="font-medium">Craft Specialty:</span> <span className="ml-2">{selectedWorker.craft_specialty || 'N/A'}</span></div>
-                <div><span className="font-medium">Years of Experience:</span> <span className="ml-2">{selectedWorker.years_of_experience ?? 'N/A'}</span></div>
-                <div>
-                  <span className="font-medium">Image:</span>
-                  <span className="ml-2">
-                    {selectedWorker.image ? (
-                      <img
-                        src={selectedWorker.image}
-                        alt="Worker"
-                        className="h-16 w-16 object-cover rounded cursor-pointer border border-gray-300"
-                        onClick={() => setPreviewImage(selectedWorker.image!)}
-                      />
-                    ) : 'No image'}
-                  </span>
-                </div>
+            <div className="grid grid-cols-2 gap-2 bg-white border border-gray-200 rounded-lg p-2 sm:p-4 mb-4 shadow max-h-[75vh] overflow-y-auto">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">First Name</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.first_name}</span>
               </div>
-              {/* RIGHT COLUMN */}
-              <div className="flex flex-col gap-4">
-                <div><span className="font-medium">Status:</span> <span className="ml-2 capitalize">{selectedWorker.is_still_active ? 'Active' : 'Not Active'}</span></div>
-                <div><span className="font-medium">Date Joined:</span> <span className="ml-2">{selectedWorker.date_joined ? new Date(selectedWorker.date_joined).toLocaleDateString() : 'N/A'}</span></div>
-                <div><span className="font-medium">Date Left:</span> <span className="ml-2">{selectedWorker.date_left ? new Date(selectedWorker.date_left).toLocaleDateString() : 'N/A'}</span></div>
-                <div><span className="font-medium">Salary Amount:</span> <span className="ml-2">₦ {formatNumber(parseFloat(selectedWorker.salary ?? '0'))}</span></div>
-                <div><span className="font-medium">Guarantor Name:</span> <span className="ml-2">{selectedWorker.guarantor_name || 'N/A'}</span></div>
-                <div><span className="font-medium">Guarantor Phone Number:</span> <span className="ml-2">{selectedWorker.guarantor_phone_number || 'N/A'}</span></div>
-                <div><span className="font-medium">Guarantor Address:</span> <span className="ml-2">{selectedWorker.guarantor_address || 'N/A'}</span></div>
-                <div>
-                  <span className="font-medium">Agreement Form Image:</span>
-                  <span className="ml-2">
-                    {selectedWorker.agreement_form_image ? (
-                      <img
-                        src={selectedWorker.agreement_form_image}
-                        alt="Agreement Form"
-                        className="h-16 w-16 object-cover rounded cursor-pointer border border-gray-300"
-                        onClick={() => setPreviewImage(selectedWorker.agreement_form_image!)}
-                      />
-                    ) : 'No image'}
-                  </span>
-                </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Last Name</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.last_name}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Email</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.email || 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Phone Number</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.phone_number || 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Address</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.address || 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Craft Specialty</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.craft_specialty || 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Years of Experience</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.years_of_experience ?? 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Image</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">
+                  {selectedWorker.image ? (
+                    <img
+                      src={selectedWorker.image}
+                      alt="Worker"
+                      className="h-16 w-16 object-cover rounded cursor-pointer border border-gray-300"
+                      onClick={() => setPreviewImage(selectedWorker.image!)}
+                    />
+                  ) : 'No image'}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Status</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.is_still_active ? 'Active' : 'Not Active'}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Date Joined</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.date_joined ? new Date(selectedWorker.date_joined).toLocaleDateString() : 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Date Left</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.date_left ? new Date(selectedWorker.date_left).toLocaleDateString() : 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Salary Amount</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">₦ {formatNumber(parseFloat(selectedWorker.salary ?? '0'))}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Guarantor Name</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.guarantor_name || 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Guarantor Phone Number</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.guarantor_phone_number || 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Guarantor Address</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">{selectedWorker.guarantor_address || 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Agreement Form Image</span>
+                <span className="text-sm sm:text-base font-medium text-black break-words hyphens-auto whitespace-pre-line">
+                  {selectedWorker.agreement_form_image ? (
+                    <img
+                      src={selectedWorker.agreement_form_image}
+                      alt="Agreement Form"
+                      className="h-16 w-16 object-cover rounded cursor-pointer border border-gray-300"
+                      onClick={() => setPreviewImage(selectedWorker.agreement_form_image!)}
+                    />
+                  ) : 'No image'}
+                </span>
               </div>
             </div>
           )}
 
           <DialogFooter>
-            <div className="flex justify-around items-center w-full">
+            <div className="flex flex-wrap justify-around items-center w-full gap-2">
               {isCEO && (
                 <>
                   <Button
@@ -305,6 +370,17 @@ const SalaryWorkersTable = ({
               >
                 Close
               </Button>
+              {selectedWorker && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsViewModalOpen(false);
+                    navigate(`/admin/salary-workers/${selectedWorker.id}/records`);
+                  }}
+                >
+                  Record
+                </Button>
+              )}
             </div>
           </DialogFooter>
         </DialogContent>

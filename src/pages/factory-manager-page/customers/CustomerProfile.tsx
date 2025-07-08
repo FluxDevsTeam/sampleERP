@@ -176,42 +176,37 @@ const CustomerProfile = () => {
   }
 
   return (
-    <div className="mx-20 my-10">
+    <div className="mx-1 sm:mx-6 my-4 sm:my-10">
       {/* Customer Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-2 sm:mb-4">
         <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
-          <h3 className="font-semibold text-lg text-black-600 mb-2">Total Projects</h3>
-          <p className="text-xl font-bold text-blue-600">{customer.total_projects_count}</p>
+          <h3 className="font-semibold text-xs sm:text-lg text-black-600 mb-1 sm:mb-2">Total Projects</h3>
+          <p className="text-base sm:text-xl font-bold text-blue-600">{customer.total_projects_count}</p>
         </article>
-
         <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
-          <h3 className="font-semibold text-lg text-black-600 mb-2">Active Projects</h3>
-          <p className="text-xl font-bold text-black-900">{customer.active_projects_count}</p>
+          <h3 className="font-semibold text-xs sm:text-lg text-black-600 mb-1 sm:mb-2">Active Projects</h3>
+          <p className="text-base sm:text-xl font-bold text-black-900">{customer.active_projects_count}</p>
         </article>
-
         <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
-          <h3 className="font-semibold text-lg text-black-600 mb-2">Total Project Cost</h3>
-          <p className="text-xl font-bold text-purple-600">₦{formatNumberWithCommas(customer.total_projects_cost)}</p>
+          <h3 className="font-semibold text-xs sm:text-lg text-black-600 mb-1 sm:mb-2">Shop Items</h3>
+          <p className="text-base sm:text-xl font-bold text-blue-600">{customer.total_shop_items_count}</p>
         </article>
-
+      </div>
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-8">
         <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
-          <h3 className="font-semibold text-lg text-black-600 mb-2">Shop Items</h3>
-          <p className="text-xl font-bold text-blue-600">{customer.total_shop_items_count}</p>
+          <h3 className="font-semibold text-xs sm:text-lg text-black-600 mb-1 sm:mb-2">Total Project Cost</h3>
+          <p className="text-base sm:text-xl font-bold text-purple-600">₦{formatNumberWithCommas(customer.total_projects_cost)}</p>
         </article>
-
         <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
-          <h3 className="font-semibold text-lg text-black-600 mb-2">Shop Items Cost</h3>
-          <p className="text-xl font-bold text-red-600">₦{formatNumberWithCommas(customer.total_shop_items_cost)}</p>
+          <h3 className="font-semibold text-xs sm:text-lg text-black-600 mb-1 sm:mb-2">Shop Items Cost</h3>
+          <p className="text-base sm:text-xl font-bold text-red-600">₦{formatNumberWithCommas(customer.total_shop_items_cost)}</p>
         </article>
       </div>
 
       {/* Customer Profile */}
-      <div className="container mx-auto mt-10 p-6 max-w-3xl bg-white shadow-lg rounded-2xl mb-12">
-        <div className="flex items-center space-x-6">
-          <div className="w-40 h-40 rounded-full bg-gray-200 flex justify-center items-center text-gray-500">
-            <FaUser size={80} />
-          </div>
-          <div className="flex flex-col gap-2">
+      <div className="container mx-auto mt-4 p-2 sm:p-4 max-w-3xl bg-white shadow-lg rounded-2xl mb-8">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-2 sm:space-y-0 sm:space-x-4">
+          <div className="flex flex-col gap-2 w-full">
             {isEditing ? (
               <>
                 <input
@@ -245,7 +240,7 @@ const CustomerProfile = () => {
                   value={editedCreatedAt ? new Date(editedCreatedAt).toISOString().split('T')[0] : ""}
                   onChange={(e) => setEditedCreatedAt(e.target.value)}
                 />
-                <div className="flex gap-3 mt-2">
+                <div className="grid grid-cols-3 gap-2 mt-2 w-full">
                   <button
                     className="bg-green-200 text-white px-4 py-2 rounded-lg flex items-center"
                     onClick={handleUpdate}
@@ -268,111 +263,113 @@ const CustomerProfile = () => {
                 <p>{customer.customer_details.phone_number}</p>
                 <p>Address: {customer.customer_details.address || "N/A"}</p>
                 <p>Created: {new Date(customer.customer_details.created_at).toLocaleDateString()}</p>
-                <div className="flex items-center gap-2 mt-2">
+                <div className="grid grid-cols-3 gap-2 mt-2 w-full">
                   {userRole === 'ceo' && (
                     <>
                       <button
-                        className="bg-white border border-[#30ff6be3] text-[#1f9733] hover:bg-[#e6fbe9] px-4 py-2 rounded-lg flex justify-center items-center"
+                        className="bg-white border border-[#30ff6be3] text-[#1f9733] hover:bg-[#e6fbe9] px-3 py-1.5 rounded flex justify-center items-center text-xs sm:text-sm w-full sm:w-auto"
                         onClick={() => setIsEditing(true)}
                       >
-                        <FaEdit className="mr-2" /> Edit
+                        <FaEdit className="mr-1" /> Edit
                       </button>
                       <button
-                        className="bg-white border border-red-700 text-red-700 hover:bg-red-50 px-4 py-2 rounded-lg flex justify-center items-center"
+                        className="bg-white border border-red-700 text-red-700 hover:bg-red-50 px-3 py-1.5 rounded flex justify-center items-center text-xs sm:text-sm w-full sm:w-auto"
                         onClick={handleDelete}
                         disabled={deleteLoading}
                       >
-                        {deleteLoading ? 'Deleting...' : <><FaTrash className="mr-2" /> Delete</>}
+                        {deleteLoading ? 'Deleting...' : <><FaTrash className="mr-1" /> Delete</>}
                       </button>
                     </>
                   )}
-                  <div className="flex justify-center">
-                    <Link to="/factory-manager/customers" className="bg-white border border-blue-400 text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:no-underline px-4 py-2 rounded-lg">
+                  <div className="flex justify-center w-full">
+                    <Link to="/factory-manager/customers" className="bg-white border border-blue-400 text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:no-underline px-3 py-1.5 rounded text-xs sm:text-sm w-full sm:w-auto text-center">
                       Back to Customers
                     </Link>
                   </div>
                 </div>
+                {updateError && <p className="text-red-500 mt-2">{updateError}</p>}
+                {deleteError && <p className="text-red-500 mt-2">{deleteError}</p>}
               </>
             )}
-            {updateError && <p className="text-red-500 mt-2">{updateError}</p>}
-            {deleteError && <p className="text-red-500 mt-2">{deleteError}</p>}
           </div>
         </div>
-
-        {/* Centering the Link */}
       </div>
  
 
       <h3 className="mb-6 mt-14 font-bold text-[24px] text-[#0178A3]">Projects</h3>
-      <table className="table-auto border-collapse border border-gray-300 w-full bg-white mb-14">
-        <thead>
-          <tr className="bg-[#F4F6F9] font-black text-left">
-            <th className="py-4 px-2 border border-gray-300">Name</th>
-            <th className="py-4 px-2 border border-gray-300">Total Paid</th>
-            <th className="py-4 px-2 border border-gray-300">Total Balance</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customer.customer_details.project && customer.customer_details.project.length > 0 ? (
-            customer.customer_details.project.map((proj) => (
-            <tr key={proj.id}>
-              <td className="py-4 px-2 border border-gray-300 capitalize">{proj.name}</td>
-              <td className="py-4 px-2 border border-gray-300 capitalize">₦{formatNumberWithCommas(Number(proj.paid))}</td>
-              <td className={`py-4 px-2 border border-gray-300 capitalize ${Number(proj.balance) <= 0 ? 'text-red-600' : ''}`}>₦{formatNumberWithCommas(Number(proj.balance))}</td>
+      <div className="overflow-x-auto mb-14">
+        <table className="table-auto border-collapse border border-gray-300 w-full bg-white text-[10px] sm:text-xs md:text-sm">
+          <thead>
+            <tr className="bg-[#F4F6F9] font-black text-left">
+              <th className="py-4 px-2 border border-gray-300">Name</th>
+              <th className="py-4 px-2 border border-gray-300">Total Paid</th>
+              <th className="py-4 px-2 border border-gray-300">Total Balance</th>
             </tr>
-              ))
-            ) : (
-              <p>No projects available.</p>
-            )
-          }
-          {/* Total Row */}
-          {customer.customer_details.project && customer.customer_details.project.length > 0 && (
-            <tr className="bg-gray-100 font-bold">
-              <td className="py-4 px-2 border border-gray-300 text-left">Total</td>
-              <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalPaid)}</td>
-              <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalBalance)}</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {customer.customer_details.project && customer.customer_details.project.length > 0 ? (
+              customer.customer_details.project.map((proj) => (
+              <tr key={proj.id}>
+                <td className="py-4 px-2 border border-gray-300 capitalize">{proj.name}</td>
+                <td className="py-4 px-2 border border-gray-300 capitalize">₦{formatNumberWithCommas(Number(proj.paid))}</td>
+                <td className={`py-4 px-2 border border-gray-300 capitalize ${Number(proj.balance) <= 0 ? 'text-red-600' : ''}`}>₦{formatNumberWithCommas(Number(proj.balance))}</td>
+              </tr>
+                ))
+              ) : (
+                <p>No projects available.</p>
+              )
+            }
+            {/* Total Row */}
+            {customer.customer_details.project && customer.customer_details.project.length > 0 && (
+              <tr className="bg-gray-100 font-bold">
+                <td className="py-4 px-2 border border-gray-300 text-left">Total</td>
+                <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalPaid)}</td>
+                <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalBalance)}</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
       
       <h3 className="mb-6 mt-14 font-bold text-[24px] text-[#0178A3]">Shop Items</h3>
-      <table className="table-auto border-collapse border border-gray-300 w-full bg-white">
-        <thead>
-          <tr className="bg-[#F4F6F9] font-black text-left">
-            <th className="py-4 px-2 border border-gray-300">Name</th>
-            <th className="py-4 px-2 border border-gray-300">Quantity</th>
-            <th className="py-4 px-2 border border-gray-300">Cost Price</th>
-            <th className="py-4 px-2 border border-gray-300">Selling Price</th>
-            <th className="py-4 px-2 border border-gray-300">Total Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customer.customer_details.shop_item && customer.customer_details.shop_item.length > 0 ? (
-            customer.customer_details.shop_item.map((proj) => (
-            <tr key={proj.id}>
-                <td className="py-4 px-2 border border-gray-300 capitalize">{proj.name || '-'}</td>
-                <td className="py-4 px-2 border border-gray-300 capitalize">{formatNumberWithCommas(Number(proj.quantity))}</td>
-                <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(Number(proj.cost_price))}</td>
-                <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(Number(proj.selling_price))}</td>
-                <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(Number(proj.total_price))}</td>
+      <div className="overflow-x-auto mb-20 md:mb-4">
+        <table className="table-auto border-collapse border border-gray-300 w-full bg-white text-[10px] sm:text-xs md:text-sm">
+          <thead>
+            <tr className="bg-[#F4F6F9] font-black text-left">
+              <th className="py-4 px-2 border border-gray-300">Name</th>
+              <th className="py-4 px-2 border border-gray-300">Quantity</th>
+              <th className="py-4 px-2 border border-gray-300">Cost Price</th>
+              <th className="py-4 px-2 border border-gray-300">Selling Price</th>
+              <th className="py-4 px-2 border border-gray-300">Total Price</th>
             </tr>
-              ))
-            ) : (
-            <tr><td className="capitalize text-center py-4 px-2 border border-gray-300" colSpan={5}>No item available.</td></tr>
-          )}
-          {/* Total Row */}
-          {customer.customer_details.shop_item && customer.customer_details.shop_item.length > 0 && (
-            <tr className="bg-gray-100 font-bold">
-              <td className="py-4 px-2 border border-gray-300 text-left">Total</td>
-              <td className="py-4 px-2 border border-gray-300"></td>
-              <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalCostPrice)}</td>
-              <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalSellingPrice)}</td>
-              <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalTotalPrice)}</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {customer.customer_details.shop_item && customer.customer_details.shop_item.length > 0 ? (
+              customer.customer_details.shop_item.map((proj) => (
+              <tr key={proj.id}>
+                  <td className="py-4 px-2 border border-gray-300 capitalize">{proj.name || '-'}</td>
+                  <td className="py-4 px-2 border border-gray-300 capitalize">{formatNumberWithCommas(Number(proj.quantity))}</td>
+                  <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(Number(proj.cost_price))}</td>
+                  <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(Number(proj.selling_price))}</td>
+                  <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(Number(proj.total_price))}</td>
+              </tr>
+                ))
+              ) : (
+              <tr><td className="capitalize text-center py-4 px-2 border border-gray-300" colSpan={5}>No item available.</td></tr>
+            )}
+            {/* Total Row */}
+            {customer.customer_details.shop_item && customer.customer_details.shop_item.length > 0 && (
+              <tr className="bg-gray-100 font-bold">
+                <td className="py-4 px-2 border border-gray-300 text-left">Total</td>
+                <td className="py-4 px-2 border border-gray-300"></td>
+                <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalCostPrice)}</td>
+                <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalSellingPrice)}</td>
+                <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(totalTotalPrice)}</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

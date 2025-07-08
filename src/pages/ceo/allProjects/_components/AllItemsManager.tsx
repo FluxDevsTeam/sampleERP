@@ -108,7 +108,7 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl p-0 max-w-4xl min-h-[600px] w-full relative shadow-2xl flex flex-col">
+      <div className="bg-white rounded-2xl p-2 sm:p-8 max-w-4xl min-h-[400px] w-full relative shadow-2xl flex flex-col max-h-[98vh] overflow-y-auto">
         {/* Sticky Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between px-8 py-6 border-b bg-white rounded-t-2xl">
           <h2 className="text-2xl font-bold tracking-tight text-black-200">All Items for <span className="text-blue-400">{project.name}</span></h2>

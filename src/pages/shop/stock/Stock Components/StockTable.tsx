@@ -414,172 +414,190 @@ const StockTable: React.FC = () => {
                 )}
               </div>
             ))}
-          </div>
-        )}
-      </div>
 
-      {/* delete and edit options modal */}
-      {showModal && selectedStock && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-sm">
-            <div className="flex justify-between items-center">
-              <h3 className="text-base sm:text-lg mb-3 sm:mb-4 font-medium">
-                <span className="font-semibold text-blue-20">
-                  {selectedStock.name}
-                </span>
-              </h3>
+            {stockData.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-50 mb-4">
+                  {/* Box icon */}
+                  <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                    <path d="M16 3v4M8 3v4M3 7h18" stroke="currentColor" strokeWidth="2" />
+                  </svg>
+                </div>
+                <h2 className="text-lg font-semibold text-gray-800 mb-1">No stock items</h2>
+                <p className="text-gray-500 mb-6 text-center max-w-xs">All your stock items will show up here. Add a new stock item to get started.</p>
+              </div>
+            ) : (
+              <div className="flex justify-between items-center mt-4">
+                {/* delete and edit options modal */}
+                {showModal && selectedStock && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-sm">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-base sm:text-lg mb-3 sm:mb-4 font-medium">
+                          <span className="font-semibold text-blue-20">
+                            {selectedStock.name}
+                          </span>
+                        </h3>
 
-              <FontAwesomeIcon
-                icon={faXmark}
-                onClick={() => setShowModal(false)}
-                className="cursor-pointer"
-              />
-            </div>
-            <div className="space-y-2 sm:space-y-3">
-              <button
-                onClick={() =>
-                  navigate(`/shop/edit-stock-item/${selectedStock.id}`)
-                }
-                className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex items-center justify-center text-sm sm:text-base"
-              >
-                <FontAwesomeIcon icon={faPencil} className="mr-2" />
-                Edit Stock Record
-              </button>
-              <button
-                onClick={() => confirmDeleteStock(selectedStock.id)}
-                className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center text-sm sm:text-base"
-              >
-                <FontAwesomeIcon icon={faTrash} className="mr-2" />
-                Delete Stock Record
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                        <FontAwesomeIcon
+                          icon={faXmark}
+                          size="2x"
+                          className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors"
+                          onClick={() => setShowModal(false)}
+                        />
+                      </div>
+                      <div className="space-y-2 sm:space-y-3">
+                        <button
+                          onClick={() =>
+                            navigate(`/shop/edit-stock-item/${selectedStock.id}`)
+                          }
+                          className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex items-center justify-center text-sm sm:text-base"
+                        >
+                          <FontAwesomeIcon icon={faPencil} className="mr-2" />
+                          Edit Stock Record
+                        </button>
+                        <button
+                          onClick={() => confirmDeleteStock(selectedStock.id)}
+                          className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center text-sm sm:text-base"
+                        >
+                          <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                          Delete Stock Record
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-      {confirmDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-sm">
-            <div className="flex justify-between items-center">
-              <h3 className="text-base sm:text-lg mb-3 sm:mb-4 font-medium">Confirm Deletion</h3>
-              <FontAwesomeIcon
-                icon={faXmark}
-                onClick={() => setConfirmDelete(false)}
-                className="cursor-pointer"
-              />
-            </div>
-            <p className="text-sm sm:text-base">Are you sure you want to delete this stock record?</p>
-            <div className="space-y-2 sm:space-y-3 mt-3 sm:mt-4">
-              <button
-                onClick={handleConfirmDelete}
-                disabled={deleteLoading}
-                className={`w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center text-sm sm:text-base ${
-                  deleteLoading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                {deleteLoading ? "Deleting..." : "Confirm"}
-              </button>
-              <button
-                onClick={() => setConfirmDelete(false)}
-                className="w-full py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors flex items-center justify-center text-sm sm:text-base"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                {confirmDelete && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-sm">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-base sm:text-lg mb-3 sm:mb-4 font-medium">Confirm Deletion</h3>
+                        <FontAwesomeIcon
+                          icon={faXmark}
+                          size="2x"
+                          className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors"
+                          onClick={() => setConfirmDelete(false)}
+                        />
+                      </div>
+                      <p className="text-sm sm:text-base">Are you sure you want to delete this stock record?</p>
+                      <div className="space-y-2 sm:space-y-3 mt-3 sm:mt-4">
+                        <button
+                          onClick={handleConfirmDelete}
+                          disabled={deleteLoading}
+                          className={`w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center text-sm sm:text-base ${
+                            deleteLoading ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
+                        >
+                          {deleteLoading ? "Deleting..." : "Confirm"}
+                        </button>
+                        <button
+                          onClick={() => setConfirmDelete(false)}
+                          className="w-full py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors flex items-center justify-center text-sm sm:text-base"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-      {showDetailsModal && selectedItem && (
-        <div
-          className={`fixed inset-0 flex items-center justify-center z-100 p-4 ${
-            confirmDelete ? "blur-sm" : ""
-          }`}
-        >
-          <div
-            className="absolute inset-0 bg-black opacity-50"
-            onClick={() => setShowDetailsModal(false)}
-          ></div>
-          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-sm w-full mx-2 sm:mx-4 border-2 border-gray-800 shadow-lg relative z-10">
-            <div className="flex justify-between items-center mb-3 sm:mb-4">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-20">
-                {selectedItem.name}
-              </h2>
-              <button
-                onClick={() => setShowDetailsModal(false)}
-                className="text-gray-500 hover:text-gray-700 focus:outline-none"
-              >
-                ✕
-              </button>
-            </div>
+                {showDetailsModal && selectedItem && (
+                  <div
+                    className={`fixed inset-0 flex items-center justify-center z-100 p-4 ${
+                      confirmDelete ? "blur-sm" : ""
+                    }`}
+                  >
+                    <div
+                      className="absolute inset-0 bg-black opacity-50"
+                      onClick={() => setShowDetailsModal(false)}
+                    ></div>
+                    <div className="bg-white rounded-lg p-4 sm:p-6 max-w-sm w-full mx-2 sm:mx-4 border-2 border-gray-800 shadow-lg relative z-10">
+                      <div className="flex justify-between items-center mb-3 sm:mb-4">
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-20">
+                          {selectedItem.name}
+                        </h2>
+                        <button
+                          onClick={() => setShowDetailsModal(false)}
+                          className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                        >
+                          ✕
+                        </button>
+                      </div>
 
-            {selectedItem.inventory_item.image && (
-              <div className="mb-3 sm:mb-4">
-                <button
-                  onClick={() => setShowImage(!showImage)}
-                  className="mb-2 px-3 sm:px-4 py-1.5 sm:py-2 text-blue-500 border border-blue-500 rounded hover:bg-blue-50 text-xs sm:text-sm"
-                >
-                  {showImage ? "Hide Image" : "View Image"}
-                </button>
-                {showImage && (
-                  <img
-                    src={selectedItem.inventory_item.image}
-                    alt={selectedItem.name}
-                    className="w-full h-32 sm:h-48 object-cover rounded-lg mt-2"
-                  />
+                      {selectedItem.inventory_item.image && (
+                        <div className="mb-3 sm:mb-4">
+                          <button
+                            onClick={() => setShowImage(!showImage)}
+                            className="mb-2 px-3 sm:px-4 py-1.5 sm:py-2 text-blue-500 border border-blue-500 rounded hover:bg-blue-50 text-xs sm:text-sm"
+                          >
+                            {showImage ? "Hide Image" : "View Image"}
+                          </button>
+                          {showImage && (
+                            <img
+                              src={selectedItem.inventory_item.image}
+                              alt={selectedItem.name}
+                              className="w-full h-32 sm:h-48 object-cover rounded-lg mt-2"
+                            />
+                          )}
+                        </div>
+                      )}
+
+                      <div className="space-y-2 sm:space-y-3">
+                        <p className="text-xs sm:text-sm">
+                          <span className="font-semibold">Quantity:</span>{" "}
+                          {selectedItem.quantity}
+                        </p>
+                        <p className="text-xs sm:text-sm">
+                          <span className="font-semibold">Date:</span>{" "}
+                          {formatDate(selectedItem.date)}
+                        </p>
+                        <p className="text-xs sm:text-sm">
+                          <span className="font-semibold">Cost Price:</span> ₦
+                          {selectedItem.cost_price}
+                        </p>
+                        <p className="text-xs sm:text-sm">
+                          <span className="font-semibold">Inventory Category:</span>{" "}
+                          {selectedItem.inventory_item.inventory_category.name}
+                        </p>
+                        <p className="text-xs sm:text-sm">
+                          <span className="font-semibold">Dimensions:</span>{" "}
+                          {selectedItem.inventory_item.dimensions}
+                        </p>
+                      </div>
+
+                      {userRole === 'ceo' && (
+                        <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2 flex flex-col sm:flex-row">
+                          <button
+                            onClick={() =>
+                              navigate(`/shop/edit-stock-item/${selectedItem.id}`)
+                            }
+                            className="pt-1.5 sm:pt-2 pr-2 sm:pr-3 p-1.5 sm:p-2 text-blue-400 rounded-lg border-2 border-blue-400 font-bold text-xs sm:text-sm"
+                          >
+                            <FontAwesomeIcon
+                              className="pr-1 text-blue-400"
+                              icon={faPencil}
+                            />
+                            Edit details
+                          </button>
+                          <button
+                            onClick={() => confirmDeleteStock(selectedItem.id)}
+                            className="pt-1.5 sm:pt-2 pr-2 sm:pr-3 p-1.5 sm:p-2 text-red-400 rounded-lg border-2 border-red-400 font-bold text-xs sm:text-sm"
+                          >
+                            <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
+                            Delete Item
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
             )}
-
-            <div className="space-y-2 sm:space-y-3">
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Quantity:</span>{" "}
-                {selectedItem.quantity}
-              </p>
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Date:</span>{" "}
-                {formatDate(selectedItem.date)}
-              </p>
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Cost Price:</span> ₦
-                {selectedItem.cost_price}
-              </p>
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Inventory Category:</span>{" "}
-                {selectedItem.inventory_item.inventory_category.name}
-              </p>
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Dimensions:</span>{" "}
-                {selectedItem.inventory_item.dimensions}
-              </p>
-            </div>
-
-            {userRole === 'ceo' && (
-              <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2 flex flex-col sm:flex-row">
-                <button
-                  onClick={() =>
-                    navigate(`/shop/edit-stock-item/${selectedItem.id}`)
-                  }
-                  className="pt-1.5 sm:pt-2 pr-2 sm:pr-3 p-1.5 sm:p-2 text-blue-400 rounded-lg border-2 border-blue-400 font-bold text-xs sm:text-sm"
-                >
-                  <FontAwesomeIcon
-                    className="pr-1 text-blue-400"
-                    icon={faPencil}
-                  />
-                  Edit details
-                </button>
-                <button
-                  onClick={() => confirmDeleteStock(selectedItem.id)}
-                  className="pt-1.5 sm:pt-2 pr-2 sm:pr-3 p-1.5 sm:p-2 text-red-400 rounded-lg border-2 border-red-400 font-bold text-xs sm:text-sm"
-                >
-                  <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
-                  Delete Item
-                </button>
-              </div>
-            )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <Modal
         isOpen={modalConfig.isOpen}

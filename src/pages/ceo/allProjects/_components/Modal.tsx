@@ -362,19 +362,40 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   };
   const progress = calculateProgress(localTasks);
 
+  // Shorter display names for financials
+  const financialsDisplayNames: Record<string, string> = {
+    total_raw_material_cost: 'Total Raw Materials',
+    total_artisan_cost: 'Artisan Cost',
+    total_overhead_cost: 'Overhead',
+    total_products_cost: 'Products Cost',
+    total_product_selling_price: 'Products Revenue',
+    product_profit: 'Product Profit',
+    total_cost_price_sold_items: 'Sold Cost',
+    total_selling_price_sold_items: 'Sold Revenue',
+    shop_items_profit: 'Shop Profit',
+    money_left_for_expensis: 'Net After Expenses',
+    money_left_for_expensis_with_logistics_and_service_charge: 'Net After All',
+    total_other_productions_budget: 'Other Prod. Budget',
+    total_other_productions_cost: 'Other Prod. Cost',
+    total_expensis: 'Expenses',
+    total_money_spent: 'Total Spent',
+    total_paid: 'Total Paid',
+    final_profit: 'Final Profit',
+  };
+
   return (
     <>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-7xl w-[95vw] sm:w-full mx-4 max-h-[80vh] overflow-y-auto">
+        <DialogContent className="w-90% max-sm:max-w-[54vh] max-sm:min-w-[54vh] min-w-[80vh]  lg:min-w-[165vh] p-1 sm:p-6 md:p-10 overflow-y-auto max-h-[98vh]">
           <DialogHeader>
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-4 px-2 mr-8">
               <div>
-            <DialogTitle className="text-lg sm:text-xl">Project Details</DialogTitle>
-            <DialogDescription className="text-sm sm:text-base">
+            <DialogTitle className="text-lg md:text-xl pt-2">Project Details</DialogTitle>
+            {/* <DialogDescription className="text-sm sm:text-base">
               View details for the selected project.
-            </DialogDescription>
+            </DialogDescription> */}
               </div>
-              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
                 <Button
                   variant="outline"
                   onClick={handleViewOtherProductionRecords}
@@ -408,9 +429,9 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                     </Button>
                   </>
                 )}
-                <Button variant="outline" onClick={() => setIsModalOpen(false)} className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2">
+                {/* <Button variant="outline" onClick={() => navigate('/ceo/allProjects')} className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2">
                   Close
-                </Button>
+                </Button> */}
               </div>
             </div>
           </DialogHeader>
@@ -422,66 +443,66 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                 <h3 className="text-base sm:text-lg font-semibold text-black-400 mb-3 sm:mb-4">
                   Project Info
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4">
+                <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-7 gap-3 sm:gap-4 w-full">
                   {/* Project Name Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Project Name</span>
-                    <p className="text-xs sm:text-sm text-black mt-1">{selectedProject.name}</p>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.name}</p>
                 </div>
                   {/* Customer Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Customer</span>
-                    <p className="text-xs sm:text-sm text-black mt-1">{selectedProject.customer_detail?.name}</p>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.customer_detail?.name}</p>
                 </div>
                   {/* Status Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Status</span>
-                    <p className="text-xs sm:text-sm text-black mt-1">{selectedProject.status}</p>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.status}</p>
                 </div>
                   {/* Start Date Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Start Date</span>
-                    <p className="text-xs sm:text-sm text-black mt-1">{dayjs(selectedProject.start_date).format("MMM D, YYYY")}</p>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">{dayjs(selectedProject.start_date).format("MMM D, YYYY")}</p>
                 </div>
                   {/* Deadline Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Deadline</span>
-                    <p className="text-xs sm:text-sm text-black mt-1">{selectedProject.deadline ? dayjs(selectedProject.deadline).format("MMM D, YYYY") : "-"}</p>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.deadline ? dayjs(selectedProject.deadline).format("MMM D, YYYY") : "-"}</p>
                 </div>
                   {/* Date Delivered Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Date Delivered</span>
-                    <p className="text-xs sm:text-sm text-black mt-1">{selectedProject.date_delivered ? dayjs(selectedProject.date_delivered).format("MMM D, YYYY") : "-"}</p>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.date_delivered ? dayjs(selectedProject.date_delivered).format("MMM D, YYYY") : "-"}</p>
                 </div>
                   {/* Time Remaining Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Time Remaining</span>
-                    <p className={`text-xs sm:text-sm mt-1 ${timeRemainingInfo.color}`}>{timeRemainingInfo.text}</p>
+                    <p className={`text-[11px] sm:text-sm mt-1 ${timeRemainingInfo.color}`}>{timeRemainingInfo.text}</p>
                 </div>
                   {/* Timeframe Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Timeframe</span>
-                    <p className="text-xs sm:text-sm text-black mt-1">{timeframeDisplay}</p>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">{timeframeDisplay}</p>
                 </div>
                   {/* Selling Price Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Selling Price</span>
-                    <p className="text-xs sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.selling_price || '0'))}</p>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.selling_price || '0'))}</p>
                 </div>
                   {/* Logistics Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Logistics</span>
-                    <p className="text-xs sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.logistics || '0'))}</p>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.logistics || '0'))}</p>
                 </div>
                   {/* Service Charge Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Service Charge</span>
-                    <p className="text-xs sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.service_charge || '0'))}</p>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.service_charge || '0'))}</p>
                 </div>
                   {/* Archived Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Archived</span>
-                    <p className="text-xs sm:text-sm text-black mt-1">{selectedProject.archived ? 'Yes' : 'No'}</p>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.archived ? 'Yes' : 'No'}</p>
                   </div>
                   {/* Invoice Image Card */}
                 {selectedProject.invoice_image && (
@@ -494,9 +515,9 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                 )}
                   {/* Note Card */}
                 {selectedProject.note && (
-                    <div className="sm:col-span-2 lg:col-span-7 bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
+                    <div className="col-span-2 max-sm:col-span-2 lg:col-span-7 bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                       <span className="text-xs text-blue-600 font-medium">Note</span>
-                      <p className="text-xs sm:text-sm text-black whitespace-pre-wrap mt-1">{selectedProject.note}</p>
+                      <p className="text-[11px] sm:text-sm text-black whitespace-pre-wrap mt-1">{selectedProject.note}</p>
                   </div>
                 )}
                 </div>
@@ -507,23 +528,45 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                 <h3 className="text-base sm:text-lg font-semibold text-black-400 mb-3 sm:mb-4">
                   Financials
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
-                  {Object.entries(selectedProject.calculations).map(
-                    ([key, value]) => (
-                      <div
-                        key={key}
-                        className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200"
-                      >
-                        <span className="text-xs text-blue-600 font-medium">
-                          {key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                  </span>
-                        <p className="text-xs sm:text-sm text-black mt-1">
-                          ₦{typeof value === "number" ? formatNumber(value) : value}
-                        </p>
+                {(() => {
+                  const entries = Object.entries(selectedProject.calculations);
+                  const mainItems = entries.slice(0, -2);
+                  const lastTwo = entries.slice(-2);
+                  return (
+                    <>
+                      <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 w-full">
+                        {mainItems.map(([key, value]) => (
+                          <div
+                            key={key}
+                            className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200"
+                          >
+                            <span className="text-xs text-blue-600 font-medium">
+                              {financialsDisplayNames[key] || key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                            </span>
+                            <p className="text-[11px] sm:text-sm text-black mt-1">
+                              ₦{typeof value === "number" ? formatNumber(value) : value}
+                            </p>
+                          </div>
+                        ))}
                       </div>
-                    )
-                  )}
-                </div>
+                      <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full mt-2">
+                        {lastTwo.map(([key, value]) => (
+                          <div
+                            key={key}
+                            className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200"
+                          >
+                            <span className="text-xs text-blue-600 font-medium">
+                              {key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                            </span>
+                            <p className="text-[11px] sm:text-sm text-black mt-1">
+                              ₦{typeof value === "number" ? formatNumber(value) : value}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
 
               {/* Tables Section */}
@@ -573,14 +616,14 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                 </div>
                 {/* Tasks Table */}
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2 gap-2">
+                  <div className="flex  md:flex-row md:items-center md:justify-between mb-2 gap-2">
                     <h4 className="text-md font-semibold text-gray-700">Tasks</h4>
                     <div className="flex-1 flex flex-col items-center justify-center">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium text-blue-400">Progress:</span>
                         <span className="text-xs font-semibold text-blue-400">{progress}%</span>
                       </div>
-                      <div className="w-40 bg-gray-200 rounded-full h-2.5">
+                      <div className="w-40 bg-gray-200 rounded h-2.5">
                         <div className="bg-blue-400 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
                       </div>
                     </div>
@@ -681,7 +724,14 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                           <td className="p-2 text-left">
                             ₦{formatNumber(totalProductsSellingPrice)}
                           </td>
-                          <td className="p-2 text-left"></td>
+                          <td className="p-2 text-left">
+                            {(() => {
+                              const products = selectedProject.products?.products || [];
+                              if (!products.length) return 0;
+                              const sum = products.reduce((acc, p) => acc + (typeof p.progress === 'number' ? p.progress : 0), 0);
+                              return Math.round(sum / products.length);
+                            })()}
+                          </td>
                         </tr>
                       </tfoot>
                     </table>

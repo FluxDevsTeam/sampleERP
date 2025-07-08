@@ -241,12 +241,12 @@ const ProductsTable: React.FC = () => {
         "Selling price": `₦${Number(item.selling_price).toLocaleString()}`,
         Quantity: item.quantity || "-",
         Progress: (
-          <div className="w-full bg-gray-200 rounded-full h-3 relative">
+          <div className="w-full bg-gray-200 h-4 relative">
             <div
-              className={`bg-blue-400 h-3 rounded-full`}
+              className={`bg-blue-100 h-4`}
               style={{ width: `${item.progress}%` }}
             ></div>
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 py-1 flex items-center justify-center">
               <span className={`text-green-200 text-xs font-semibold ${item.progress > 59 ? "text-white" : ""}`}>{item.progress}%</span>
             </div>
           </div>
@@ -304,7 +304,9 @@ const ProductsTable: React.FC = () => {
   }, [currentPage, searchQuery, ordering, selectedProject]);
 
   const currentItems = tableData;
-  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  // Clamp currentPage and totalPages
+  const safeTotalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
+  const safeCurrentPage = Math.min(Math.max(currentPage, 1), safeTotalPages);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -905,16 +907,128 @@ const ProductsTable: React.FC = () => {
     }
   };
 
+  const [salaryWorkers, setSalaryWorkers] = useState<any[]>([]);
+
+  // Fetch salary workers when modal opens
+  useEffect(() => {
+    if (showWorkersModal && selectedProduct?.id) {
+      const fetchSalaryWorkers = async () => {
+        try {
+          const token = localStorage.getItem("accessToken");
+          const response = await fetch(`https://backend.kidsdesigncompany.com/api/product/${selectedProduct.id}/salary/`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${token}`,
+            },
+          });
+          if (!response.ok) throw new Error("Failed to fetch salary workers");
+          const data = await response.json();
+          setSalaryWorkers(data.results || []);
+        } catch (err) {
+          setSalaryWorkers([]);
+        }
+      };
+      fetchSalaryWorkers();
+    } else if (!showWorkersModal) {
+      setSalaryWorkers([]);
+    }
+  }, [showWorkersModal, selectedProduct?.id]);
+
   return (
     <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
       {/* Blur only the background content when showTasksModal is true */}
       <div className={showTasksModal ? "blur-sm" : ""}>
+      {/* Heading and Add Product button in grid */}
+      <div className="grid grid-cols-2 items-center mb-4 gap-2">
       <h1
         style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-        className="font-semibold py-5 mt-2"
+          className="font-semibold py-0 mt-2 text-left"
       >
-        Products Management
+          <span className="block sm:hidden">Products</span>
+          <span className="hidden sm:block">Products Management</span>
       </h1>
+        <div className="flex justify-end w-full">
+          <button
+            onClick={() => navigate("/project-manager/add-product")}
+            className="bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap w-full sm:w-auto"
+            style={{ display: (user?.role === 'ceo' || user?.role === 'project_manager' || user?.role === 'factory_manager') ? 'inline-flex' : 'none' }}
+          >
+            <FontAwesomeIcon icon={faPlus} className="mr-2" />
+            Add Product
+          </button>
+          </div>
+      </div>
+      {/* Responsive search and filter controls right-aligned in grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 items-center mb-4">
+        <div></div>
+        <div className="flex justify-end w-full">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            {/* Search input and buttons */}
+            <div className="flex flex-row items-center gap-2 w-full sm:w-auto">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-xs sm:text-sm w-full sm:w-48"
+                />
+                <button
+                  onClick={() => setSearchQuery(searchTerm)}
+                className="px-2 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-xs sm:text-sm"
+                >
+                  <FontAwesomeIcon icon={faSearch} />
+                </button>
+                  {searchTerm && (
+                    <button
+                      onClick={() => {
+                        setSearchTerm("");
+                        setSearchQuery("");
+                      }}
+                  className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 shadow hover:bg-red-100 hover:text-red-500 hover:scale-110 transition-all duration-200"
+                      aria-label="Clear search"
+                    >
+                      <FontAwesomeIcon icon={faXmark} size="lg" />
+                    </button>
+                  )}
+              </div>
+            {/* Project dropdown and sort dropdown */}
+            <div className="flex flex-row items-center gap-2 w-full sm:w-auto">
+              <div className="flex-[5_5_0%] w-full sm:w-56">
+                  <SearchablePaginatedProjectDropdown
+                    endpoint="https://backend.kidsdesigncompany.com/api/project/?ordering=-start_date"
+                    onChange={(value) => {
+                      setSelectedProject(value);
+                      setCurrentPage(1);
+                    }}
+                    selectedValue={selectedProject}
+                    selectedName={projects.find((p) => String(p.id) === selectedProject)?.name || ""}
+                  />
+              </div>
+                  {selectedProject && (
+                    <button
+                      onClick={() => {
+                        setSelectedProject("");
+                        setCurrentPage(1);
+                      }}
+                  className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-xs"
+                    >
+                      Clear
+                    </button>
+                  )}
+                <select
+                  value={ordering}
+                  onChange={(e) => setOrdering(e.target.value)}
+                className="flex-[3_3_0%] w-full sm:w-auto bg-white border border-gray-300 text-black text-xs sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                >
+                  <option value="">Sort by</option>
+                  <option value="progress">Progress ▲</option>
+                  <option value="-progress">Progress ▼</option>
+                </select>
+              </div>
+            </div>
+        </div>
+      </div>
 
       <div
         className={`overflow-x-auto pb-6 ${
@@ -936,109 +1050,97 @@ const ProductsTable: React.FC = () => {
           </div>
         ) : (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-                <button
-                  onClick={() => setSearchQuery(searchTerm)}
-                  className="ml-2 px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
-                >
-                  <FontAwesomeIcon icon={faSearch} />
-                </button>
-                  {searchTerm && (
-                    <button
-                      onClick={() => {
-                        setSearchTerm("");
-                        setSearchQuery("");
-                      }}
-                      className="ml-2 w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 shadow hover:bg-red-100 hover:text-red-500 hover:scale-110 transition-all duration-200"
-                      aria-label="Clear search"
-                    >
-                      <FontAwesomeIcon icon={faXmark} size="lg" />
-                    </button>
-                  )}
-              </div>
-              <div className="flex items-center space-x-4">
-                {/* Sort by Dropdown */}
-                {/* Project Filter Dropdown */}
-                <div className="w-56 flex items-center gap-2">
-                  <SearchablePaginatedProjectDropdown
-                    endpoint="https://backend.kidsdesigncompany.com/api/project/?ordering=-start_date"
-                    onChange={(value) => {
-                      setSelectedProject(value);
-                      setCurrentPage(1);
-                    }}
-                    selectedValue={selectedProject}
-                    selectedName={projects.find((p) => String(p.id) === selectedProject)?.name || ""}
-                  />
-                  {selectedProject && (
-                    <button
-                      onClick={() => {
-                        setSelectedProject("");
-                        setCurrentPage(1);
-                      }}
-                      className="ml-2 px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-xs"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-                <select
-                  value={ordering}
-                  onChange={(e) => setOrdering(e.target.value)}
-                  className="bg-white border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-                >
-                  <option value="">Sort by</option>
-                  <option value="progress">Progress ▲</option>
-                  <option value="-progress">Progress ▼</option>
-                </select>
-                <button
-                  onClick={() => navigate("/project-manager/add-product")}
-                  className="bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
-                  style={{ display: (user?.role === 'ceo' || user?.role === 'project_manager' || user?.role === 'factory_manager') ? 'inline-flex' : 'none' }}
-                >
-                  <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                  Add Product
-                </button>
-              </div>
-            </div>
             <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
               <thead>
                 <tr className="bg-blue-400 text-white">
-                  {headers.map((header: string) => (
+                  {headers.map((header: string) => {
+                    // Hide Selling price, Linked Project, and Quotation on <lg
+                    if (["Selling price", "Linked Project", "Quotation"].includes(header)) {
+                      return (
+                        <th
+                          key={header}
+                          className="py-2 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold hidden lg:table-cell"
+                        >
+                          {header}
+                        </th>
+                      );
+                    }
+                    // Only show these columns on mobile
+                    if (["Product", "Progress", "Task", "Details"].includes(header)) {
+                      return (
                     <th
                       key={header}
                       className="py-2 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold"
                     >
                       {header}
                     </th>
-                  ))}
+                      );
+                    }
+                    // Hide these columns on mobile
+                    return (
+                      <th
+                        key={header}
+                        className="py-2 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold hidden sm:table-cell"
+                      >
+                        {header}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
                 {currentItems.length === 0 ? (
                   <tr>
-                    <td colSpan={headers.length} className="text-center py-6 text-gray-500 text-sm">
-                      No products found.
+                    <td colSpan={headers.length} className="p-0">
+                      <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+                        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                          {/* SVG icon for box/product */}
+                          <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                            <path d="M16 3v4M8 3v4M3 7h18" stroke="currentColor" strokeWidth="2" />
+                          </svg>
+                        </div>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-1">No products found</h2>
+                        <p className="text-gray-500 mb-6 text-center max-w-xs">All your products will show up here. Add a new product to get started.</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
                   currentItems.map((row, index) => (
                     <tr key={index} className="hover:bg-gray-100">
-                      {headers.map((header) => (
+                      {headers.map((header) => {
+                        // Hide Selling price, Linked Project, and Quotation on <lg
+                        if (["Selling price", "Linked Project", "Quotation"].includes(header)) {
+                          return (
+                            <td
+                              key={`${index}-${header}`}
+                              className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden lg:table-cell"
+                            >
+                              {row[header]}
+                            </td>
+                          );
+                        }
+                        // Only show these columns on mobile
+                        if (["Product", "Progress", "Task", "Details"].includes(header)) {
+                          return (
                         <td
                           key={`${index}-${header}`}
                           className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700"
                         >
                           {row[header]}
                         </td>
-                      ))}
+                          );
+                        }
+                        // Hide these columns on mobile
+                        return (
+                          <td
+                            key={`${index}-${header}`}
+                            className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden sm:table-cell"
+                          >
+                            {row[header]}
+                          </td>
+                        );
+                      })}
                     </tr>
                   ))
                 )}
@@ -1055,32 +1157,32 @@ const ProductsTable: React.FC = () => {
          ${showWorkersModal ? "hidden" : ""}`}
       >
         <button
-          onClick={() => setCurrentPage(1)}
-          disabled={currentPage === 1}
+          onClick={() => safeCurrentPage > 1 && setCurrentPage(1)}
+          disabled={safeCurrentPage === 1 || safeTotalPages === 1}
           className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
         >
           <FontAwesomeIcon icon={faAnglesLeft} />
         </button>
         <button
-          onClick={() => setCurrentPage(currentPage - 1)}
-          disabled={currentPage === 1}
+          onClick={() => safeCurrentPage > 1 && setCurrentPage(safeCurrentPage - 1)}
+          disabled={safeCurrentPage === 1 || safeTotalPages === 1}
           className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
         <span className="mx-2 sm:mx-4 text-xs sm:text-sm">
-          Page {currentPage} of {totalPages || 1}
+          Page {safeCurrentPage} of {safeTotalPages}
         </span>
         <button
-          onClick={() => setCurrentPage(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          onClick={() => safeCurrentPage < safeTotalPages && setCurrentPage(safeCurrentPage + 1)}
+          disabled={safeCurrentPage === safeTotalPages || safeTotalPages === 1}
           className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
         >
           <FontAwesomeIcon icon={faArrowRight} />
         </button>
         <button
-          onClick={() => setCurrentPage(totalPages)}
-          disabled={currentPage === totalPages}
+          onClick={() => safeCurrentPage < safeTotalPages && setCurrentPage(safeTotalPages)}
+          disabled={safeCurrentPage === safeTotalPages || safeTotalPages === 1}
           className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
         >
           <FontAwesomeIcon icon={faAnglesRight} />
@@ -1097,12 +1199,8 @@ const ProductsTable: React.FC = () => {
             ${showQuotationModal ? "hidden" : ""}`}
         >
           <div
-            className="absolute overflow-scroll inset-0 bg-black opacity-50"
-            onClick={() => setShowProductDetailsModal(false)}
-          ></div>
-          <div
             ref={modalContentRef}
-            className="bg-white overflow-scroll rounded-2xl p-4 sm:p-10 max-h-[90vh] max-w-5xl w-[95vw] sm:w-full mx-4 border-2 border-blue-400 shadow-2xl relative z-[100]"
+            className="bg-white overflow-scroll rounded-2xl p-4 sm:p-10 max-h-[90vh] max-w-5xl w-[95vw] sm:w-full mx-4 border border-gray-200 shadow-2xl relative z-[100]"
           >
             {modalLoading || !selectedProduct ? (
               <div className="flex flex-col items-center justify-center h-96">
@@ -1111,7 +1209,7 @@ const ProductsTable: React.FC = () => {
             ) : (
               <>
                 {/* NAME */}
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
                   <h2 className="text-lg sm:text-2xl font-bold text-gray-20">
                     {selectedProduct.name}
                   </h2>
@@ -1119,23 +1217,41 @@ const ProductsTable: React.FC = () => {
                     onClick={() => setShowProductDetailsModal(false)}
                     className="text-gray-500 hover:text-gray-700 focus:outline-none text-lg sm:text-xl"
                   >
-                    ✕
+                    <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
                   </button>
                 </div>
 
                 {/* Calculation Cards */}
                 {selectedProduct.calculations && (
                   <>
-                    <div className="w-full mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
-                      <DashboardCard title="Total raw material cost" value={Number(selectedProduct.calculations.total_raw_material_cost) || 0} currency="₦" />
-                      <DashboardCard title="Total production cost" value={Number(selectedProduct.calculations.total_production_cost) || 0} currency="₦" />
-                      <DashboardCard title="Total overhead Cost" value={Number(selectedProduct.calculations.total_overhead_cost) || 0} currency="₦" />
-                      <DashboardCard title="Quantity" value={Number(selectedProduct.calculations.quantity) || 0} />
-                      <DashboardCard title="Profit" value={Number(selectedProduct.calculations.profit) || 0} currency="₦" />
-                      <DashboardCard title="Profit per item" value={Number(selectedProduct.calculations.profit_per_item) || 0} currency="₦" />
+                    <div className="w-full mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 justify-center">
+                        <div className="bg-white rounded shadow border border-blue-100 flex flex-col items-center py-2 px-1 sm:py-4 sm:px-2">
+                          <p className="text-blue-400 font-bold text-xs sm:text-sm mb-1">Raw material cost</p>
+                          <p className="font-medium text-sm md:text-base lg:text-lg">₦ {Number(selectedProduct.calculations.total_raw_material_cost).toLocaleString('en-NG')}</p>
+                        </div>
+                        <div className="bg-white rounded shadow border border-blue-100 flex flex-col items-center py-2 px-1 sm:py-4 sm:px-2">
+                          <p className="text-blue-400 font-bold text-xs sm:text-sm mb-1">Production cost</p>
+                          <p className="font-medium text-base sm:text-lg">₦ {Number(selectedProduct.calculations.total_production_cost).toLocaleString('en-NG')}</p>
+                        </div>
+                        <div className="bg-white rounded shadow border border-blue-100 flex flex-col items-center py-2 px-1 sm:py-4 sm:px-2">
+                          <p className="text-blue-400 font-bold text-xs sm:text-sm mb-1">Overhead Cost</p>
+                          <p className="font-medium text-base sm:text-lg">₦ {Number(selectedProduct.calculations.total_overhead_cost).toLocaleString('en-NG')}</p>
+                        </div>
+                        <div className="bg-white rounded shadow border border-blue-100 flex flex-col items-center py-2 px-1 sm:py-4 sm:px-2">
+                          <p className="text-blue-400 font-bold text-xs sm:text-sm mb-1">Quantity</p>
+                          <p className="font-medium text-base sm:text-lg">{Number(selectedProduct.calculations.quantity).toLocaleString('en-NG')}</p>
+                        </div>
+                        <div className="bg-white rounded shadow border border-blue-100 flex flex-col items-center py-2 px-1 sm:py-4 sm:px-2">
+                          <p className="text-blue-400 font-bold text-xs sm:text-sm mb-1">Profit</p>
+                          <p className="font-medium text-base sm:text-lg">₦ {Number(selectedProduct.calculations.profit).toLocaleString('en-NG')}</p>
+                        </div>
+                        <div className="bg-white rounded shadow border border-blue-100 flex flex-col items-center py-2 px-1 sm:py-4 sm:px-2">
+                          <p className="text-blue-400 font-bold text-xs sm:text-sm mb-1">Profit per item</p>
+                          <p className="font-medium text-base sm:text-lg">₦ {Number(selectedProduct.calculations.profit_per_item).toLocaleString('en-NG')}</p>
+                        </div>
                     </div>
                     {/* Action Buttons Row */}
-                    <div className="flex flex-wrap gap-2 sm:gap-4 justify-end mb-6 sm:mb-8">
+                    <div className="flex flex-wrap md:flex-nowrap gap-2 md:gap-3 justify-end mb-6 sm:mb-8 max-sm:justify-center overflow-x-auto">
                       <button
                         onClick={() => {
                           setShowProductDetailsModal(false);
@@ -1196,61 +1312,44 @@ const ProductsTable: React.FC = () => {
                     </div>
                   </>
                 )}
-                <div className="flex flex-col md:flex-row gap-1">
+                <div className="flex flex-col-reverse md:flex-row gap-1">
                   {/* LEFT: Details */}
                   <div className="flex-1">
-                  {/* other prodict details */}
+                    <div className="bg-white rounded-xl border border-blue-100 md:border-0 max-sm:shadow lg:pe-10 p-4 mb-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
                   <div>
-                    {/* COLOUR */}
-                    <p className="text-sm text-gray-20 mb-3">
-                      <span className="font-semibold">Colour:</span>{" "}
-                      {selectedProduct.colour || "No colour available"}
-                    </p>
-
-                    {/* DESIGN */}
-                    <p className="text-sm text-gray-20 mb-3">
-                      <span className="font-semibold">Design:</span>{" "}
-                      {selectedProduct.design || "No design added"}
-                    </p>
-
-                    {/* SELLINg PRICE */}
-                    <p className="text-sm text-gray-20 mb-3">
-                      <span className="font-semibold">Selling price:</span> ₦
-                      {selectedProduct.selling_price || "No selling price added"}
-                    </p>
-
-                    {/* DIMENSIONS */}
-                    <p className="text-sm text-gray-20 mb-3">
-                      <span className="font-semibold">Dimensions:</span>{" "}
-                      {`${selectedProduct.dimensions}${" "}cm` ||
-                        "no dimensions added"}
-                    </p>
-
-                    {/* OVERHEAD COST */}
-                    <p className="text-sm text-gray-20 mb-3">
-                      <span className="font-semibold">Overhead cost:</span>{" "}
-                      {selectedProduct.overhead_cost || "no overhead cost added"}
-                    </p>
-
-                    {/* Overhead cost base at creation:*/}
-                    <p className="text-sm text-gray-20 mb-3">
-                      <span className="font-semibold">
-                        Overhead cost base at creation:
-                      </span>{" "}
-                      {selectedProduct.overhead_cost_base_at_creation}
-                    </p>
-
-                    {/* PRODUCTION NOTE */}
-                    <p className="text-sm text-gray-20 mb-3">
-                      <span className="font-semibold">Production note:</span>{" "}
-                      {selectedProduct.production_note}
-                    </p>
-
-                    {/* LINKED PROJECTS */}
-                    <p className="text-sm text-gray-20 mb-3">
-                      <span className="font-semibold">Linked Project:</span>{" "}
-                      {selectedProduct.linked_project?.name}
-                    </p>
+                          <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Colour</span>
+                          <span className="block text-sm sm:text-base font-bold text-black">{selectedProduct.colour || "No colour available"}</span>
+                        </div>
+                        <div>
+                          <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Design</span>
+                          <span className="block text-sm sm:text-base font-bold text-black">{selectedProduct.design || "No design added"}</span>
+                        </div>
+                        <div>
+                          <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Selling Price</span>
+                          <span className="block text-sm sm:text-base font-bold text-black">₦ {selectedProduct.selling_price || "No selling price added"}</span>
+                        </div>
+                        <div>
+                          <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Dimensions</span>
+                          <span className="block text-sm sm:text-base font-bold text-black">{selectedProduct.dimensions ? `${selectedProduct.dimensions} cm` : "No dimensions added"}</span>
+                        </div>
+                        <div>
+                          <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Overhead Cost</span>
+                          <span className="block text-sm sm:text-base font-bold text-black">₦ {selectedProduct.overhead_cost || "No overhead cost added"}</span>
+                        </div>
+                        <div>
+                          <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Overhead Cost Base at Creation</span>
+                          <span className="block text-sm sm:text-base font-bold text-black">{selectedProduct.overhead_cost_base_at_creation || "-"}</span>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Production Note</span>
+                          <span className="block text-sm sm:text-base font-bold text-black">{selectedProduct.production_note || "-"}</span>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Linked Project</span>
+                          <span className="block text-sm sm:text-base font-bold text-black">{selectedProduct.linked_project?.name || "-"}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   {/* RIGHT: Progress and Images */}
@@ -1438,7 +1537,7 @@ const ProductsTable: React.FC = () => {
       {/* Expanded Image Overlay */}
       {expandedImage && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black bg-opacity-80" onClick={() => setExpandedImage(null)}>
-          <img src={expandedImage} alt="Expanded" className="max-w-3xl max-h-[90vh] rounded-lg shadow-2xl border-4 border-white" />
+          <img src={expandedImage} alt="Expanded" className="max-w-full max-h-[80vh] w-auto h-auto rounded-lg shadow-2xl border-4 border-white object-contain" />
         </div>
       )}
 
@@ -1449,18 +1548,17 @@ const ProductsTable: React.FC = () => {
             modalConfig.isOpen ? "hidden" : ""
           } ${showEditContractorModal ? "blur-sm" : ""}`}
         >
-          <div className="bg-white rounded-2xl p-4 sm:p-20 w-[95vw] sm:w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
+          <div className="bg-white rounded-2xl p-2 sm:p-6 md:p-10 w-[98vw] sm:w-[90vw] md:w-[60vw] max-w-2xl max-h-[98vh] min-h-[350px] sm:min-h-[400px] md:min-h-[500px] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
             <div className="flex flex-col items-center w-full mb-4 sm:mb-6">
-              <h3 className="text-lg sm:text-2xl pb-6 sm:pb-10 font-bold text-blue-400 text-center">Contractors for <span className="font-extrabold text-xl sm:text-3xl">{selectedProduct.name}</span></h3>
+              <h3 className="text-base sm:text-lg md:text-2xl pb-4 sm:pb-6 md:pb-10 font-bold text-blue-400 text-center">Contractors for <span className="font-extrabold text-lg sm:text-xl md:text-3xl">{selectedProduct.name}</span></h3>
               <button
                 onClick={() => setShowContractorsModal(false)}
-                className="absolute top-4 sm:top-6 right-4 sm:right-8 text-gray-500 hover:text-gray-700 text-xl sm:text-3xl font-bold"
+                className="absolute top-2 sm:top-4 md:top-6 right-2 sm:right-4 md:right-8 text-gray-500 hover:text-gray-700 text-lg sm:text-xl md:text-3xl font-bold"
                 aria-label="Close"
               >
-                <FontAwesomeIcon icon={faXmark} />
+                <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-lg sm:text-2xl md:text-3xl text-gray-700 hover:text-red-500 transition-colors" />
               </button>
             </div>
-
             <div className="w-full">
               <div className="flex justify-start mb-4">
                 {user?.role !== 'storekeeper' && (
@@ -1470,16 +1568,15 @@ const ProductsTable: React.FC = () => {
                         state: { from: "contractorsModal", returnTo: "contractors" },
                       });
                     }}
-                    className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-lg bg-blue-400 rounded-lg text-white font-semibold hover:bg-blue-500 flex items-center gap-2 shadow"
+                    className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm md:text-lg bg-blue-400 rounded-lg text-white font-semibold hover:bg-blue-500 flex items-center gap-2 shadow"
                   >
                     <FontAwesomeIcon icon={faPlus} /> Add Contractor
                   </button>
                 )}
               </div>
-
               {selectedProduct?.contractors?.length > 0 ? (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[10px] sm:text-[12px]">
+                  <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[10px] sm:text-[12px] md:text-sm">
                     <thead>
                       <tr className="bg-blue-400 text-white">
                         <th className="py-1 px-1 sm:px-2 text-left font-bold">Name</th>
@@ -1543,7 +1640,7 @@ const ProductsTable: React.FC = () => {
             modalConfig.isOpen ? "hidden" : ""
           } ${showEditWorkerModal ? "blur-sm" : ""}`}
         >
-          <div className="bg-white rounded-2xl p-4 sm:p-20 w-[95vw] sm:w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
+          <div className="bg-white rounded-2xl p-4 sm:p-20 w-[95vw] sm:w-[60%] max-h-[98vh] min-h-[350px] sm:min-h-[400px] md:min-h-[500px] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
             <div className="flex flex-col items-center w-full mb-4 sm:mb-6">
               <h3 className="text-lg sm:text-2xl pb-6 sm:pb-10 font-bold text-blue-400 text-center">Salary Workers for <span className="font-extrabold text-xl sm:text-3xl">{selectedProduct.name}</span></h3>
               <button
@@ -1551,7 +1648,7 @@ const ProductsTable: React.FC = () => {
                 className="absolute top-4 sm:top-6 right-4 sm:right-8 text-gray-500 hover:text-gray-700 text-xl sm:text-3xl font-bold"
                 aria-label="Close"
               >
-                <FontAwesomeIcon icon={faXmark} />
+                <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
               </button>
             </div>
 
@@ -1571,29 +1668,27 @@ const ProductsTable: React.FC = () => {
                 )}
               </div>
 
-              {selectedProduct?.workers?.length > 0 ? (
+              {salaryWorkers.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[10px] sm:text-[12px]">
                     <thead>
                       <tr className="bg-blue-400 text-white">
                         <th className="py-1 px-1 sm:px-2 text-left font-bold">Name</th>
                         <th className="py-1 px-1 sm:px-2 text-left font-bold">Date</th>
-                        <th className="py-1 px-1 sm:px-2 text-left font-bold">Cost</th>
                         {user?.role === 'ceo' && (
                           <th className="py-1 px-1 sm:px-2 text-left font-bold">Actions</th>
                         )}
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedProduct.workers.map((worker: any, index: number) => (
+                      {salaryWorkers.map((worker: any, index: number) => (
                         <tr key={index} className="border-b">
                           <td className="py-1 px-1 sm:px-2">
-                            {worker.linked_worker?.first_name} {worker.linked_worker?.last_name}
+                            {worker.linked_salary_worker?.first_name} {worker.linked_salary_worker?.last_name}
                           </td>
                           <td className="py-1 px-1 sm:px-2">
                             {new Date(worker.date).toLocaleDateString("en-GB")}
                           </td>
-                          <td className="py-1 px-1 sm:px-2">₦{worker.cost || "-"}</td>
                           {user?.role === 'ceo' && (
                             <td className="py-1 px-1 sm:px-2">
                               <button
@@ -1646,7 +1741,7 @@ const ProductsTable: React.FC = () => {
                 onClick={() => setShowEditContractorModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <FontAwesomeIcon icon={faXmark} />
+                <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
               </button>
             </div>
             <div className="space-y-4">
@@ -1709,7 +1804,7 @@ const ProductsTable: React.FC = () => {
                 onClick={() => setShowEditWorkerModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <FontAwesomeIcon icon={faXmark} />
+                <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
               </button>
             </div>
             <div className="space-y-4">
@@ -1748,36 +1843,35 @@ const ProductsTable: React.FC = () => {
             modalConfig.isOpen ? "hidden" : ""
           }`}
         >
-          <div className="bg-white rounded-2xl p-20 w-[60%] max-h-[98vh] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
-            <div className="flex flex-col items-center w-full mb-6">
-              <h3 className="text-2xl pb-10 font-bold text-blue-400 text-center">Quotations for <span className="font-extrabold text-3xl">{selectedProduct.name}</span></h3>
+          <div className="bg-white rounded-2xl p-2 sm:p-6 md:p-10 w-[98vw] sm:w-[90vw] md:w-[60vw] max-w-2xl max-h-[98vh] min-h-[350px] sm:min-h-[400px] md:min-h-[500px] overflow-y-auto border-2 border-blue-400 shadow-2xl flex flex-col items-center relative">
+            <div className="flex flex-col items-center w-full mb-4 sm:mb-6">
+              <h3 className="text-base sm:text-lg md:text-2xl pb-4 sm:pb-6 md:pb-10 font-bold text-blue-400 text-center">Quotations for <span className="font-extrabold text-lg sm:text-xl md:text-3xl">{selectedProduct.name}</span></h3>
                 <button
                 onClick={() => setShowQuotationModal(false)}
-                className="absolute top-6 right-8 text-gray-500 hover:text-gray-700 text-3xl font-bold"
+                className="absolute top-2 sm:top-4 md:top-6 right-2 sm:right-4 md:right-8 text-gray-500 hover:text-gray-700 text-lg sm:text-xl md:text-3xl font-bold"
                 aria-label="Close"
               >
-                <FontAwesomeIcon icon={faXmark} />
+                <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-lg sm:text-2xl md:text-3xl text-gray-700 hover:text-red-500 transition-colors" />
                 </button>
               </div>
-            {/* Department, Project, Workers, Contractors as table columns */}
             <div className="w-full">
               <div className="flex justify-start mb-4">
                 {user?.role !== 'storekeeper' && (
                   <button
                     onClick={() => navigate(`/project-manager/add-quotation/${selectedProduct.id}`)}
-                    className="px-4 py-2 text-lg bg-blue-400 rounded-lg text-white font-semibold hover:bg-blue-500 flex items-center gap-2 shadow"
+                    className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm md:text-lg bg-blue-400 rounded-lg text-white font-semibold hover:bg-blue-500 flex items-center gap-2 shadow"
                   >
                     <FontAwesomeIcon icon={faPlus} /> Add Quotation
                   </button>
                 )}
               </div>
               {quotation && quotation.length > 0 ? (
-                <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[12px]">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full mb-20 bg-white border rounded-lg shadow text-[10px] sm:text-[12px] md:text-sm">
                   <thead>
                     <tr className="bg-blue-400 text-white">
-                      {/* <th className="py-1 px-2 text-left font-bold">#</th> */}
                       <th className="py-1 px-2 text-left font-bold">Department</th>
-                      <th className="py-1 px-2 text-left font-bold">Project</th>
+                        <th className="py-1 px-2 text-left font-bold hidden sm:table-cell">Project</th>
                       <th className="py-1 px-2 text-left font-bold">Workers</th>
                       <th className="py-1 px-2 text-left font-bold">Contractors</th>
                       <th className="py-1 px-2 text-left font-bold">Items</th>
@@ -1789,9 +1883,8 @@ const ProductsTable: React.FC = () => {
                   <tbody>
                     {quotation.map((item: any, index: number) => (
                       <tr key={index} className="border-b">
-                        {/* <td className="py-1 px-2">{index + 1}</td> */}
                         <td className="py-1 px-2">{item.department || '-'}</td>
-                        <td className="py-1 px-2">{item.project_name || '-'}</td>
+                          <td className="py-1 px-2 hidden sm:table-cell">{item.project_name || '-'}</td>
                         <td className="py-1 px-2">{item.salary_worker?.length > 0 ? (
                           <div className="flex flex-col gap-1">
                             {item.salary_worker.map((w: any, i: number) => (
@@ -1842,6 +1935,7 @@ const ProductsTable: React.FC = () => {
                     ))}
                   </tbody>
                 </table>
+                </div>
               ) : (
                 <div className="w-full flex flex-col items-center">
                   <p className="italic text-gray-500 mb-4">No quotation items available</p>
@@ -1900,7 +1994,7 @@ const ProductsTable: React.FC = () => {
         <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black bg-opacity-30" onClick={() => setShowTasksModal(false)}>
           <div className="bg-white rounded-lg p-6 max-w-2xl min-h-[400px] w-full relative shadow-xl border-2 border-blue-400" onClick={e => e.stopPropagation()}>
             <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-700" onClick={() => setShowTasksModal(false)}>
-              ✕
+              <FontAwesomeIcon icon={faXmark} size="2x" className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors" />
             </button>
             {modalLoading || !selectedTasksProduct ? (
               <div className="flex flex-col items-center justify-center h-60">

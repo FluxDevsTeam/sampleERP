@@ -274,8 +274,9 @@ const StockTable: React.FC = () => {
 
               <FontAwesomeIcon
                 icon={faXmark}
+                size="2x"
+                className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors"
                 onClick={() => setShowModal(false)}
-                className="cursor-pointer"
               />
             </div>
             <div className="space-y-3">
@@ -307,8 +308,9 @@ const StockTable: React.FC = () => {
               <h3 className="text-lg mb-4 font-medium">Confirm Deletion</h3>
               <FontAwesomeIcon
                 icon={faXmark}
+                size="2x"
+                className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors"
                 onClick={() => setConfirmDelete(false)}
-                className="cursor-pointer"
               />
             </div>
             <p>Are you sure you want to delete this stock record?</p>

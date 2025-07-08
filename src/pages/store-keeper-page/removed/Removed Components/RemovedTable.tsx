@@ -390,8 +390,9 @@ const RemovedTable: React.FC = () => {
               <h3 className="text-base sm:text-lg mb-3 sm:mb-4 font-medium">Confirm Deletion</h3>
               <FontAwesomeIcon
                 icon={faXmark}
+                size="2x"
+                className="font-bold text-2xl text-gray-700 hover:text-red-500 transition-colors"
                 onClick={() => setConfirmDelete(false)}
-                className="cursor-pointer"
               />
             </div>
             <p className="text-sm sm:text-base">Are you sure you want to delete this item?</p>

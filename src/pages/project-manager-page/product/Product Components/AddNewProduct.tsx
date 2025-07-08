@@ -185,7 +185,7 @@ const AddNewProductPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 mb-4">
       <div
         className={`max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-10 ${
           showSuccessModal || showErrorModal ? "hidden" : ""
@@ -206,7 +206,7 @@ const AddNewProductPage = () => {
           className="grid grid-cols-1 md:grid-cols-2 gap-6"
           encType="multipart/form-data"
         >
-          <div>
+          <div className="col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-gray-700">
               Project
             </label>
@@ -218,46 +218,62 @@ const AddNewProductPage = () => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Name
-            </label>
-            <input
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            />
+          <div className="md:col-span-2 grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Name
+              </label>
+              <input
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Quantity (optional)
+              </label>
+              <input
+                type="number"
+                name="quantity"
+                value={formData.quantity}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                min="1"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Dimensions
-            </label>
-            <input
-              name="dimensions"
-              value={formData.dimensions}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            />
+          <div className="md:col-span-2 grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Dimensions
+              </label>
+              <input
+                name="dimensions"
+                value={formData.dimensions}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Colour
+              </label>
+              <input
+                name="colour"
+                value={formData.colour}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                required
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Colour
-            </label>
-            <input
-              name="colour"
-              value={formData.colour}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            />
-          </div>
-
-          <div>
+          <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700">
               Production Note (optional)
             </label>
@@ -270,7 +286,7 @@ const AddNewProductPage = () => {
             />
           </div>
 
-          <div>
+          <div className="col-span-1 md:col-span-2">
             <label className="block text-sm font-medium text-gray-700">
               Design (optional)
             </label>
@@ -282,79 +298,67 @@ const AddNewProductPage = () => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Selling Price
-            </label>
-            <input
-              type="number"
-              name="selling_price"
-              value={formData.selling_price}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            />
+          <div className="md:col-span-2 grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Selling Price
+              </label>
+              <input
+                type="number"
+                name="selling_price"
+                value={formData.selling_price}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Overhead Cost
+              </label>
+              <input
+                type="number"
+                name="overhead_cost"
+                value={formData.overhead_cost}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                required
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Overhead Cost
-            </label>
-            <input
-              type="number"
-              name="overhead_cost"
-              value={formData.overhead_cost}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Quantity (optional)
-            </label>
-            <input
-              type="number"
-              name="quantity"
-              value={formData.quantity}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              min="1"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Image
-            </label>
-            <input
-              type="file"
-              name="images"
-              onChange={handleFileChange}
-              className="mt-1 block w-full"
-              accept="image/*"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Sketch
-            </label>
-            <input
-              type="file"
-              name="sketch"
-              onChange={handleFileChange}
-              className="mt-1 block w-full"
-              accept="image/*"
-            />
+          <div className="md:col-span-2 grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Image
+              </label>
+              <input
+                type="file"
+                name="images"
+                onChange={handleFileChange}
+                className="mt-1 block w-full"
+                accept="image/*"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Sketch
+              </label>
+              <input
+                type="file"
+                name="sketch"
+                onChange={handleFileChange}
+                className="mt-1 block w-full"
+                accept="image/*"
+              />
+            </div>
           </div>
 
           <div className="md:col-span-2 flex justify-end">
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-lg font-semibold shadow ${
+              className={`px-6 py-2 md:py-3 bg-blue-400 text-white rounded-lg hover:bg-blue-500 md:text-lg text-md font-semibold shadow ${
                 isSubmitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
