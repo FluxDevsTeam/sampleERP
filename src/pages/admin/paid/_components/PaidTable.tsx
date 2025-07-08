@@ -186,7 +186,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
 
   return (
     <div className={`relative ${!data?.daily_data?.length ? 'min-h-[300px]' : ''}`}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 sm:gap-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center md:mb-4 mb-10 gap-3 sm:gap-0">
         <Button onClick={() => setIsAddModalOpen(true)} className="px-3 py-2 sm:px-4 sm:py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-sm">
           Record Payment
         </Button>
@@ -254,13 +254,22 @@ const PaidTable: React.FC<PaidTableProps> = ({
               </ul>
             )}
           </div>
-          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["paid"] })} disabled={isLoading} className="px-2 py-1.5 sm:px-4 sm:py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-xs sm:text-sm">Filter</Button>
-          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["paid"] }); }} disabled={isLoading} className="px-2 py-1.5 sm:px-4 sm:py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-xs sm:text-sm">Clear</Button>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["paid"] })} disabled={isLoading} className="px-1 py-1 md:px-4 md:py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-xs md:text-sm">Filter</Button>
+          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["paid"] }); }} disabled={isLoading} className="px-1 py-1 md:px-4 md:py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-xs md:text-sm">Clear</Button>
         </div>
       </div>
       <div className={`overflow-x-auto pb-8 ${isTableModalOpen || isViewModalOpen || isDeleteDialogOpen ? 'blur-md' : ''}`}>
         {(!data?.daily_data || data.daily_data.length === 0) ? (
-          <div className="text-center text-gray-500 py-8">No paid entries found.</div>
+          <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+              {/* SVG icon for receipt */}
+              <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2V7a2 2 0 00-2-2h-1V3.5a1.5 1.5 0 00-3 0V5H9a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold text-gray-800 mb-1">No paid entries found</h2>
+            <p className="text-gray-500 mb-6 text-center max-w-xs">All your paid entries for this month will show up here. Start by adding a new paid entry.</p>
+          </div>
         ) : (
           data.daily_data.map((day) => (
             <div
@@ -268,7 +277,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
               className="bg-white shadow-md rounded-lg overflow-auto mb-6"
             >
               <div
-                className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-300 hover:text-blue-20 w-full"
+                className="bg-white text-blue-20 px-2 sm:px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-300 hover:text-blue-20 w-full"
                 onClick={() => toggleCollapse(day.date)}
               >
                 <div className="flex items-center space-x-2">
@@ -276,7 +285,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
                     icon={collapsed[day.date] ? faChevronDown : faChevronUp}
                   />
                   <h3
-                    className="text-lg font-semibold"
+                    className="text-base sm:text-lg font-semibold"
                     style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
                   >
                     {formatDate(day.date)}
@@ -291,49 +300,51 @@ const PaidTable: React.FC<PaidTableProps> = ({
               </div>
 
               {!collapsed[day.date] && (
-                <table className="min-w-full overflow-auto">
-                  <thead className="bg-gray-800">
-                    <tr>
-                      <th className="px-2 py-2 sm:px-4 sm:py-3 text-left text-xs font-bold text-blue-400">Date</th>
-                      <th className="px-2 py-2 sm:px-4 sm:py-3 text-left text-xs font-bold text-blue-400">Name</th>
-                      <th className="px-2 py-2 sm:px-4 sm:py-3 text-left text-xs font-bold text-blue-400">Amount</th>
-                      <th className="px-2 py-2 sm:px-4 sm:py-3 text-left text-xs font-bold text-blue-400">Details</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {day.entries.length === 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-xs sm:text-sm">
+                    <thead className="bg-gray-800">
                       <tr>
-                        <td colSpan={4} className="text-center py-6 text-gray-500 text-sm">
-                          No paid entries for this day.
-                        </td>
+                        <th className="px-2 py-2 sm:px-4 sm:py-3 text-left font-bold text-blue-400">Date</th>
+                        <th className="px-2 py-2 sm:px-4 sm:py-3 text-left font-bold text-blue-400">Name</th>
+                        <th className="px-2 py-2 sm:px-4 sm:py-3 text-left font-bold text-blue-400">Amount</th>
+                        <th className="px-2 py-2 sm:px-4 sm:py-3 text-left font-bold text-blue-400">Details</th>
                       </tr>
-                    ) : (
-                      day.entries.map((entry) => {
-                        const workerName = entry.salary_detail 
-                          ? `${entry.salary_detail.first_name} ${entry.salary_detail.last_name}`
-                          : entry.contractor_detail
-                          ? `${entry.contractor_detail.first_name} ${entry.contractor_detail.last_name}`
-                          : "N/A";
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {day.entries.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="text-center py-6 text-gray-500 text-sm">
+                            No paid entries for this day.
+                          </td>
+                        </tr>
+                      ) : (
+                        day.entries.map((entry) => {
+                          const workerName = entry.salary_detail 
+                            ? `${entry.salary_detail.first_name} ${entry.salary_detail.last_name}`
+                            : entry.contractor_detail
+                            ? `${entry.contractor_detail.first_name} ${entry.contractor_detail.last_name}`
+                            : "N/A";
 
-                        return (
-                          <tr key={entry.id} className="hover:bg-gray-50">
-                            <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm">{new Date(entry.date).toLocaleDateString()}</td>
-                            <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-medium">{workerName}</td>
-                            <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-medium">₦ {formatNumber(entry.amount)}</td>
-                            <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm">
-                              <button
-                                onClick={() => handleRowClick(entry)}
-                                className="px-2 py-1 sm:px-3 sm:py-1 text-blue-400 border-2 border-blue-400 rounded text-xs"
-                              >
-                                View
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
+                          return (
+                            <tr key={entry.id} className="hover:bg-gray-50">
+                              <td className="px-2 py-2 sm:px-4 sm:py-3">{new Date(entry.date).toLocaleDateString()}</td>
+                              <td className="px-2 py-2 sm:px-4 sm:py-3 font-medium">{workerName}</td>
+                              <td className="px-2 py-2 sm:px-4 sm:py-3 font-medium">₦ {formatNumber(entry.amount)}</td>
+                              <td className="px-2 py-2 sm:px-4 sm:py-3">
+                                <button
+                                  onClick={() => handleRowClick(entry)}
+                                  className="px-2 py-1 sm:px-3 sm:py-1 text-blue-400 border-2 border-blue-400 rounded text-xs sm:text-sm"
+                                >
+                                  View
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           ))
@@ -349,10 +360,10 @@ const PaidTable: React.FC<PaidTableProps> = ({
           </DialogHeader>
 
           {selectedEntry && (
-            <div className="grid gap-3 sm:gap-4 py-3 sm:py-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Name:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">
+            <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Name</span>
+                <span className="text-base font-bold text-black">
                   {selectedEntry.salary_detail 
                     ? `${selectedEntry.salary_detail.first_name} ${selectedEntry.salary_detail.last_name}`
                     : selectedEntry.contractor_detail
@@ -360,32 +371,32 @@ const PaidTable: React.FC<PaidTableProps> = ({
                     : "N/A"}
                 </span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Amount:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">₦ {formatNumber(selectedEntry.amount)}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Amount</span>
+                <span className="text-base font-bold text-black">₦ {formatNumber(selectedEntry.amount)}</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-start sm:items-center gap-2 sm:gap-4">
-                <span className="font-medium text-sm sm:text-base">Date:</span>
-                <span className="col-span-1 sm:col-span-2 text-sm sm:text-base">{new Date(selectedEntry.date).toLocaleDateString()}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Date</span>
+                <span className="text-base font-bold text-black">{new Date(selectedEntry.date).toLocaleDateString()}</span>
               </div>
             </div>
           )}
 
           <DialogFooter>
-            <div className="flex flex-col sm:flex-row justify-around items-center w-full gap-2 sm:gap-0">
-              <Button variant="outline" onClick={() => setIsViewModalOpen(false)} className="w-full sm:w-auto text-sm">
+            <div className="w-full grid grid-cols-3 gap-2">
+              <Button variant="outline" onClick={() => setIsViewModalOpen(false)} className="w-full text-sm">
                 Close
               </Button>
-              {isceo && (
-                <>
-                  <Button variant="secondary" onClick={handleEdit} className="w-full sm:w-auto text-sm">
-                    Edit
-                  </Button>
-                  <Button variant="destructive" onClick={handleDelete} disabled={deletePaidEntryMutation.isPending} className="w-full sm:w-auto text-sm">
-                    Delete
-                  </Button>
-                </>
-              )}
+              {isceo ? (
+                <Button variant="secondary" onClick={handleEdit} className="w-full text-sm">
+                  Edit
+                </Button>
+              ) : <div />}
+              {isceo ? (
+                <Button variant="destructive" onClick={handleDelete} disabled={deletePaidEntryMutation.isPending} className="w-full text-sm">
+                  Delete
+                </Button>
+              ) : <div />}
             </div>
           </DialogFooter>
         </DialogContent>

@@ -28,25 +28,25 @@ const Paid = () => {
   if (error) return <p>Error loading paid: {error.message}</p>;
 
   return (
-    <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
+    <div className="wrapper w-full max-w-[98vw] sm:w-11/12 mx-auto px-1 md:pt-2">
       <div
-        className={`grid grid-cols-2 lg:grid-cols-3 gap-4 mb-2 mt-4 ${isTableModalOpen ? "blur-md" : ""}`}
+        className={`grid grid-cols-3 md:gap-4 gap-2 mb-2 mt-4 ${isTableModalOpen ? "blur-md" : ""}`}
       >
-        <PaidData info="Total Paid" digits={totalPaid} currency="₦ " />
-        <PaidData info="Salary Paid This Month" digits={totalSalaryPaid} currency="₦ " />
-        <PaidData info="Contractors Paid This Month" digits={totalContractorsPaid} currency="₦ " />
+        <PaidData info="Total Paid" digits={totalPaid} currency="\u20a6 " />
+        <PaidData info="Salary Paid This Month" digits={totalSalaryPaid} currency="\u20a6 " />
+        <PaidData info="Contr. Paid This Month" digits={totalContractorsPaid} currency="\u20a6 " />
       </div>
 
-      <div>
+      <div className="w-full">
         <h1
           style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-          className={`font-semibold py-2 mt-2 ${isTableModalOpen ? "blur-md" : ""}`}
+          className={`font-semibold md:py-2 md:mt-2 mb-2 text-[18px] sm:text-[22px] md:text-[26px] lg:text-[30px] ${isTableModalOpen ? "blur-md" : ""}`}
         >
           Paid Entries
         </h1>
 
         <div
-          className={`${isTableModalOpen ? "blur-md" : ""}`}
+          className={`w-full ${isTableModalOpen ? "blur-md" : ""}`}
         >
           <PaidTable
             isTableModalOpen={isTableModalOpen}

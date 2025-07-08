@@ -145,41 +145,42 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-xl p-20">
+      <DialogContent className="max-w-2xl w-full px-3 md:px-6 py-6 md:py-8 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Paid Entry</DialogTitle>
           <DialogDescription>Edit the details for the selected paid entry.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className=" items-center gap-4">
-            <Label htmlFor="amount" className="text-right">Amount</Label>
-            <Input
-              id="amount"
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="col-span-3"
-              required
-            />
+        <form onSubmit={handleSubmit} className="grid gap-4 py-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="amount" className="text-right">Amount</Label>
+              <Input
+                id="amount"
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="p-2 border rounded w-full"
+                required
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="workerType" className="text-left">Worker Type</Label>
+              <select
+                id="workerType"
+                value={workerType}
+                onChange={(e) => {
+                  setWorkerType(e.target.value as "salary" | "contractor");
+                  setWorkerId(null);
+                  setSelectedWorkerName(null);
+                }}
+                className="p-2 border rounded w-full"
+              >
+                <option value="salary">Salary Worker</option>
+                <option value="contractor">Contractor</option>
+              </select>
+            </div>
           </div>
-          
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="workerType" className="text-left">Worker Type</Label>
-            <select
-              id="workerType"
-              value={workerType}
-              onChange={(e) => {
-                setWorkerType(e.target.value as "salary" | "contractor");
-                setWorkerId(null);
-                setSelectedWorkerName(null);
-              }}
-              className="p-2 border rounded w-full"
-            >
-              <option value="salary">Salary Worker</option>
-              <option value="contractor">Contractor</option>
-            </select>
-          </div>
-          <div className="col-span-4">
+          <div className="col-span-1 md:col-span-2">
             <SearchablePaginatedDropdown
               key={workerId || "edit-worker-dropdown"}
               endpoint={workerEndpoint}
@@ -192,22 +193,24 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
               selectedName={selectedWorkerName}
             />
           </div>
-          <div className="items-center gap-4">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="date" className="text-right">Date</Label>
             <Input
               id="date"
               type="date"
               value={date}
-              onChange={e => setDate(e.target.value)}
+              onChange={(e) => setDate(e.target.value)}
               className="p-2 border rounded w-full"
               required
             />
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={editPaidEntryMutation.isPending || !workerId}>
-              {editPaidEntryMutation.isPending ? "Updating..." : "Update Entry"}
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+            <div className="w-full md:mt-8 grid grid-cols-2 gap-2 md:flex md:gap-2 md:w-auto">
+              <Button type="submit" disabled={editPaidEntryMutation.isPending || !workerId} className="w-full">
+                {editPaidEntryMutation.isPending ? "Saving..." : "Save Changes"}
+              </Button>
+              <Button type="button" variant="outline" onClick={onClose} className="w-full">Cancel</Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>

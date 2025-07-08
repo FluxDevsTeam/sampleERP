@@ -120,13 +120,13 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-xl p-20">
+      <DialogContent className="max-w-2xl w-full px-3 md:px-6 py-6 md:py-8 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Record New Paid Entry</DialogTitle>
           <DialogDescription>Fill in the details for the new paid entry.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className="items-center gap-4">
+        <form onSubmit={handleSubmit} className="grid gap-4 py-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="amount" className="text-right">Amount</Label>
             <Input
               id="amount"
@@ -138,7 +138,7 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
             />
           </div>
           
-          <div className="">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="workerType" className="text-left">Worker Type</Label>
             <select
               id="workerType"
@@ -168,7 +168,7 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
             />
           </div>
           {userRole === 'ceo' && (
-            <div className="items-center gap-4">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="date" className="text-right">Date</Label>
               <Input
                 id="date"
@@ -181,10 +181,12 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
             </div>
           )}
           <DialogFooter>
-            <Button type="submit" disabled={addPaidEntryMutation.isPending || !workerId}>
-              {addPaidEntryMutation.isPending ? "Adding..." : "Add Entry"}
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+            <div className="w-full md:mt-8 grid grid-cols-2 gap-2 md:flex md:gap-2 md:w-auto">
+              <Button type="submit" disabled={addPaidEntryMutation.isPending || !workerId} className="w-full">
+                {addPaidEntryMutation.isPending ? "Adding..." : "Add Entry"}
+              </Button>
+              <Button type="button" variant="outline" onClick={onClose} className="w-full">Cancel</Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>

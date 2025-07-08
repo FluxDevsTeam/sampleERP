@@ -20,7 +20,7 @@ const PaidData = (PaidData: PaidDataProps) => {
           style={{ fontSize: "clamp(10px, 3vw, 24px)" }}
           className="font-medium "
         >
-          {PaidData.currency? `${PaidData.currency} ` : ''}{formattedDigits}
+          {PaidData.currency ? `${PaidData.currency.replace(/\\u20a6|\\u20A6|\\u20A6|\\u20a6/g, '₦')}` : ''}{formattedDigits}
         </p>
       </div>
     </div>
