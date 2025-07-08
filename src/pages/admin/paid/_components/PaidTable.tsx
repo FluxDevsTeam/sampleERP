@@ -186,7 +186,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
 
   return (
     <div className={`relative ${!data?.daily_data?.length ? 'min-h-[300px]' : ''}`}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center md:mb-4 mb-10 gap-3 sm:gap-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center md:mb-4 mb-14 gap-3 sm:gap-0">
         <Button onClick={() => setIsAddModalOpen(true)} className="px-3 py-2 sm:px-4 sm:py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-sm">
           Record Payment
         </Button>
