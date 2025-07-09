@@ -19,7 +19,7 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg p-3 sm:p-4 md:p-6 max-w-xs sm:max-w-sm w-full border-2 border-black-100 mx-2 sm:mx-4">
+      <div className="bg-white rounded-lg w-[95vw] max-w-md mx-auto p-3 sm:p-6 border-2 border-black-100 mx-2 sm:mx-4">
         <div
           className={`text-base sm:text-lg md:text-xl lg:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 ${
             type === "success" ? "text-blue-400" : "text-red-600"

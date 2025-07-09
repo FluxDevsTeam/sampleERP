@@ -98,7 +98,7 @@ const Workers = () => {
   if (error) return <p>Error loading workers: {error.message}</p>;
 
   return (
-    <div className="wrapper w-11/12 mx-auto mb-2 pl-1 pt-0">
+    <div className="wrapper w-11/12 mx-auto mb-10 md:mb-2 pl-1 pt-0">
       {/* Analysis Sections Container */}
       <div
         className={`grid grid-cols-1 md:grid-cols-2 gap-4 mb-2 ${

@@ -391,72 +391,34 @@ const SoldTable: React.FC = () => {
                 {openDates[dayData.date] && (
                   //////// Table
                   <div className="overflow-x-auto">
-                    <table className="min-w-full">
-                      {/* Table headers */}
-                      <thead className="bg-gray-800">
-                        <tr>
-                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">
-                            Name
-                          </th>
-                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">
-                            Qty
-                          </th>
-                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell">
-                            Sold To
-                          </th>
-                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">
-                            Logistics
-                          </th>
-                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">
-                            Project
-                          </th>
-                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">
-                            Cost
-                          </th>
-                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">
-                            Selling
-                          </th>
-                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">
-                            Total
-                          </th>
-                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell">
-                            Profit
-                          </th>
-                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">
-                            Details
-                          </th>
+                    <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
+                      <thead>
+                        <tr className="bg-blue-400 text-white">
+                          {/* Adjust headers: hide less important columns on mobile */}
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Date</th>
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Name</th>
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Quantity</th>
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Sold To</th>
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Profit</th>
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Actions</th>
                         </tr>
                       </thead>
-
-                      {/* Table body */}
-                      <tbody className="divide-y divide-gray-200">
+                      <tbody>
                         {dayData.entries.map((entry) => (
                           <tr key={entry.id} className="hover:bg-gray-50">
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm cursor-pointer hover:text-blue-600">
-                              {entry.name}
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
+                              {formatDate(entry.date)}
                             </td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
+                              {entry.name}
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">
                               {formatNumber(entry.quantity)}
                             </td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">
                               {entry.sold_to?.name || "—"}
                             </td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">
-                              {entry.logistics ? `₦${formatNumber(entry.logistics)}` : "—"}
-                            </td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">
-                              {entry.linked_project?.name || "—"}
-                            </td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">
-                              ₦{formatNumber(entry.cost_price)}
-                            </td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">
-                              ₦{formatNumber(entry.selling_price)}
-                            </td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-blue-600">
-                              ₦{formatNumber(entry.total_price)}
-                            </td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-blue-400 hidden md:table-cell">
                               ₦{formatNumber(entry.profit)}
                             </td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-blue-400">

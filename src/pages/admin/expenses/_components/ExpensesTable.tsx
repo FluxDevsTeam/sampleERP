@@ -190,6 +190,17 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
     };
   }, []);
 
+  // Ensure only the first day's table is open, others are collapsed
+  useEffect(() => {
+    if (data?.daily_data && data.daily_data.length > 0) {
+      const initialCollapsedState: { [key: string]: boolean } = {};
+      data.daily_data.forEach((day, index) => {
+        initialCollapsedState[day.date] = index !== 0;
+      });
+      setCollapsed(initialCollapsedState);
+    }
+  }, [data?.daily_data]);
+
   // Helper to format numbers with Naira sign
   const formatNumber = (number: number | string | undefined | null) => {
     if (number === undefined || number === null || number === "") {
@@ -377,24 +388,22 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
               </ul>
             )}
           </div>
-          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["expenses"] })} disabled={isLoading} className="px-2 py-1 border border-blue-400 text-blue-400 bg-transparent rounded hover:bg-blue-50 transition-colors text-xs w-14 sm:w-auto">Filter</Button>
-          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["expenses"] }); }} disabled={isLoading} className="px-2 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-xs w-14 sm:w-auto">Clear</Button>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["expenses"] })} disabled={isLoading} className="px-2 py-1 border border-blue-400 text-blue-400 bg-transparent rounded hover:bg-blue-50 transition-colors text-xs w-12 sm:w-auto">Filter</Button>
+          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["expenses"] }); }} disabled={isLoading} className="px-1 md:px-2 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-xs w-12 sm:w-auto">Clear</Button>
         </div>
       </div>
       <div className={`overflow-x-auto pb-8 ${isTableModalOpen || isViewModalOpen || isEditModalOpen || isDeleteDialogOpen || isAddModalOpen ? 'blur-md' : ''}`}>
         {(!data?.daily_data || data.daily_data.length === 0) ? (
-          <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+          <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10 m-2">
             <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
-              {/* SVG icon for receipt */}
+              {/* SVG icon for receipt, styled to match assets table */}
               <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2V7a2 2 0 00-2-2h-1V3.5a1.5 1.5 0 00-3 0V5H9a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                <path d="M9 21V7M15 21V7M3 7h18" stroke="currentColor" strokeWidth="2" />
               </svg>
             </div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-1">No expense records for this month</h2>
-            <p className="text-gray-500 mb-6 text-center max-w-xs">All your expense records for this month will show up here. Start by adding a new expense.</p>
-            {/* Optional: keep a single skeleton row for continuity */}
-            <div className="w-full max-w-2xl mt-4">
-            </div>
+            <h2 className="text-lg font-semibold text-gray-800 mb-1">No expenses found</h2>
+            <p className="text-gray-500 mb-6 text-center max-w-xs">All your expense records will show up here. Add a new expense to get started.</p>
           </div>
         ) : (
           data.daily_data.map((day) => (
@@ -430,7 +439,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
                   <table className="min-w-full">
                     <thead className="bg-gray-800">
                       <tr>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Date</th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">Date</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Name</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell">Category</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Project</th>
@@ -450,7 +459,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
                       ) : (
                         day.entries.map((entry) => (
                           <tr key={entry.id} className="hover:bg-gray-50">
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{new Date(entry.date).toLocaleDateString()}</td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{new Date(entry.date).toLocaleDateString()}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium">{entry.name}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">{entry.expense_category?.name || "N/A"}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.linked_project?.name || "N/A"}</td>

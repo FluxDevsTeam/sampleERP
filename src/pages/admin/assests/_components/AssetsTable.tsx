@@ -205,7 +205,7 @@ const AssetsTable = ({
                   key={asset.id}
                   className="hover:bg-gray-100"
                 >
-                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 max-w-[12ch] truncate">
                     {asset.name}
                   </td>
                   <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">

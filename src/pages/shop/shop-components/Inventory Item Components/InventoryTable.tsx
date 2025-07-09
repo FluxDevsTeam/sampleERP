@@ -236,17 +236,13 @@ const Table: React.FC<TableProps> = ({ headers }) => {
                 <p className="text-gray-500 mb-6 text-center max-w-xs">All your inventory items will show up here. Add a new item to get started.</p>
               </div>
             ) : (
-              <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+              <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
                 <thead>
                   <tr className="bg-blue-400 text-white">
-                    {headers.map((header) => (
-                      <th
-                        key={header}
-                        className="py-2 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold"
-                      >
-                        {header}
-                      </th>
-                    ))}
+                    <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Product</th>
+                    <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Category</th>
+                    <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Stock Status</th>
+                    <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Details</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -259,14 +255,18 @@ const Table: React.FC<TableProps> = ({ headers }) => {
                   ) : (
                     currentItems.map((row, index) => (
                       <tr key={index} className="hover:bg-gray-100">
-                        {headers.map((header) => (
-                          <td
-                            key={`${index}-${header}`}
-                            className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700"
-                          >
-                            {row[header]}
-                          </td>
-                        ))}
+                        <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-gray-700">
+                          {row.Product}
+                        </td>
+                        <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-gray-700">
+                          {row.Category}
+                        </td>
+                        <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-gray-700 hidden sm:table-cell">
+                          {row["Stock Status"]}
+                        </td>
+                        <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-gray-700">
+                          {row.Details}
+                        </td>
                       </tr>
                     ))
                   )}

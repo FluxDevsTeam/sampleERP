@@ -28,7 +28,7 @@ const Paid = () => {
   if (error) return <p>Error loading paid: {error.message}</p>;
 
   return (
-    <div className="wrapper w-full max-w-[98vw] sm:w-11/12 mx-auto px-1 md:pt-2">
+    <div className="wrapper w-full max-w-[98vw] sm:w-11/12 mx-auto px-1 md:pt-2 mb-10 md:pb-2">
       <div
         className={`grid grid-cols-3 md:gap-4 gap-2 mb-2 mt-4 ${isTableModalOpen ? "blur-md" : ""}`}
       >

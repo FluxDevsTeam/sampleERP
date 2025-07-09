@@ -101,6 +101,17 @@ const PaidTable: React.FC<PaidTableProps> = ({
     }
   }, [data]);
 
+  // Ensure only the first day's table is open, others are collapsed
+  useEffect(() => {
+    if (data?.daily_data && data.daily_data.length > 0) {
+      const initialCollapsedState: { [key: string]: boolean } = {};
+      data.daily_data.forEach((day, index) => {
+        initialCollapsedState[day.date] = index !== 0;
+      });
+      setCollapsed(initialCollapsedState);
+    }
+  }, [data?.daily_data]);
+
   // Helper to format numbers with Naira sign
   const formatNumber = (number: number | string | undefined | null) => {
     if (number === undefined || number === null || number === "") {
@@ -304,7 +315,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
                   <table className="min-w-full text-xs sm:text-sm">
                     <thead className="bg-gray-800">
                       <tr>
-                        <th className="px-2 py-2 sm:px-4 sm:py-3 text-left font-bold text-blue-400">Date</th>
+                        <th className="px-2 py-2 sm:px-4 sm:py-3 text-left font-bold text-blue-400 hidden sm:table-cell">Date</th>
                         <th className="px-2 py-2 sm:px-4 sm:py-3 text-left font-bold text-blue-400">Name</th>
                         <th className="px-2 py-2 sm:px-4 sm:py-3 text-left font-bold text-blue-400">Amount</th>
                         <th className="px-2 py-2 sm:px-4 sm:py-3 text-left font-bold text-blue-400">Details</th>
@@ -327,7 +338,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
 
                           return (
                             <tr key={entry.id} className="hover:bg-gray-50">
-                              <td className="px-2 py-2 sm:px-4 sm:py-3">{new Date(entry.date).toLocaleDateString()}</td>
+                              <td className="px-2 py-2 sm:px-4 sm:py-3 hidden sm:table-cell">{new Date(entry.date).toLocaleDateString()}</td>
                               <td className="px-2 py-2 sm:px-4 sm:py-3 font-medium">{workerName}</td>
                               <td className="px-2 py-2 sm:px-4 sm:py-3 font-medium">₦ {formatNumber(entry.amount)}</td>
                               <td className="px-2 py-2 sm:px-4 sm:py-3">

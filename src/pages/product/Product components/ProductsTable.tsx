@@ -606,7 +606,7 @@ const ProductsTable: React.FC = () => {
   };
 
   return (
-    <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
+    <div className="wrapper w-11/12 mx-auto my-0 mb-10 md:mb-2 pl-1 pt-2">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-center mt-2 mb-2">
         <h1
           style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}

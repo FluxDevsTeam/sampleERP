@@ -115,13 +115,13 @@ const CategoryTable: React.FC<TableProps> = ({ headers }) => {
           </div>
         ) : (
           <div>
-            <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+            <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
               <thead>
                 <tr className="bg-blue-400 text-white">
-                  {headers.map((header) => (
+                  {headers.map((header, idx) => (
                     <th
                       key={header}
-                      className="py-4 px-4 text-left text-sm font-semibold"
+                      className={`py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold ${idx > 1 ? 'hidden sm:table-cell' : ''}`}
                     >
                       {header}
                     </th>
@@ -138,10 +138,10 @@ const CategoryTable: React.FC<TableProps> = ({ headers }) => {
                 ) : (
                   currentItems.map((row, index) => (
                     <tr key={index} className="hover:bg-gray-100">
-                      {headers.map((header) => (
+                      {headers.map((header, idx) => (
                         <td
                           key={`${index}-${header}`}
-                          className="py-5 px-4 border-b border-gray-200 text-sm text-gray-700"
+                          className={`py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 ${idx > 1 ? 'hidden sm:table-cell' : ''}`}
                         >
                           {renderCellContent(header, row[header])}
                         </td>

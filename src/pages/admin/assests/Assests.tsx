@@ -65,7 +65,7 @@ const Assets = () => {
   if (error) return <p>Error loading assets: {error.message}</p>;
 
   return (
-    <div className="wrapper w-11/12 mx-auto my-2 pl-1 pt-4">
+    <div className="wrapper w-11/12 mb-10 md:md-2 mx-auto my-2 pl-1 pt-4">
       {/* Asset Summary Cards */}
       <div
         className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4 sm:mb-6 ${

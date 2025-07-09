@@ -135,11 +135,9 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
-      {/* <Header /> */}
-
       {/* Card grid for all data */}
       <div className="mb-4 sm:mb-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-5 p-1 sm:p-2">
+        <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-5 p-1 sm:p-2 overflow-x-auto">
           {visibleCards.map(card => (
             <AdminDashboardCard key={card.key} title={card.title} value={card.value} currency={card.currency} />
           ))}
@@ -168,10 +166,10 @@ const AdminDashboard = () => {
       </div>
 
       {/* Two charts in a row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
         {/* Expense Category Breakdown */}
-        <div>
-          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">
+        <div className="bg-white rounded-lg shadow p-2 sm:p-4 mb-4 w-full overflow-x-auto">
+          <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">
             Expense Category Breakdown
           </h2>
           <ResponsiveContainer width="100%" height={250} className="sm:h-[350px]">
@@ -195,18 +193,18 @@ const AdminDashboard = () => {
                 ))}
               </Pie>
               <Tooltip />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: '12px' }} />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
         {/* Top Categories */}
-        <div>
-          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Top Categories</h2>
+        <div className="bg-white rounded-lg shadow p-2 sm:p-4 mb-4 w-full overflow-x-auto">
+          <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">Top Categories</h2>
           <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
             <BarChart data={topCategories} barSize={20} className="sm:barSize-[30px]">
-              <XAxis dataKey="name" />
-              <YAxis />
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} angle={-20} textAnchor="end" height={60} />
+              <YAxis tick={{ fontSize: 12 }} />
               <Tooltip />
               <Bar dataKey="total" fill="#ff7300" />
             </BarChart>
@@ -214,21 +212,17 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Line Chart takes Full Width */}
-      <div>
-        <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Monthly Expense Trend</h2>
+      {/* Single Bar Chart for Monthly Expense Trend */}
+      <div className="bg-white rounded-lg shadow p-2 sm:p-4 w-full overflow-x-auto">
+        <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">Monthly Expense Trend</h2>
         <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
-          <BarChart data={monthlyExpenseTrend}>
-            <XAxis dataKey="month" />
-            <YAxis />
+          <BarChart data={monthlyExpenseTrend} margin={{ top: 10, right: 20, left: 0, bottom: 30 }}>
+            <XAxis dataKey="month" tick={{ fontSize: 12 }} interval={0} angle={-20} textAnchor="end" height={60} />
+            <YAxis tick={{ fontSize: 12 }} />
             <CartesianGrid strokeDasharray="3 3" />
             <Tooltip />
-            <Legend />
-            <Bar dataKey="type_breakdown.project" fill="#82ca9d" name="Project Expenses" stackId="a" />
-            <Bar dataKey="type_breakdown.shop" fill="#ffc658" name="Shop Expenses" stackId="a" />
-            <Bar dataKey="type_breakdown.others" fill="#ff7300" name="Other Expenses" stackId="a" />
-            {/* Optionally show total as a separate bar if needed, or rely on the sum of stacked bars */}
-            {/* <Bar dataKey="total" fill="#8884d8" name="Total" /> */}
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            <Bar dataKey="total_expenses" fill="#ffc658" name="Total Expenses" />
           </BarChart>
         </ResponsiveContainer>
       </div>

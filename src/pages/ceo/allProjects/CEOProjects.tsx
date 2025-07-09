@@ -4,7 +4,7 @@ import Header from "./_components/Header"
 
 const CEOProjects = () => {
   return (
-    <div>
+    <div className="mb-10 md:mb-2">
       <Header />
       <ProjectsTable />
       </div>

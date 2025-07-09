@@ -150,7 +150,7 @@ const FactoryManagerCustomers = () => {
   }
 
   return (
-    <div className="px-2 sm:px-6 md:px-10 py-3 sm:py-5 text-[#0A0A0A]">
+    <div className="px-2 sm:px-6 md:px-10 pt-3 pb-10 md:pb-5 text-[#0A0A0A]">
 
       <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-8 w-full">
         <article className="border rounded-lg p-2 sm:p-4 shadow-md flex flex-col items-center justify-center">
