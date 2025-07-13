@@ -128,7 +128,7 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <label className="block mb-1">{label}:</label>
+      <label className="block mb-1">{label}</label>
       <div className="relative">
         <input
           type="text"

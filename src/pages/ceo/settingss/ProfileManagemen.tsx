@@ -100,6 +100,7 @@ const ProfileManagement = () => {
   const { signup } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const { data, isLoading, error, refetch } = useQuery<ApiResponse>({
     queryKey: ["users", currentPage],
@@ -276,9 +277,9 @@ const ProfileManagement = () => {
 
   return (
     <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-8 gap-4">
-        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-800">Profile Management</h1>
-        <Button onClick={() => setIsCreateModalOpen(true)} className="bg-blue-400 text-white text-sm sm:text-base px-3 sm:px-4 py-2">Create New Profile</Button>
+      <div className="flex flex-row justify-between items-start sm:items-center mb-4 sm:mb-8 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-800">Profile</h1>
+        <Button onClick={() => setIsCreateModalOpen(true)} className="border border-blue-400 text-blue-400 bg-white hover:bg-blue-50 text-sm sm:text-base px-3 sm:px-4 py-2">+ Create New Profile</Button>
       </div>
 
       <div className="rounded-md border my-4 sm:my-5 overflow-x-auto">
@@ -289,43 +290,45 @@ const ProfileManagement = () => {
               <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Email</TableHead>
               <TableHead className="text-xs sm:text-sm hidden md:table-cell">Phone</TableHead>
               <TableHead className="text-xs sm:text-sm">Roles</TableHead>
-              <TableHead className="text-xs sm:text-sm">Actions</TableHead>
+              <TableHead className="text-xs sm:text-sm">Details</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.results?.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="text-xs sm:text-sm">
-                  <div>
-                    <div className="font-medium">{user.first_name} {user.last_name}</div>
-                    <div className="text-gray-500 sm:hidden text-xs">{user.email}</div>
+            {data?.results?.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="py-8">
+                  <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-4">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                      <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                        <path d="M16 3v4M8 3v4M3 7h18" stroke="currentColor" strokeWidth="2" />
+                      </svg>
+                    </div>
+                    <h2 className="text-lg font-semibold text-gray-800 mb-1">No profiles found</h2>
+                    <p className="text-gray-500 mb-6 text-center max-w-xs">All user profiles will show up here. Click 'Create New Profile' to add your first user.</p>
                   </div>
-                </TableCell>
-                <TableCell className="text-xs sm:text-sm hidden sm:table-cell">{user.email}</TableCell>
-                <TableCell className="text-xs sm:text-sm hidden md:table-cell">{user.phone_number || "-"}</TableCell>
-                <TableCell className="text-xs sm:text-sm">{user.roles || "-"}</TableCell>
-                <TableCell>
-                  <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditClick(user)}
-                      className="text-xs px-2 sm:px-3 py-1 sm:py-2"
-                    >
-                      Edit
+                </td>
+              </tr>
+            ) : (
+              data?.results?.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="text-xs sm:text-sm">
+                    <div>
+                      <div className="font-medium">{user.first_name} {user.last_name}</div>
+                      {/* Remove email on mobile, only show name */}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden sm:table-cell">{user.email}</TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden md:table-cell">{user.phone_number || "-"}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">{user.roles || "-"}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">
+                    <Button size="sm" className="text-xs px-2 sm:px-3 py-1 sm:py-2 border border-blue-400 text-blue-400 bg-white hover:bg-blue-50" onClick={() => setSelectedUser(user)}>
+                      Details
                     </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => setDeleteUserId(user.id)}
-                      className="text-xs px-2 sm:px-3 py-1 sm:py-2"
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -340,97 +343,47 @@ const ProfileManagement = () => {
 
       {/* Edit User Modal */}
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
-        <DialogContent className="max-w-md w-[95vw] sm:w-full mx-4">
+        <DialogContent className="w-full max-w-md mx-0 px-2 sm:mx-4 sm:px-6 py-4 sm:py-6 overflow-x-hidden">
           <DialogHeader>
             <DialogTitle className="text-lg sm:text-xl">Edit User</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label
-                  htmlFor="first_name"
-                  className="block text-sm font-medium mb-1"
-                >
-                  First Name
-                </label>
-                <Input
-                  id="first_name"
-                  name="first_name"
-                  value={formData.first_name}
-                  onChange={handleChange}
-                  className="text-sm sm:text-base"
-                />
+                <label htmlFor="first_name" className="block text-xs sm:text-sm font-medium mb-1">First Name</label>
+                <Input id="first_name" name="first_name" value={formData.first_name} onChange={handleChange} className="text-xs sm:text-base w-full" />
               </div>
               <div>
-                <label
-                  htmlFor="last_name"
-                  className="block text-sm font-medium mb-1"
-                >
-                  Last Name
-                </label>
-                <Input
-                  id="last_name"
-                  name="last_name"
-                  value={formData.last_name}
-                  onChange={handleChange}
-                  className="text-sm sm:text-base"
-                />
+                <label htmlFor="last_name" className="block text-xs sm:text-sm font-medium mb-1">Last Name</label>
+                <Input id="last_name" name="last_name" value={formData.last_name} onChange={handleChange} className="text-xs sm:text-base w-full" />
               </div>
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1">
-                Email
-              </label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="text-sm sm:text-base"
-              />
+              <label htmlFor="email" className="block text-xs sm:text-sm font-medium mb-1">Email</label>
+              <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} className="text-xs sm:text-base w-full" />
             </div>
             <div>
-              <label
-                htmlFor="phone_number"
-                className="block text-sm font-medium mb-1"
-              >
-                Phone Number
-              </label>
-              <Input
-                id="phone_number"
-                name="phone_number"
-                value={formData.phone_number}
-                onChange={handleChange}
-                className="text-sm sm:text-base"
-              />
+              <label htmlFor="phone_number" className="block text-xs sm:text-sm font-medium mb-1">Phone Number</label>
+              <Input id="phone_number" name="phone_number" value={formData.phone_number} onChange={handleChange} className="text-xs sm:text-base w-full" />
             </div>
-
             {/* Roles Section */}
             <div>
-              <label className="block text-sm font-medium mb-2">Role</label>
-              <Select
-                value={formData.roles[0] || ""}
-                onValueChange={handleRoleChange}
-              >
-                <SelectTrigger className="text-sm sm:text-base">
+              <label className="block text-xs sm:text-sm font-medium mb-2">Role</label>
+              <Select value={formData.roles[0] || ""} onValueChange={handleRoleChange}>
+                <SelectTrigger className="text-xs sm:text-base w-full">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
                   {roleOptions.map((role) => (
-                    <SelectItem key={role} value={role}>
-                      {formatRoleName(role)}
-                    </SelectItem>
+                    <SelectItem key={role} value={role}>{formatRoleName(role)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row justify-end gap-2">
-            <Button variant="outline" onClick={() => setEditingUser(null)} className="text-sm sm:text-base">
-              Cancel
-            </Button>
-            <Button onClick={handleUpdate} disabled={isSaving} className="text-sm sm:text-base">
+          <div className="flex flex-row justify-end gap-2 mt-4 w-full">
+            <Button variant="outline" onClick={() => setEditingUser(null)} className="text-xs sm:text-base w-full sm:w-auto">Cancel</Button>
+            <Button onClick={handleUpdate} disabled={isSaving} className="text-xs sm:text-base w-full sm:w-auto">
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -468,12 +421,12 @@ const ProfileManagement = () => {
 
       {/* Create New Profile Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="max-w-md w-[95vw] sm:w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-11/12 sm:w-full max-h-[90vh] pb-20 overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg sm:text-xl">Create New Profile</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="first_name" className="block text-sm font-medium mb-1">First Name</label>
                 <Input id="first_name" name="first_name" value={createFormData.first_name} onChange={handleCreateChange} required className="text-sm sm:text-base" />
@@ -519,6 +472,30 @@ const ProfileManagement = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {selectedUser && (
+        <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
+          <DialogContent className="w-full max-w-md mx-0 px-2 sm:mx-4 sm:px-6 py-4 sm:py-6 overflow-x-hidden">
+            <DialogHeader>
+              <DialogTitle className="text-lg sm:text-xl">User Details</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-2 py-2">
+              <div className="font-semibold">Name:</div>
+              <div>{selectedUser.first_name} {selectedUser.last_name}</div>
+              <div className="font-semibold">Email:</div>
+              <div>{selectedUser.email}</div>
+              <div className="font-semibold">Phone:</div>
+              <div>{selectedUser.phone_number}</div>
+              <div className="font-semibold">Roles:</div>
+              <div>{selectedUser.roles?.join(', ')}</div>
+            </div>
+            <div className="flex flex-row justify-end gap-2 mt-4 w-full">
+              <Button onClick={() => handleEditClick(selectedUser)} className="w-full sm:w-auto">Edit</Button>
+              <Button variant="destructive" onClick={() => setDeleteUserId(selectedUser.id)} className="w-full sm:w-auto">Delete</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

@@ -58,7 +58,7 @@ const AddNewSoldItemPage = () => {
     customer: "",
     project: "",
     item: "",
-    logistics: "",
+    logistics: "0",
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -91,7 +91,7 @@ const AddNewSoldItemPage = () => {
       customer: "",
       project: "",
       item: "",
-      logistics: "",
+      logistics: "0",
     });
   }, [saleType]);
 
@@ -239,7 +239,7 @@ const AddNewSoldItemPage = () => {
         <button
           type="submit"
           disabled={loading}
-          className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ${
+          className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >

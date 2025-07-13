@@ -29,6 +29,8 @@ const AddToRM: React.FC = () => {
     type: "success",
   });
 
+  const [costPriceEditable, setCostPriceEditable] = useState(false);
+
   const handleDropdownChange = async (name: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -130,16 +132,17 @@ const AddToRM: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+    <div className="min-h-auto flex items-center justify-center bg-gray-50 py-8 px-2">
+      <div className="w-full max-w-lg bg-white rounded-xl shadow-lg p-6 sm:p-8">
         <div className="flex items-center mb-6">
           <button
             onClick={() => navigate("/store-keeper/record-rm-added")}
-            className="mr-4 text-gray-600 hover:text-gray-800"
+            className="mr-4 text-black-400 hover:text-blue-400 focus:outline-none"
+            aria-label="Back"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-500">Add Raw Material</h1>
+          <h1 className="text-2xl font-bold text-black-800">Add Raw Material</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -156,40 +159,46 @@ const AddToRM: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Quantity
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Quantity</label>
             <input
               type="number"
               name="quantity"
               value={formData.quantity}
               onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
               required
-              step="0.01" // Allow decimal inputs
+              step="0.01"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Cost Price
-            </label>
-            <input
-              type="number"
-              name="cost_price"
-              value={formData.cost_price}
-              onChange={handleInputChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-              step="0.01"
-            />
+            <label className="block text-sm font-medium text-gray-700">Cost Price</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                name="cost_price"
+                value={formData.cost_price}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                required
+                step="0.01"
+                readOnly={!costPriceEditable}
+              />
+              <button
+                type="button"
+                onClick={() => setCostPriceEditable((prev) => !prev)}
+                className={`px-2 py-1 text-xs rounded border ${costPriceEditable ? 'border-gray-400 text-gray-600' : 'border-blue-400 text-blue-400'} hover:bg-blue-50 transition-colors`}
+              >
+                {costPriceEditable ? 'Lock' : 'Edit'}
+              </button>
+            </div>
           </div>
 
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={submitLoading}
-              className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ${
+              className={`px-4 py-2 border-2 border-blue-400 text-blue-400 rounded-lg font-semibold transition-colors duration-150 hover:bg-blue-400 hover:text-white focus:ring-2 focus:ring-blue-200 ${
                 submitLoading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -198,7 +207,6 @@ const AddToRM: React.FC = () => {
           </div>
         </form>
       </div>
-
       <Modal
         isOpen={modalConfig.isOpen}
         onClose={handleCloseModal}

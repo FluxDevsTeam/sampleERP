@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../../shop/Modal";
 
 const AddRawMaterialCategory: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
@@ -63,7 +64,18 @@ const AddRawMaterialCategory: React.FC = () => {
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === "success") {
-      navigate(`/store-keeper/raw-materials`);
+      setFormData({ name: "" });
+      // Redirect based on returnTo param
+      const params = new URLSearchParams(location.search);
+      const returnTo = params.get("returnTo");
+      const id = params.get("id");
+      if (returnTo === "add") {
+        navigate("/store-keeper/add-raw-material");
+      } else if (returnTo === "edit" && id) {
+        navigate(`/store-keeper/edit-raw-material/${id}`);
+      } else {
+        navigate(`/store-keeper/raw-materials`);
+      }
     }
   };
 

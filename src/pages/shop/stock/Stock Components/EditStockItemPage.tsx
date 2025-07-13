@@ -14,6 +14,7 @@ const EditStockItemPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     quantity: "",
+    date: "",
   });
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
@@ -43,6 +44,7 @@ const EditStockItemPage: React.FC = () => {
         const data = await response.json();
         setFormData({
           quantity: data.quantity || "",
+          date: data.date ? data.date.slice(0, 10) : "",
         });
       } catch (error) {
         setError("Failed to load stock data");
@@ -63,6 +65,7 @@ const EditStockItemPage: React.FC = () => {
     try {
       const requestBody = {
         quantity: parseFloat(formData.quantity),
+        date: formData.date,
       };
 
       const response = await fetch(
@@ -112,16 +115,17 @@ const EditStockItemPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+    <div className="min-h-auto flex items-center justify-center bg-gray-50 py-8 px-2">
+      <div className="w-full max-w-lg bg-white rounded-xl shadow-lg p-6 sm:p-8">
         <div className="flex items-center mb-6">
           <button
             onClick={() => navigate("/shop/stock")}
-            className="mr-4 text-gray-20 hover:text-gray-800"
+            className="mr-4 text-black-400 hover:text-blue-400 focus:outline-none"
+            aria-label="Back"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-20">Edit Item</h1>
+          <h1 className="text-2xl font-bold text-black">Edit Stock</h1>
         </div>
 
         {error && (
@@ -131,12 +135,8 @@ const EditStockItemPage: React.FC = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          
-
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Quantity
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Quantity</label>
             <input
               type="number"
               required
@@ -144,7 +144,17 @@ const EditStockItemPage: React.FC = () => {
               onChange={(e) =>
                 setFormData({ ...formData, quantity: e.target.value })
               }
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Date</label>
+            <input
+              type="date"
+              required
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
             />
           </div>
 
@@ -152,7 +162,7 @@ const EditStockItemPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+              className={`px-4 py-2 border-2 border-blue-400 text-blue-400 rounded-lg font-semibold transition-colors duration-150 hover:bg-blue-400 hover:text-white focus:ring-2 focus:ring-blue-200 ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >

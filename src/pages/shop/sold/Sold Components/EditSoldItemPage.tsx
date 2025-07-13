@@ -35,6 +35,7 @@ const EditSoldItemPage: React.FC = () => {
     project: "",
     logistics: "",
     item: "",
+    date: "",
   });
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
@@ -69,6 +70,7 @@ const EditSoldItemPage: React.FC = () => {
           project: data.project?.id.toString() || "",
           logistics: data.logistics || "",
           item: data.item?.id.toString() || "",
+          date: data.date ? data.date.slice(0, 10) : "",
         });
       } catch (error) {
         setError("Failed to load sale data");
@@ -159,6 +161,7 @@ const EditSoldItemPage: React.FC = () => {
         logistics: formData.project
           ? null
           : parseFloat(formData.logistics) || null, // Set logistics to null if project exists
+        date: formData.date,
       };
 
       const response = await fetch(
@@ -208,7 +211,7 @@ const EditSoldItemPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 pb-20">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center mb-6">
           <button
@@ -226,7 +229,18 @@ const EditSoldItemPage: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block mb-1">Date:</label>
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={e => setFormData({ ...formData, date: e.target.value })}
+              className="w-full border rounded p-2"
+              required
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Item

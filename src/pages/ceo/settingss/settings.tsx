@@ -3,7 +3,7 @@ import ProfileManagement from "./ProfileManagemen"
 
 const settings = () => {
   return (
-    <div>
+    <div className="mb-10">
       <OverheadCost />
       <ProfileManagement/>
     </div>

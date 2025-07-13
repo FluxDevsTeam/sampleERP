@@ -7,6 +7,8 @@ import {
   faPen,
   faTrash,
   faPlus,
+  faXmark,
+  faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import Modal from "@/pages/shop/Modal";
 import { useNavigate } from "react-router-dom";
@@ -55,6 +57,7 @@ const RecordRemovedTable: React.FC = () => {
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isMonthOpen, setIsMonthOpen] = useState(false);
   const [isDayOpen, setIsDayOpen] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<MaterialEntry | null>(null);
 
   const yearRef = useRef<HTMLDivElement>(null);
   const monthRef = useRef<HTMLDivElement>(null);
@@ -222,85 +225,97 @@ const RecordRemovedTable: React.FC = () => {
   };
 
   return (
-    <div className="relative">
-      <div className="flex justify-between items-center mb-4">
-      <button
-          onClick={() => navigate("/store-keeper/add-to-raw-material")}
-          className="bg-blue-400 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center"
+    <div className="">
+      {/* Heading and Add Record button in the same row */}
+      <div className="flex flex-row justify-between items-center mb-2 sm:mb-4 gap-3 sm:gap-0">
+        <h1
+          style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
+          className="font-semibold py-3 sm:py-5 mt-2 sm:mt-0"
         >
-          <FontAwesomeIcon icon={faPlus} className="mr-2" />
-          Add Raw Material
+          Added Raw Materials
+        </h1>
+        <button
+          onClick={() => navigate("/store-keeper/add-record-removed")}
+          className="px-3 max-sm:px-2 py-1 md:py-2 max-md:px-0 border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-white transition-colors text-sm sm:text-base w-auto outline-none focus:ring-2 focus:ring-blue-200"
+        >
+          <FontAwesomeIcon className="pr-2" icon={faPlus} />
+          Add Record
         </button>
-
-        <div className="flex items-center space-x-4">
-          <div ref={yearRef} className="relative">
-            <button onClick={() => setIsYearOpen(!isYearOpen)} className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center">
-              {year || "Year"} <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} className="ml-2" />
+      </div>
+      {/* Filter controls below and right-aligned */}
+      <div className="flex w-full justify-end mb-4">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Year Dropdown */}
+          <div className="relative w-20 sm:w-24 max-sm:w-14" ref={yearRef}>
+            <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
+              <span>{year || 'Year'}</span>
+              <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} className="text-xs" />
             </button>
             {isYearOpen && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
-                <ul className="max-h-60 overflow-auto">
-                  {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(y => (
-                    <li key={y} onClick={() => { setYear(y); setIsYearOpen(false); }} className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
-                      {y}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Year</li>
+                {[...Array(10)].map((_, i) => {
+                  const y = new Date().getFullYear() - i;
+                  return <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{y}</li>
+                })}
+              </ul>
             )}
           </div>
-          <div ref={monthRef} className="relative">
-            <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center">
-              {month ? months[Number(month) - 1] : "Month"} <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} className="ml-2" />
+          {/* Month Dropdown */}
+          <div className="relative w-24 sm:w-32" ref={monthRef}>
+            <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
+              <span>{month ? months[Number(month) - 1] : 'Month'}</span>
+              <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} className="text-xs" />
             </button>
             {isMonthOpen && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
-                <ul className="max-h-60 overflow-auto">
-                  {months.map((m, i) => (
-                    <li key={m} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
-                      {m}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Month</li>
+                {months.map((m, i) => (
+                  <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{m}</li>
+                ))}
+              </ul>
             )}
           </div>
-          <div ref={dayRef} className="relative">
-            <button onClick={() => setIsDayOpen(!isDayOpen)} className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center">
-              {day || "Day"} <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} className="ml-2" />
+          {/* Day Dropdown */}
+          <div className="relative w-20 sm:w-24 max-sm:w-14" ref={dayRef}>
+            <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
+              <span>{day || 'Day'}</span>
+              <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} className="text-xs" />
             </button>
             {isDayOpen && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
-                <ul className="max-h-60 overflow-auto">
-                  {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
-                    <li key={d} onClick={() => { setDay(d); setIsDayOpen(false); }} className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
-                      {d}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Day</li>
+                {[...Array(31)].map((_, i) => (
+                  <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{i + 1}</li>
+                ))}
+              </ul>
             )}
           </div>
-          <button 
-            onClick={handleFilter} 
+          <button
+            onClick={handleFilter}
             disabled={filterLoading}
-            className={`bg-blue-400 text-white px-4 py-2 rounded-md hover:bg-blue-600 ${
+            className={`p-1.5 sm:p-2 border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-white transition-colors text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-200 flex items-center justify-center ${
               filterLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {filterLoading ? "Filtering..." : "Filter"}
+            <span className="sm:hidden">
+              <FontAwesomeIcon icon={faFilter} />
+            </span>
+            <span className="hidden sm:inline">{filterLoading ? "Filtering..." : "Filter"}</span>
           </button>
-          <button 
-            onClick={handleClear} 
+          <button
+            onClick={handleClear}
             disabled={filterLoading}
-            className={`bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 ${
+            className={`p-1.5 sm:p-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-300 hover:text-black transition-colors text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-200 flex items-center justify-center ${
               filterLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {filterLoading ? "Clearing..." : "Clear"}
+            <span className="sm:hidden">
+              <FontAwesomeIcon icon={faXmark} />
+            </span>
+            <span className="hidden sm:inline">{filterLoading ? "Clearing..." : "Clear"}</span>
           </button>
         </div>
-
       </div>
       
       <div className="overflow-x-auto pb-8">
@@ -313,6 +328,18 @@ const RecordRemovedTable: React.FC = () => {
               color="#60A5FA"
               radius="9"
             />
+          </div>
+        ) : materialData?.daily_data && materialData.daily_data.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-50 mb-4">
+              {/* Box icon */}
+              <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                <path d="M16 3v4M8 3v4M3 7h18" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold text-gray-800 mb-1">No raw material records</h2>
+            <p className="text-gray-500 mb-6 text-center max-w-xs">All your added raw material records will show up here. Add a new record to get started.</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -353,52 +380,28 @@ const RecordRemovedTable: React.FC = () => {
 
                 {openDates[dayData.date] && (
                   <table className="min-w-full overflow-auto">
-                    <thead className="bg-gray-800">
+                    <thead className="bg-blue-20 text-white">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Material
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Quantity
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Unit
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">
-                          Cost Price
-                        </th>
-                        {userRole === 'ceo' && <th className="px-4 py-3 text-left text-xs font-bold text-blue-400">Actions</th>}
+                        <th className="px-4 py-3 text-left text-xs font-bold hidden sm:table-cell">Date</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold">Material</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold">Quantity</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold">Details</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {dayData.entries.map((entry) => (
                         <tr key={entry.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm">
-                            {entry.material?.name || "N/A"}
+                          <td className="px-4 py-3 text-sm hidden sm:table-cell">{entry.date ? new Date(entry.date).toLocaleDateString() : "-"}</td>
+                          <td className="px-4 py-3 text-sm">{entry.material?.name || "N/A"}</td>
+                          <td className="px-4 py-3 text-sm">{entry.quantity}</td>
+                          <td className="px-4 py-3 text-sm text-blue-600">
+                            <button
+                              className="px-2 py-1 border border-blue-400 text-blue-400 bg-white rounded hover:bg-blue-50 text-xs sm:text-sm"
+                              onClick={() => setSelectedEntry(entry)}
+                            >
+                              Details
+                            </button>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            {entry.quantity}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            {entry.material?.unit || "N/A"}
-                          </td>
-                          <td className="px-4 py-3 text-sm">
-                            ₦{parseFloat(entry.cost_price).toLocaleString()}
-                          </td>
-                          {userRole === 'ceo' && (
-                            <td className="flex justify-evenly px-4 py-3 text-sm text-blue-600">
-                              <FontAwesomeIcon
-                                onClick={() => handleEdit(entry.id)}
-                                className="pr-2 cursor-pointer hover:text-blue-500"
-                                icon={faPen}
-                              />
-                              <FontAwesomeIcon
-                                onClick={() => handleDeleteClick(entry.id)}
-                                className="cursor-pointer text-red-400"
-                                icon={faTrash}
-                              />
-                            </td>
-                          )}
                         </tr>
                       ))}
                     </tbody>
@@ -411,9 +414,57 @@ const RecordRemovedTable: React.FC = () => {
       </div>
 
       {/* Add confirmation modal */}
+      {selectedEntry && !confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm" onClick={() => setSelectedEntry(null)}></div>
+          <div className="relative z-10 bg-white rounded-xl p-6 sm:p-8 max-w-md w-full mx-2 border-2 border-black-200 shadow-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-blue-400">Raw Material Details</h2>
+              <button
+                onClick={() => setSelectedEntry(null)}
+                className="text-black-400 hover:text-blue-400 focus:outline-none text-2xl font-bold"
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="grid gap-y-2 gap-x-4 grid-cols-2">
+              <div className="font-semibold text-black">Material:</div>
+              <div className="text-black">{selectedEntry.material?.name || 'N/A'}</div>
+              <div className="font-semibold text-black">Quantity:</div>
+              <div className="text-black">{selectedEntry.quantity}</div>
+              <div className="font-semibold text-black">Date:</div>
+              <div className="text-black">{selectedEntry.date ? new Date(selectedEntry.date).toLocaleDateString() : '-'}</div>
+              <div className="font-semibold text-black">Cost Price:</div>
+              <div className="text-black">₦{selectedEntry.cost_price}</div>
+              <div className="font-semibold text-black">Unit:</div>
+              <div className="text-black">{selectedEntry.material?.unit || 'N/A'}</div>
+            </div>
+            <div className="flex flex-row justify-end gap-2 mt-6 w-full">
+              {userRole === 'ceo' && (
+                <>
+                  <button
+                    onClick={() => handleEdit(selectedEntry.id)}
+                    className="w-full sm:w-auto py-2 px-4 border-2 border-blue-400 text-blue-400 rounded-lg font-semibold transition-colors hover:bg-blue-400 hover:text-white focus:ring-2 focus:ring-blue-200 text-sm"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => setConfirmDelete(true)}
+                    className="w-full sm:w-auto py-2 px-4 border-2 border-red-400 text-red-400 rounded-lg font-semibold transition-colors hover:bg-red-400 hover:text-white focus:ring-2 focus:ring-red-200 text-sm"
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       {confirmDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+          <div className="bg-black bg-opacity-50 absolute inset-0" />
+          <div className="bg-white rounded-lg p-6 w-96 z-[101]">
             <h3 className="text-lg font-medium mb-4">Confirm Deletion</h3>
             <p className="mb-4">Are you sure you want to delete this item?</p>
             <div className="flex justify-end space-x-3">

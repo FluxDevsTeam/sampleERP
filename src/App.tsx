@@ -599,7 +599,7 @@ const router = createBrowserRouter([
         element: <EditRecordRemovedItem />,
       },
       {
-        path: "add-to-raw-material",
+        path: "add-record-removed",
         element: <AddToRM />,
       },
       {
@@ -671,7 +671,7 @@ const router = createBrowserRouter([
         element: <Stock />,
       },
       {
-        path: "add-new-stock-item",
+        path: "add-new-stock",
         element: <AddNewStockPage />,
       },
       {

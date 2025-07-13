@@ -1,4 +1,4 @@
-import React, { useEffect, useState, JSX } from "react";
+import React, { useEffect, useState, JSX, useRef } from "react";
 import { ThreeDots } from "react-loader-spinner";
 import { Whisper, Tooltip } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
@@ -12,6 +12,7 @@ import {
   faXmark,
   faAnglesLeft,
   faAnglesRight,
+  faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import Modal from "../../Modal";
@@ -19,10 +20,6 @@ import Modal from "../../Modal";
 interface TableProps {
   headers: string[];
   onModalChange: (isOpen: boolean) => void;
-  searchQuery: string;
-  archived: boolean;
-  emptyStock: boolean;
-  lowStock: boolean;
 }
 
 interface TableData {
@@ -36,10 +33,6 @@ interface TableData {
 const Table: React.FC<TableProps> = ({
   headers,
   onModalChange,
-  searchQuery,
-  archived,
-  emptyStock,
-  lowStock,
 }) => {
   const userRole = localStorage.getItem("user_role");
   const [tableData, setTableData] = useState<TableData[]>([]);
@@ -59,6 +52,40 @@ const Table: React.FC<TableProps> = ({
   });
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Add search/filter state here
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [archived, setArchived] = useState(false);
+  const [emptyStock, setEmptyStock] = useState(false);
+  const [lowStock, setLowStock] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isFilterOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isFilterOpen]);
+
+  const handleSearch = () => {
+    setSearchQuery(searchInput);
+  };
+
+  const handleClear = () => {
+    setSearchInput("");
+    setSearchQuery("");
+    setArchived(false);
+    setEmptyStock(false);
+    setLowStock(false);
+  };
 
   const fetchItems = async () => {
     try {
@@ -242,6 +269,112 @@ const Table: React.FC<TableProps> = ({
 
   return (
     <div className="relative">
+      {/* Heading and Add Button in a two-column grid */}
+      <div className="grid grid-cols-2 items-center mb-4">
+        <h1
+          style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
+          className="font-semibold py-0 mt-0"
+        >
+          Inventory Items
+        </h1>
+        <div className="flex justify-end">
+          <button
+            onClick={() => navigate("/shop/add-new-item")}
+            className="px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
+          >
+            <FontAwesomeIcon className="pr-2" icon={faPlus} />
+            Add Item
+          </button>
+        </div>
+      </div>
+      {/* Search and Filter Bar */}
+      <div className="flex justify-between items- mb-4">
+        {/* Search Bar */}
+        <div className="flex items-center gap-x-2 w-1/2 ">
+          <input
+            type="text"
+            placeholder="Search for items by name..."
+            className="border p-2 rounded w-32 md:w-96"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSearch();
+            }}
+          />
+          <button
+            onClick={handleSearch}
+            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 flex items-center justify-center"
+          >
+            {/* Icon for mobile, text for md+ */}
+            <FontAwesomeIcon icon={faMagnifyingGlass} className="inline md:hidden" />
+            <span className="hidden md:inline">Search</span>
+          </button>
+          <button
+            onClick={handleClear}
+            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 flex items-center justify-center"
+          >
+            {/* Icon for mobile, text for md+ */}
+            <FontAwesomeIcon icon={faXmark} className="inline md:hidden" />
+            <span className="hidden md:inline">Clear</span>
+          </button>
+        </div>
+        {/* Filter Dropdown */}
+        <div className="relative" ref={filterRef}>
+          <button
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="border p-2 rounded flex items-center"
+          >
+            Filters{" "}
+            <svg
+              className="w-4 h-4 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </button>
+          {isFilterOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-xl z-10">
+              <div className="p-4">
+                <label className="flex items-center cursor-pointer mb-2">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox h-5 w-5 text-blue-600 mr-2"
+                    checked={archived}
+                    onChange={() => setArchived(!archived)}
+                  />
+                  <span>Archived</span>
+                </label>
+                <label className="flex items-center cursor-pointer mb-2">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox h-5 w-5 text-blue-600 mr-2"
+                    checked={emptyStock}
+                    onChange={() => setEmptyStock(!emptyStock)}
+                  />
+                  <span>Empty Stock</span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox h-5 w-5 text-blue-600 mr-2"
+                    checked={lowStock}
+                    onChange={() => setLowStock(!lowStock)}
+                  />
+                  <span>Low Stock</span>
+                </label>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
       <div className="overflow-x-auto pb-8">
         {loading ? (
           <div className="w-1/5 mx-auto">
@@ -257,43 +390,48 @@ const Table: React.FC<TableProps> = ({
             />
           </div>
         ) : (
-          <div>
-            <button
-              onClick={() => navigate("/shop/add-new-item")}
-              className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
-            >
-              <FontAwesomeIcon className="pr-2" icon={faPlus} />
-              Add Item / Category
-            </button>
-            <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
-              <thead>
-                <tr className="bg-blue-400 text-white">
-                  <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Product</th>
-                  <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Category</th>
-                  <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Stock Status</th>
-                  <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentItems.map((row, index) => (
-                  <tr key={index} className="hover:bg-gray-100">
-                    <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
-                      {row.Product}
-                    </td>
-                    <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
-                      {row.Category}
-                    </td>
-                    <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700 hidden sm:table-cell">
-                      {row["Stock Status"]}
-                    </td>
-                    <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
-                      {row.Details}
-                    </td>
+          currentItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2V7a2 2 0 00-2-2h-1V3.5a1.5 1.5 0 00-3 0V5H9a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h2 className="text-lg font-semibold text-gray-800 mb-1">No inventory items found</h2>
+              <p className="text-gray-500 mb-6 text-center max-w-xs">All your inventory items will show up here. Start by adding a new item.</p>
+            </div>
+          ) : (
+            <div>
+              <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
+                <thead>
+                  <tr className="bg-blue-400 text-white">
+                    <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Product</th>
+                    <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Category</th>
+                    <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Stock</th>
+                    <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Details</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {currentItems.map((row, index) => (
+                    <tr key={index} className="hover:bg-gray-100">
+                      <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
+                        {row.Product}
+                      </td>
+                      <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700 hidden sm:table-cell">
+                        {row.Category}
+                      </td>
+                      <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
+                        {row["Stock Status"]}
+                      </td>
+                      <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
+                        {row.Details}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
         )}
       </div>
 
@@ -345,96 +483,89 @@ const Table: React.FC<TableProps> = ({
             className="absolute inset-0 bg-black opacity-50"
             onClick={() => setShowModal(false)}
           ></div>
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 border-2 border-gray-800 shadow-lg relative z-10">
+          <div className="w-[95vw] max-w-md mx-auto p-4 sm:p-6 bg-white border border-gray-200 rounded-lg shadow-lg relative z-10" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-20">
-                {selectedProduct.name}{" "}
-              </h2>
+              <h2 className="text-lg sm:text-xl font-bold text-black">{selectedProduct.name}</h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                className="text-gray-500 hover:text-gray-700 focus:outline-none text-2xl font-bold"
+                aria-label="Close"
               >
-                ✕
+                ×
               </button>
             </div>
-            {!showImagePreview && (
-              <Whisper
-                followCursor
-                speaker={<Tooltip>Click for full view</Tooltip>}
-              >
+            {!showImagePreview && selectedProduct.image && (
+              <Whisper followCursor speaker={<Tooltip>Click for full view</Tooltip>}>
                 <img
                   src={selectedProduct.image}
                   alt={selectedProduct.name}
-                  className="block w-1/5 h-auto mb-2 cursor-pointer"
+                  className="block w-24 h-24 object-contain mb-4 cursor-pointer border border-gray-200 rounded"
                   onClick={() => setShowImagePreview(true)}
                 />
               </Whisper>
             )}
-            {/* If showImagePreview is true, render the image directly without Whisper */}
-            {showImagePreview && (
+            {showImagePreview && selectedProduct.image && (
               <img
                 src={selectedProduct.image}
                 alt={selectedProduct.name}
-                className="block w-1/5 h-auto mb-2 cursor-pointer"
+                className="block w-24 h-24 object-contain mb-4 cursor-pointer border border-gray-200 rounded"
                 onClick={() => setShowImagePreview(true)}
               />
             )}
-            <div className="space-y-2"></div>
-            <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Category:</span>{" "}
-              {selectedProduct.inventory_category?.name || "No category"}
-            </p>
-            <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Description:</span>{" "}
-              {selectedProduct.description
-                ? selectedProduct.description
-                : "no description"}
-            </p>
-            <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Dimensions:</span>{" "}
-              {selectedProduct.dimensions} cm
-            </p>
-            <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Cost Price:</span> &#8358;{" "}
-              {selectedProduct.cost_price}
-            </p>
-            <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Selling Price:</span> &#8358;{" "}
-              {selectedProduct.selling_price}
-            </p>
-            <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Profit per item:</span> &#8358;{" "}
-              {selectedProduct.profit_per_item}
-            </p>
-            <p className="text-sm text-gray-20 mb-3">
-              <span className="font-semibold">Total Price:</span> &#8358;{" "}
-              {selectedProduct.total_price}
-            </p>
-
-            {userRole === "ceo" && (
-              <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white border border-gray-100 rounded-lg p-4 mb-4 shadow">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Category</span>
+                <span className="text-base font-bold text-black">{selectedProduct.inventory_category?.name || "No category"}</span>
+              </div>
+              <div className="flex flex-col gap-1 col-span-1 sm:col-span-2">
+                <span className="text-xs font-semibold text-black uppercase">Description</span>
+                <span className="text-base font-bold text-black">{selectedProduct.description || "No description"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Dimensions</span>
+                <span className="text-base font-bold text-black">{selectedProduct.dimensions} cm</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Cost Price</span>
+                <span className="text-base font-bold text-black">₦ {selectedProduct.cost_price}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Selling Price</span>
+                <span className="text-base font-bold text-black">₦ {selectedProduct.selling_price}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Profit per item</span>
+                <span className="text-base font-bold text-black">₦ {selectedProduct.profit_per_item}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Total Price</span>
+                <span className="text-base font-bold text-black">₦ {selectedProduct.total_price}</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 w-full mt-2">
+              <button
+                onClick={() => setShowModal(false)}
+                className="w-full py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors text-sm"
+              >
+                Close
+              </button>
+              {userRole === "ceo" && (
                 <button
                   onClick={editItem}
-                  className="pt-2 pr-3 p-2 text-blue-400 rounded-lg border-2 border-blue-400 mt-4 mr-2 font-bold"
+                  className="w-full py-2 px-4 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-sm"
                 >
-                  <FontAwesomeIcon
-                    className="pr-1 text-blue-400"
-                    icon={faPencil}
-                  />
-                  Edit details
+                  <FontAwesomeIcon className="pr-1" icon={faPencil} /> Edit
                 </button>
+              )}
+              {userRole === "ceo" && (
                 <button
                   onClick={confirmDeleteItem}
-                  className="pt-2 pr-3 p-2 text-red-400 rounded-lg border-2 border-red-400 mt-4 font-bold"
+                  className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
                 >
-                  <FontAwesomeIcon
-                    className="pr-1 text-red-400"
-                    icon={faTrash}
-                  />
-                  Delete Item
+                  <FontAwesomeIcon className="pr-1" icon={faTrash} /> Delete
                 </button>
-              </>
-            )}
+              )}
+            </div>
           </div>
         </div>
       )}

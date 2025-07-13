@@ -117,48 +117,54 @@ const AddNewStockPage = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <div className="flex items-center mb-6">
-        <button
-          onClick={() => navigate("/shop/stock")}
-          className="mr-4 text-gray-20 hover:text-gray-600"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} />
-        </button>
-        <h1 className="text-2xl font-bold text-gray-20">Add Stock</h1>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <SearchablePaginatedDropdown
-          endpoint="https://backend.kidsdesigncompany.com/api/inventory-item/"
-          label="Item"
-          name="item"
-          onChange={handleDropdownChange}
-          resultsKey="results.items"
-        />
-        <div>
-          <label className="block mb-1">Quantity:</label>
-          <input
-            type="number"
-            name="quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-            required
-          />
+    <div className="min-h-auto flex items-center justify-center bg-gray-50 py-8 px-2">
+      <div className="w-full max-w-lg bg-white rounded-xl shadow-lg p-6 sm:p-8">
+        <div className="flex items-center mb-6">
+          <button
+            onClick={() => navigate("/shop/stock")}
+            className="mr-4 text-black-400 hover:text-blue-400 focus:outline-none"
+            aria-label="Back"
+          >
+            <FontAwesomeIcon icon={faArrowLeft} />
+          </button>
+          <h1 className="text-2xl font-bold text-black-800">Add Stock</h1>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ${
-            loading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-        >
-          {loading ? "Submitting..." : "Submit"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <SearchablePaginatedDropdown
+              endpoint="https://backend.kidsdesigncompany.com/api/inventory-item/"
+              label="Item"
+              name="item"
+              onChange={handleDropdownChange}
+              resultsKey="results.items"
+            />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">Quantity</label>
+            <input
+              type="number"
+              name="quantity"
+              value={formData.quantity}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+              required
+            />
+          </div>
 
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-2 px-4 border-2 border-blue-400 text-blue-400 rounded-lg font-semibold transition-colors duration-150 hover:bg-blue-400 hover:text-white focus:ring-2 focus:ring-blue-200 ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {loading ? "Submitting..." : "Submit"}
+          </button>
+        </form>
+      </div>
+
+      {/* Success Modal */}
       <Modal
         isOpen={showSuccessModal}
         onClose={() => {
@@ -168,6 +174,7 @@ const AddNewStockPage = () => {
         type="success"
       />
 
+      {/* Error Modal */}
       <Modal
         isOpen={showErrorModal}
         onClose={() => setShowErrorModal(false)}

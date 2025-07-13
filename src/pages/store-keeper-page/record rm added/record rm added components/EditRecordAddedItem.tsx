@@ -20,6 +20,7 @@ const EditRecordRemovedItem: React.FC = () => {
     material: "",
     quantity: "",
     cost_price: "",
+    date: "",
   });
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
@@ -46,6 +47,7 @@ const EditRecordRemovedItem: React.FC = () => {
           material: data.material?.id.toString() || "",
           quantity: data.quantity || "",
           cost_price: data.cost_price || "",
+          date: data.date ? data.date.slice(0, 10) : "",
         });
       } catch (error) {
         console.error("Error:", error);
@@ -93,6 +95,7 @@ const EditRecordRemovedItem: React.FC = () => {
           },
           body: JSON.stringify({
             quantity: formData.quantity,
+            date: formData.date,
           }),
         }
       );
@@ -125,42 +128,47 @@ const EditRecordRemovedItem: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+    <div className="min-h-auto flex items-center justify-center bg-gray-50 py-8 px-2">
+      <div className="w-full max-w-lg bg-white rounded-xl shadow-lg p-6 sm:p-8">
         <div className="flex items-center mb-6">
           <button
             onClick={() => navigate("/store-keeper/record-rm-added")}
-            className="mr-4 text-gray-600 hover:text-gray-800"
+            className="mr-4 text-black-400 hover:text-blue-400 focus:outline-none"
+            aria-label="Back"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-500">
-            Edit Raw Material Record
-          </h1>
+          <h1 className="text-2xl font-bold text-black-800">Edit Raw Material Record</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Raw Material
-            </label>
+            <label className="block text-xs font-medium text-gray-700">Raw Material</label>
             <h3 className="mt-1 text-lg font-semibold text-gray-500">
               {rawMaterials.find((material) => material.id.toString() === formData.material)?.name || ""}
             </h3>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Quantity
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Quantity</label>
             <input
               type="number"
               value={formData.quantity}
               onChange={(e) =>
                 setFormData({ ...formData, quantity: e.target.value })
               }
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
               required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Date</label>
+            <input
+              type="date"
+              required
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
             />
           </div>
 
@@ -168,14 +176,14 @@ const EditRecordRemovedItem: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate("/store-keeper/record-rm-added")}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              className="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold transition-colors hover:bg-gray-300 hover:text-black focus:ring-2 focus:ring-gray-200"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+              className={`px-4 py-2 border-2 border-blue-400 text-blue-400 rounded-lg font-semibold transition-colors hover:bg-blue-400 hover:text-white focus:ring-2 focus:ring-blue-200 ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -184,7 +192,6 @@ const EditRecordRemovedItem: React.FC = () => {
           </div>
         </form>
       </div>
-
       <Modal
         isOpen={modalConfig.isOpen}
         onClose={handleCloseModal}

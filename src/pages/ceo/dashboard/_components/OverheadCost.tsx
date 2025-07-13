@@ -95,7 +95,7 @@ export default function OverheadCost() {
         />
         <button
           type="submit"
-          className="w-full bg-blue-400 text-white py-2 rounded hover:bg-blue-600"
+          className="w-full bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-white py-2 rounded hover:from-blue-500 hover:to-blue-700 hover:via-blue-600"
           disabled={mutation.isPending}
         >
           {mutation.isPending ? "Updating..." : "Update Cost"}

@@ -80,8 +80,8 @@ const PaginationComponent: React.FC<PaginationProps> = ({
                 onClick={() => handlePageChange(page as number)}
                 className={`w-7 h-7 sm:w-8 sm:h-8 mx-0.5 sm:mx-1 flex items-center justify-center rounded-md text-xs sm:text-sm ${
                   currentPage === page
-                    ? "bg-neutral-900 text-white"
-                    : "border hover:bg-gray-100"
+                    ? "bg-blue-400 text-white"
+                    : "border hover:bg-blue-300"
                 }`}
               >
                 {page}

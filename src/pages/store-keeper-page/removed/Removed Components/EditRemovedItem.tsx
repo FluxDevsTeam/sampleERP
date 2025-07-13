@@ -26,6 +26,7 @@ interface RemovedItem {
   quantity: string;
   price: string;
   product_its_used: Product;
+  date: string;
 }
 
 const EditRemovedItem: React.FC = () => {
@@ -37,6 +38,7 @@ const EditRemovedItem: React.FC = () => {
   const [formData, setFormData] = useState({
     product: "",
     quantity: "",
+    date: "",
   });
 
 
@@ -63,6 +65,24 @@ const EditRemovedItem: React.FC = () => {
     }));
   };
 
+  // Helper functions for date format conversion
+  function yyyyMMddToDdMonthYyyy(isoDate: string) {
+    if (!isoDate) return "";
+    const [yyyy, mm, dd] = isoDate.split("-");
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const monthName = months[parseInt(mm, 10) - 1];
+    return `${dd}-${monthName}-${yyyy}`;
+  }
+
+  function ddMmYyToYyyyMmDd(ddmmyy: string) {
+    if (!ddmmyy) return "";
+    const [dd, mm, yy] = ddmmyy.split("-");
+    return `20${yy}-${mm}-${dd}`;
+  }
+
   useEffect(() => {
     const fetchItem = async () => {
       setInitialDataLoading(true);
@@ -82,6 +102,7 @@ const EditRemovedItem: React.FC = () => {
         setFormData({
           product: data.product_its_used?.id?.toString() || "",
           quantity: data.quantity || "",
+          date: data.date ? yyyyMMddToDdMonthYyyy(data.date.slice(0, 10)) : "",
         });
 
         // Set search text for dropdowns
@@ -112,6 +133,7 @@ const EditRemovedItem: React.FC = () => {
       const requestBody = {
         product: parseInt(formData.product),
         quantity: parseFloat(formData.quantity),
+        date: formData.date,
       };
 
       const response = await fetch(
@@ -202,6 +224,24 @@ const EditRemovedItem: React.FC = () => {
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Date
+            </label>
+            <input
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              required
+            />
+            {formData.date && (
+              <div className="text-xs text-gray-500 mt-1">
+                Selected date: {yyyyMMddToDdMonthYyyy(formData.date)}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end space-x-3 mt-6">

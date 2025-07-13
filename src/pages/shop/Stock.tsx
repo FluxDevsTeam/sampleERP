@@ -54,36 +54,19 @@ const Stock = () => {
       >
         Sold Summary
       </h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-11">
-        <InventoryData
-          info="Yearly Added Stock"
-          digits={yearlyAddedStockCount}
-        ></InventoryData>
-        <InventoryData
-          info="Yearly Added Total Cost Price"
-          digits={yearlyAddedTotalCostPrice}
-        ></InventoryData>
-        <InventoryData
-          info="Monthly Added Stock"
-          digits={monthlyAddedStockCount}
-        ></InventoryData>
-        <InventoryData
-          info="Monthly Added Total Cost Price"
-          digits={monthlyAddedTotalCostPrice}
-        ></InventoryData>
-        <InventoryData
-          info="Daily Added Cost Total"
-          digits={dailyAddedCostTotal}
-        ></InventoryData>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-11">
+        <InventoryData info="Yearly Added Stock" digits={yearlyAddedStockCount} trend="" />
+        <InventoryData info="Yearly Added Total Cost Price" digits={yearlyAddedTotalCostPrice} trend="" />
+        <InventoryData info="Monthly Added Stock" digits={monthlyAddedStockCount} trend="" />
+        <div className="md:col-span-2 lg:col-span-1">
+          <InventoryData info="Monthly Added Total Cost Price" digits={monthlyAddedTotalCostPrice} trend="" />
+        </div>
+        <div className="col-span-2 md:col-span-3 lg:col-span-1">
+          <InventoryData info="Daily Added Cost Total" digits={dailyAddedCostTotal} trend="" />
+        </div>
       </div>
 
       <div>
-        <h1
-          style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-          className="font-semibold py-3 sm:py-5 mt-2"
-        >
-          Stocks Added
-        </h1>
         <StockTable />
       </div>
     </div>

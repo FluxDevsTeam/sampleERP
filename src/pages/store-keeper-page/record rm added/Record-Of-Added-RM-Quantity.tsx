@@ -37,45 +37,27 @@ const RecordOfRMAdded: React.FC = () => {
     fetchStockInfo();
   }, []);
 
-  return (
-    <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
-      {/* <h1
-        style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-        className="font-semibold py-5 mt-2"
-      >
-        Raw Materials Added Summary
-      </h1> */}
+  // Destructure values from boxData with fallback to 0
+  const {
+    yearly_added_material_count = 0,
+    yearly_added_total_cost = 0,
+    monthly_added_material_count = 0,
+    monthly_added_total_cost = 0,
+  } = boxData || {};
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 my-4">
-        <InventoryData
-          info="Monthly Added Stock"
-          digits={boxData.monthly_added_material_count}
-          
-        ></InventoryData>
-        <InventoryData
-          info="Monthly Added Total Cost"
-          digits={boxData.monthly_added_total_cost}
-          currency="₦"
-        ></InventoryData>
-        <InventoryData
-          info="Yearly Added Stock"
-          digits={boxData.yearly_added_material_count}
-          trend="up"
-        ></InventoryData>
-        <InventoryData
-          info="Yearly Added Total Cost Price"
-          digits={boxData.yearly_added_total_cost}
-          currency="₦"
-        ></InventoryData>
+  return (
+    <div className="wrapper w-full mx-auto my-0 pl-1 mb-20 pt-2">
+      {/* <h4>Removed Dashboard</h4> */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 max-sm:gap-1 mb-0 md:mb-6 mt-2">
+        <InventoryData info="Total Raw Materials Added (Year)" digits={yearly_added_material_count} trend="" />
+        <InventoryData info="Total Raw Materials Added (Month)" digits={monthly_added_material_count} trend="" />
+        <InventoryData info="Total Cost of Raw Materials (Year)" digits={yearly_added_total_cost} currency="₦" trend="" />
+        <InventoryData info="Total Cost of Raw Materials (Month)" digits={monthly_added_total_cost} currency="₦" trend="" />
       </div>
 
-      <h1
-        className="font-semibold py-3 sm:py-5 mt-2"
-        style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-      >
-        Addition to raw materials
-      </h1>
-      <RecordRemovedTable />
+      <div>
+        <RecordRemovedTable />
+      </div>
     </div>
   );
 };

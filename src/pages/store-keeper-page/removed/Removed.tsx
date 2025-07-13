@@ -39,7 +39,7 @@ export const Removed = () => {
 
   return (
     <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-4 mb-4 mt-4">
+      <div className="grid grid-cols-2  gap-2 md:gap-10 mb-4 mt-4">
         <InventoryData
           info="This Month's Removed Count"
           digits={thisMonthRemovedCount}
@@ -52,12 +52,7 @@ export const Removed = () => {
       </div>
 
       <div>
-        <h1
-          style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-          className="font-semibold py-3 sm:py-5 mt-2"
-        >
-          Removed Items
-        </h1>
+        {/* Removed the heading from here, only render RemovedTable */}
         <RemovedTable />
       </div>
     </div>

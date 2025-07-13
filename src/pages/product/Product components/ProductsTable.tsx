@@ -9,6 +9,7 @@ import {
   faXmark,
   faAnglesLeft,
   faAnglesRight,
+  faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 // import { Accordion } from "rsuite";

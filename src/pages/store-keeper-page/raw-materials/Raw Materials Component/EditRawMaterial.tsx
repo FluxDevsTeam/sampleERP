@@ -170,62 +170,21 @@ const EditRawMaterial = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div
-        className={`max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6 ${
-          showSuccessModal || showErrorModal ? "hidden" : ""
-        }`}
-      >
-        <div className="flex items-center mb-6">
-          <button
-            onClick={() => navigate("/store-keeper/raw-materials")}
-            className="mr-4 text-gray-20 hover:text-gray-600"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-20">Edit Raw Material</h1>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            />
+    <div className="w-[95vw] max-w-2xl  mx-auto px-4 pt-4 pb-20 bg-white border border-gray-200 rounded-lg shadow-lg">
+      <div className="flex justify-between items-center mb-4">
+        <button onClick={() => navigate('/store-keeper/raw-materials')} className="text-gray-500 hover:text-gray-700 focus:outline-none text-2xl font-bold" aria-label="Back">
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
+        <h2 className="text-lg sm:text-xl font-bold text-black">Edit Raw Material</h2>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-black uppercase mb-1">Name</label>
+            <input type="text" name="name" value={formData.name} onChange={handleChange} className="border p-2 rounded w-full text-base font-bold text-black" required />
           </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Category
-              </label>
-              <div className="flex space-x-2">
-                <button
-                  type="button"
-                  onClick={() => navigate("/store-keeper/raw-materials/add-category")}
-                  className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center font-medium shadow-sm"
-                >
-                  <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                  Add Category
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDeleteCategory}
-                  disabled={!formData.category || loading}
-                  className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center font-medium shadow-sm"
-                >
-                  <FontAwesomeIcon icon={faTrash} className="mr-2" />
-                  Delete Category
-                </button>
-              </div>
-            </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-black uppercase mb-1">Category</label>
             <SearchablePaginatedDropdown
               endpoint="https://backend.kidsdesigncompany.com/api/raw-materials-category/"
               label=""
@@ -235,117 +194,60 @@ const EditRawMaterial = () => {
               onChange={handleDropdownChange}
               onSearchChange={setCategoryName}
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Quantity
-            </label>
-            <input
-              type="number"
-              name="quantity"
-              value={formData.quantity}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Unit
-            </label>
-            <input
-              type="text"
-              name="unit"
-              value={formData.unit}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Price
-            </label>
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Description (optional)
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              rows={4}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Archive Status
-            </label>
-            <div className="flex space-x-4">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  name="archived"
-                  value="true"
-                  checked={formData.archived === "true"}
-                  onChange={handleChange}
-                  className="form-radio"
-                />
-                <span className="ml-2">Yes</span>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  name="archived"
-                  value="false"
-                  checked={formData.archived === "false"}
-                  onChange={handleChange}
-                  className="form-radio"
-                />
-                <span className="ml-2">No</span>
-              </label>
+            <div className="flex gap-2 mt-2">
+              <button type="button" onClick={() => navigate(`/store-keeper/raw-materials/add-category?returnTo=edit&id=${id}`)} className="px-3 py-2 text-xs sm:text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center font-medium shadow-sm">
+                <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                <span className="inline sm:hidden">Add</span>
+                <span className="hidden sm:inline">Add Category</span>
+              </button>
+              <button type="button" onClick={handleDeleteCategory} disabled={!formData.category || loading} className="px-3 py-2 text-xs sm:text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center font-medium shadow-sm">
+                <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                <span className="inline sm:hidden">Delete</span>
+                <span className="hidden sm:inline">Delete Category</span>
+              </button>
             </div>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Image (optional)
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-black uppercase mb-1">Quantity</label>
+            <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} className="border p-2 rounded w-full text-base font-bold text-black" required />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-black uppercase mb-1">Unit</label>
+            <input type="text" name="unit" value={formData.unit} onChange={handleChange} className="border p-2 rounded w-full text-base font-bold text-black" required />
+          </div>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold text-black uppercase mb-1">Price</label>
+          <input type="number" name="price" value={formData.price} onChange={handleChange} className="border p-2 rounded w-full text-base font-bold text-black" required />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold text-black uppercase mb-1">Description</label>
+          <textarea name="description" value={formData.description} onChange={handleChange} className="border p-2 rounded w-full text-base font-bold text-black" rows={4} />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold text-black uppercase mb-1">Archive Status</label>
+          <div className="flex gap-4">
+            <label className="inline-flex items-center">
+              <input type="radio" name="archived" value="true" checked={formData.archived === "true"} onChange={handleChange} className="form-radio" />
+              <span className="ml-2">Yes</span>
             </label>
-            <input
-              type="file"
-              name="image"
-              onChange={handleFileChange}
-              className="mt-1 block w-full"
-              accept="image/*"
-            />
+            <label className="inline-flex items-center">
+              <input type="radio" name="archived" value="false" checked={formData.archived === "false"} onChange={handleChange} className="form-radio" />
+              <span className="ml-2">No</span>
+            </label>
           </div>
-
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500"
-              disabled={loading || userRole !== 'ceo'}
-            >
-              {loading ? "Updating..." : "Update"}
-            </button>
-          </div>
-        </form>
-      </div>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold text-black uppercase mb-1">Image (optional)</label>
+          <input type="file" name="image" onChange={handleFileChange} className="mt-1 block w-full" accept="image/*" />
+        </div>
+        <div className="flex gap-2 mt-4">
+          <button type="submit" className="w-full py-2 px-4 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-sm" disabled={loading || userRole !== 'ceo'}>{loading ? "Updating..." : "Update"}</button>
+          <button type="button" onClick={() => navigate('/store-keeper/raw-materials')} className="w-full py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors text-sm">Cancel</button>
+        </div>
+      </form>
 
       <Modal
         isOpen={showSuccessModal}

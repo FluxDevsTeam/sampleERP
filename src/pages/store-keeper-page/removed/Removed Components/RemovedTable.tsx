@@ -8,6 +8,7 @@ import {
   faTrash,
   faXmark,
   faPen,
+  faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import Modal from "@/pages/shop/Modal";
@@ -217,17 +218,27 @@ const RemovedTable: React.FC = () => {
 
   return (
     <div className="p-2 sm:p-4 md:p-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-8 gap-3 sm:gap-0">
+      {/* Heading and Remove Item button in the same row */}
+      <div className="flex flex-row justify-between items-center mb-2 sm:mb-4 gap-3 sm:gap-0">
+        <h1
+          style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
+          className="font-semibold py-3 sm:py-5 mt-2 sm:mt-0"
+        >
+          Removed Items
+        </h1>
         <button
           onClick={() => navigate("/store-keeper/add-removed")}
-          className="px-3 sm:px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-sm sm:text-base w-full sm:w-auto"
+          className="px-3 max-sm:px-2 py-1 md:py-2 max-md:px-0 border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-white transition-colors text-sm sm:text-base w-auto outline-none focus:ring-2 focus:ring-blue-200"
         >
           <FontAwesomeIcon className="pr-2" icon={faPlus} />
           Remove Item
         </button>
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+      </div>
+      {/* Filter controls below and right-aligned */}
+      <div className="flex w-full justify-end mb-4">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Year Dropdown */}
-          <div className="relative w-20 sm:w-24" ref={yearRef}>
+          <div className="relative w-20 sm:w-24 max-sm:w-14" ref={yearRef}>
             <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{year || 'Year'}</span>
               <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} className="text-xs" />
@@ -258,7 +269,7 @@ const RemovedTable: React.FC = () => {
             )}
           </div>
           {/* Day Dropdown */}
-          <div className="relative w-20 sm:w-24" ref={dayRef}>
+          <div className="relative w-20 sm:w-24 max-sm:w-14" ref={dayRef}>
             <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{day || 'Day'}</span>
               <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} className="text-xs" />
@@ -275,20 +286,26 @@ const RemovedTable: React.FC = () => {
           <button 
             onClick={handleFilter} 
             disabled={filterLoading}
-            className={`p-1.5 sm:p-2 bg-blue-400 text-white rounded hover:bg-blue-500 text-xs sm:text-sm ${
+            className={`p-1.5 sm:p-2 border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-white transition-colors text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-200 flex items-center justify-center ${
               filterLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {filterLoading ? "Filtering..." : "Filter"}
+            <span className="sm:hidden">
+              <FontAwesomeIcon icon={faFilter} />
+            </span>
+            <span className="hidden sm:inline">{filterLoading ? "Filtering..." : "Filter"}</span>
           </button>
           <button 
             onClick={handleClear} 
             disabled={filterLoading}
-            className={`p-1.5 sm:p-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 text-xs sm:text-sm ${
+            className={`p-1.5 sm:p-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-300 hover:text-black transition-colors text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-200 flex items-center justify-center ${
               filterLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {filterLoading ? "Clearing..." : "Clear"}
+            <span className="sm:hidden">
+              <FontAwesomeIcon icon={faXmark} />
+            </span>
+            <span className="hidden sm:inline">{filterLoading ? "Clearing..." : "Clear"}</span>
           </button>
         </div>
       </div>
@@ -306,25 +323,33 @@ const RemovedTable: React.FC = () => {
       ) : (
         <div className="space-y-4 sm:space-y-6">
           {removedData?.daily_data?.length === 0 ? (
-            <div className="text-center text-gray-500 py-8">No removed items found.</div>
+            <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2V7a2 2 0 00-2-2h-1V3.5a1.5 1.5 0 00-3 0V5H9a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h2 className="text-lg font-semibold text-gray-800 mb-1">No removed items found</h2>
+              <p className="text-gray-500 mb-6 text-center max-w-xs">All removed items will show up here. Start by removing an item.</p>
+            </div>
           ) : (
             removedData?.daily_data?.map((dayData: any) => (
               <div key={dayData.date} className="bg-white shadow-md rounded-lg overflow-hidden">
                 <div
-                  className="bg-white text-blue-20 px-3 sm:px-4 py-2 border-b flex flex-col sm:flex-row sm:justify-between sm:items-center cursor-pointer hover:bg-slate-200 gap-2"
+                  className="bg-white text-blue-20 px-3 sm:px-4 py-2 border-b flex flex-row justify-between items-center cursor-pointer hover:bg-slate-200 gap-2 max-md:text-xs"
                   onClick={() => toggleDate(dayData.date)}
                 >
                   <div className="flex items-center space-x-2">
                     <FontAwesomeIcon
                       icon={openSections.includes(dayData.date) ? faChevronUp : faChevronDown}
-                      className="text-blue-400"
+                      className="text-blue-400 max-md:text-xs"
                     />
                     <h2 className="text-base sm:text-lg font-semibold text-gray-700">
                       {formatDate(dayData.date)}
                     </h2>
                   </div>
                   <div className="text-left sm:text-right">
-                    <p className="text-base sm:text-lg font-bold text-gray-700">
+                    <p className="text-base sm:text-lg font-bold text-gray-700 max-md:text-xs">
                       Total: {formatCurrency(dayData.daily_total)}
                     </p>
                   </div>
@@ -335,12 +360,18 @@ const RemovedTable: React.FC = () => {
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                           <tr>
+                            {/* Name - always visible */}
                             <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Name</th>
+                            {/* Qty - visible on mobile and desktop */}
                             <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Qty</th>
+                            {/* Product - visible on mobile only, desktop version is below */}
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 max-md:table-cell hidden">Product</th>
+                            {/* Desktop only columns */}
                             <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">Cost/Unit</th>
-                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Total</th>
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">Total</th>
                             <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell">Product</th>
                             <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Progress</th>
+                            {/* Actions - always at the end */}
                             {userRole === 'ceo' && <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Actions</th>}
                           </tr>
                         </thead>
@@ -354,12 +385,18 @@ const RemovedTable: React.FC = () => {
                           ) : (
                             dayData.entries.map((entry: any) => (
                               <tr key={entry.id} className="hover:bg-gray-50">
+                                {/* Name - always visible */}
                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm cursor-pointer hover:text-blue-600">{entry.name}</td>
+                                {/* Qty - always visible */}
                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{entry.quantity}</td>
+                                {/* Product - visible on mobile only */}
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm max-md:table-cell hidden">{entry.product_its_used.name || "—"}</td>
+                                {/* Desktop only columns */}
                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{formatCurrency(entry.price)}</td>
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{formatCurrency(parseFloat(entry.price) * parseFloat(entry.quantity))}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{formatCurrency(parseFloat(entry.price) * parseFloat(entry.quantity))}</td>
                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">{entry.product_its_used.name || "—"}</td>
                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.product_its_used.progress}%</td>
+                                {/* Actions - always at the end */}
                                 {userRole === 'ceo' && (
                                   <td className="flex justify-evenly px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-blue-600">
                                     <>

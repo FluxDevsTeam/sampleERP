@@ -37,46 +37,15 @@ const Stock = () => {
 
 
   return (
-    <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
-      {/* <h1
-        style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-        className="font-medium py-0 mt-2"
-      >
-        Sold Summary
-      </h1> */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mt-4 mb-10">
-      <InventoryData
-          info="Daily Added Cost Total"
-          digits={stockData.daily_added_cost_total}
-          currency="₦"
-        ></InventoryData>
-        <InventoryData
-          info="Monthly Added Stock"
-          digits={stockData.monthly_added_stock_count}
-        ></InventoryData>
-        <InventoryData
-          info="Monthly Added Total Cost Price"
-          digits={stockData.monthly_added_total_cost_price}
-          currency="₦"
-        ></InventoryData>
-        <InventoryData
-          info="Yearly Added Stock"
-          digits={stockData.yearly_added_stock_count}
-        ></InventoryData>
-        <InventoryData
-          info="Yearly Added Total Cost Price"
-          digits={stockData.yearly_added_total_cost_price}
-          currency="₦"
-        ></InventoryData>
+    <div className="wrapper w-11/12 mx-auto my-0 pl-1 mb-20 pt-2">
+      {/* <h4>Stock Dashboard</h4> */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 max-sm:gap-1 mb-0 md:mb-6 mt-2">
+        <InventoryData info="Monthly Stock Additions" digits={stockData.monthly_added_stock_count} />
+        <InventoryData info="Yearly Stock Additions" digits={stockData.yearly_added_stock_count} />
+        <InventoryData info="Monthly Stock Value Added" digits={stockData.monthly_added_total_cost_price} currency="₦" />
+        <InventoryData info="Yearly Stock Value Added" digits={stockData.yearly_added_total_cost_price} currency="₦" />
       </div>
-
       <div>
-        <h1
-          style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-          className="font-medium py-5 mt-2"
-        >
-          Stocks Added
-        </h1>
         <StockTable />
       </div>
     </div>

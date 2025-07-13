@@ -70,28 +70,20 @@ export const Sold = () => {
     }, []);
 
   return (
-    <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
-      {/* <h1
-        style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-        className="font-semibold py-5 md:py-0 mt-2"
-      >
-        Sold Summary
-      </h1> */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-2  mt-4">
-      <InventoryData info="Count of this month sales" digits={thisMonthSalesCount}></InventoryData>
-        <InventoryData info="Non project sales this month" digits={thisMonthNonProjectSales} currency="₦ "></InventoryData>
-        <InventoryData info="Project sales for this month" digits={thisMonthProjectSales} currency="₦ "></InventoryData>
-        <InventoryData info="This month sales" digits={thisMonthSales} currency="₦ "></InventoryData>
-        <InventoryData info="This month profit" digits={thisMonthProfit} currency="₦ "></InventoryData>
+    <div className="wrapper w-11/12 mx-auto my-0 pl-1 mb-20 pt-2">
+        <h4>Monthly Sales Dashboard</h4>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 max-sm:gap-1 mb-0 md:mb-6 mt-2">
+        <InventoryData info="Sales Count" digits={thisMonthSalesCount}></InventoryData>
+        <InventoryData info="Non-Project Sales" digits={thisMonthNonProjectSales} currency="₦ "></InventoryData>
+        <InventoryData info="Project Sales" digits={thisMonthProjectSales} currency="₦ "></InventoryData>
+        <div className="md:col-span-1 lg:col-span-1">
+          <InventoryData info="Total Sales" digits={thisMonthSales} currency="₦ "></InventoryData>
+        </div>
+        <div className="col-span-2 md:col-span-2 lg:col-span-1">
+          <InventoryData info="Profit" digits={thisMonthProfit} currency="₦ "></InventoryData>
+        </div>
       </div>
-
       <div>
-        <h1
-          style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
-          className="font-semibold py-5 mt-2"
-        >
-          Sold Items
-        </h1>
         <SoldTable />
       </div>
     </div>

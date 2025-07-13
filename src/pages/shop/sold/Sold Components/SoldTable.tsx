@@ -8,6 +8,7 @@ import {
   faTrash,
   faPencil,
   faXmark,
+  faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../Modal";
@@ -256,12 +257,103 @@ const SoldTable: React.FC = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="">
+      {/* Heading and Record Sale button in the same row */}
+      <div className="flex flex-row justify-between items-center mb-2 sm:mb-4 gap-3 sm:gap-0">
+        <h1
+          style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
+          className="font-semibold py-3 sm:py-5 mt-2 sm:mt-0"
+        >
+          Sold Items
+        </h1>
+        <button
+          onClick={() => navigate("/shop/add-new-sold-item")}
+          className="px-3 max-sm:px-2 py-1 md:py-2 max-md:px-0 border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-white transition-colors text-sm sm:text-base w-auto outline-none focus:ring-2 focus:ring-blue-200"
+        >
+          <FontAwesomeIcon className="pr-2" icon={faPlus} />
+          Record Sale
+        </button>
+      </div>
+      {/* Filter controls below and right-aligned */}
+      <div className="flex w-full justify-end mb-4">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Year Dropdown */}
+          <div className="relative w-20 sm:w-24 max-sm:w-14" ref={yearRef}>
+            <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
+              <span>{year || 'Year'}</span>
+              <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} className="text-xs" />
+            </button>
+            {isYearOpen && (
+              <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Year</li>
+                {[...Array(10)].map((_, i) => {
+                  const y = new Date().getFullYear() - i;
+                  return <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{y}</li>
+                })}
+              </ul>
+            )}
+          </div>
+          {/* Month Dropdown */}
+          <div className="relative w-24 sm:w-32" ref={monthRef}>
+            <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
+              <span>{month ? months[Number(month) - 1] : 'Month'}</span>
+              <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} className="text-xs" />
+            </button>
+            {isMonthOpen && (
+              <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Month</li>
+                {months.map((m, i) => (
+                  <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{m}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {/* Day Dropdown */}
+          <div className="relative w-20 sm:w-24 max-sm:w-14" ref={dayRef}>
+            <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
+              <span>{day || 'Day'}</span>
+              <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} className="text-xs" />
+            </button>
+            {isDayOpen && (
+              <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
+                <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Day</li>
+                {[...Array(31)].map((_, i) => (
+                  <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{i + 1}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <button
+            onClick={handleFilter}
+            disabled={filterLoading}
+            className={`p-1.5 sm:p-2 border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-white transition-colors text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-200 flex items-center justify-center ${
+              filterLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <span className="sm:hidden">
+              <FontAwesomeIcon icon={faFilter} />
+            </span>
+            <span className="hidden sm:inline">{filterLoading ? "Filtering..." : "Filter"}</span>
+          </button>
+          <button
+            onClick={handleClear}
+            disabled={filterLoading}
+            className={`p-1.5 sm:p-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-300 hover:text-black transition-colors text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-200 flex items-center justify-center ${
+              filterLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <span className="sm:hidden">
+              <FontAwesomeIcon icon={faXmark} />
+            </span>
+            <span className="hidden sm:inline">{filterLoading ? "Clearing..." : "Clear"}</span>
+          </button>
+        </div>
+      </div>
+
       <div className="overflow-x-auto pb-8">
         {loading ? (
-          <div className="w-1/5 mx-auto">
+          <div className="flex justify-center items-center h-64">
             <ThreeDots
-              visible={true}
               height="80"
               width="80"
               color="#60A5FA"
@@ -281,90 +373,14 @@ const SoldTable: React.FC = () => {
             <p className="text-gray-500 mb-6 text-center max-w-xs">All your sold items will show up here. Add a new sale to get started.</p>
           </div>
         ) : (
-          <div className="space-y-6 ">
-            <div className="flex justify-between items-center mb-4">
-              <button
-                onClick={() => navigate("/shop/add-new-sold-item")}
-                className="px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors"
-              >
-                <FontAwesomeIcon className="pr-2" icon={faPlus} />
-                Record Sale
-              </button>
-              <div className="flex items-center space-x-2">
-                {/* Year Dropdown */}
-                <div className="relative w-24" ref={yearRef}>
-                  <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
-                    <span>{year || 'Year'}</span>
-                    <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} />
-                  </button>
-                  {isYearOpen && (
-                    <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
-                      <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Year</li>
-                      {[...Array(10)].map((_, i) => {
-                        const y = new Date().getFullYear() - i;
-                        return <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{y}</li>
-                      })}
-                    </ul>
-                  )}
-                </div>
-                {/* Month Dropdown */}
-                <div className="relative w-32" ref={monthRef}>
-                  <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
-                    <span>{month ? months[Number(month) - 1] : 'Month'}</span>
-                    <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} />
-                  </button>
-                  {isMonthOpen && (
-                    <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
-                      <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Month</li>
-                      {months.map((m, i) => (
-                        <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{m}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                {/* Day Dropdown */}
-                <div className="relative w-24" ref={dayRef}>
-                  <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-2 border rounded w-full text-left flex justify-between items-center">
-                    <span>{day || 'Day'}</span>
-                    <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} />
-                  </button>
-                  {isDayOpen && (
-                    <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
-                      <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">Day</li>
-                      {[...Array(31)].map((_, i) => (
-                        <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-2 hover:bg-gray-200 cursor-pointer">{i + 1}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <button
-                  onClick={handleFilter}
-                  disabled={filterLoading}
-                  className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors ${
-                    filterLoading ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {filterLoading ? "Filtering..." : "Filter"}
-                </button>
-                <button
-                  onClick={handleClear}
-                  disabled={filterLoading}
-                  className={`px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors ${
-                    filterLoading ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {filterLoading ? "Clearing..." : "Clear"}
-                </button>
-              </div>
-            </div>
-
+          <div className="space-y-4 sm:space-y-6">
             {soldData.map((dayData) => (
               <div
                 key={dayData.date}
-                className="bg-white shadow-md rounded-lg overflow-auto"
+                className="bg-white shadow-md rounded-lg overflow-hidden"
               >
                 <div
-                  className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-300 hover:text-blue-20 w-full"
+                  className="bg-white text-blue-20 px-3 sm:px-4 py-2 border-b flex flex-row justify-between items-center cursor-pointer hover:bg-slate-200 gap-2 max-md:text-xs"
                   onClick={() => toggleDate(dayData.date)}
                 >
                   <div className="flex items-center space-x-2">
@@ -372,20 +388,17 @@ const SoldTable: React.FC = () => {
                       icon={
                         openDates[dayData.date] ? faChevronUp : faChevronDown
                       }
+                      className="text-blue-400 max-md:text-xs"
                     />
-                    <h3
-                      className="text-lg font-semibold"
-                      style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
-                    >
+                    <h2 className="text-base sm:text-lg font-semibold text-gray-700">
                       {formatDate(dayData.date)}
-                    </h3>
+                    </h2>
                   </div>
-                  <p
-                    className="font-bold"
-                    style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
-                  >
+                  <div className="text-left sm:text-right">
+                    <p className="text-base sm:text-lg font-bold text-gray-700 max-md:text-xs">
                     Total: ₦{formatNumber(dayData.daily_total)}
                   </p>
+                  </div>
                 </div>
 
                 {openDates[dayData.date] && (
@@ -394,33 +407,44 @@ const SoldTable: React.FC = () => {
                     <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
                       <thead>
                         <tr className="bg-blue-400 text-white">
-                          {/* Adjust headers: hide less important columns on mobile */}
-                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Date</th>
+                          {/* Date - visible on tablet and up */}
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden lg:table-cell">Date</th>
+                          {/* Name - always visible */}
                           <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Name</th>
-                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Quantity</th>
-                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Sold To</th>
-                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Profit</th>
+                          {/* Quantity - always visible */}
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Quantity</th>
+                          {/* Sold To - visible on tablet and up */}
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden md:table-cell">Sold To</th>
+                          {/* Profit - visible on tablet and up */}
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden md:table-cell">Profit</th>
+                          {/* Actions - always visible */}
                           <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {dayData.entries.map((entry) => (
                           <tr key={entry.id} className="hover:bg-gray-50">
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
+                            {/* Date - visible on tablet and up */}
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">
                               {formatDate(entry.date)}
                             </td>
+                            {/* Name - always visible */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
                               {entry.name}
                             </td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">
+                            {/* Quantity - always visible */}
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
                               {formatNumber(entry.quantity)}
                             </td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">
+                            {/* Sold To - visible on tablet and up */}
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">
                               {entry.sold_to?.name || "—"}
                             </td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">
+                            {/* Profit - visible on tablet and up */}
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">
                               ₦{formatNumber(entry.profit)}
                             </td>
+                            {/* Actions - always visible */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-blue-400">
                               <button
                                 className="px-2 sm:px-3 py-1 text-blue-400 border-2 border-blue-400 rounded text-xs sm:text-sm"
@@ -516,93 +540,87 @@ const SoldTable: React.FC = () => {
         </div>
       )}
 
-      {showDetailsModal && selectedItem && (
-        <div className={`fixed inset-0 flex items-center justify-center z-100 p-4 ${
-          confirmDelete ? "blur-sm" : ""
-        }`}>
-          <div
-            className="absolute inset-0 bg-black opacity-50"
-            onClick={() => setShowDetailsModal(false)}
-          ></div>
-          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-sm w-full mx-2 sm:mx-4 border-2 border-gray-800 shadow-lg relative z-10">
-            <div className="flex justify-between items-center mb-3 sm:mb-4">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-20">
-                {selectedItem.name}
-              </h2>
+      {showDetailsModal && selectedItem && !confirmDelete && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center">
+          {/* Blurred backdrop */}
+          <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm" onClick={() => setShowDetailsModal(false)}></div>
+          <div className="relative w-[95vw] max-w-md mx-auto p-4 sm:p-6 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-y-auto" style={{ maxHeight: '80vh' }}>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-black">{selectedItem.name}</h2>
               <button
                 onClick={() => setShowDetailsModal(false)}
-                className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                className="text-gray-500 hover:text-gray-700 focus:outline-none text-2xl font-bold"
+                aria-label="Close"
               >
-                ✕
+                ×
               </button>
             </div>
-
-            <div className="space-y-2 sm:space-y-3">
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Item Category:</span>{" "}
-                {selectedItem.item_sold?.inventory_category.name}
-              </p>
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Date:</span>{" "}
-                {formatDate(selectedItem.date)}
-              </p>
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Dimensions:</span>{" "}
-                {selectedItem.item_sold?.dimensions}
-              </p>
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Quantity:</span>{" "}
-                {formatNumber(selectedItem.quantity)}
-              </p>
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Project:</span>{" "}
-                {selectedItem.linked_project?.name || "—"}
-              </p>
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Customer:</span>{" "}
-                {selectedItem.sold_to?.name || "—"}
-              </p>
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Logistics:</span>{" "}
-                {selectedItem.logistics ? `₦${formatNumber(selectedItem.logistics)}` : "—"}
-              </p>
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Cost Price:</span> ₦
-                {formatNumber(selectedItem.cost_price)}
-              </p>
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Selling Price:</span> ₦
-                {formatNumber(selectedItem.selling_price)}
-              </p>
-              {/* <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Total Price:</span> ₦
-                {formatNumber(selectedItem.total_price)}
-              </p> */}
-              <p className="text-xs sm:text-sm">
-                <span className="font-semibold">Profit:</span> ₦
-                {formatNumber(selectedItem.profit)}
-              </p>
+            <div className="grid grid-cols-2 gap-4 bg-white border border-gray-100 rounded-lg p-4 mb-4 shadow">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Category</span>
+                <span className="text-base font-bold text-black">{selectedItem.item_sold?.inventory_category.name}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Date</span>
+                <span className="text-base font-bold text-black">{formatDate(selectedItem.date)}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Dimensions</span>
+                <span className="text-base font-bold text-black">{selectedItem.item_sold?.dimensions}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Quantity</span>
+                <span className="text-base font-bold text-black">{formatNumber(selectedItem.quantity)}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Project</span>
+                <span className="text-base font-bold text-black">{selectedItem.linked_project?.name || "—"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Customer</span>
+                <span className="text-base font-bold text-black">{selectedItem.sold_to?.name || "—"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Logistics</span>
+                <span className="text-base font-bold text-black">{selectedItem.logistics ? `₦${formatNumber(selectedItem.logistics)}` : "—"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Cost Price</span>
+                <span className="text-base font-bold text-black">₦{formatNumber(selectedItem.cost_price)}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Selling Price</span>
+                <span className="text-base font-bold text-black">₦{formatNumber(selectedItem.selling_price)}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Profit</span>
+                <span className="text-base font-bold text-black">₦{formatNumber(selectedItem.profit)}</span>
+              </div>
             </div>
             {userRole === 'ceo' && (
-              <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2 flex flex-col sm:flex-row">
+              <div className="flex flex-row space-x-2 mb-2">
                 <button
-                  onClick={() =>
-                    navigate(`/shop/edit-sold-item/${selectedItem.id}`)
-                  }
-                  className="pt-1.5 sm:pt-2 pr-2 sm:pr-3 p-1.5 sm:p-2 text-blue-400 rounded-lg border-2 border-blue-400 font-bold text-xs sm:text-sm"
+                  onClick={() => navigate(`/shop/edit-sold-item/${selectedItem.id}`)}
+                  className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex items-center justify-center text-sm sm:text-base"
                 >
-                  <FontAwesomeIcon className="pr-1 text-blue-400" icon={faPencil} />
-                  Edit details
+                  <FontAwesomeIcon icon={faPencil} className="mr-2" />
+                  Edit Sale Record
                 </button>
                 <button
                   onClick={() => confirmDeleteSale(selectedItem.id)}
-                  className="pt-1.5 sm:pt-2 pr-2 sm:pr-3 p-1.5 sm:p-2 text-red-400 rounded-lg border-2 border-red-400 font-bold text-xs sm:text-sm"
+                  className="w-full py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors flex items-center justify-center text-sm sm:text-base"
                 >
-                  <FontAwesomeIcon className="pr-1 text-red-400" icon={faTrash} />
-                  Delete Item
+                  <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                  Delete Sale Record
                 </button>
               </div>
             )}
+            <button
+              onClick={() => setShowDetailsModal(false)}
+              className="w-full mt-2 py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors text-sm"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
