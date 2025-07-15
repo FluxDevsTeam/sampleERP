@@ -7,7 +7,9 @@ import { RoundedBar, CustomTooltip } from '../../../components/CustomChartCompon
 const formatNairaCompact = (value: number) => {
   const absValue = Math.abs(value);
   const sign = value < 0 ? '-' : '';
-  if (absValue >= 1_000_000) {
+  if (absValue >= 1_000_000_000) {
+    return `${sign}₦${(absValue / 1_000_000_000).toFixed(1).replace(/\.0$/, '')}b`;
+  } else if (absValue >= 1_000_000) {
     return `${sign}₦${(absValue / 1_000_000).toFixed(1).replace(/\.0$/, '')}m`;
   } else if (absValue >= 1_000) {
     return `${sign}₦${(absValue / 1_000).toFixed(1).replace(/\.0$/, '')}k`;

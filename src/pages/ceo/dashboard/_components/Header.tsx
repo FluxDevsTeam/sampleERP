@@ -164,57 +164,62 @@ const Header = () => {
   if (!data) return <p className="p-4 sm:p-6">No dashboard data available</p>;
 
   return (
-    <div
-      className="relative z-50 p-3 sm:p-4 lg:p-6"
-      style={
-        isSidebarOpen && window.innerWidth < 1024
-          ? { marginLeft: '220px', transition: 'margin-left 0.3s' } // Adjust 220px to your sidebar width
-          : undefined
-      }
-    >
+    <div className="relative z-10 p-2 sm:p-3 lg:p-4 w-full min-w-0">
       {/* Collapsible Section Headers Row */}
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 lg:gap-4 mb-4 px-2 py-2 overflow-x-auto">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:flex gap-2 mb-3 px-0 py-1 w-full min-w-0">
         <button 
-          className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-blue-50/60 hover:bg-blue-100 transition font-semibold text-blue-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'key' ? 'ring-2 ring-blue-400' : ''}`} 
+          className={`w-full flex-1 flex-shrink min-w-0 flex items-center justify-between px-2 py-6 rounded-lg shadow bg-blue-50/60 hover:bg-blue-100 transition font-semibold text-blue-700 text-[11px] sm:text-xs ${openSection === 'key' ? 'ring-2 ring-blue-400' : ''}`} 
           onClick={() => handleSectionClick('key')}
         >
-          <span className="truncate">Key Business Metrics</span>
-          {openSection === 'key' ? <MdExpandLess size={20} className="ml-2 flex-shrink-0" /> : <MdExpandMore size={20} className="ml-2 flex-shrink-0" />}
+          <span className="truncate text-left flex-1">Key Business Metrics</span>
+          <span className="flex items-center justify-end ml-2">
+            {openSection === 'key' ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
+          </span>
         </button>
         <button 
-          className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-green-50/60 hover:bg-green-100 transition font-semibold text-green-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'income' ? 'ring-2 ring-green-400' : ''}`} 
+          className={`w-full flex-1 flex-shrink min-w-0 flex items-center justify-between px-2 py-6 rounded-lg shadow bg-green-50/60 hover:bg-green-100 transition font-semibold text-green-700 text-[11px] sm:text-xs ${openSection === 'income' ? 'ring-2 ring-green-400' : ''}`} 
           onClick={() => handleSectionClick('income')}
         >
-          <span className="truncate">Income Breakdown</span>
-          {openSection === 'income' ? <MdExpandLess size={20} className="ml-2 flex-shrink-0" /> : <MdExpandMore size={20} className="ml-2 flex-shrink-0" />}
+          <span className="truncate text-left flex-1">Income Breakdown</span>
+          <span className="flex items-center justify-end ml-2">
+            {openSection === 'income' ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
+          </span>
         </button>
         <button 
-          className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-teal-50/60 hover:bg-teal-100 transition font-semibold text-teal-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'expense' ? 'ring-2 ring-teal-400' : ''}`} 
+          className={`w-full flex-1 flex-shrink min-w-0 flex items-center justify-between px-2 py-6 rounded-lg shadow bg-teal-50/60 hover:bg-teal-100 transition font-semibold text-teal-700 text-[11px] sm:text-xs ${openSection === 'expense' ? 'ring-2 ring-teal-400' : ''}`} 
           onClick={() => handleSectionClick('expense')}
         >
-          <span className="truncate">Expense Breakdown</span>
-          {openSection === 'expense' ? <MdExpandLess size={20} className="ml-2 flex-shrink-0" /> : <MdExpandMore size={20} className="ml-2 flex-shrink-0" />}
+          <span className="truncate text-left flex-1">Expense Breakdown</span>
+          <span className="flex items-center justify-end ml-2">
+            {openSection === 'expense' ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
+          </span>
         </button>
         <button 
-          className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-purple-50/60 hover:bg-purple-100 transition font-semibold text-purple-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'asset' ? 'ring-2 ring-purple-400' : ''}`} 
+          className={`w-full flex-1 flex-shrink min-w-0 flex items-center justify-between px-2 py-6 rounded-lg shadow bg-purple-50/60 hover:bg-purple-100 transition font-semibold text-purple-700 text-[11px] sm:text-xs ${openSection === 'asset' ? 'ring-2 ring-purple-400' : ''}`} 
           onClick={() => handleSectionClick('asset')}
         >
-          <span className="truncate">Asset & Store Analysis</span>
-          {openSection === 'asset' ? <MdExpandLess size={20} className="ml-2 flex-shrink-0" /> : <MdExpandMore size={20} className="ml-2 flex-shrink-0" />}
+          <span className="truncate text-left flex-1">Asset & Store Analysis</span>
+          <span className="flex items-center justify-end ml-2">
+            {openSection === 'asset' ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
+          </span>
         </button>
         <button 
-          className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-yellow-50/60 hover:bg-yellow-100 transition font-semibold text-yellow-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'customer' ? 'ring-2 ring-yellow-400' : ''}`} 
+          className={`w-full flex-1 flex-shrink min-w-0 flex items-center justify-between px-2 py-6 rounded-lg shadow bg-yellow-50/60 hover:bg-yellow-100 transition font-semibold text-yellow-700 text-[11px] sm:text-xs ${openSection === 'customer' ? 'ring-2 ring-yellow-400' : ''}`} 
           onClick={() => handleSectionClick('customer')}
         >
-          <span className="truncate">Customers & Workers</span>
-          {openSection === 'customer' ? <MdExpandLess size={20} className="ml-2 flex-shrink-0" /> : <MdExpandMore size={20} className="ml-2 flex-shrink-0" />}
+          <span className="truncate text-left flex-1">Customers & Workers</span>
+          <span className="flex items-center justify-end ml-2">
+            {openSection === 'customer' ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
+          </span>
         </button>
         <button 
-          className={`flex items-center justify-between px-3 sm:px-4 py-4 sm:py-6 lg:py-8 rounded-xl shadow bg-gray-50/60 hover:bg-gray-100 transition font-semibold text-gray-700 text-xs sm:text-sm lg:text-base min-h-[60px] sm:min-h-[80px] ${openSection === 'additional' ? 'ring-2 ring-gray-400' : ''}`} 
+          className={`w-full flex-1 flex-shrink min-w-0 flex items-center justify-between px-2 py-6 rounded-lg shadow bg-gray-50/60 hover:bg-gray-100 transition font-semibold text-gray-700 text-[11px] sm:text-xs ${openSection === 'additional' ? 'ring-2 ring-gray-400' : ''}`} 
           onClick={() => handleSectionClick('additional')}
         >
-          <span className="truncate">Additional Metrics</span>
-          {openSection === 'additional' ? <MdExpandLess size={20} className="ml-2 flex-shrink-0" /> : <MdExpandMore size={20} className="ml-2 flex-shrink-0" />}
+          <span className="truncate text-left flex-1">Additional Metrics</span>
+          <span className="flex items-center justify-end ml-2">
+            {openSection === 'additional' ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
+          </span>
         </button>
       </div>
 

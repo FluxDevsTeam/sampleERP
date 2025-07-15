@@ -11,19 +11,11 @@ import {
 } from "recharts";
 
 // Define interfaces for the data structure
-interface IncomeExpenseData {
-  month: string;
-  total: number;
-}
-
-interface MonthlyTrendsData {
-  income: IncomeExpenseData[];
-  expenses: IncomeExpenseData[];
-}
-
-// Define interface for the API response
+interface IncomeData { month: string; total_income: number; }
+interface ExpenseData { month: string; total_expenses: number; }
 interface ApiResponse {
-  monthly_trends: MonthlyTrendsData;
+  monthly_income_trend: IncomeData[];
+  monthly_expense_trend: ExpenseData[];
 }
 
 // Define custom tooltip prop types
@@ -34,7 +26,8 @@ interface CustomTooltipProps {
 }
 
 const MonthlyTrendsCharts = () => {
-  const [data, setData] = useState<MonthlyTrendsData | null>(null);
+  const [incomeData, setIncomeData] = useState<IncomeData[]>([]);
+  const [expenseData, setExpenseData] = useState<ExpenseData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,7 +53,8 @@ const MonthlyTrendsCharts = () => {
           throw new Error("Network response was not ok");
         }
         const result: ApiResponse = await response.json();
-        setData(result.monthly_trends);
+        setIncomeData(result.monthly_income_trend || []);
+        setExpenseData(result.monthly_expense_trend || []);
         setLoading(false);
       } catch (err) {
         setError("Failed to fetch data");
@@ -114,29 +108,28 @@ const MonthlyTrendsCharts = () => {
     return <div className="text-center p-8">Loading dashboard data...</div>;
   }
 
-  if (error && !data) {
+  if (error && incomeData.length === 0 && expenseData.length === 0) {
     return <div className="text-red-600 p-8">Error: {error}</div>;
   }
 
-  if (!data) return <div className="text-red-600 p-8">No data available</div>;
+  if (incomeData.length === 0 && expenseData.length === 0) return <div className="text-red-600 p-8">No data available</div>;
 
   // Prepare grouped data for recharts
-  const months = data.income.map((item) => item.month);
+  const months = incomeData.map((item) => item.month);
   const groupedData = months.map((month, idx) => ({
     month,
-    income: data.income[idx]?.total || 0,
-    expenses: data.expenses[idx]?.total || 0,
+    income: incomeData[idx]?.total_income || 0,
+    expenses: expenseData[idx]?.total_expenses || 0,
   }));
 
   return (
     <div className="w-full px-2 sm:px-4">
       <div className="flex flex-col w-full">
-        <div className="flex-1 bg-gradient-to-br from-[#e0f2ff] to-[#f5f7fa] rounded-2xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-blue-100 relative overflow-hidden">
-          <h2 className="text-lg sm:text-xl lg:text-2xl font-bold mb-4 sm:mb-6 text-blue-700 text-center tracking-wide z-10">Monthly Income & Expenses</h2>
+        <div className="flex-1 bg-gradient-to-br from-[#e0f2ff] to-[#f5f7fa] rounded-lg shadow-2xl p-0 border border-blue-100 relative overflow-hidden">
           <ResponsiveContainer width="100%" height={300} className="sm:h-[350px] lg:h-[440px]">
             <BarChart
               data={groupedData}
-              margin={{ top: 30, right: 40, left: 40, bottom: 80 }}
+              margin={{ top: 16, right: 16, left: 0, bottom: 16 }}
               barCategoryGap={24}
               barGap={0}
             >

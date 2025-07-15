@@ -163,7 +163,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
   return (
     <aside
       className={clsx(
-        `bg-white fixed lg:relative top-[60px] sm:top-[70px] lg:top-0 bottom-0 z-50 lg:z-0 h-full max-h-full overflow-hidden transition-all ease-in-out duration-500 shadow-xl lg:shadow-lg`,
+        `bg-white fixed lg:relative top-[60px] sm:top-[70px] lg:top-0 bottom-0 z-[100] lg:z-0 h-full max-h-full overflow-hidden transition-all ease-in-out duration-500 shadow-xl lg:shadow-lg`,
         isSidebarOpen
           ? "lg:ml-0 lg:w-[250px] w-[280px] sm:w-[320px] left-0"
           : "lg:w-[80px] w-0 -left-full lg:left-0 lg:ml-0"

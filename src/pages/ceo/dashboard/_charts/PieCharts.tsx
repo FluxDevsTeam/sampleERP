@@ -8,6 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import React from "react";
 
 // Define interfaces for the data structure
 interface ExpenseCategory {
@@ -84,6 +85,37 @@ const formatValue = (value: number): string => {
   return `₦ ${value}`;
 };
 
+const getPieRadii = () => {
+  if (typeof window !== 'undefined') {
+    if (window.innerWidth < 640) return { outer: 78, inner: 35, cx: '50%' };
+    if (window.innerWidth < 1024) return { outer: 100, inner: 40, cx: '50%' };
+  }
+  return { outer: 110, inner: 30, cx: '50%' };
+};
+
+// Custom Legend content to wrap text and add left padding
+const CustomLegend = (props: any) => {
+  const { payload } = props;
+  // Always remove left padding for closer alignment
+  return (
+    <ul className="pl-0 ml-[-8px]">
+      {payload.map((entry: any, index: number) => (
+        <li
+          key={`item-${index}`}
+          className="text-xs sm:text-sm md:text-base break-words whitespace-normal mb-1 flex items-start"
+          style={{ wordBreak: 'break-word', maxWidth: window.innerWidth < 640 ? 110 : 'none' }}
+        >
+          <span
+            className="inline-block w-2 h-2 sm:w-3 sm:h-3 aspect-square rounded-full mr-2 mt-[2px]"
+            style={{ backgroundColor: entry.color }}
+          ></span>
+          {entry.value}
+        </li>
+      ))}
+    </ul>
+  );
+};
+
 const PieCharts = () => {
   const [yearData, setYearData] = useState<ExpenseCategory[]>([]);
   const [monthData, setMonthData] = useState<ExpenseCategory[]>([]);
@@ -91,6 +123,14 @@ const PieCharts = () => {
   const [error, setError] = useState<string | null>(null);
   const [yearTotal, setYearTotal] = useState<number>(0);
   const [monthTotal, setMonthTotal] = useState<number>(0);
+  const [pieRadii, setPieRadii] = useState(getPieRadii());
+
+  useEffect(() => {
+    const handleResize = () => setPieRadii(getPieRadii());
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -131,19 +171,38 @@ const PieCharts = () => {
           );
 
           // Add percentage to each item
-          const processedYearData = yearCategories
+          let processedYearData = yearCategories
             .map((item) => ({
               ...item,
               percent: item.value / yearSum,
             }))
             .sort((a, b) => b.value - a.value); // Sort by value descending
 
-          const processedMonthData = monthCategories
+          let processedMonthData = monthCategories
             .map((item) => ({
               ...item,
               percent: item.value / monthSum,
             }))
             .sort((a, b) => b.value - a.value); // Sort by value descending
+
+          // Top 5 + 'Others' logic for year
+          if (processedYearData.length > 5) {
+            const top5 = processedYearData.slice(0, 5);
+            const others = processedYearData.slice(5);
+            const othersValue = others.reduce((sum, item) => sum + item.value, 0);
+            const othersPercent = others.reduce((sum, item) => sum + (item.percent || 0), 0);
+            top5.push({ name: 'Others', value: othersValue, percent: othersPercent });
+            processedYearData = top5;
+          }
+          // Top 5 + 'Others' logic for month
+          if (processedMonthData.length > 5) {
+            const top5 = processedMonthData.slice(0, 5);
+            const others = processedMonthData.slice(5);
+            const othersValue = others.reduce((sum, item) => sum + item.value, 0);
+            const othersPercent = others.reduce((sum, item) => sum + (item.percent || 0), 0);
+            top5.push({ name: 'Others', value: othersValue, percent: othersPercent });
+            processedMonthData = top5;
+          }
 
           setYearData(processedYearData);
           setMonthData(processedMonthData);
@@ -209,29 +268,29 @@ const PieCharts = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 p-3 sm:p-4 lg:p-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-4  lg:gap-8 p-2 sm:p-4 lg:p-6">
       {/* Yearly Expenses Card */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-blue-50 p-3 sm:p-4 border-b border-blue-100">
-          <h2 className="text-lg sm:text-xl font-bold text-neutral-800 text-center">
+        <div className="bg-blue-50 p-2 mb-4 sm:p-4 border-b border-blue-100">
+          <h2 className="text-base sm:text-lg md:text-xl font-bold text-neutral-800 text-center">
             Annual Expense Distribution
           </h2>
-          <p className="text-center text-blue-600 font-medium mt-1 text-sm sm:text-base">
+          <p className="text-center text-blue-600 font-medium mt-1 text-xs sm:text-sm md:text-base">
             Total: ₦ {yearTotal.toLocaleString()}
           </p>
         </div>
 
-        <div className="p-3 sm:p-4 bg-[#f5f7fa]">
-          <ResponsiveContainer width="100%" height={300} className="sm:h-[350px] lg:h-[400px]">
+        <div className="p-1 sm:p-4 bg-[#f5f7fa]">
+          <ResponsiveContainer width="100%" height={240} className="sm:h-[300px] md:h-[350px] lg:h-[400px]">
             <PieChart>
               <Pie
                 data={yearData}
                 dataKey="value"
                 nameKey="name"
-                cx="50%"
+                cx="38%"
                 cy="50%"
-                outerRadius={120}
-                innerRadius={60}
+                outerRadius={pieRadii.outer}
+                innerRadius={pieRadii.inner}
                 labelLine={false}
                 label={renderCustomizedLabel}
               >
@@ -243,26 +302,26 @@ const PieCharts = () => {
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
-              <Legend layout="vertical" verticalAlign="middle" align="right" />
+              <Legend content={<CustomLegend />} layout="vertical" verticalAlign="middle" align="right" />
             </PieChart>
           </ResponsiveContainer>
 
           {/* Top categories summary */}
-          <div className="mt-3 sm:mt-4 border-t border-gray-100 pt-3 sm:pt-4">
-            <h3 className="font-medium text-gray-700 mb-2 text-sm sm:text-base">
+          <div className="mt-2 sm:mt-4 border-t border-gray-100 pt-2 sm:pt-4">
+            <h3 className="font-medium text-gray-700 mb-1 sm:mb-2 text-xs sm:text-sm md:text-base">
               Top Expense Categories
             </h3>
-            <div className="space-y-1.5 sm:space-y-2">
+            <div className="space-y-1 sm:space-y-2">
               {yearData.slice(0, 3).map((category, index) => (
                 <div key={index} className="flex justify-between items-center">
                   <div className="flex items-center">
                     <div
-                      className="w-3 h-3 rounded-full mr-2"
+                      className="w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-2"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     ></div>
-                    <span className="text-neutral-800 text-sm sm:text-base">{category.name}</span>
+                    <span className="text-neutral-800 text-xs sm:text-sm md:text-base">{category.name}</span>
                   </div>
-                  <span className="font-medium text-sm sm:text-base">
+                  <span className="font-medium text-xs sm:text-sm md:text-base">
                     {formatValue(category.value)}
                   </span>
                 </div>
@@ -274,26 +333,26 @@ const PieCharts = () => {
 
       {/* Monthly Expenses Card */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-blue-50 p-3 sm:p-4 border-b border-blue-100">
-          <h2 className="text-lg sm:text-xl font-bold text-neutral-800 text-center">
+        <div className="bg-blue-50 p-2 sm:p-4 border-b border-blue-100">
+          <h2 className="text-base sm:text-lg md:text-xl font-bold text-neutral-800 text-center">
             Monthly Expense Distribution
           </h2>
-          <p className="text-center text-neutral-600 font-medium mt-1 text-sm sm:text-base">
+          <p className="text-center text-neutral-600 font-medium mt-1 text-xs sm:text-sm md:text-base">
             Total: ₦ {monthTotal.toLocaleString()}
           </p>
         </div>
 
-        <div className="p-3 sm:p-4 bg-[#f5f7fa] h-full">
-          <ResponsiveContainer width="100%" height={300} className="sm:h-[350px] lg:h-[400px]">
+        <div className="p-1 sm:p-4 bg-[#f5f7fa] h-full">
+          <ResponsiveContainer width="100%" height={240} className="sm:h-[300px] md:h-[350px] lg:h-[400px]">
             <PieChart>
               <Pie
                 data={monthData}
                 dataKey="value"
                 nameKey="name"
-                cx="50%"
+                cx="38%"
                 cy="50%"
-                outerRadius={120}
-                innerRadius={60}
+                outerRadius={pieRadii.outer}
+                innerRadius={pieRadii.inner}
                 labelLine={false}
                 label={renderCustomizedLabel}
               >
@@ -305,26 +364,26 @@ const PieCharts = () => {
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
-              <Legend layout="vertical" verticalAlign="middle" align="right" />
+              <Legend content={<CustomLegend />} layout="vertical" verticalAlign="middle" align="right" />
             </PieChart>
           </ResponsiveContainer>
 
           {/* Top categories summary */}
-          <div className="mt-3 sm:mt-4 border-t border-gray-100 pt-3 sm:pt-4">
-            <h3 className="font-medium text-gray-700 mb-2 text-sm sm:text-base">
+          <div className="mt-2 sm:mt-4 border-t border-gray-100 pt-2 sm:pt-4">
+            <h3 className="font-medium text-gray-700 mb-1 sm:mb-2 text-xs sm:text-sm md:text-base">
               Top Expense Categories
             </h3>
-            <div className="space-y-1.5 sm:space-y-2">
+            <div className="space-y-1 sm:space-y-2">
               {monthData.slice(0, 3).map((category, index) => (
                 <div key={index} className="flex justify-between items-center">
                   <div className="flex items-center">
                     <div
-                      className="w-3 h-3 rounded-full mr-2"
+                      className="w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-2"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     ></div>
-                    <span className="text-neutral-800 text-sm sm:text-base">{category.name}</span>
+                    <span className="text-neutral-800 text-xs sm:text-sm md:text-base">{category.name}</span>
                   </div>
-                  <span className="font-medium text-sm sm:text-base">
+                  <span className="font-medium text-xs sm:text-sm md:text-base">
                     {formatValue(category.value)}
                   </span>
                 </div>
