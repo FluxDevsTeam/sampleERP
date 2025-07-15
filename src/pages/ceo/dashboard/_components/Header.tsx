@@ -90,6 +90,20 @@ interface CEODashboardData {
 }
 
 // Data card component styled like the Header component
+const NO_NAIRA_LABELS = [
+  "Deprecated Assets",
+  "Active Assets",
+  "All Customers",
+  "Active Customers",
+  "Owing Customers",
+  "Total Workers",
+  "Active Workers",
+  "Total Contractors",
+  "Active Contractors",
+  "Inventory Items",
+  "Raw Materials Count",
+];
+
 const DataCard = ({
   label,
   value,
@@ -97,18 +111,19 @@ const DataCard = ({
   label: string;
   value: number | string;
 }) => {
-  // Show Naira sign only for numbers and not for percentage or string values
+  // Show Naira sign only for numbers and not for percentage or string values, and not for count metrics
   const isNumber = typeof value === "number";
   const isPercent = typeof value === "string" && value.trim().endsWith("%");
+  const showNaira = isNumber && !NO_NAIRA_LABELS.includes(label);
   return (
     <div className="p-3 sm:p-4 border rounded-lg shadow-md flex flex-col items-center justify-center min-h-[80px] sm:min-h-[100px]">
       <div className="text-xs sm:text-sm lg:text-base font-medium text-center mb-1 leading-tight">{label}</div>
       <div className="text-sm sm:text-base lg:text-lg font-semibold text-blue-400 text-center">
-        {isNumber ? "₦" : ""}
+        {showNaira ? "₦" : ""}
         {isNumber ? value.toLocaleString("en-NG") : value}
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 // Fetch CEO dashboard data
@@ -244,7 +259,7 @@ const Header = () => {
               <DataCard label="Projects" value={data.income_breakdown_month.projects} />
               <DataCard label="Non-Shop Projects" value={data.income_breakdown_month.no_shop_projects} />
               <DataCard label="Shop Sales" value={data.income_breakdown_month.shop_sales} />
-              <DataCard label="Non-Project Shop" value={data.income_breakdown_month.non_project_shop_sales} />
+              <DataCard label="Non-Project Shop Sales" value={data.income_breakdown_month.non_project_shop_sales} />
               <DataCard label="Projects %" value={`${data.income_breakdown_month.percentage_projects}%`} />
               <DataCard label="Shop %" value={`${data.income_breakdown_month.percentage_shop}%`} />
             </div>
@@ -255,7 +270,7 @@ const Header = () => {
               <DataCard label="Projects" value={data.income_breakdown_year.projects} />
               <DataCard label="Non-Shop Projects" value={data.income_breakdown_year.no_shop_projects} />
               <DataCard label="Shop Sales" value={data.income_breakdown_year.shop_sales} />
-              <DataCard label="Non-Project Shop" value={data.income_breakdown_year.non_project_shop_sales} />
+              <DataCard label="Non-Project Shop Sales" value={data.income_breakdown_year.non_project_shop_sales} />
               <DataCard label="Projects %" value={`${data.income_breakdown_year.percentage_projects}%`} />
               <DataCard label="Shop %" value={`${data.income_breakdown_year.percentage_shop}%`} />
             </div>
@@ -311,18 +326,16 @@ const Header = () => {
             <DataCard label="Total Workers" value={data.additional_metrics.total_salary_workers} />
             <DataCard label="Active Workers" value={data.additional_metrics.active_salary_workers} />
             <DataCard label="Total Contractors" value={data.additional_metrics.total_contractors} />
+            <DataCard label="Active Contractors" value={data.additional_metrics.active_contractors} />
           </div>
         </section>
       )}
       {openSection === 'additional' && (
         <section className="mb-6 sm:mb-8 bg-gray-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
-            <DataCard label="Active Contractors" value={data.additional_metrics.active_contractors} />
             <DataCard label="Inventory Items" value={data.additional_metrics.inventory_items} />
-            <DataCard label="Raw Materials" value={data.additional_metrics.raw_materials_types} />
+            <DataCard label="Raw Materials Count" value={data.additional_metrics.raw_materials_types} />
             <DataCard label="Suggested Overhead" value={data.key_metrics.suggested_overhead_cost} />
-            <DataCard label="Profit (Month)" value={data.key_metrics.profit_month} />
-            <DataCard label="Non-Project Shop" value={data.income_breakdown_month.non_project_shop_sales} />
           </div>
         </section>
       )}
