@@ -115,29 +115,34 @@ const CategoryTable: React.FC<TableProps> = ({ headers }) => {
             />
           </div>
         ) : (
-          <div>
-            <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-              <thead>
-                <tr className="bg-blue-400 text-white">
-                  {headers.map((header) => (
-                    <th
-                      key={header}
-                      className="py-2 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold"
-                    >
-                      {header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {currentItems.length === 0 ? (
-                  <tr>
-                    <td colSpan={headers.length} className="text-center py-6 text-gray-500 text-sm">
-                      No categories found.
-                    </td>
+          currentItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                {/* Folder SVG icon */}
+                <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M3 7a2 2 0 012-2h3.172a2 2 0 011.414.586l1.828 1.828A2 2 0 0012.828 8H19a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" stroke="currentColor" strokeWidth="2" fill="none" />
+                </svg>
+              </div>
+              <h2 className="text-lg font-semibold text-gray-800 mb-1">No categories found</h2>
+              <p className="text-gray-500 mb-6 text-center max-w-xs">All your shop categories will show up here. Add a new category to get started.</p>
+            </div>
+          ) : (
+            <div>
+              <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                <thead>
+                  <tr className="bg-blue-400 text-white">
+                    {headers.map((header) => (
+                      <th
+                        key={header}
+                        className="py-2 sm:py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-semibold"
+                      >
+                        {header}
+                      </th>
+                    ))}
                   </tr>
-                ) : (
-                  currentItems.map((row, index) => (
+                </thead>
+                <tbody>
+                  {currentItems.map((row, index) => (
                     <tr key={index} className="hover:bg-gray-100">
                       {headers.map((header) => (
                         <td
@@ -148,48 +153,48 @@ const CategoryTable: React.FC<TableProps> = ({ headers }) => {
                         </td>
                       ))}
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
 
-            {/* Updated Pagination Controls */}
-            <div className="flex justify-center items-center mt-4 gap-1 sm:gap-2">
-              <button
-                onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1}
-                className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
-              >
-                <FontAwesomeIcon icon={faAnglesLeft} />
-              </button>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
-              >
-                <FontAwesomeIcon icon={faArrowLeft} />
-              </button>
+              {/* Updated Pagination Controls */}
+              <div className="flex justify-center items-center mt-4 gap-1 sm:gap-2">
+                <button
+                  onClick={() => handlePageChange(1)}
+                  disabled={currentPage === 1}
+                  className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
+                >
+                  <FontAwesomeIcon icon={faAnglesLeft} />
+                </button>
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </button>
 
-              <span className="mx-2 sm:mx-4 text-xs sm:text-sm">
-                Page {currentPage} of {totalPages}
-              </span>
+                <span className="mx-2 sm:mx-4 text-xs sm:text-sm">
+                  Page {currentPage} of {totalPages}
+                </span>
 
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
-              >
-                <FontAwesomeIcon icon={faArrowRight} />
-              </button>
-              <button
-                onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages}
-                className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
-              >
-                <FontAwesomeIcon icon={faAnglesRight} />
-              </button>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
+                >
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </button>
+                <button
+                  onClick={() => handlePageChange(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
+                >
+                  <FontAwesomeIcon icon={faAnglesRight} />
+                </button>
+              </div>
             </div>
-          </div>
+          )
         )}
       </div>
     </div>

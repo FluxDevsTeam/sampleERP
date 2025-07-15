@@ -153,6 +153,7 @@ export const RawMaterials: React.FC = () => {
             Name: item.name,
             Category: item.store_category?.name,
             Quantity: item.quantity ? Number(item.quantity).toLocaleString() : 0,
+            price: item.price,
             Details: (
               <button
                 onClick={() => handleViewDetails(item)}
@@ -297,6 +298,11 @@ export const RawMaterials: React.FC = () => {
       button.disabled = false;
     }, 3000);
     await deleteItem();
+  };
+
+  const formatNumber = (num: number | string) => {
+    if (num === undefined || num === null) return '-';
+    return Number(num).toLocaleString();
   };
 
   return (
@@ -466,6 +472,8 @@ export const RawMaterials: React.FC = () => {
                         <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Name</th>
                         <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Category</th>
                         <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Quantity</th>
+                        <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden md:table-cell">Price</th>
+                        <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden md:table-cell">Total Value</th>
                         <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Details</th>
                       </tr>
                     </thead>
@@ -475,6 +483,8 @@ export const RawMaterials: React.FC = () => {
                           <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">{row.Name}</td>
                           <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700 hidden sm:table-cell">{row.Category}</td>
                           <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">{row.Quantity}</td>
+                          <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">₦ {formatNumber(typeof row.price === 'number' || typeof row.price === 'string' ? row.price : 0)}</td>
+                          <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">₦ {formatNumber((Number(typeof row.price === 'number' || typeof row.price === 'string' ? row.price : 0) * Number(typeof row.Quantity === 'number' || typeof row.Quantity === 'string' ? row.Quantity.toString().replace(/,/g, '') : 0)))}</td>
                           <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">{row.Details}</td>
                         </tr>
                       ))}
@@ -524,7 +534,7 @@ export const RawMaterials: React.FC = () => {
 
           {/*   PRODUCT DETAILS   */}
           {showModal && selectedProduct && (
-            <div className={`fixed inset-0 flex items-center justify-center z-[100] ${confirmDelete ? "blur-sm" : ""} ${showImagePreview ? "blur-sm" : ""}`}>
+            <div className={`fixed inset-0 flex items-center justify-center z-[100] ${confirmDelete ? "blur-sm" : ""} ${showImagePreview ? "blur-sm" : ""}`}> 
               <div className="absolute inset-0 bg-black opacity-50" onClick={() => setShowModal(false)}></div>
               <div className="w-[95vw] max-w-2xl mx-auto p-4 sm:p-6 bg-white border border-gray-200 rounded-lg shadow-lg relative z-10 overflow-y-auto" style={{ maxHeight: '80vh' }}>
                 <div className="flex justify-between items-center mb-4">
@@ -550,7 +560,7 @@ export const RawMaterials: React.FC = () => {
                   </div>
                   <div className="flex flex-col gap-1">
                     <span className="text-xs font-semibold text-black uppercase">Quantity</span>
-                    <span className="text-base font-bold text-black">{selectedProduct.quantity}</span>
+                    <span className="text-base font-bold text-black">{formatNumber(selectedProduct.quantity)}</span>
                   </div>
                   <div className="flex flex-col gap-1">
                     <span className="text-xs font-semibold text-black uppercase">Unit</span>
@@ -558,7 +568,11 @@ export const RawMaterials: React.FC = () => {
                   </div>
                   <div className="flex flex-col gap-1">
                     <span className="text-xs font-semibold text-black uppercase">Price</span>
-                    <span className="text-base font-bold text-black">₦ {selectedProduct.price}</span>
+                    <span className="text-base font-bold text-black">₦ {formatNumber(selectedProduct.price)}</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-semibold text-black uppercase">Total Value</span>
+                    <span className="text-base font-bold text-black">₦ {formatNumber(Number(selectedProduct.price) * Number(selectedProduct.quantity))}</span>
                   </div>
                   <div className="flex flex-col gap-1">
                     <span className="text-xs font-semibold text-black uppercase">Archived</span>
@@ -578,9 +592,9 @@ export const RawMaterials: React.FC = () => {
                     </button>
                   )}
                   </div>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* confirmation modal */}
           {confirmDelete && (

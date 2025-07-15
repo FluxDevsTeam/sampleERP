@@ -4,6 +4,8 @@ import { NavLink } from "react-router-dom";
 import Logo from "./Logo";
 import Logout from "@/pages/AuthPages/logout/Logout";
 import { useState } from "react";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronRight, faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 
@@ -15,6 +17,36 @@ interface SidebarProp {
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
+  const location = useLocation();
+
+  // Helper to recursively find the parent dropdown id(s) for the current path
+  function findParentDropdowns(items, pathname, parents = []) {
+    for (const item of items) {
+      if (item.isDropdown && item.dropdownItems) {
+        const found = findParentDropdowns(item.dropdownItems, pathname, [...parents, item.id]);
+        if (found.length) return found;
+      } else if (item.href && pathname.startsWith(item.href)) {
+        return parents;
+      }
+    }
+    return [];
+  }
+
+  // Open the dropdown containing the current route on mount and when route changes
+  useEffect(() => {
+    const parents = findParentDropdowns(data, location.pathname);
+    setOpenDropdowns(parents);
+  }, [location.pathname, data]);
+
+  // NEW: When sidebar is opened, also open the dropdown for the current route
+  useEffect(() => {
+    if (isSidebarOpen) {
+      const parents = findParentDropdowns(data, location.pathname);
+      setOpenDropdowns(parents);
+    }
+    // No need to close dropdowns when closing sidebar (preserve state)
+    // eslint-disable-next-line
+  }, [isSidebarOpen]);
 
   // Function to handle link clicks
   const handleLinkClick = () => {

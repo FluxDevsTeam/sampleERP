@@ -15,7 +15,6 @@ const EditRawMaterial = () => {
   const [formData, setFormData] = useState({
     name: "",
     category: "",
-    quantity: "",
     unit: "",
     price: "",
     description: "",
@@ -55,7 +54,6 @@ const EditRawMaterial = () => {
         setFormData({
           name: data.name || "",
           category: data.store_category?.id.toString() || "",
-          quantity: data.quantity?.toString() || "",
           unit: data.unit || "",
           price: data.price?.toString() || "",
           description: data.description || "",
@@ -105,7 +103,7 @@ const EditRawMaterial = () => {
 
     const formDataToSend = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      if (value !== null) {
+      if (value !== null && key !== 'quantity') {
         formDataToSend.append(key, value);
       }
     });
@@ -210,17 +208,13 @@ const EditRawMaterial = () => {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-semibold text-black uppercase mb-1">Quantity</label>
-            <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} className="border p-2 rounded w-full text-base font-bold text-black" required />
-          </div>
-          <div className="flex flex-col gap-1">
             <label className="text-xs font-semibold text-black uppercase mb-1">Unit</label>
             <input type="text" name="unit" value={formData.unit} onChange={handleChange} className="border p-2 rounded w-full text-base font-bold text-black" required />
-          </div>
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs font-semibold text-black uppercase mb-1">Price</label>
           <input type="number" name="price" value={formData.price} onChange={handleChange} className="border p-2 rounded w-full text-base font-bold text-black" required />
+          </div>
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs font-semibold text-black uppercase mb-1">Description</label>

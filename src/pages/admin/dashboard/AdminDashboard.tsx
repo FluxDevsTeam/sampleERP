@@ -42,6 +42,44 @@ const isMonetary = (key: string) => {
   return /amount|income|profit|paid|value|expenses|cost|sales|pay|assets|shop/i.test(key);
 };
 
+// Mapping for better card names
+const cardNameMap: Record<string, string> = {
+  yearly_total_paid: "Yearly Total Paid",
+  active_salary_workers_count: "Active Salary Workers",
+  all_active_contractors_count: "Active Contractors",
+  total_expenses: "Total Expenses",
+  total_income: "Total Income",
+  total_profit: "Total Profit",
+  total_assets: "Total Assets",
+  total_shop_value: "Total Shop Value",
+  salary: "Salary Paid",
+  contractors: "Contractors Paid",
+  sales_count: "Sales Count",
+  // ...add more as needed
+};
+
+// Custom order for cards
+const cardOrder = [
+  "Active Assets",
+  "Deprecated Assets",
+  "Active Salary Workers",
+  "Active Contractors",
+  "Total Income",
+  "Total Profit",
+  "Total Assets",
+  "Total Shop Value",
+  "Total Expenses",
+  "Total Paid",
+  "Monthly Total Paid",
+  "Total Salary Workers Monthly Pay",
+  "Total Contractors Monthly Pay",
+  "Total Contractors Weekly Pay",
+  "Yearly Total Paid",
+  "Salary Paid",
+  "Contractors Paid",
+  "Sales Count",
+];
+
 const AdminDashboard = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["financialData"],
@@ -53,22 +91,31 @@ const AdminDashboard = () => {
   const numRowsDefault = 2;
   const defaultVisibleCount = numCols * numRowsDefault;
 
+  // Responsive: show fewer XAxis ticks on mobile
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  const isTablet = typeof window !== 'undefined' && window.innerWidth < 1024 && window.innerWidth >= 640;
+
   // Flatten all relevant data into a single array of cards
   const financialHealthCards = data?.financial_health
-    ? Object.entries(data.financial_health).map(([key, value]) => ({
-        key: `financialHealth-${key}`,
-        title: key.replace(/_/g, " "),
-        value: Number(value) || 0,
-        currency: isMonetary(key) ? "₦ " : undefined,
-      }))
+    ? Object.entries(data.financial_health).map(([key, value]) => {
+        const title = cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        // Remove naira sign for Deprecated Assets and Active Assets
+        const noNaira = ["Deprecated Assets", "Active Assets"].includes(title);
+        return {
+          key: `financialHealth-${key}`,
+          title,
+          value: value === undefined || value === null ? 0 : Number(value),
+          currency: !noNaira && isMonetary(key) ? "₦ " : undefined,
+        };
+      })
     : [];
   const workersCards = data?.workers
     ? Object.entries(data.workers)
         .filter(([key]) => !['contractors_count', 'salary_workers_count', 'all_contractors_count'].includes(key))
         .map(([key, value]) => ({
         key: `workers-${key}`,
-        title: key.replace(/_/g, " "),
-        value: Number(value) || 0,
+        title: cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+        value: value === undefined || value === null ? 0 : Number(value),
         currency: isMonetary(key) ? "₦ " : undefined,
       }))
     : [];
@@ -77,8 +124,8 @@ const AdminDashboard = () => {
         .filter(([key]) => !['weekly_total_paid'].includes(key))
         .map(([key, value]) => ({
         key: `paid-${key}`,
-        title: key.replace(/_/g, " "),
-        value: Number(value) || 0,
+        title: cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+        value: value === undefined || value === null ? 0 : Number(value),
         currency: isMonetary(key) ? "₦ " : undefined,
       }))
     : [];
@@ -88,29 +135,12 @@ const AdminDashboard = () => {
     ...workersCards,
     ...paidCards,
   ].sort((a, b) => {
-    // Priority items that should appear first
-    const priorityItems = [
-      'yearly total paid',
-      'active salary workers count',
-      'all active contractors count',
-      'salary',
-      'active',
-      'contractors'
-    ];
-    
-    const aTitle = a.title.toLowerCase();
-    const bTitle = b.title.toLowerCase();
-    
-    const aIsPriority = priorityItems.some(item => aTitle.includes(item));
-    const bIsPriority = priorityItems.some(item => bTitle.includes(item));
-    
-    // Special case: yearly total paid should come before total expenses
-    if (aTitle.includes('yearly total paid') && bTitle.includes('total expenses')) return -1;
-    if (bTitle.includes('yearly total paid') && aTitle.includes('total expenses')) return 1;
-    
-    if (aIsPriority && !bIsPriority) return -1;
-    if (!aIsPriority && bIsPriority) return 1;
-    return 0;
+    const aIdx = cardOrder.indexOf(a.title);
+    const bIdx = cardOrder.indexOf(b.title);
+    if (aIdx === -1 && bIdx === -1) return 0;
+    if (aIdx === -1) return 1;
+    if (bIdx === -1) return -1;
+    return aIdx - bIdx;
   });
   const visibleCards = showAllCards ? allCards : allCards.slice(0, defaultVisibleCount);
 
@@ -128,16 +158,128 @@ const AdminDashboard = () => {
   }));
 
   const expenseCategoryBreakdown = data?.expense_category_breakdown || [];
+  // Show top 5, group the rest as 'Others' (handle duplicate 'Others')
+  let pieData = expenseCategoryBreakdown;
+  if (expenseCategoryBreakdown.length > 5) {
+    const sorted = [...expenseCategoryBreakdown].sort((a, b) => b.percentage - a.percentage);
+    let top5 = sorted.slice(0, 5);
+    let others = sorted.slice(5);
+    // Check if 'Others' is in top5
+    let othersInTop5Idx = top5.findIndex(item => item.category.toLowerCase() === 'others');
+    // Sum all 'Others' in the rest
+    let othersFromRest = others.filter(item => item.category.toLowerCase() === 'others');
+    let nonOthersRest = others.filter(item => item.category.toLowerCase() !== 'others');
+    let othersTotal = nonOthersRest.reduce((sum, item) => sum + (item.percentage || 0), 0);
+    let othersLabel = 'Others';
+    // If 'Others' is already in top5, merge all into it
+    if (othersInTop5Idx !== -1) {
+      let mergedValue = top5[othersInTop5Idx].percentage + othersTotal + othersFromRest.reduce((sum, item) => sum + (item.percentage || 0), 0);
+      top5[othersInTop5Idx] = { ...top5[othersInTop5Idx], percentage: mergedValue };
+    } else {
+      // If 'Others' is not in top5, but present in rest, merge all as 'Other Categories'
+      if (othersFromRest.length > 0) {
+        othersLabel = 'Other Categories';
+        othersTotal += othersFromRest.reduce((sum, item) => sum + (item.percentage || 0), 0);
+      }
+      if (othersTotal > 0) {
+        top5.push({ category: othersLabel, percentage: othersTotal });
+      }
+    }
+    pieData = top5;
+  }
   const monthlyExpenseTrend = data?.monthly_expense_trend || [];
   const topCategories = data?.top_categories || [];
 
   const colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#ff0000"];
 
+  // Format number with naira sign, commas, and compact notation
+  const formatNairaCompact = (value: number) => {
+    if (value >= 1_000_000) {
+      return `₦${(value / 1_000_000).toFixed(1).replace(/\.0$/, '')}m`;
+    } else if (value >= 1_000) {
+      return `₦${(value / 1_000).toFixed(1).replace(/\.0$/, '')}k`;
+    }
+    return `₦${value.toLocaleString()}`;
+  };
+
+  // Custom Tooltip for PieChart to only show for top 5 + 'Others'
+  const CustomPieTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const cat = payload[0]?.payload?.category;
+      // Only show tooltip for categories in pieData (top 5 + 'Others')
+      if (pieData.some((item: { category: string }) => item.category === cat)) {
+        return (
+          <div className="p-2 bg-white border border-gray-200 rounded shadow">
+            <div className="font-semibold">{cat}</div>
+            <div>
+              {payload[0]?.value}%
+            </div>
+          </div>
+        );
+      }
+    }
+    return null;
+  };
+
+  // Helper to determine if a color is light or dark
+  function isColorLight(hex: string) {
+    // Remove # if present
+    hex = hex.replace('#', '');
+    // Convert to RGB
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    // Perceived brightness
+    return (r * 0.299 + g * 0.587 + b * 0.114) > 186;
+  }
+
+  // Custom label for Pie chart: show percentage inside the slice segment
+  const PieLabel = ({ value, percent, cx, cy, midAngle, innerRadius, outerRadius, index }: { 
+    value: number; 
+    percent: number; 
+    cx: number; 
+    cy: number; 
+    midAngle: number; 
+    innerRadius: number; 
+    outerRadius: number; 
+    index: number 
+  }) => {
+    if (percent < 0.05) return null;
+    
+    // Calculate position inside the slice
+    const RADIAN = Math.PI / 180;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    
+    // Always use white for percentage text color
+    return (
+      <text
+        x={x}
+        y={y}
+        textAnchor="middle"
+        fontSize={window.innerWidth < 640 ? 10 : 13}
+        fontWeight="bold"
+        fill="#fff"
+        dominantBaseline="central"
+      >
+        {`${Math.round(percent * 100)}%`}
+      </text>
+    );
+  };
+
+  // Pie legend: ensure 'Others' or 'Other Categories' is always last
+  const othersLabels = ['Others', 'Other Categories'];
+  const pieLegendData = [
+    ...pieData.filter((entry: { category: string }) => !othersLabels.includes(entry.category)),
+    ...pieData.filter((entry: { category: string }) => othersLabels.includes(entry.category)),
+  ];
+
   return (
-    <div className="p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
+    <div className="p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6 mb-20">
       {/* Card grid for all data */}
-      <div className="mb-4 sm:mb-6">
-        <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-5 p-1 sm:p-2 overflow-x-auto">
+      <div className="mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 p-1 sm:p-2 overflow-x-auto">
           {visibleCards.map(card => (
             <AdminDashboardCard key={card.key} title={card.title} value={card.value} currency={card.currency} />
           ))}
@@ -168,45 +310,70 @@ const AdminDashboard = () => {
       {/* Two charts in a row */}
       <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
         {/* Expense Category Breakdown */}
-        <div className="bg-white rounded-lg shadow p-2 sm:p-4 mb-4 w-full overflow-x-auto">
-          <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">
+        <div className="bg-white rounded-lg shadow p-1 mb-4 w-full overflow-x-auto">
+          <h2 className="text-base sm:text-lg ml-6 mt-2 font-semibold mb-2 4">
             Expense Category Breakdown
           </h2>
-          <ResponsiveContainer width="100%" height={250} className="sm:h-[350px]">
+          <div className="overflow-x-auto">
+          <ResponsiveContainer width="100%" height={300} className="sm:h-[350px]">
             <PieChart>
               <Pie
-                data={expenseCategoryBreakdown}
+                  data={pieData}
                 dataKey="percentage"
                 nameKey="category"
                 cx="50%"
                 cy="50%"
-                outerRadius={60}
-                innerRadius={30}
+                  outerRadius={120}
+                  innerRadius={20}
                 className="sm:outerRadius-[100px] sm:innerRadius-[50px]"
-                label={({ name, value }) => `${name} (${value}%)`}
+                  label={PieLabel}
+                  labelLine={false}
               >
-                {expenseCategoryBreakdown.map((_entry: any, index: number) => (
+                  {pieData.map((_entry: any, index: number) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={colors[index % colors.length]}
                   />
                 ))}
               </Pie>
-              <Tooltip />
-              <Legend wrapperStyle={{ fontSize: '12px' }} />
+                {/* <Tooltip content={<CustomPieTooltip />} /> */}
+                <Legend 
+                  layout="horizontal" 
+                  verticalAlign="bottom" 
+                  align="center"
+                  payload={pieLegendData.map((entry: { category: string }, index: number) => ({
+                    value: entry.category,
+                    type: 'circle',
+                    color: colors[index % colors.length]
+                  }))}
+                  wrapperStyle={{ 
+                    fontSize: window.innerWidth < 640 ? '10px' : '12px', 
+                    whiteSpace: 'pre-wrap', 
+                    wordBreak: 'break-word', 
+                    maxWidth: '100%',
+                    paddingTop: '10px'
+                  }} 
+                />
             </PieChart>
           </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Top Categories */}
         <div className="bg-white rounded-lg shadow p-2 sm:p-4 mb-4 w-full overflow-x-auto">
           <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">Top Categories</h2>
-          <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
+          <ResponsiveContainer width="100%" height={300} className="sm:h-[300px]">
             <BarChart data={topCategories} barSize={20} className="sm:barSize-[30px]">
+              <defs>
+                <linearGradient id="topCategoriesGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ffc658" stopOpacity={0.9} />
+                  <stop offset="100%" stopColor="#ff7300" stopOpacity={0.9} />
+                </linearGradient>
+              </defs>
               <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} angle={-20} textAnchor="end" height={60} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Bar dataKey="total" fill="#ff7300" />
+              <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} />
+              <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
+              <Bar dataKey="total" fill="url(#topCategoriesGradient)" label={{ position: "top", formatter: formatNairaCompact }} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -214,15 +381,63 @@ const AdminDashboard = () => {
 
       {/* Single Bar Chart for Monthly Expense Trend */}
       <div className="bg-white rounded-lg shadow p-2 sm:p-4 w-full overflow-x-auto">
-        <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">Monthly Expense Trend</h2>
-        <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
-          <BarChart data={monthlyExpenseTrend} margin={{ top: 10, right: 20, left: 0, bottom: 30 }}>
-            <XAxis dataKey="month" tick={{ fontSize: 12 }} interval={0} angle={-20} textAnchor="end" height={60} />
-            <YAxis tick={{ fontSize: 12 }} />
+        <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 ml-4">Monthly Expense Trend</h2>
+        <ResponsiveContainer width="100%" height={400} className="sm:h-[300px]">
+          <BarChart data={monthlyExpenseTrend} margin={{ top: 10, right: 10, left: 0, bottom: 30 }}>
+            <defs>
+              <linearGradient id="monthlyExpenseGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ffc658" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="#ff7300" stopOpacity={0.9} />
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="month" tick={{ fontSize: 12 }} interval={isMobile ? 2 : isTablet ? 1 : 0} angle={-20} textAnchor="end" height={60} />
+            <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} />
             <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip />
+            <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
             <Legend wrapperStyle={{ fontSize: '12px' }} />
-            <Bar dataKey="total_expenses" fill="#ffc658" name="Total Expenses" />
+            <Bar dataKey="total_expenses" fill="url(#monthlyExpenseGradient)" name="Total Expenses" barSize={42} label={{ position: "top", formatter: formatNairaCompact }} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Single Bar Chart for Monthly Income Trend */}
+      <div className="bg-white rounded-lg shadow p-2 sm:p-4 w-full overflow-x-auto mt-6">
+        <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 ml-4">Monthly Income Trend</h2>
+        <ResponsiveContainer width="100%" height={400} className="sm:h-[300px]">
+          <BarChart data={data?.monthly_income_trend || []} margin={{ top: 10, right: 10, left: 0, bottom: 30 }}>
+            <defs>
+              <linearGradient id="monthlyIncomeGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#82ca9d" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="#388e3c" stopOpacity={0.9} />
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="month" tick={{ fontSize: 12 }} interval={isMobile ? 2 : isTablet ? 1 : 0} angle={-20} textAnchor="end" height={60} />
+            <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            <Bar dataKey="total_income" fill="url(#monthlyIncomeGradient)" name="Total Income" barSize={42} label={{ position: "top", formatter: formatNairaCompact }} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Single Bar Chart for Monthly Profit Trend */}
+      <div className="bg-white rounded-lg shadow p-2 sm:p-4 w-full overflow-x-auto mt-6">
+        <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 ml-4">Monthly Profit Trend</h2>
+        <ResponsiveContainer width="100%" height={400} className="sm:h-[300px]">
+          <BarChart data={data?.monthly_profit_trend || []} margin={{ top: 10, right: 10, left: 0, bottom: 30 }}>
+            <defs>
+              <linearGradient id="monthlyProfitGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#8884d8" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="#4a148c" stopOpacity={0.9} />
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="month" tick={{ fontSize: 12 }} interval={isMobile ? 2 : isTablet ? 1 : 0} angle={-20} textAnchor="end" height={60} />
+            <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            <Bar dataKey="profit" fill="url(#monthlyProfitGradient)" name="Profit" barSize={42} label={{ position: "top", formatter: formatNairaCompact }} />
           </BarChart>
         </ResponsiveContainer>
       </div>

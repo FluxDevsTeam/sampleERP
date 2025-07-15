@@ -229,43 +229,49 @@ const StoreKeeperDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
+    <div className="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6 pb-20">
       <div className="mb-8 sm:mb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-12 sm:mb-20">
+        {/* Responsive card grid */}
+        <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-6 sm:mb-20">
           <DashboardData
-            info="Amount added this month"
+            info="Total Raw Material Types"
+            digits={dashboardData?.total_raw_materials}
+          />
+              <DashboardData
+                info="Raw Materials Added (This Year)"
+                digits={dashboardData?.added_amount_this_year}
+                currency="₦"
+              />
+            <DashboardData
+              info="Raw Materials Removed (This Year)"
+              digits={dashboardData?.removed_amount_year}
+              currency="₦"
+            />
+          <DashboardData
+            info="Raw Materials Added (This Month)"
             digits={dashboardData?.added_amount_this_month}
             currency="₦"
           />
           <DashboardData
-            info="Amount added this year"
-            digits={dashboardData?.added_amount_this_year}
-            currency="₦"
-          />
-          <DashboardData
-            info="Removed amount year"
-            digits={dashboardData?.removed_amount_year}
-            currency="₦"
-          />
-          <DashboardData
-            info="Removed cost month"
+            info="Cost of Materials Removed (This Month)"
             digits={dashboardData?.removed_cost_month}
             currency="₦"
           />
           <DashboardData
-            info="Total Raw materials"
-            digits={dashboardData?.total_raw_materials}
-          />
-          <DashboardData
-            info="Total value"
+            info="Total Inventory Value"
             digits={dashboardData?.total_value}
             currency="₦"
           />
         </div>
 
-        <div className="grid gap-4 sm:gap-6 md:gap-8 md:grid-cols-2 items-center rounded-sm mb-16 sm:mb-[100px] max-md:mb-[40px]">
-          <AmountSoldMonthlyBarChart></AmountSoldMonthlyBarChart>
-          <MonthlyAddedValueSpikedChart></MonthlyAddedValueSpikedChart>
+        {/* Responsive chart grid */}
+        <div className="grid gap-4 md:gap-2 lg:grid-cols-2 items-center rounded-sm">
+          <div className="w-full min-h-[160px] md:min-h-[300px] bg-white rounded-lg shadow p-2 overflow-x-auto">
+            <AmountSoldMonthlyBarChart />
+          </div>
+          <div className="w-full min-h-[160px] md:min-h-[300px] bg-white rounded-lg shadow p-2 overflow-x-auto">
+            <MonthlyAddedValueSpikedChart />
+          </div>
         </div>
       </div>
 
@@ -301,6 +307,17 @@ const StoreKeeperDashboard: React.FC = () => {
             radius="9"
             ariaLabel="three-dots-loading"
           />
+        </div>
+      ) : filteredTableDataTwo.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+            {/* Folder SVG icon */}
+            <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M3 7a2 2 0 012-2h3.172a2 2 0 011.414.586l1.828 1.828A2 2 0 0012.828 8H19a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" stroke="currentColor" strokeWidth="2" fill="none" />
+            </svg>
+          </div>
+          <h2 className="text-lg font-semibold text-gray-800 mb-1">No shop categories</h2>
+          <p className="text-gray-500 mb-6 text-center max-w-xs">All your shop categories will show up here. Add a new category to get started.</p>
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow-md overflow-x-auto mb-20 sm:mb-28 max-md:mb-16">
@@ -361,9 +378,9 @@ const StoreKeeperDashboard: React.FC = () => {
           </div>
           <button
             onClick={() => navigate("/store-keeper/add-raw-material-category")}
-            className="w-full sm:w-fit bg-blue-400 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-600 text-sm sm:text-base"
+            className="w-full sm:w-fit border border-blue-400 text-blue-400 bg-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-400 hover:text-white transition text-sm sm:text-base"
           >
-            Add New Category
+            + Add New Category
           </button>
         </div>
       </div>
@@ -378,6 +395,18 @@ const StoreKeeperDashboard: React.FC = () => {
             radius="9"
             ariaLabel="three-dots-loading"
           />
+        </div>
+      ) : filteredTableData.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-50 mb-4">
+            {/* Box SVG icon */}
+            <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+              <path d="M16 3v4M8 3v4M3 7h18" stroke="currentColor" strokeWidth="2" />
+            </svg>
+          </div>
+          <h2 className="text-lg font-semibold text-gray-800 mb-1">No raw material categories</h2>
+          <p className="text-gray-500 mb-6 text-center max-w-xs">All your raw material categories will show up here. Add a new category to get started.</p>
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow-md overflow-x-auto">

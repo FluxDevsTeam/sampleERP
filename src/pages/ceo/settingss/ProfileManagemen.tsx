@@ -311,22 +311,22 @@ const ProfileManagement = () => {
               </tr>
             ) : (
               data?.results?.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="text-xs sm:text-sm">
-                    <div>
-                      <div className="font-medium">{user.first_name} {user.last_name}</div>
+              <TableRow key={user.id}>
+                <TableCell className="text-xs sm:text-sm">
+                  <div>
+                    <div className="font-medium">{user.first_name} {user.last_name}</div>
                       {/* Remove email on mobile, only show name */}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden sm:table-cell">{user.email}</TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden md:table-cell">{user.phone_number || "-"}</TableCell>
-                  <TableCell className="text-xs sm:text-sm">{user.roles || "-"}</TableCell>
+                  </div>
+                </TableCell>
+                <TableCell className="text-xs sm:text-sm hidden sm:table-cell">{user.email}</TableCell>
+                <TableCell className="text-xs sm:text-sm hidden md:table-cell">{user.phone_number || "-"}</TableCell>
+                <TableCell className="text-xs sm:text-sm">{user.roles || "-"}</TableCell>
                   <TableCell className="text-xs sm:text-sm">
                     <Button size="sm" className="text-xs px-2 sm:px-3 py-1 sm:py-2 border border-blue-400 text-blue-400 bg-white hover:bg-blue-50" onClick={() => setSelectedUser(user)}>
                       Details
                     </Button>
-                  </TableCell>
-                </TableRow>
+                </TableCell>
+              </TableRow>
               ))
             )}
           </TableBody>

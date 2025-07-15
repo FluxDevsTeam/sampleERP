@@ -50,6 +50,7 @@ const RecordRemovedTable: React.FC = () => {
   const [openDates, setOpenDates] = useState<{ [key: string]: boolean }>({});
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [year, setYear] = useState<number | string>("");
   const [month, setMonth] = useState<number | string>("");
@@ -184,6 +185,7 @@ const RecordRemovedTable: React.FC = () => {
   const handleDelete = async () => {
     if (!selectedItem) return;
 
+    setDeleteLoading(true);
     try {
       const response = await fetch(
         `https://backend.kidsdesigncompany.com/api/add-raw-materials/${selectedItem}/`,
@@ -205,8 +207,8 @@ const RecordRemovedTable: React.FC = () => {
         message: "Item deleted successfully",
         type: "success",
       });
-
-      fetchData(); // Refresh the data
+      // Redirect to the main record page after delete
+      window.location.href = '/store-keeper/record-rm-added';
     } catch (error) {
       setModalConfig({
         isOpen: true,
@@ -215,6 +217,7 @@ const RecordRemovedTable: React.FC = () => {
         type: "error",
       });
     } finally {
+      setDeleteLoading(false);
       setConfirmDelete(false);
       setSelectedItem(null);
     }
@@ -234,7 +237,7 @@ const RecordRemovedTable: React.FC = () => {
         >
           Added Raw Materials
         </h1>
-        <button
+      <button
           onClick={() => navigate("/store-keeper/add-record-removed")}
           className="px-3 max-sm:px-2 py-1 md:py-2 max-md:px-0 border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-white transition-colors text-sm sm:text-base w-auto outline-none focus:ring-2 focus:ring-blue-200"
         >
@@ -258,7 +261,7 @@ const RecordRemovedTable: React.FC = () => {
                   const y = new Date().getFullYear() - i;
                   return <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{y}</li>
                 })}
-              </ul>
+                </ul>
             )}
           </div>
           {/* Month Dropdown */}
@@ -270,10 +273,10 @@ const RecordRemovedTable: React.FC = () => {
             {isMonthOpen && (
               <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
                 <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Month</li>
-                {months.map((m, i) => (
+                  {months.map((m, i) => (
                   <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{m}</li>
-                ))}
-              </ul>
+                  ))}
+                </ul>
             )}
           </div>
           {/* Day Dropdown */}
@@ -287,12 +290,12 @@ const RecordRemovedTable: React.FC = () => {
                 <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Day</li>
                 {[...Array(31)].map((_, i) => (
                   <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{i + 1}</li>
-                ))}
-              </ul>
+                  ))}
+                </ul>
             )}
           </div>
-          <button
-            onClick={handleFilter}
+          <button 
+            onClick={handleFilter} 
             disabled={filterLoading}
             className={`p-1.5 sm:p-2 border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-white transition-colors text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-200 flex items-center justify-center ${
               filterLoading ? "opacity-50 cursor-not-allowed" : ""
@@ -303,8 +306,8 @@ const RecordRemovedTable: React.FC = () => {
             </span>
             <span className="hidden sm:inline">{filterLoading ? "Filtering..." : "Filter"}</span>
           </button>
-          <button
-            onClick={handleClear}
+          <button 
+            onClick={handleClear} 
             disabled={filterLoading}
             className={`p-1.5 sm:p-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-300 hover:text-black transition-colors text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-200 flex items-center justify-center ${
               filterLoading ? "opacity-50 cursor-not-allowed" : ""
@@ -450,7 +453,10 @@ const RecordRemovedTable: React.FC = () => {
                     Edit
                   </button>
                   <button
-                    onClick={() => setConfirmDelete(true)}
+                    onClick={() => {
+                      setSelectedItem(selectedEntry.id);
+                      setConfirmDelete(true);
+                    }}
                     className="w-full sm:w-auto py-2 px-4 border-2 border-red-400 text-red-400 rounded-lg font-semibold transition-colors hover:bg-red-400 hover:text-white focus:ring-2 focus:ring-red-200 text-sm"
                   >
                     Delete
@@ -471,14 +477,16 @@ const RecordRemovedTable: React.FC = () => {
               <button
                 onClick={() => setConfirmDelete(false)}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                disabled={deleteLoading}
               >
-                Cancel
+                {deleteLoading ? 'Please wait...' : 'Cancel'}
               </button>
               <button
                 onClick={handleDelete}
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                disabled={deleteLoading}
               >
-                Delete
+                {deleteLoading ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>

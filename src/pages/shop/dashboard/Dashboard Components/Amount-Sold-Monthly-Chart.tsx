@@ -10,7 +10,7 @@ import {
 } from "recharts";
 
 // Format number with naira sign and commas
-const formatNaira = (value: number) => `₦${value.toLocaleString()}`;
+const formatNairaCompact = (value: number) => `\u20a6${new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value)}`;
 
 const AmountSoldMonthlyBarChart = () => {
   const [month1, setMonth1] = useState("Jan");
@@ -137,8 +137,8 @@ const AmountSoldMonthlyBarChart = () => {
       >
         Amount Sold Monthly
       </h1>
-      <ResponsiveContainer width="100%" height={447}>
-        <BarChart data={data} className="bg-white" margin={{ left: 40, right: 10, top: 5, bottom: 5 }}>
+      <ResponsiveContainer width="100%" height={340}>
+        <BarChart data={data} className="bg-white" margin={{ left: 0, right: 14, top: 10, bottom: 9 }}>
           <defs>
             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
               <stop offset="10%" stopColor="gray" stopOpacity={1} />
@@ -147,8 +147,8 @@ const AmountSoldMonthlyBarChart = () => {
           </defs>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
-          <YAxis tickFormatter={formatNaira} width={60} />
-          <Tooltip formatter={(value: number) => formatNaira(value)} />
+          <YAxis tickFormatter={formatNairaCompact} width={60} />
+          <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
           <Bar
             // type="monotone"
             dataKey="value"

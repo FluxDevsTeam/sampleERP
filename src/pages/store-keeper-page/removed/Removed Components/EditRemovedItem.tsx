@@ -43,6 +43,9 @@ const EditRemovedItem: React.FC = () => {
 
 
   const [productSearch, setProductSearch] = useState("");
+  const [materialDetails, setMaterialDetails] = useState<{ quantity: number; price: number } | null>(null);
+  const [originalQuantity, setOriginalQuantity] = useState<number>(0);
+  const [rawMaterialId, setRawMaterialId] = useState<string>("");
 
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
@@ -63,6 +66,40 @@ const EditRemovedItem: React.FC = () => {
       ...prev,
       [name]: value,
     }));
+    // If the product changes, fetch its raw material details if available
+    if (name === "product" && value) {
+      // Fetch the product to get its raw material id
+      fetch(`https://backend.kidsdesigncompany.com/api/product/${value}/`, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+      })
+        .then(res => res.ok ? res.json() : null)
+        .then(productData => {
+          if (productData && productData.raw_material) {
+            setRawMaterialId(productData.raw_material.id?.toString() || "");
+            // Fetch raw material details
+            fetch(`https://backend.kidsdesigncompany.com/api/raw-materials/${productData.raw_material.id}/`, {
+              headers: {
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+                "Content-Type": "application/json",
+              },
+            })
+              .then(rmRes => rmRes.ok ? rmRes.json() : null)
+              .then(rmData => {
+                if (rmData) {
+                  setMaterialDetails({
+                    quantity: Number(rmData.quantity) || 0,
+                    price: Number(rmData.price) || 0,
+                  });
+                }
+              });
+          } else {
+            setMaterialDetails(null);
+          }
+        });
+    }
   };
 
   // Helper functions for date format conversion
@@ -102,13 +139,32 @@ const EditRemovedItem: React.FC = () => {
         setFormData({
           product: data.product_its_used?.id?.toString() || "",
           quantity: data.quantity || "",
-          date: data.date ? yyyyMMddToDdMonthYyyy(data.date.slice(0, 10)) : "",
+          date: data.date ? data.date.slice(0, 10) : "",
         });
+        setRawMaterialId(data.raw_material?.id?.toString() || "");
 
         // Set search text for dropdowns
-
         setProductSearch(data.product_its_used?.name || "");
+        setOriginalQuantity(Number(data.quantity) || 0);
 
+        // Fetch raw material details for initial display
+        if (data.raw_material?.id) {
+          try {
+            const rmRes = await fetch(`https://backend.kidsdesigncompany.com/api/raw-materials/${data.raw_material.id}/`, {
+              headers: {
+                Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+                "Content-Type": "application/json",
+              },
+            });
+            if (rmRes.ok) {
+              const rmData = await rmRes.json();
+              setMaterialDetails({
+                quantity: Number(rmData.quantity) || 0,
+                price: Number(rmData.price) || 0,
+              });
+            }
+          } catch {}
+        }
       } catch (error) {
         console.error("Error:", error);
         setModalConfig({
@@ -187,11 +243,11 @@ const EditRemovedItem: React.FC = () => {
         <div className="flex items-center mb-6">
           <button
             onClick={() => navigate("/store-keeper/removed")}
-            className="mr-4 text-gray-600 hover:text-gray-800"
+            className="mr-4 text-black-600 hover:text-gray-800"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-700">
+          <h1 className="text-2xl font-bold text-black-700">
             Edit Removed Item
           </h1>
         </div>
@@ -218,12 +274,28 @@ const EditRemovedItem: React.FC = () => {
             <input
               type="number"
               value={formData.quantity}
-              onChange={(e) =>
-                setFormData({ ...formData, quantity: e.target.value })
-              }
+              min={1}
+              max={materialDetails ? materialDetails.quantity + originalQuantity : undefined}
+              onChange={(e) => {
+                let val = e.target.value;
+                if (materialDetails && Number(val) > materialDetails.quantity + originalQuantity) {
+                  val = (materialDetails.quantity + originalQuantity).toString();
+                }
+                setFormData({ ...formData, quantity: val });
+              }}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
               required
+              disabled={!formData.product}
             />
+            {materialDetails && (
+              <div className="text-xs text-black mt-1">Max: {(materialDetails.quantity + originalQuantity).toLocaleString()}</div>
+            )}
+            {materialDetails && (
+              <div className="mt-2 text-xs text-black">
+                <div>Available Quantity: <span className="font-semibold">{(materialDetails.quantity + originalQuantity).toLocaleString()}</span></div>
+                <div>Unit Price: <span className="font-semibold">₦{materialDetails.price.toLocaleString()}</span></div>
+              </div>
+            )}
           </div>
 
           <div>

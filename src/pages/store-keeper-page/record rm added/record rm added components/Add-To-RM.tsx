@@ -174,16 +174,16 @@ const AddToRM: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700">Cost Price</label>
             <div className="flex items-center gap-2">
-              <input
-                type="number"
-                name="cost_price"
-                value={formData.cost_price}
-                onChange={handleInputChange}
+            <input
+              type="number"
+              name="cost_price"
+              value={formData.cost_price}
+              onChange={handleInputChange}
                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                required
-                step="0.01"
+              required
+              step="0.01"
                 readOnly={!costPriceEditable}
-              />
+            />
               <button
                 type="button"
                 onClick={() => setCostPriceEditable((prev) => !prev)}

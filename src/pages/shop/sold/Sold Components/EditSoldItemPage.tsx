@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ThreeDots } from "react-loader-spinner";
 import Modal from "../../Modal";
+import SearchablePaginatedDropdown from "./SearchablePaginatedDropdown";
 
 interface Customer {
   id: number;
@@ -43,6 +44,10 @@ const EditSoldItemPage: React.FC = () => {
     message: "",
     type: "success" as "success" | "error",
   });
+  // Add state to store the names for unavailable values
+  const [unavailableNames, setUnavailableNames] = useState({ item: '', customer: '', project: '' });
+  // Add state for selected names
+  const [selectedNames, setSelectedNames] = useState({ item: '', customer: '', project: '' });
 
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
@@ -66,11 +71,30 @@ const EditSoldItemPage: React.FC = () => {
         const data = await response.json();
         setFormData({
           quantity: data.quantity || "",
-          customer: data.customer?.id.toString() || "",
-          project: data.project?.id.toString() || "",
+          customer: data.sold_to?.id?.toString() || "",
+          project: data.linked_project?.id?.toString() || "",
           logistics: data.logistics || "",
-          item: data.item?.id.toString() || "",
+          item: data.item_sold?.id?.toString() || "",
           date: data.date ? data.date.slice(0, 10) : "",
+        });
+        setSelectedNames({
+          item: data.item_sold?.name || '',
+          customer: data.sold_to?.name || '',
+          project: data.linked_project?.name || '',
+        });
+        console.log('Fetched sold item:', data);
+        console.log('Set formData:', {
+          quantity: data.quantity || "",
+          customer: data.sold_to?.id?.toString() || "",
+          project: data.linked_project?.id?.toString() || "",
+          logistics: data.logistics || "",
+          item: data.item_sold?.id?.toString() || "",
+          date: data.date ? data.date.slice(0, 10) : "",
+        });
+        console.log('Set selectedNames:', {
+          item: data.item_sold?.name || '',
+          customer: data.sold_to?.name || '',
+          project: data.linked_project?.name || '',
         });
       } catch (error) {
         setError("Failed to load sale data");
@@ -210,6 +234,9 @@ const EditSoldItemPage: React.FC = () => {
     );
   }
 
+  // Add a debug log before rendering
+  console.log('Rendering EditSoldItemPage with formData:', formData, 'selectedNames:', selectedNames);
+
   return (
     <div className="container mx-auto px-4 py-8 pb-20">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
@@ -241,116 +268,64 @@ const EditSoldItemPage: React.FC = () => {
               required
             />
           </div>
+          <SearchablePaginatedDropdown
+            endpoint="https://backend.kidsdesigncompany.com/api/inventory-item/"
+            label="Item"
+            name="item"
+            onChange={(name, value) => setFormData({ ...formData, [name]: value })}
+            resultsKey="results.items"
+            selectedValue={formData.item}
+            selectedName={selectedNames.item}
+          />
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Item
-            </label>
-            <select
-              value={formData.item}
-              onChange={(e) =>
-                setFormData({ ...formData, item: e.target.value })
-              }
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            >
-              <option value="">Select item</option>
-              {inventoryItems.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Quantity
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Quantity</label>
             <input
               type="number"
               required
               value={formData.quantity}
-              onChange={(e) =>
-                setFormData({ ...formData, quantity: e.target.value })
-              }
+              onChange={e => setFormData({ ...formData, quantity: e.target.value })}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              disabled={!formData.item}
             />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Customers
-            </label>
-            <select
-              value={formData.customer}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  customer: e.target.value,
-                  project: e.target.value ? "" : formData.project,
-                })
-              }
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+          <SearchablePaginatedDropdown
+            endpoint="https://backend.kidsdesigncompany.com/api/customer/"
+            label="Customer"
+            name="customer"
+            onChange={(name, value) => setFormData({ ...formData, [name]: value, project: value ? '' : formData.project })}
+            resultsKey="results.all_customers"
+            selectedValue={formData.customer}
+            selectedName={selectedNames.customer}
               disabled={!!formData.project}
-            >
-              <option value="">Pick customer</option>
-              {customers.map((customer) => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.name}
-                </option>
-              ))}
-            </select>
+          />
             {formData.project && (
               <p className="mt-1 text-sm text-gray-500">
-                * customer selection is disabled when a project is selected
+              * Customer is disabled when a project is selected
               </p>
             )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Project
-            </label>
-            <select
-              value={formData.project}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  project: e.target.value,
-                  customer: e.target.value ? "" : formData.customer,
-                  logistics: e.target.value ? "" : formData.logistics, // Clear logistics when project selected
-                })
-              }
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+          <SearchablePaginatedDropdown
+            endpoint="https://backend.kidsdesigncompany.com/api/project/"
+            label="Project"
+            name="project"
+            onChange={(name, value) => setFormData({ ...formData, [name]: value, customer: value ? '' : formData.customer, logistics: value ? '' : formData.logistics })}
+            resultsKey="all_projects"
+            selectedValue={formData.project}
+            selectedName={selectedNames.project}
               disabled={!!formData.customer}
-            >
-              <option value="">Select project</option>
-              {projects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-            </select>
+          />
             {formData.customer && (
               <p className="mt-1 text-sm text-gray-500">
-                * project selection is disabled when a customer is selected
+              * Project is disabled when a customer is selected
               </p>
             )}
-          </div>
-
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Logistics
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Logistics</label>
             <input
               type="number"
               value={formData.logistics}
-              onChange={(e) =>
-                setFormData({ ...formData, logistics: e.target.value })
-              }
+              onChange={e => setFormData({ ...formData, logistics: e.target.value })}
               disabled={!!formData.project}
-              className={`mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 ${
-                formData.project ? "bg-gray-100" : ""
-              }`}
+              className={`mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 ${formData.project ? "bg-gray-100" : ""}`}
             />
             {formData.project && (
               <p className="mt-1 text-sm text-gray-500">
@@ -358,14 +333,11 @@ const EditSoldItemPage: React.FC = () => {
               </p>
             )}
           </div>
-
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={loading}
-              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {loading ? "Updating..." : "Update Item"}
             </button>

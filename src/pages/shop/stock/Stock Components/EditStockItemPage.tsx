@@ -22,6 +22,8 @@ const EditStockItemPage: React.FC = () => {
     message: "",
     type: "success" as "success" | "error",
   });
+  const [itemDetails, setItemDetails] = useState<{ quantity: number; price: number } | null>(null);
+  const [originalQuantity, setOriginalQuantity] = useState<number>(0);
 
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
@@ -42,10 +44,19 @@ const EditStockItemPage: React.FC = () => {
           }
         );
         const data = await response.json();
+        console.log('Fetched stock item:', data);
         setFormData({
           quantity: data.quantity || "",
           date: data.date ? data.date.slice(0, 10) : "",
         });
+        setOriginalQuantity(Number(data.quantity) || 0);
+        // Use inventory_item directly for itemDetails
+        if (data.inventory_item) {
+          setItemDetails({
+            quantity: Number(data.inventory_item.quantity) || 0,
+            price: Number(data.inventory_item.cost_price || data.cost_price) || 0,
+        });
+        }
       } catch (error) {
         setError("Failed to load stock data");
         console.error("Error fetching stocks item:", error);
@@ -53,7 +64,6 @@ const EditStockItemPage: React.FC = () => {
         setInitialDataLoading(false);
       }
     };
-
     if (id) fetchSoldItem();
   }, [id]);
 
@@ -141,11 +151,27 @@ const EditStockItemPage: React.FC = () => {
               type="number"
               required
               value={formData.quantity}
-              onChange={(e) =>
-                setFormData({ ...formData, quantity: e.target.value })
-              }
+              min={1}
+              max={itemDetails ? itemDetails.quantity + originalQuantity : undefined}
+              onChange={(e) => {
+                let val = e.target.value;
+                if (itemDetails && Number(val) > itemDetails.quantity + originalQuantity) {
+                  val = (itemDetails.quantity + originalQuantity).toString();
+                }
+                setFormData({ ...formData, quantity: val });
+              }}
               className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+              disabled={!itemDetails}
             />
+            {itemDetails && (
+              <div className="text-xs text-black mt-1">Max: {(itemDetails.quantity + originalQuantity).toLocaleString()}</div>
+            )}
+            {itemDetails && (
+              <div className="mt-2 text-xs text-black">
+                <div>Available Quantity: <span className="font-semibold">{(itemDetails.quantity + originalQuantity).toLocaleString()}</span></div>
+                <div>Unit Price: <span className="font-semibold">₦{itemDetails.price.toLocaleString()}</span></div>
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Date</label>

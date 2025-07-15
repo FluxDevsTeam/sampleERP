@@ -50,58 +50,64 @@ const ShopDashboard = () => {
   }, []);
 
   return (
-    <div className="w-full sm:w-11/12 mx-auto mt-3 sm:mt-6 pl-1 pt-2">
+    <div className="w-full sm:w-11/12 mx-auto mt-3 sm:mt-6 pl-1 pt-2 mb-20">
       <div className="mb-8 sm:mb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 mb-12 sm:mb-20">
-          <DashboardData
-            info="Monthly Stock Added"
-            digits={dashboardData?.total_added_this_month}
-            currency="₦ "
-          ></DashboardData>
-          <DashboardData
-            info="Total Cost Value"
-            digits={dashboardData?.total_cost_value}
-            currency="₦ "
-          ></DashboardData>
-          <DashboardData
-            info="Total Profit Potential"
-            digits={dashboardData?.total_profit_potential}
-            currency="₦ "
-          ></DashboardData>
-          <DashboardData
-            info="Total Profit this month"
-            digits={dashboardData?.total_profit_this_month}
-            currency="₦ "
-          ></DashboardData>
+        <h2 className="text-lg sm:text-2xl font-bold mb-4">Shop Overview</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-6">
           <DashboardData
             info="Total shop value"
             digits={dashboardData?.total_shop_value}
             currency="₦ "
-          ></DashboardData>
+          />
+              <DashboardData
+                info="Total Cost Value"
+                digits={dashboardData?.total_cost_value}
+                currency="₦ "
+              />
+            <DashboardData
+              info="Total Profit Potential"
+              digits={dashboardData?.total_profit_potential}
+              currency="₦ "
+            />
+          <DashboardData
+            info="Monthly Stock Added"
+            digits={dashboardData?.total_added_this_month}
+            currency="₦ "
+          />
           <DashboardData
             info="Total sold this month"
             digits={dashboardData?.total_sold_this_month}
             currency="₦ "
-          ></DashboardData>
+          />
+          <DashboardData
+            info="Total Profit this month"
+            digits={dashboardData?.total_profit_this_month}
+            currency="₦ "
+          />
           <DashboardData
             info="Yearly added value"
             digits={dashboardData?.yearly_added_value}
             currency="₦ "
-          ></DashboardData>
+          />
           <DashboardData
             info="Yearly profit"
             digits={dashboardData?.yearly_profit}
             currency="₦ "
-          ></DashboardData>
+          />
         </div>
 
-        <div className="grid gap-6 sm:gap-10 md:grid-cols-2 items-center rounded-sm mb-6 sm:mb-9">
-          <AmountSoldMonthlyBarChart></AmountSoldMonthlyBarChart>
-          <MonthlyAddedValueSpikedChart></MonthlyAddedValueSpikedChart>
+        {/* Responsive chart grid */}
+        <div className="grid gap-4 md:gap-2 lg:grid-cols-2 items-center rounded-sm">
+          <div className="w-full min-h-[160px] md:min-h-[300px] bg-white rounded-lg shadow p-2 overflow-x-auto">
+            <AmountSoldMonthlyBarChart />
+          </div>
+          <div className="w-full min-h-[160px] md:min-h-[300px] bg-white rounded-lg shadow p-2 overflow-x-auto">
+            <MonthlyAddedValueSpikedChart />
+          </div>
         </div>
-
-
-        <MonthlyProfitChart></MonthlyProfitChart>
+        <div className="w-full min-h-[160px] md:min-h-[300px] bg-white rounded-lg shadow p-2 overflow-x-auto">
+          <MonthlyProfitChart />
+        </div>
       </div>
 
       <h1

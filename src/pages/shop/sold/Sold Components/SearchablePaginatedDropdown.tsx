@@ -16,9 +16,10 @@ interface SearchablePaginatedDropdownProps {
   dataMapper?: (data: any) => DropdownItem[];
   selectedValue?: string | null;
   selectedName?: string | null;
+  disabled?: boolean;
 }
 
-const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = ({ endpoint, label, onChange, name, resultsKey, dataMapper, selectedValue, selectedName }) => {
+const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = ({ endpoint, label, onChange, name, resultsKey, dataMapper, selectedValue, selectedName, disabled }) => {
   const [items, setItems] = useState<DropdownItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(''); 
@@ -33,6 +34,15 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
       setInputValue(selectedName);
     }
   }, [selectedName]);
+
+  useEffect(() => {
+    // Always update inputValue when selectedValue or selectedName changes
+    if (selectedName) {
+      setInputValue(selectedName);
+    } else if (selectedValue === '' || selectedValue == null) {
+      setInputValue('');
+    }
+  }, [selectedValue, selectedName]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -116,6 +126,7 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           className="w-full border rounded p-1.5 sm:p-2 text-xs sm:text-sm"
+          disabled={disabled}
         />
         <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
           <FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} className="text-xs sm:text-sm" />

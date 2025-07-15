@@ -13,6 +13,16 @@ import {
 // Format number with naira sign and commas
 const formatNaira = (value: number) => `₦${value.toLocaleString()}`;
 
+// Add compact formatter
+const formatNairaCompact = (value: number) => {
+  if (value >= 1_000_000) {
+    return `₦${(value / 1_000_000).toFixed(1).replace(/\.0$/, '')}m`;
+  } else if (value >= 1_000) {
+    return `₦${(value / 1_000).toFixed(1).replace(/\.0$/, '')}k`;
+  }
+  return `₦${value.toLocaleString()}`;
+};
+
 const colors = [
   "#0088FE",
   "#00C49F",
@@ -174,19 +184,19 @@ const MonthlyAddedValueSpikedChart = () => {
       <h1 style={{ fontSize: "clamp(16.5px, 3vw, 23px)" }}>
         Monthly Added Value
       </h1>
-      <ResponsiveContainer width="100%" height={460}>
-        <BarChart data={data} margin={{ left: 40, right: 10, top: 17, bottom: 9 }}>
+      <ResponsiveContainer width="100%" height={340}>
+        <BarChart data={data} margin={{ left: 0, right: 14, top: 10, bottom: 9 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
-          <YAxis tickFormatter={formatNaira} width={60} />
-          <Tooltip formatter={(value: number) => formatNaira(value)} />
+          <YAxis tickFormatter={formatNairaCompact} width={60} />
+          <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
           <Bar
             dataKey="value"
             stroke="black"
             fillOpacity={1}
             fill="green"
             shape={<TriangleBar />}
-            label={{ position: "top" }}
+            label={{ position: "top", formatter: formatNairaCompact }}
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={colors[index % 20]} />

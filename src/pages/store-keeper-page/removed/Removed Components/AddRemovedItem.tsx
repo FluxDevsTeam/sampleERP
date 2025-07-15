@@ -12,6 +12,7 @@ const AddRemovedItem: React.FC = () => {
     material: "",
     product: "",
     quantity: "",
+    date: new Date().toISOString().slice(0, 10),
   });
   const [materialSearch, setMaterialSearch] = useState('');
   const [productSearch, setProductSearch] = useState('');
@@ -21,12 +22,34 @@ const AddRemovedItem: React.FC = () => {
     message: "",
     type: "success" as "success" | "error",
   });
+  const [materialDetails, setMaterialDetails] = useState<{ quantity: number; price: number } | null>(null);
 
-  const handleDropdownChange = (name: string, value: string) => {
+  const handleDropdownChange = async (name: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+    if (name === "material" && value) {
+      try {
+        const response = await fetch(`https://backend.kidsdesigncompany.com/api/raw-materials/${value}/`, {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setMaterialDetails({
+            quantity: Number(data.quantity) || 0,
+            price: Number(data.price) || 0,
+          });
+        } else {
+          setMaterialDetails(null);
+        }
+      } catch {
+        setMaterialDetails(null);
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -88,11 +111,11 @@ const AddRemovedItem: React.FC = () => {
         <div className="flex items-center mb-6">
           <button
             onClick={() => navigate("/store-keeper/removed")}
-            className="mr-4 text-gray-600 hover:text-gray-800"
+            className="mr-4 text-black-600 hover:text-gray-800"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-500">Remove Item</h1>
+          <h1 className="text-2xl font-bold text-black-500">Remove Item</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -106,6 +129,12 @@ const AddRemovedItem: React.FC = () => {
               onChange={handleDropdownChange}
               onSearchChange={setMaterialSearch}
             />
+            {materialDetails && (
+              <div className="mt-2 text-xs text-black">
+                <div>Available Quantity: <span className="font-semibold">{materialDetails.quantity.toLocaleString()}</span></div>
+                <div>Unit Price: <span className="font-semibold">₦{materialDetails.price.toLocaleString()}</span></div>
+              </div>
+            )}
           </div>
 
           <div>
@@ -127,14 +156,36 @@ const AddRemovedItem: React.FC = () => {
             <input
               type="number"
               value={formData.quantity}
-              onChange={(e) =>
-                setFormData({ ...formData, quantity: e.target.value })
-              }
+              min={1}
+              max={materialDetails ? materialDetails.quantity : undefined}
+              onChange={(e) => {
+                let val = e.target.value;
+                if (materialDetails && Number(val) > materialDetails.quantity) {
+                  val = materialDetails.quantity.toString();
+                }
+                setFormData({ ...formData, quantity: val });
+              }}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              required
+              disabled={!formData.material}
+            />
+            {materialDetails && (
+              <div className="text-xs text-black mt-1">Max: {materialDetails.quantity.toLocaleString()}</div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Date
+            </label>
+            <input
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
               required
             />
           </div>
-
 
 
           <div className="flex justify-end space-x-3 mt-6">

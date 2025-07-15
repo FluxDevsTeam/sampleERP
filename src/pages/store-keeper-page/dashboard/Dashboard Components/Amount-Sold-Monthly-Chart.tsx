@@ -11,7 +11,7 @@ import {
 import { TooltipProps } from 'recharts';
 
 // Format number with naira sign and commas
-const formatNaira = (value: number) => `₦${value.toLocaleString()}`;
+const formatNairaCompact = (value: number) => `\u20a6${new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value)}`;
 
 const AmountSoldMonthlyBarChart = () => {
   const [month1, setMonth1] = useState("Jan");
@@ -156,24 +156,21 @@ const AmountSoldMonthlyBarChart = () => {
 
   return (
     <div>
-      <h1
-        style={{ fontSize: "clamp(16.5px, 3vw, 23px)" }}
-        className="font-semibold mb-2"
-      >
+      <h1 className="ml-5" style={{ fontSize: "clamp(12px, 2vw, 16px)" }}>
         Added Amount Monthly
       </h1>
-      <ResponsiveContainer width="100%" height={447}>
-        <BarChart data={data} margin={{ left: 60, right: 20, top: 5, bottom: 5 }}>
+      <ResponsiveContainer width="100%" height={340}>
+        <BarChart data={data} margin={{ left: 0, right: 14, top: 10, bottom: 9 }}>
           <defs>
             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="10%" stopColor="gray" stopOpacity={1} />
-              <stop offset="90%" stopColor="blue" stopOpacity={0.2} />
+              <stop offset="10%" stopColor="blue" stopOpacity={1} />
+              <stop offset="90%" stopColor="pink" stopOpacity={0.2} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
-          <YAxis tickFormatter={formatNaira} width={80} />
-          <Tooltip formatter={(value: number) => formatNaira(value)} />
+          <YAxis tickFormatter={formatNairaCompact} width={60} />
+          <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
           <Bar
             // type="monotone"
             dataKey="value"

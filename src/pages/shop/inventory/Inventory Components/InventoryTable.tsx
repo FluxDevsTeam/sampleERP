@@ -517,6 +517,10 @@ const Table: React.FC<TableProps> = ({
                 <span className="text-xs font-semibold text-black uppercase">Category</span>
                 <span className="text-base font-bold text-black">{selectedProduct.inventory_category?.name || "No category"}</span>
               </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Stock</span>
+                <span className="text-base font-bold text-black">{selectedProduct.stock ?? selectedProduct.quantity ?? '—'}</span>
+              </div>
               <div className="flex flex-col gap-1 col-span-1 sm:col-span-2">
                 <span className="text-xs font-semibold text-black uppercase">Description</span>
                 <span className="text-base font-bold text-black">{selectedProduct.description || "No description"}</span>

@@ -28,6 +28,8 @@ const EditRecordRemovedItem: React.FC = () => {
     message: "",
     type: "success" as "success" | "error",
   });
+  const [materialDetails, setMaterialDetails] = useState<{ quantity: number; price: number } | null>(null);
+  const [originalQuantity, setOriginalQuantity] = useState<number>(0);
 
   useEffect(() => {
     const fetchItem = async () => {
@@ -49,6 +51,23 @@ const EditRecordRemovedItem: React.FC = () => {
           cost_price: data.cost_price || "",
           date: data.date ? data.date.slice(0, 10) : "",
         });
+        setOriginalQuantity(Number(data.quantity) || 0);
+        // Fetch material details for max/available
+        if (data.material?.id) {
+          const rmRes = await fetch(`https://backend.kidsdesigncompany.com/api/raw-materials/${data.material.id}/`, {
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              "Content-Type": "application/json",
+            },
+          });
+          if (rmRes.ok) {
+            const rmData = await rmRes.json();
+            setMaterialDetails({
+              quantity: Number(rmData.quantity) || 0,
+              price: Number(rmData.price) || 0,
+            });
+          }
+        }
       } catch (error) {
         console.error("Error:", error);
       }
@@ -154,12 +173,28 @@ const EditRecordRemovedItem: React.FC = () => {
             <input
               type="number"
               value={formData.quantity}
-              onChange={(e) =>
-                setFormData({ ...formData, quantity: e.target.value })
-              }
+              min={1}
+              max={materialDetails ? materialDetails.quantity + originalQuantity : undefined}
+              onChange={(e) => {
+                let val = e.target.value;
+                if (materialDetails && Number(val) > materialDetails.quantity + originalQuantity) {
+                  val = (materialDetails.quantity + originalQuantity).toString();
+                }
+                setFormData({ ...formData, quantity: val });
+              }}
               className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
               required
+              disabled={!formData.material}
             />
+            {materialDetails && (
+              <div className="text-xs text-black mt-1">Max: {(materialDetails.quantity + originalQuantity).toLocaleString()}</div>
+            )}
+            {materialDetails && (
+              <div className="mt-2 text-xs text-black">
+                <div>Available Quantity: <span className="font-semibold">{(materialDetails.quantity + originalQuantity).toLocaleString()}</span></div>
+                <div>Unit Price: <span className="font-semibold">₦{materialDetails.price.toLocaleString()}</span></div>
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Date</label>

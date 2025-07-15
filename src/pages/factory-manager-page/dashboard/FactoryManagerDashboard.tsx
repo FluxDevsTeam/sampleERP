@@ -231,9 +231,13 @@ const FactoryManagerDashboard = () => {
         )}
       </div>
       <div className="p-2 sm:p-4">
-        <h2 className="text-base sm:text-lg font-bold mb-4 sm:mb-8">Financial Overview</h2>
+
+        <div className="w-full min-h-[220px] sm:min-h-[350px] bg-white rounded-lg shadow p-2 sm:p-4 overflow-x-auto mb-4">
         <PieChartComponent data={expenseBreakdown} />
+        </div>
+        <div className="w-full min-h-[220px] sm:min-h-[350px] bg-white rounded-lg shadow p-2 sm:p-4 overflow-x-auto">
         <BarChartComponent />
+        </div>
       </div>
     </div>
   );

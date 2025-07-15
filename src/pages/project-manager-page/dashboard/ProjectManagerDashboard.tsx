@@ -18,6 +18,8 @@ import {
 import { Accordion } from "rsuite";
 import { RoundedBar, CustomTooltip } from "../../../components/CustomChartComponents";
 import DashboardCard from "../../factory-manager-page/dashboard/DashboardCard";
+import PieChartComponent from "../../factory-manager-page/dashboard/PieChart";
+import BarChartComponent from "../../factory-manager-page/dashboard/Barchart";
 
 const ProjectManagerDashboard = () => {
   document.title = "Product Dashboard - KDC Admin";
@@ -248,7 +250,7 @@ const ProjectManagerDashboard = () => {
       key: `breakdownYear-${key}`,
       title: key.replace(/_/g, ' '),
       value: Number(value) || 0,
-      currency: isMonetary(key) ? '₦ ' : undefined
+      currency: isMonetary(key) ? '\u20a6 ' : undefined
     })) : [];
 
   const monthlyBreakdownCards = breakdownMonth ? Object.entries(breakdownMonth)
@@ -257,7 +259,7 @@ const ProjectManagerDashboard = () => {
       key: `breakdownMonth-${key}`,
       title: key.replace(/_/g, ' '),
       value: Number(value) || 0,
-      currency: isMonetary(key) ? '₦ ' : undefined
+      currency: isMonetary(key) ? '\u20a6 ' : undefined
     })) : [];
 
   const yearlyExpenseCards = expenseBreakdownYear ? Object.entries(expenseBreakdownYear)
@@ -265,7 +267,7 @@ const ProjectManagerDashboard = () => {
       key: `expenseBreakdownYear-${key}`,
       title: key.replace(/_/g, ' '),
       value: Number(value) || 0,
-      currency: isMonetary(key) ? '₦ ' : undefined
+      currency: isMonetary(key) ? '\u20a6 ' : undefined
     })) : [];
 
   const monthlyExpenseCards = expenseBreakdownMonth ? Object.entries(expenseBreakdownMonth)
@@ -273,7 +275,7 @@ const ProjectManagerDashboard = () => {
       key: `expenseBreakdownMonth-${key}`,
       title: key.replace(/_/g, ' '),
       value: Number(value) || 0,
-      currency: isMonetary(key) ? '₦ ' : undefined
+      currency: isMonetary(key) ? '\u20a6 ' : undefined
     })) : [];
 
   // Combine for show more/less logic
@@ -325,9 +327,12 @@ const ProjectManagerDashboard = () => {
   const groupNames = ['Yearly Breakdown', 'Monthly Breakdown', 'Yearly Expenses', 'Monthly Expenses'];
   const groupSlices = showAllCards ? groups.map(g => [0, g.length]) : getVisibleGroupSlices(groups, defaultVisibleCount);
 
+  // Prepare pie chart data (use monthlyExpenseCards as example, adapt as needed)
+  const pieChartData = monthlyExpenseCards.map(card => ({ name: card.title, value: card.value }));
+
   return (
-    <div className="w-full sm:w-11/12 mx-auto mt-3 sm:mt-6 pl-1 pt-2">
-      <div className="mb-8 sm:mb-16">
+    <div>
+      <div className="p-2 sm:p-4">
         {/* Grouped card sections, only first 2 rows by default */}
         {groups.map((group, i) => renderCardGroup(groupNames[i], group, groupSlices[i][0], groupSlices[i][1]))}
         {allCards.length > defaultVisibleCount && (
@@ -349,59 +354,15 @@ const ProjectManagerDashboard = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-              </div>
+          </div>
         )}
-
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 p-2 sm:p-4 bg-gray-50">
-          {/* Income Chart */}
-          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-md border border-gray-200">
-            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">Monthly Income</h2>
-            <div className="h-[250px] sm:h-[350px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={incomeData} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} tick={{ fontSize: 12 }} />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(240, 240, 240, 0.5)' }} />
-                  <Bar dataKey="value" name="Income" shape={<RoundedBar />} fill="#4A90E2" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Expenses Chart */}
-          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-md border border-gray-200">
-            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">Monthly Expenses</h2>
-            <div className="h-[250px] sm:h-[350px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={expensesData} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} tick={{ fontSize: 12 }} />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(240, 240, 240, 0.5)' }} />
-                  <Bar dataKey="value" name="Expenses" shape={<RoundedBar />} fill="#F5A623" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Profit Chart */}
-          <div className="lg:col-span-2 bg-white p-3 sm:p-6 rounded-lg shadow-md border border-gray-200">
-            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-700">Monthly Profit</h2>
-            <div className="h-[300px] sm:h-[400px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={profitData} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tickFormatter={(value) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value as number)} tick={{ fontSize: 12 }} />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(240, 240, 240, 0.5)' }} />
-                  <Area type="monotone" dataKey="value" name="Profit" fill="#82ca9d" stroke="#82ca9d" />
-                  <Bar dataKey="value" name="Profit" barSize={20} shape={<RoundedBar />} fill="#413ea0" />
-                  <Line type="monotone" dataKey="value" name="Profit" stroke="#ff7300" />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+      </div>
+      <div className="p-2 sm:p-4">
+        <div className="w-full min-h-[220px] sm:min-h-[350px] bg-white rounded-lg shadow p-2 sm:p-4 overflow-x-auto mb-4">
+          <PieChartComponent data={pieChartData} />
+        </div>
+        <div className="w-full min-h-[220px] sm:min-h-[350px] bg-white rounded-lg shadow p-2 sm:p-4 overflow-x-auto">
+          <BarChartComponent />
         </div>
       </div>
     </div>

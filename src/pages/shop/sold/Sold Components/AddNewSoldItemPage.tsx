@@ -59,9 +59,11 @@ const AddNewSoldItemPage = () => {
     project: "",
     item: "",
     logistics: "0",
+    date: new Date().toISOString().slice(0, 10),
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [itemDetails, setItemDetails] = useState<{ quantity: number; price: number } | null>(null);
 
   useEffect(() => {
     console.log("Form data updated:", formData);
@@ -77,12 +79,33 @@ const AddNewSoldItemPage = () => {
     }));
   };
 
-  const handleDropdownChange = (name: string, value: string) => {
+  const handleDropdownChange = async (name: string, value: string) => {
     console.log(`handleDropdownChange called with: name=${name}, value=${value}`);
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+    if (name === "item" && value) {
+      try {
+        const response = await fetch(`https://backend.kidsdesigncompany.com/api/inventory-item/${value}/`, {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setItemDetails({
+            quantity: Number(data.quantity) || 0,
+            price: Number(data.price) || 0,
+          });
+        } else {
+          setItemDetails(null);
+        }
+      } catch {
+        setItemDetails(null);
+      }
+    }
   };
 
   useEffect(() => {
@@ -92,6 +115,7 @@ const AddNewSoldItemPage = () => {
       project: "",
       item: "",
       logistics: "0",
+      date: new Date().toISOString().slice(0, 10),
     });
   }, [saleType]);
 
@@ -189,12 +213,39 @@ const AddNewSoldItemPage = () => {
           onChange={handleDropdownChange}
           resultsKey="results.items"
         />
+        {itemDetails && (
+          <div className="mt-2 text-xs text-black">
+            <div>Available Quantity: <span className="font-semibold">{itemDetails.quantity.toLocaleString()}</span></div>
+            <div>Unit Price: <span className="font-semibold">₦{itemDetails.price.toLocaleString()}</span></div>
+          </div>
+        )}
         <div>
           <label className="block mb-1">Quantity:</label>
           <input
             type="number"
             name="quantity"
             value={formData.quantity}
+            min={1}
+            max={itemDetails ? itemDetails.quantity : undefined}
+            onChange={e => {
+              let val = e.target.value;
+              if (itemDetails && Number(val) > itemDetails.quantity) {
+                val = itemDetails.quantity.toString();
+              }
+              setFormData(prev => ({ ...prev, quantity: val }));
+            }}
+            className="w-full border rounded p-2"
+            required
+            disabled={!formData.item}
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1">Date:</label>
+          <input
+            type="date"
+            name="date"
+            value={formData.date}
             onChange={handleChange}
             className="w-full border rounded p-2"
             required
