@@ -98,7 +98,7 @@ const Workers = () => {
   if (error) return <p>Error loading workers: {error.message}</p>;
 
   return (
-    <div className="wrapper w-11/12 mx-auto mb-10 md:mb-2 pl-1 pt-0">
+    <div className="wrapper w-full mx-auto mb-20 md:mb-2 pl-1 pt-0">
       {/* Analysis Sections Container */}
       <div
         className={`grid grid-cols-1 md:grid-cols-2 gap-4 mb-2 ${
@@ -237,7 +237,7 @@ const Workers = () => {
       </div>
 
       {/* Contractor Section Heading and Add Button Row */}
-      <div className={`flex flex-row items-center justify-between gap-2 mb-2 mt-6 pt-3 border-t border-gray-500 ${isTableModalOpen ? "blur-md" : ""}`}> 
+      <div className={`flex flex-row items-center justify-between gap-2 mb-2 mt pt-3 border-t border-gray-500 ${isTableModalOpen ? "blur-md" : ""}`}> 
         <h1
           style={{ fontSize: "clamp(12.5px, 3vw, 24px)" }}
           className="font-semibold py-1 mt-0 mb-0"
@@ -258,7 +258,7 @@ const Workers = () => {
         <input
           type="text"
           placeholder="Search for contractors by name..."
-          className="border p-2 rounded text-xs w-24 sm:w-40 md:w-56 min-w-[100px]"
+          className="border p-2 rounded text-xs w-32 sm:w-40 md:w-56 min-w-[100px]"
           value={contractorSearchInput}
           onChange={(e) => setContractorSearchInput(e.target.value)}
           onKeyDown={(e) => {

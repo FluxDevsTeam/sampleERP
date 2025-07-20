@@ -196,7 +196,7 @@ const ProjectManagerDashboard = () => {
   const profitData = apiData?.monthly_profit_trend || [];
 
   return (
-    <div className="w-full sm:w-11/12 mx-auto mt-3 sm:mt-6 pl-1 md-20 pt-2">
+    <div className="w-full sm:w-11/12 mx-auto mt-3 sm:mt-6 pl-1 mb-20 pt-2">
       <div className="mb-8 sm:mb-16">
         {/* Grouped card sections, only first 2 rows by default */}
         {groups.map((group, i) => renderCardGroup(groupNames[i], group, groupSlices[i][0], groupSlices[i][1]))}

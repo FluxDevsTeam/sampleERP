@@ -38,7 +38,7 @@ export const Removed = () => {
   }, []);
 
   return (
-    <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2">
+    <div className="wrapper w-full mx-auto my-0 mb-20 md:mb-4 pt-2">
       <div className="grid grid-cols-2  gap-2 md:gap-10 mb-4 mt-4">
         <InventoryData
           info="This Month's Removed Count"

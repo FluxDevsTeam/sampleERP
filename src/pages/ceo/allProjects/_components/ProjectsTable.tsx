@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import ProjectTaskManager from "./ProjectTaskManager";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faXmark, faArrowLeft, faArrowRight, faAnglesLeft, faAnglesRight } from "@fortawesome/free-solid-svg-icons";
 
 interface Product {
   id: number;
@@ -130,7 +130,8 @@ const getTimeRemainingInfo = (project: Project) => {
   const deadlineDate = dayjs(deadline);
   const days = deadlineDate.diff(today, "day");
   const dayText = Math.abs(days) === 1 ? "day" : "days";
-  const color = days < 0 ? "text-red-500" : "";
+  // Make text red if days <= 0
+  const color = days <= 0 ? "text-red-500" : "";
 
   return { text: `${days} ${dayText}`, color };
 };
@@ -328,7 +329,7 @@ const ProjectsTable = () => {
   const hasPreviousPage = currentPage > 1;
 
   return (
-    <div className="p-6 flex flex-col h-full bg-white">
+    <div className="py-6 flex flex-col h-full bg-white">
       <div className="flex w-full justify-end mb-6">
         <div className="grid grid-cols-1 sm:flex sm:flex-row sm:flex-wrap gap-2 sm:gap-4 w-full justify-end">
           {/* First row on mobile: Add Project and Filter by Status */}
@@ -565,7 +566,7 @@ const ProjectsTable = () => {
       </div>
 
       <div className="flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200">
-        <div className="overflow-x-auto pb-6">
+        <div className="overflow-x-auto ">
           {projects.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
               <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
@@ -647,7 +648,7 @@ const ProjectsTable = () => {
                       {project.timeframe || "-"}
                     </td>
                     <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 w-2/5 sm:w-auto">
-                      {getTimeRemainingInfo(project).text}
+                      <span className={timeRemainingInfo.color}>{timeRemainingInfo.text}</span>
                       </td>
                     <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center hidden sm:table-cell">
                         <button
@@ -693,14 +694,36 @@ const ProjectsTable = () => {
         </div>
       </div>
 
-      <div className="mt-6">
-        <PaginationComponent
-          currentPage={currentPage}
-          totalPages={totalPages}
-          hasNextPage={hasNextPage}
-          hasPreviousPage={hasPreviousPage}
-          handlePageChange={handlePageChange}
-        />
+      <div className="flex justify-center items-center mt-4 gap-2">
+        <button
+          onClick={() => handlePageChange(1)}
+          disabled={!hasPreviousPage}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faAnglesLeft} />
+        </button>
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={!hasPreviousPage}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
+        <span className="mx-4 text-md ">Page {currentPage} of {totalPages}</span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={!hasNextPage}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faArrowRight} />
+        </button>
+        <button
+          onClick={() => handlePageChange(totalPages)}
+          disabled={!hasNextPage}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faAnglesRight} />
+        </button>
       </div>
 
       <ProjectModals

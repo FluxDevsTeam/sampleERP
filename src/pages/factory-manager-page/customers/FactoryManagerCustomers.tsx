@@ -3,6 +3,8 @@ import { fetchData } from "./api";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import img from "./ìmg/hi.jpg"; // Ensure the correct file path
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faArrowRight, faAnglesLeft, faAnglesRight } from "@fortawesome/free-solid-svg-icons";
 
 const FactoryManagerCustomers = () => {
   const [customers, setCustomers] = useState<unknown[]>([]);
@@ -149,8 +151,10 @@ const FactoryManagerCustomers = () => {
     return <div className="text-red-500">{error}</div>;
   }
 
+  const itemsPerPage = 10;
+
   return (
-    <div className="px-2 sm:px-6 md:px-10 pt-3 pb-10 md:pb-5 text-[#0A0A0A]">
+    <div className="px-0 md:px-10 pt-3 mb-20 md:mb-10 text-[#0A0A0A]">
 
       <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-8 w-full">
         <article className="border rounded-lg p-2 sm:p-4 shadow-md flex flex-col items-center justify-center">
@@ -174,7 +178,8 @@ const FactoryManagerCustomers = () => {
             placeholder="Search customers..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border p-2 rounded-lg text-xs sm:text-sm flex-1 min-w-0"
+            className="border p-2 rounded-lg border-blue-400 text-xs
+             sm:text-sm flex-1 min-w-0"
           />
           <button onClick={handleSearch} className="bg-blue-400 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-xs sm:text-sm whitespace-nowrap">Search</button>
           <button onClick={clearSearch} className="bg-gray-500 text-white px-3 py-1.5 rounded text-xs sm:text-sm whitespace-nowrap">Clear</button>
@@ -221,7 +226,7 @@ const FactoryManagerCustomers = () => {
               <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Email</th>
               <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Phone</th>
               <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden md:table-cell">Location</th>
-              <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold w-20 hidden md:table-cell">Year Joined</th>
+              <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold w-32 hidden md:table-cell">Year Joined</th>
               <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Details</th>
             </tr>
           </thead>
@@ -232,7 +237,7 @@ const FactoryManagerCustomers = () => {
                 <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 border-r border-gray-200 hidden sm:table-cell">{customer.email}</td>
                 <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 border-r border-gray-200">{customer.phone_number}</td>
                 <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 border-r border-gray-200 hidden md:table-cell">{customer.address}</td>
-                <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 w-20 border-r border-gray-200 hidden md:table-cell">{formatDate(customer.created_at)}</td>
+                <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 w-32 border-r border-gray-200 hidden md:table-cell">{formatDate(customer.created_at)}</td>
                 <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 text-center">
                   <button
                     onClick={() => navigate(`/factory-manager/customers/${customer.id}`)}
@@ -247,21 +252,33 @@ const FactoryManagerCustomers = () => {
         </table>
       </div>
 
-      <div className="flex justify-center items-center mt-6">
-        <button 
+      <div className="flex justify-center items-center gap-2">
+        <button
           onClick={() => {
-            if (previousPage) {
+            if (currentPage > 1 && previousPage) {
+              fetchCustomers(`https://backend.kidsdesigncompany.com/api/customer/?page=1`);
+              setCurrentPage(1);
+            }
+          }}
+          disabled={!previousPage || currentPage === 1 || loading}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faAnglesLeft} />
+        </button>
+        <button
+          onClick={() => {
+            if (previousPage && currentPage > 1) {
               fetchCustomers(previousPage);
               setCurrentPage(currentPage - 1);
             }
           }}
-          disabled={!previousPage || loading}
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg mr-2 disabled:bg-gray-300"
+          disabled={!previousPage || currentPage === 1 || loading}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
-          Previous
+          <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-        <span className="text-lg font-semibold">{currentPage}</span>
-        <button 
+        <span className="mx-4 text-md ">Page {currentPage} of {Math.max(1, Math.ceil(totalCustomers / itemsPerPage))}</span>
+        <button
           onClick={() => {
             if (nextPage) {
               fetchCustomers(nextPage);
@@ -269,9 +286,38 @@ const FactoryManagerCustomers = () => {
             }
           }}
           disabled={!nextPage || loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg ml-2 disabled:bg-gray-300"
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
-          Next
+          <FontAwesomeIcon icon={faArrowRight} />
+        </button>
+        <button
+          onClick={async () => {
+            if (nextPage) {
+              // Find the last page number by fetching until nextPage is null
+              let lastPage = currentPage;
+              let url: string | null = nextPage;
+              while (url) {
+                const response: Response = await fetch(url, {
+                  headers: { 'Authorization': `JWT ${localStorage.getItem('accessToken')}` }
+                });
+                if (!response.ok) break;
+                const data: any = await response.json();
+                if (data.next) {
+                  url = data.next;
+                  lastPage++;
+                } else {
+                  url = null;
+                  lastPage++;
+                }
+              }
+              fetchCustomers(`https://backend.kidsdesigncompany.com/api/customer/?page=${lastPage}`);
+              setCurrentPage(lastPage);
+            }
+          }}
+          disabled={!nextPage || loading}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faAnglesRight} />
         </button>
       </div>
     </div>

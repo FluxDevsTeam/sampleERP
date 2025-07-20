@@ -110,9 +110,17 @@ export const RawMaterials: React.FC = () => {
     };
   }, [isFilterOpen]);
 
-  const fetchRMInfo = async () => {
+  // Add backend pagination state
+  const [nextPageUrl, setNextPageUrl] = useState<string | null>(null);
+  const [prevPageUrl, setPrevPageUrl] = useState<string | null>(null);
+  const [currentItems, setCurrentItems] = useState<TableData[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [count, setCount] = useState(0);
+
+  const fetchRMInfo = async (url?: string) => {
     setLoading(true);
     try {
+      let fetchUrl = url || `https://backend.kidsdesigncompany.com/api/raw-materials/?page=${currentPage}`;
       const params = new URLSearchParams();
       if (searchQuery) {
         params.append("search", searchQuery);
@@ -126,49 +134,45 @@ export const RawMaterials: React.FC = () => {
       if (lowStock) {
         params.append("low_stock", "true");
       }
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/raw-materials/?${params.toString()}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-
+      if (!url) {
+        fetchUrl += `&${params.toString()}`;
+      }
+      const response = await fetch(fetchUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+        },
+      });
       if (!response.ok) {
         throw new Error("Authentication failed");
       }
-
       const logData = await response.json();
-      // console.log(logData);
-
       setTotalStockValue(logData.results.total_stock_value);
       setTotalStoreCount(logData.results.total_store_count);
-
-      const updatedTableData: TableData[] = logData.results.items.map(
-        (item: any) => {
-          return {
-            Name: item.name,
-            Category: item.store_category?.name,
-            Quantity: item.quantity ? Number(item.quantity).toLocaleString() : 0,
-            price: item.price,
-            Details: (
-              <button
-                onClick={() => handleViewDetails(item)}
-                className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
-              >
-                View
-              </button>
-            ),
-          };
-        }
-      );
-
+      setCount(logData.count);
+      setNextPageUrl(logData.next);
+      setPrevPageUrl(logData.previous);
+      setTotalPages(Math.ceil(logData.count / itemsPerPage));
+      const updatedTableData: TableData[] = logData.results.items.map((item: any) => {
+        return {
+          Name: item.name,
+          Category: item.store_category?.name,
+          Quantity: item.quantity ? Number(item.quantity).toLocaleString() : 0,
+          price: item.price,
+          Details: (
+            <button
+              onClick={() => handleViewDetails(item)}
+              className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+            >
+              View
+            </button>
+          ),
+        };
+      });
       setTableData(updatedTableData);
       setRawMaterials(logData.results.items);
       setFilteredMaterials(logData.results.items);
+      setCurrentItems(updatedTableData);
     } catch (error) {
       console.error("Error fetching items:", error);
     } finally {
@@ -176,6 +180,24 @@ export const RawMaterials: React.FC = () => {
     }
   };
 
+  // Update handlePageChange to use backend URLs
+  const handlePageChange = (pageNumber: number) => {
+    if (pageNumber < 1 || (totalPages && pageNumber > totalPages)) return;
+    setCurrentPage(pageNumber);
+    let url = null;
+    if (pageNumber === 1 && prevPageUrl) {
+      url = prevPageUrl.replace(/page=\d+/, 'page=1');
+    } else if (pageNumber === totalPages && nextPageUrl) {
+      url = nextPageUrl.replace(/page=\d+/, `page=${totalPages}`);
+    }
+    if (url) {
+      fetchRMInfo(url);
+    } else {
+      fetchRMInfo(`https://backend.kidsdesigncompany.com/api/raw-materials/?page=${pageNumber}`);
+    }
+  };
+
+  // Update useEffect to refetch on currentPage change
   useEffect(() => {
     setUserRole(localStorage.getItem("user_role"));
     const loadData = async () => {
@@ -200,19 +222,8 @@ export const RawMaterials: React.FC = () => {
         }
       }
     };
-
     loadData();
-  }, [openProductId, searchQuery, archived, emptyStock, lowStock, location.search]); // Added filter states to trigger refresh
-
-  // Calculate pagination values
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(tableData.length / itemsPerPage);
-
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
+  }, [openProductId, searchQuery, archived, emptyStock, lowStock, location.search, currentPage]);
 
   useEffect(() => {
     if (showModal || showImagePreview) {
@@ -300,14 +311,26 @@ export const RawMaterials: React.FC = () => {
     await deleteItem();
   };
 
-  const formatNumber = (num: number | string) => {
-    if (num === undefined || num === null) return '-';
-    return Number(num).toLocaleString();
+  const formatNumber = (number: number | string | undefined | null) => {
+    if (number === undefined || number === null || number === "") {
+      return "0";
+    }
+    const num = typeof number === "string" ? parseFloat(number.replace(/,/g, '')) : number;
+    if (isNaN(num)) {
+      return String(number);
+    }
+    if (Number.isFinite(num) && Math.floor(num) === num) {
+      return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+    if (Number.isFinite(num) && Number(num) % 1 === 0) {
+      return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+    return num.toLocaleString("en-US", { maximumFractionDigits: 2 });
   };
 
   return (
     <>
-      <div className={`wrapper w-11/12 mx-auto mb-0 mt-0 pl-1 pb-12 pt-2`}>
+      <div className={`wrapper w-full mx-auto mt-0 pl-1 mb-20 md:mb-4 pt-2`}>
         {/* <h1
           className={`${showImagePreview ? "blur-sm" : ""} ${
             showModal ? "blur-md" : ""
@@ -455,7 +478,7 @@ export const RawMaterials: React.FC = () => {
               </div>
             ) : (
               currentItems.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+                <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-2">
                   <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
                     <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2V7a2 2 0 00-2-2h-1V3.5a1.5 1.5 0 00-3 0V5H9a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -482,7 +505,7 @@ export const RawMaterials: React.FC = () => {
                         <tr key={index} className="hover:bg-gray-100">
                           <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">{row.Name}</td>
                           <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700 hidden sm:table-cell">{row.Category}</td>
-                          <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">{row.Quantity}</td>
+                          <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">{formatNumber(row.Quantity)}</td>
                           <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">₦ {formatNumber(typeof row.price === 'number' || typeof row.price === 'string' ? row.price : 0)}</td>
                           <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">₦ {formatNumber((Number(typeof row.price === 'number' || typeof row.price === 'string' ? row.price : 0) * Number(typeof row.Quantity === 'number' || typeof row.Quantity === 'string' ? row.Quantity.toString().replace(/,/g, '') : 0)))}</td>
                           <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">{row.Details}</td>
@@ -499,14 +522,14 @@ export const RawMaterials: React.FC = () => {
           <div className="flex justify-center items-center mb-20 sm:mb-28 gap-1 sm:gap-2">
             <button
               onClick={() => handlePageChange(1)}
-              disabled={currentPage === 1}
+              disabled={!prevPageUrl}
               className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
             >
               <FontAwesomeIcon icon={faAnglesLeft} />
             </button>
             <button
               onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
+              disabled={!prevPageUrl}
               className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
             >
               <FontAwesomeIcon icon={faArrowLeft} />
@@ -518,14 +541,14 @@ export const RawMaterials: React.FC = () => {
 
             <button
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              disabled={!nextPageUrl}
               className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
             >
               <FontAwesomeIcon icon={faArrowRight} />
             </button>
             <button
               onClick={() => handlePageChange(totalPages)}
-              disabled={currentPage === totalPages}
+              disabled={!nextPageUrl}
               className="px-2 sm:px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300 text-xs sm:text-sm"
             >
               <FontAwesomeIcon icon={faAnglesRight} />

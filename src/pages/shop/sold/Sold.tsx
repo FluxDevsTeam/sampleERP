@@ -70,7 +70,7 @@ export const Sold = () => {
     }, []);
 
   return (
-    <div className="wrapper w-11/12 mx-auto my-0 pl-1 mb-20 pt-2">
+    <div className="wrapper w-full mx-auto my-0 pl-1 mb-20 pt-2">
         <h4>Monthly Sales Dashboard</h4>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 max-sm:gap-1 mb-0 md:mb-6 mt-2">
         <InventoryData info="Sales Count" digits={thisMonthSalesCount}></InventoryData>

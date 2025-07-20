@@ -48,7 +48,7 @@ const Header = () => {
   ];
 
   return (
-    <div className="p-6">
+    <div className="py-6">
       {/* <p className="md:text-3xl text-black font-bold py-6">Project Overview</p> */}
 
       <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4">

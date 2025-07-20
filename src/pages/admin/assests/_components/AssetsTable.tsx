@@ -236,14 +236,36 @@ const AssetsTable = ({
         </table>
       </div>
 
-      <div className="flex justify-center items-center mb-28 gap-2">
-        <PaginationComponent
-          currentPage={currentPage}
-          totalPages={totalPages}
-          hasNextPage={hasNextPage}
-          hasPreviousPage={hasPreviousPage}
-          handlePageChange={handlePageChange}
-        />
+      <div className="flex justify-center items-center mt-2 mb-2 gap-2">
+        <button
+          onClick={() => handlePageChange(1)}
+          disabled={!hasPreviousPage}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faAnglesLeft} />
+        </button>
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={!hasPreviousPage}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
+        <span className="mx-4 text-md ">Page {currentPage} of {totalPages}</span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={!hasNextPage}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faArrowRight} />
+        </button>
+        <button
+          onClick={() => handlePageChange(totalPages)}
+          disabled={!hasNextPage}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faAnglesRight} />
+        </button>
       </div>
 
       <Modals

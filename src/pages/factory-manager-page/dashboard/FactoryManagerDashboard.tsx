@@ -204,8 +204,8 @@ const FactoryManagerDashboard = () => {
   const groupSlices = showAllCards ? groups.map(g => [0, g.length]) : getVisibleGroupSlices(groups, defaultVisibleCount);
 
   return (
-    <div>
-      <div className="p-2 sm:p-4">
+    <div className="mb-20 md:mb-4">
+      <div className="p-2 sm:p-4 mb-20 md:mb-4">
         {/* Grouped card sections, only first 2 rows by default */}
         {groups.map((group, i) => renderCardGroup(groupNames[i], group, groupSlices[i][0], groupSlices[i][1]))}
         {allCards.length > defaultVisibleCount && (

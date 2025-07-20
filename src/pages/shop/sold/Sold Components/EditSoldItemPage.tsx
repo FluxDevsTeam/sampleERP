@@ -48,6 +48,9 @@ const EditSoldItemPage: React.FC = () => {
   const [unavailableNames, setUnavailableNames] = useState({ item: '', customer: '', project: '' });
   // Add state for selected names
   const [selectedNames, setSelectedNames] = useState({ item: '', customer: '', project: '' });
+  // Add state for item details (stock and price)
+  const [itemDetails, setItemDetails] = useState<{ quantity: number; price: number } | null>(null);
+  const [originalQuantity, setOriginalQuantity] = useState<number>(0);
 
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
@@ -82,6 +85,7 @@ const EditSoldItemPage: React.FC = () => {
           customer: data.sold_to?.name || '',
           project: data.linked_project?.name || '',
         });
+        setOriginalQuantity(Number(data.quantity) || 0);
         console.log('Fetched sold item:', data);
         console.log('Set formData:', {
           quantity: data.quantity || "",
@@ -171,6 +175,36 @@ const EditSoldItemPage: React.FC = () => {
     };
     fetchInventoryItems();
   }, []);
+
+  useEffect(() => {
+    // Fetch item details when item changes
+    const fetchItemDetails = async () => {
+      if (formData.item) {
+        try {
+          const response = await fetch(`https://backend.kidsdesigncompany.com/api/inventory-item/${formData.item}/`, {
+            headers: {
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+              "Content-Type": "application/json",
+            },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setItemDetails({
+              quantity: Number(data.stock) || 0,
+              price: Number(data.selling_price) || 0,
+            });
+          } else {
+            setItemDetails(null);
+          }
+        } catch (e) {
+          setItemDetails(null);
+        }
+      } else {
+        setItemDetails(null);
+      }
+    };
+    fetchItemDetails();
+  }, [formData.item]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -283,10 +317,25 @@ const EditSoldItemPage: React.FC = () => {
               type="number"
               required
               value={formData.quantity}
-              onChange={e => setFormData({ ...formData, quantity: e.target.value })}
+              onChange={e => {
+                let val = e.target.value;
+                const max = itemDetails ? itemDetails.quantity + originalQuantity : undefined;
+                if (max !== undefined && Number(val) > max) {
+                  val = max.toString();
+                }
+                setFormData({ ...formData, quantity: val });
+              }}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
               disabled={!formData.item}
+              min={1}
+              max={itemDetails ? itemDetails.quantity + originalQuantity : undefined}
             />
+            {itemDetails && (
+              <div className="mt-2 text-xs text-black">
+                <div>Available Quantity: <span className="font-semibold">{(itemDetails.quantity + originalQuantity).toLocaleString()}</span></div>
+                <div>Unit Price: <span className="font-semibold">₦{itemDetails.price.toLocaleString()}</span></div>
+              </div>
+            )}
           </div>
           <SearchablePaginatedDropdown
             endpoint="https://backend.kidsdesigncompany.com/api/customer/"
@@ -319,7 +368,7 @@ const EditSoldItemPage: React.FC = () => {
               </p>
             )}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Logistics</label>
+            <label className="block text-sm font-medium text-gray-700">Logistics (optional)</label>
             <input
               type="number"
               value={formData.logistics}

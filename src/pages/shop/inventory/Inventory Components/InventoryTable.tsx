@@ -42,6 +42,11 @@ const Table: React.FC<TableProps> = ({
   const [showImagePreview, setShowImagePreview] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [nextPageUrl, setNextPageUrl] = useState<string | null>(null);
+  const [prevPageUrl, setPrevPageUrl] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [count, setCount] = useState(0);
+  const [currentItems, setCurrentItems] = useState<TableData[]>([]);
   const location = useLocation();
   const navigate = useNavigate();
   const [modalConfig, setModalConfig] = useState({
@@ -87,10 +92,10 @@ const Table: React.FC<TableProps> = ({
     setLowStock(false);
   };
 
-  const fetchItems = async () => {
+  const fetchItems = async (url?: string) => {
     try {
       setLoading(true);
-
+      let fetchUrl = url || `https://backend.kidsdesigncompany.com/api/inventory-item/?page=${currentPage}`;
       const params = new URLSearchParams();
       if (searchQuery) {
         params.append("search", searchQuery);
@@ -104,25 +109,24 @@ const Table: React.FC<TableProps> = ({
       if (lowStock) {
         params.append("low_stock", "true");
       }
-
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/inventory-item/?${params.toString()}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
+      if (!url) {
+        fetchUrl += `&${params.toString()}`;
+      }
+      const response = await fetch(fetchUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+        },
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
-
       const data = await response.json();
-      console.log("API Response:", data);
-
+      setCount(data.count);
+      setNextPageUrl(data.next);
+      setPrevPageUrl(data.previous);
+      setTotalPages(Math.ceil(data.count / itemsPerPage));
       const updatedTableData: TableData[] = data.results.items.map(
         (item: any) => {
           return {
@@ -140,8 +144,8 @@ const Table: React.FC<TableProps> = ({
           };
         }
       );
-
       setTableData(updatedTableData);
+      setCurrentItems(updatedTableData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -151,16 +155,22 @@ const Table: React.FC<TableProps> = ({
 
   useEffect(() => {
     fetchItems();
-  }, [searchQuery, archived, emptyStock, lowStock]);
-
-  // Calculate pagination values
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(tableData.length / itemsPerPage);
+  }, [searchQuery, archived, emptyStock, lowStock, currentPage]);
 
   const handlePageChange = (pageNumber: number) => {
+    if (pageNumber < 1 || (totalPages && pageNumber > totalPages)) return;
     setCurrentPage(pageNumber);
+    let url = null;
+    if (pageNumber === 1 && prevPageUrl) {
+      url = prevPageUrl.replace(/page=\d+/, 'page=1');
+    } else if (pageNumber === totalPages && nextPageUrl) {
+      url = nextPageUrl.replace(/page=\d+/, `page=${totalPages}`);
+    }
+    if (url) {
+      fetchItems(url);
+    } else {
+      fetchItems(`https://backend.kidsdesigncompany.com/api/inventory-item/?page=${pageNumber}`);
+    }
   };
 
   useEffect(() => {
@@ -265,6 +275,24 @@ const Table: React.FC<TableProps> = ({
     setDeleteLoading(true);
     await deleteItem();
     setDeleteLoading(false);
+  };
+
+  // Format number as integer if .00, otherwise as float
+  const formatNumber = (number: number | string | undefined | null) => {
+    if (number === undefined || number === null || number === "") {
+      return "0";
+    }
+    const num = typeof number === "string" ? parseFloat(number) : number;
+    if (isNaN(num)) {
+      return String(number);
+    }
+    if (Number.isFinite(num) && Math.floor(num) === num) {
+      return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+    if (Number.isFinite(num) && Number(num) % 1 === 0) {
+      return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+    return num.toLocaleString("en-US", { maximumFractionDigits: 2 });
   };
 
   return (
@@ -421,7 +449,7 @@ const Table: React.FC<TableProps> = ({
                         {row.Category}
                       </td>
                       <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
-                        {row["Stock Status"]}
+                        {formatNumber(row["Stock Status"])}
                       </td>
                       <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
                         {row.Details}
@@ -439,14 +467,14 @@ const Table: React.FC<TableProps> = ({
       <div className="flex justify-center items-center mb-28 gap-2">
         <button
           onClick={() => handlePageChange(1)}
-          disabled={currentPage === 1}
+          disabled={!prevPageUrl}
           className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
           <FontAwesomeIcon icon={faAnglesLeft} />
         </button>
         <button
           onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          disabled={!prevPageUrl}
           className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
@@ -458,14 +486,14 @@ const Table: React.FC<TableProps> = ({
 
         <button
           onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          disabled={!nextPageUrl}
           className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
           <FontAwesomeIcon icon={faArrowRight} />
         </button>
         <button
           onClick={() => handlePageChange(totalPages)}
-          disabled={currentPage === totalPages}
+          disabled={!nextPageUrl}
           className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
           <FontAwesomeIcon icon={faAnglesRight} />
@@ -519,7 +547,7 @@ const Table: React.FC<TableProps> = ({
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Stock</span>
-                <span className="text-base font-bold text-black">{selectedProduct.stock ?? selectedProduct.quantity ?? '—'}</span>
+                <span className="text-base font-bold text-black">{formatNumber(selectedProduct.stock ?? selectedProduct.quantity ?? '—')}</span>
               </div>
               <div className="flex flex-col gap-1 col-span-1 sm:col-span-2">
                 <span className="text-xs font-semibold text-black uppercase">Description</span>

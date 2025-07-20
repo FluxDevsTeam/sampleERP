@@ -96,8 +96,8 @@ const AddNewSoldItemPage = () => {
         if (response.ok) {
           const data = await response.json();
           setItemDetails({
-            quantity: Number(data.quantity) || 0,
-            price: Number(data.price) || 0,
+            quantity: Number(data.stock) || 0,
+            price: Number(data.selling_price) || 0,
           });
         } else {
           setItemDetails(null);

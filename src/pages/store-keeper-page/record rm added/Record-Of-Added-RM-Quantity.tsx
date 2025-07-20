@@ -46,7 +46,7 @@ const RecordOfRMAdded: React.FC = () => {
   } = boxData || {};
 
   return (
-    <div className="wrapper w-full mx-auto my-0 pl-1 mb-20 pt-2">
+    <div className="wrapper w-full mx-auto my-0 mb-20 pt-2">
       {/* <h4>Removed Dashboard</h4> */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 max-sm:gap-1 mb-0 md:mb-6 mt-2">
         <InventoryData info="Total Raw Materials Added (Year)" digits={yearly_added_material_count} trend="" />

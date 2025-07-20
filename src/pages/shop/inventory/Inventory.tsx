@@ -69,7 +69,7 @@ export const Inventory = () => {
 
   return (
     <>
-      <div className="wrapper w-11/12 mx-auto mt-2 pl-1 pt-4 mb-20">
+      <div className="wrapper w-full mx-auto mt-2 pl-1 pt-4 mb-20">
         <div
           className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4 ${
             isModalOpen ? "blur-md" : ""

@@ -126,7 +126,16 @@ const StockTable: React.FC = () => {
     if (isNaN(num)) {
       return String(number);
     }
-    return num.toLocaleString("en-US");
+    // If the number is a float but has no decimal part, show as integer
+    if (Number.isFinite(num) && Math.floor(num) === num) {
+      return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+    // If the number is a float with .00, show as integer
+    if (Number.isFinite(num) && Number(num) % 1 === 0) {
+      return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+    // Otherwise, show as is (with up to 2 decimals)
+    return num.toLocaleString("en-US", { maximumFractionDigits: 2 });
   };
 
   useEffect(() => {

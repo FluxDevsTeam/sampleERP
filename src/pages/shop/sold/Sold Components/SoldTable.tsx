@@ -430,7 +430,7 @@ const SoldTable: React.FC = () => {
                             </td>
                             {/* Name - always visible */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
-                              {entry.name}
+                              {entry.name || "—"}
                             </td>
                             {/* Quantity - always visible */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
@@ -472,7 +472,7 @@ const SoldTable: React.FC = () => {
             <div className="flex justify-between items-center">
               <h3 className="text-base sm:text-lg mb-3 sm:mb-4 font-medium">
                 <span className="font-semibold text-blue-20">
-                  {selectedSale.name}
+                  {selectedSale.name || "—"}
                 </span>
               </h3>
 
@@ -546,7 +546,7 @@ const SoldTable: React.FC = () => {
           <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm" onClick={() => setShowDetailsModal(false)}></div>
           <div className="relative w-[95vw] max-w-md mx-auto p-4 sm:p-6 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-y-auto" style={{ maxHeight: '80vh' }}>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg sm:text-xl font-bold text-black">{selectedItem.name}</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-black">{selectedItem.name || "—"}</h2>
               <button
                 onClick={() => setShowDetailsModal(false)}
                 className="text-gray-500 hover:text-gray-700 focus:outline-none text-2xl font-bold"
@@ -558,7 +558,7 @@ const SoldTable: React.FC = () => {
             <div className="grid grid-cols-2 gap-4 bg-white border border-gray-100 rounded-lg p-4 mb-4 shadow">
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Category</span>
-                <span className="text-base font-bold text-black">{selectedItem.item_sold?.inventory_category.name}</span>
+                <span className="text-base font-bold text-black">{selectedItem.item_sold?.inventory_category?.name || "—"}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Date</span>
@@ -566,7 +566,7 @@ const SoldTable: React.FC = () => {
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Dimensions</span>
-                <span className="text-base font-bold text-black">{selectedItem.item_sold?.dimensions}</span>
+                <span className="text-base font-bold text-black">{selectedItem.item_sold?.dimensions || "—"}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Quantity</span>

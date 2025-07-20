@@ -197,7 +197,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
 
   return (
     <div className={`relative ${!data?.daily_data?.length ? 'min-h-[300px]' : ''}`}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center md:mb-4 mb-14 gap-3 sm:gap-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
         <Button onClick={() => setIsAddModalOpen(true)} className="px-3 py-2 sm:px-4 sm:py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-sm">
           Record Payment
         </Button>
@@ -269,7 +269,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
           <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["paid"] }); }} disabled={isLoading} className="px-1 py-1 md:px-4 md:py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-xs md:text-sm">Clear</Button>
         </div>
       </div>
-      <div className={`overflow-x-auto pb-8 ${isTableModalOpen || isViewModalOpen || isDeleteDialogOpen ? 'blur-md' : ''}`}>
+      <div className={`overflow-x-auto mt-4 pb-8 ${isTableModalOpen || isViewModalOpen || isDeleteDialogOpen ? 'blur-md' : ''}`}>
         {(!data?.daily_data || data.daily_data.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
             <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">

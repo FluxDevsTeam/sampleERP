@@ -61,3 +61,11 @@ html, body, #root {
   height: 100%;
   overflow: hidden;
 }
+
+@media (max-width: 640px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}

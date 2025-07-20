@@ -173,6 +173,23 @@ const RecordRemovedTable: React.FC = () => {
     });
   };
 
+  const formatNumber = (number: number | string | undefined | null) => {
+    if (number === undefined || number === null || number === "") {
+      return "0";
+    }
+    const num = typeof number === "string" ? parseFloat(number.replace(/,/g, '')) : number;
+    if (isNaN(num)) {
+      return String(number);
+    }
+    if (Number.isFinite(num) && Math.floor(num) === num) {
+      return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+    if (Number.isFinite(num) && Number(num) % 1 === 0) {
+      return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+    return num.toLocaleString("en-US", { maximumFractionDigits: 2 });
+  };
+
   const handleEdit = (id: number) => {
     navigate(`/store-keeper/edit-record-removed/${id}`);
   };
@@ -383,7 +400,7 @@ const RecordRemovedTable: React.FC = () => {
 
                 {openDates[dayData.date] && (
                   <table className="min-w-full overflow-auto">
-                    <thead className="bg-blue-20 text-white">
+                    <thead className="bg-blue-400 text-white">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-bold hidden sm:table-cell">Date</th>
                         <th className="px-4 py-3 text-left text-xs font-bold">Material</th>
@@ -396,7 +413,7 @@ const RecordRemovedTable: React.FC = () => {
                         <tr key={entry.id} className="hover:bg-gray-50">
                           <td className="px-4 py-3 text-sm hidden sm:table-cell">{entry.date ? new Date(entry.date).toLocaleDateString() : "-"}</td>
                           <td className="px-4 py-3 text-sm">{entry.material?.name || "N/A"}</td>
-                          <td className="px-4 py-3 text-sm">{entry.quantity}</td>
+                          <td className="px-4 py-3 text-sm">{formatNumber(entry.quantity)}</td>
                           <td className="px-4 py-3 text-sm text-blue-600">
                             <button
                               className="px-2 py-1 border border-blue-400 text-blue-400 bg-white rounded hover:bg-blue-50 text-xs sm:text-sm"
@@ -435,7 +452,7 @@ const RecordRemovedTable: React.FC = () => {
               <div className="font-semibold text-black">Material:</div>
               <div className="text-black">{selectedEntry.material?.name || 'N/A'}</div>
               <div className="font-semibold text-black">Quantity:</div>
-              <div className="text-black">{selectedEntry.quantity}</div>
+              <div className="text-black">{formatNumber(selectedEntry.quantity)}</div>
               <div className="font-semibold text-black">Date:</div>
               <div className="text-black">{selectedEntry.date ? new Date(selectedEntry.date).toLocaleDateString() : '-'}</div>
               <div className="font-semibold text-black">Cost Price:</div>

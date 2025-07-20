@@ -30,6 +30,8 @@ import {
   Contractor,
   PaginatedContractorsResponse, // Use the new paginated response interface
 } from "../_api/apiService";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faArrowRight, faAnglesLeft, faAnglesRight } from "@fortawesome/free-solid-svg-icons";
 // import EditContractorModal from "../_pages/_contractors/EditContractor"; // No longer needed
 
 interface ContractorsTableProps {
@@ -143,7 +145,7 @@ const ContractorsTable = ({
   return (
     <div className="relative">
       <div
-        className={`overflow-x-auto pb-6 ${isViewModalOpen || isTableModalOpen || isDeleteDialogOpen ? "blur-md" : ""}`}
+        className={`overflow-x-auto pb-2 md:pb-6 ${isViewModalOpen || isTableModalOpen || isDeleteDialogOpen ? "blur-md" : ""}`}
       >
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
           <thead className="bg-blue-400 text-white">
@@ -234,14 +236,36 @@ const ContractorsTable = ({
         </table>
       </div>
 
-      <div className="flex justify-center items-center mb-28 gap-2">
-        <PaginationComponent
-          currentPage={currentPage}
-          totalPages={totalPages}
-          hasNextPage={hasNextPage}
-          hasPreviousPage={hasPreviousPage}
-          handlePageChange={handlePageChange}
-        />
+      <div className="flex justify-center items-center mt-2 gap-2">
+        <button
+          onClick={() => handlePageChange(1)}
+          disabled={!hasPreviousPage}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faAnglesLeft} />
+        </button>
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={!hasPreviousPage}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
+        <span className="mx-4 text-md ">Page {currentPage} of {totalPages}</span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={!hasNextPage}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faArrowRight} />
+        </button>
+        <button
+          onClick={() => handlePageChange(totalPages)}
+          disabled={!hasNextPage}
+          className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
+        >
+          <FontAwesomeIcon icon={faAnglesRight} />
+        </button>
       </div>
 
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>

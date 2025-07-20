@@ -134,6 +134,23 @@ const RemovedTable: React.FC = () => {
     });
   };
 
+  const formatNumber = (number: number | string | undefined | null) => {
+    if (number === undefined || number === null || number === "") {
+      return "0";
+    }
+    const num = typeof number === "string" ? parseFloat(number.replace(/,/g, '')) : number;
+    if (isNaN(num)) {
+      return String(number);
+    }
+    if (Number.isFinite(num) && Math.floor(num) === num) {
+      return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+    if (Number.isFinite(num) && Number(num) % 1 === 0) {
+      return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+    return num.toLocaleString("en-US", { maximumFractionDigits: 2 });
+  };
+
   const handleFilter = async () => {
     setFilterLoading(true);
     try {
@@ -217,7 +234,7 @@ const RemovedTable: React.FC = () => {
   };
 
   return (
-    <div className="p-2 sm:p-4 md:p-8">
+    <div className="p-2">
       {/* Heading and Remove Item button in the same row */}
       <div className="flex flex-row justify-between items-center mb-2 sm:mb-4 gap-3 sm:gap-0">
         <h1
@@ -388,7 +405,7 @@ const RemovedTable: React.FC = () => {
                                 {/* Name - always visible */}
                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm cursor-pointer hover:text-blue-600">{entry.name}</td>
                                 {/* Qty - always visible */}
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{entry.quantity}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{formatNumber(entry.quantity)}</td>
                                 {/* Product - visible on mobile only */}
                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm max-md:table-cell hidden">{entry.product_its_used.name || "—"}</td>
                                 {/* Desktop only columns */}
