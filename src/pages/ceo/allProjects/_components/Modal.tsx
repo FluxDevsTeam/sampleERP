@@ -411,7 +411,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                   }}
                   className="text-xs md:text-sm px-1 md:px-3 py-1 md:py-2"
                 >
-                  +Item
+                  + Item
                 </Button>
                 <Button
                   variant="outline"
@@ -656,77 +656,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                     </table>
                   </div>
                 </div>
-                {/* Tasks Table */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                  <div className="flex  md:flex-row md:items-center md:justify-between mb-2 gap-2">
-                    <h4 className="text-md font-semibold text-gray-700">Tasks</h4>
-                    <div className="flex-1 flex flex-col items-center justify-center">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium text-blue-400">Progress:</span>
-                        <span className="text-xs font-semibold text-blue-400">{progress}%</span>
-                      </div>
-                      <div className="w-40 bg-gray-200 rounded h-2.5">
-                        <div className="bg-blue-400 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => {
-                        if (selectedProject) {
-                          setIsModalOpen(false);
-                          setTimeout(() => handleViewTasks(selectedProject), 300);
-                        }
-                      }}
-                      className="px-3 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500 transition-colors"
-                      disabled={!selectedProject}
-                    >
-                      + Task
-                    </button>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full text-sm">
-                      <thead className="bg-blue-400 text-white">
-                        <tr>
-                          <th className="p-2 text-left">Task</th>
-                          <th className="p-2 text-left">Completed</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {Array.isArray(localTasks) && localTasks.length > 0 ? (
-                          localTasks.map((task, idx) => (
-                            task ? (
-                              <React.Fragment key={idx}>
-                                <tr className="border-b border-gray-200">
-                                  <td className="p-2 text-left font-medium">{task?.title}</td>
-                                  <td className="p-2 text-left">
-                                    <input type="checkbox" checked={task?.checked} onChange={() => task && handleTaskCompletionToggle(idx)} />
-                            </td>
-                                </tr>
-                                {Array.isArray(task.subtasks) ? task.subtasks.map((sub, subIdx) => (
-                                  sub ? (
-                                    <tr key={subIdx} className="border-b border-gray-100">
-                                      <td className="p-2 pl-8 text-left text-gray-700 flex items-center gap-2">
-                                        <span className="inline-block w-2 h-2 rounded-full bg-blue-400"></span>
-                                        <span>{sub.title}</span>
-                            </td>
-                                      <td className="p-2 text-left">
-                                        <input type="checkbox" checked={sub.checked} onChange={() => sub && handleTaskCompletionToggle(idx, subIdx)} />
-                            </td>
-                                    </tr>
-                                  ) : null
-                                )) : null}
-                              </React.Fragment>
-                            ) : null
-                          ))
-                        ) : (
-                          <tr>
-                            <td className="p-2 text-left" colSpan={2}>No tasks found</td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                {/* Products Table */}
+                                {/* Products Table */}
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                   <h4 className="text-md font-semibold text-gray-700 mb-2">
                     Products
@@ -830,6 +760,77 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                     </table>
                     </div>
                     </div>
+
+                {/* Tasks Table */}
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                  <div className="flex  md:flex-row md:items-center md:justify-between mb-2 gap-2">
+                    <h4 className="text-md font-semibold text-gray-700">Tasks</h4>
+                    <div className="flex-1 flex flex-col items-center justify-center">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-blue-400">Progress:</span>
+                        <span className="text-xs font-semibold text-blue-400">{progress}%</span>
+                      </div>
+                      <div className="w-40 bg-gray-200 rounded h-2.5">
+                        <div className="bg-blue-400 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        if (selectedProject) {
+                          setIsModalOpen(false);
+                          setTimeout(() => handleViewTasks(selectedProject), 300);
+                        }
+                      }}
+                      className="px-3 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500 transition-colors"
+                      disabled={!selectedProject}
+                    >
+                      + Task
+                    </button>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead className="bg-blue-400 text-white">
+                        <tr>
+                          <th className="p-2 text-left">Task</th>
+                          <th className="p-2 text-left">Completed</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Array.isArray(localTasks) && localTasks.length > 0 ? (
+                          localTasks.map((task, idx) => (
+                            task ? (
+                              <React.Fragment key={idx}>
+                                <tr className="border-b border-gray-200">
+                                  <td className="p-2 text-left font-medium">{task?.title}</td>
+                                  <td className="p-2 text-left">
+                                    <input type="checkbox" checked={task?.checked} onChange={() => task && handleTaskCompletionToggle(idx)} />
+                            </td>
+                                </tr>
+                                {Array.isArray(task.subtasks) ? task.subtasks.map((sub, subIdx) => (
+                                  sub ? (
+                                    <tr key={subIdx} className="border-b border-gray-100">
+                                      <td className="p-2 pl-8 text-left text-gray-700 flex items-center gap-2">
+                                        <span className="inline-block w-2 h-2 rounded-full bg-blue-400"></span>
+                                        <span>{sub.title}</span>
+                            </td>
+                                      <td className="p-2 text-left">
+                                        <input type="checkbox" checked={sub.checked} onChange={() => sub && handleTaskCompletionToggle(idx, subIdx)} />
+                            </td>
+                                    </tr>
+                                  ) : null
+                                )) : null}
+                              </React.Fragment>
+                            ) : null
+                          ))
+                        ) : (
+                          <tr>
+                            <td className="p-2 text-left" colSpan={2}>No tasks found</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
 
                 {/* Expenses Table */}
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">

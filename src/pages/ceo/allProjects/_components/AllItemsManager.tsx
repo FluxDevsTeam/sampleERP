@@ -110,10 +110,17 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
   };
 
   // Delete Item (CEO only)
-  const handleRemoveItem = (idx: number) => {
-    if (userRole !== "ceo") return;
-    setItems((prev) => prev.filter((_, i) => i !== idx));
-  };
+const handleRemoveItem = (idx: number) => {
+  setItems((prev) => {
+    const newItems = prev.filter((_, i) => i !== idx);
+    return newItems;
+  });
+  setUserTyped(true);
+  setDirty(true);
+  saveItems();
+};
+
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
@@ -152,7 +159,7 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
               className="bg-white border border-gray-200 rounded-xl p-2 shadow group flex flex-col gap-2 relative transition-all hover:shadow-lg"
               ref={idx === items.length - 1 ? lastItemRef : null}
             >
-              <div className="grid grid-cols-4 md:grid-cols-4 gap-4 mb-2">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
                 <div className="flex flex-col">
                   <label className="text-xs font-semibold text-black-400 mb-1">Name</label>
                   {editingAll ? (
@@ -164,6 +171,21 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
                     />
                   ) : (
                     <span className="font-semibold text-md text-black-400 px-2 py-2">{itm.item || <span className='text-gray-300'>—</span>}</span>
+                  )}
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs font-semibold text-black-400 mb-1">Quantity</label>
+                  {editingAll ? (
+                    <input
+                      className="text-md border-b-2 border-blue-400 focus:border-blue-600 outline-none bg-transparent w-full px-2 py-2 text-black-400 placeholder-black-400 transition-all"
+                      value={itm.quantity}
+                      placeholder="Quantity"
+                      type="number"
+                      min="1"
+                      onChange={e => handleItemChange(idx, "quantity", e.target.value)}
+                    />
+                  ) : (
+                    <span className="text-md text-black-400 px-2 py-2">{itm.quantity || <span className='text-gray-300'>—</span>}</span>
                   )}
                 </div>
                 <div className="flex flex-col">
@@ -194,21 +216,6 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
                     />
                   ) : (
                     <span className="text-md text-black-400 px-2 py-2">{itm.price ? `₦${itm.price}` : '₦0'}</span>
-                  )}
-                </div>
-                <div className="flex flex-col">
-                  <label className="text-xs font-semibold text-black-400 mb-1">Quantity</label>
-                  {editingAll ? (
-                    <input
-                      className="text-md border-b-2 border-blue-400 focus:border-blue-600 outline-none bg-transparent w-full px-2 py-2 text-black-400 placeholder-black-400 transition-all"
-                      value={itm.quantity}
-                      placeholder="Quantity"
-                      type="number"
-                      min="1"
-                      onChange={e => handleItemChange(idx, "quantity", e.target.value)}
-                    />
-                  ) : (
-                    <span className="text-md text-black-400 px-2 py-2">{itm.quantity || <span className='text-gray-300'>—</span>}</span>
                   )}
                 </div>
               </div>

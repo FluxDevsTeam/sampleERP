@@ -584,16 +584,16 @@ const ProjectsTable = () => {
             <table className="w-full lg:min-w-[1100px] bg-white shadow-md rounded-lg text-xs sm:text-sm">
               <thead>
                 <tr className="bg-blue-400 text-white">
-                  <th className="py-2 px-2 text-center font-bold">Project Name</th>
-                  <th className="py-2 px-2 text-center font-bold">Status</th>
-                  <th className="py-2 px-2 text-center font-bold hidden sm:table-cell">Progress</th>
-                  <th className="py-2 px-2 text-center font-bold hidden lg:table-cell">Start Date</th>
-                  <th className="py-2 px-2 text-center font-bold hidden lg:table-cell">Deadline</th>
-                  <th className="py-2 px-2 text-center font-bold hidden lg:table-cell">Date Delivered</th>
-                  <th className="py-2 px-2 text-center font-bold hidden sm:table-cell">Timeframe</th>
-                  <th className="py-2 px-2 text-center font-bold">Time Remaining</th>
-                  <th className="py-2 px-2 text-center font-bold hidden sm:table-cell">Tasks</th>
-                  <th className="py-2 px-2 text-center font-bold">Details</th>
+                  <th className="py-4 px-2 text-center font-bold">Project Name</th>
+                  <th className="py-4 px-2 text-center font-bold">Status</th>
+                  <th className="py-4 px-2 text-center font-bold hidden sm:table-cell">Progress</th>
+                  <th className="py-4 px-2 text-center font-bold hidden lg:table-cell">Start Date</th>
+                  <th className="py-4 px-2 text-center font-bold hidden lg:table-cell">Deadline</th>
+                  <th className="py-4 px-2 text-center font-bold hidden lg:table-cell">Date Delivered</th>
+                  <th className="py-4 px-2 text-center font-bold hidden sm:table-cell">Timeframe</th>
+                  <th className="py-4 px-2 text-center font-bold">Time Remaining</th>
+                  <th className="py-4 px-2 text-center font-bold hidden sm:table-cell">Tasks</th>
+                  <th className="py-4 px-2 text-center font-bold">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -672,12 +672,12 @@ const ProjectsTable = () => {
                         disabled={detailsLoadingId === project.id}
                       >
                         {detailsLoadingId === project.id ? (
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1 px-2">
                             <svg className="animate-spin h-4 w-4 text-blue-400" viewBox="0 0 24 24">
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
                             </svg>
-                            Loading...
+
                           </span>
                         ) : (
                           'Details'
