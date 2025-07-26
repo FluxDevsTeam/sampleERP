@@ -19,6 +19,7 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
   const initialLoad = React.useRef(true);
   const [pendingSave, setPendingSave] = React.useState(false);
   const [userTyped, setUserTyped] = React.useState(false);
+  const lastItemRef = React.useRef<HTMLDivElement | null>(null); // Ref for the last item
 
   React.useEffect(() => {
     let loadedItems = project.all_items;
@@ -94,6 +95,12 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
     setItems((prev) => [...prev, { item: "", price: "0", budget: "0", quantity: 1 }]);
     setUserTyped(false);
     setEditingAll(true);
+    // Scroll to the last item after the state update
+    setTimeout(() => {
+      if (lastItemRef.current) {
+        lastItemRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 0);
   };
 
   // Edit Item
@@ -140,7 +147,11 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
             <div className="text-gray-400 text-center text-lg py-24">No items yet. Click <span className='font-semibold text-blue-400'>+ Add Item</span> to get started.</div>
           )}
           {Array.isArray(items) && items.map((itm, idx) => (
-            <div key={idx} className="bg-white border border-gray-200 rounded-xl p-2 shadow group flex flex-col gap-2 relative transition-all hover:shadow-lg">
+            <div
+              key={idx}
+              className="bg-white border border-gray-200 rounded-xl p-2 shadow group flex flex-col gap-2 relative transition-all hover:shadow-lg"
+              ref={idx === items.length - 1 ? lastItemRef : null}
+            >
               <div className="grid grid-cols-4 md:grid-cols-4 gap-4 mb-2">
                 <div className="flex flex-col">
                   <label className="text-xs font-semibold text-black-400 mb-1">Name</label>
