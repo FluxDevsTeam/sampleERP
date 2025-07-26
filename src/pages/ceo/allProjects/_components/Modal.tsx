@@ -89,7 +89,7 @@ interface Project {
   customer_detail: CustomerDetail;
   products: {
     progress: number | null;
-    total_project_selling_price: number;
+    total_product_selling_price: number;
     total_production_cost: number;
     total_artisan_cost: number;
     total_overhead_cost: number;
@@ -509,6 +509,12 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                     <span className="text-xs text-blue-600 font-medium">Service Charge</span>
                     <p className="text-[11px] sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.service_charge || '0'))}</p>
                 </div>
+                  {/* Total Card */}
+                  <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
+                    <span className="text-xs text-blue-600 font-medium">Total</span>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.total || '0'))}</p>
+                </div>
+                
                   {/* Archived Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Archived</span>
@@ -525,7 +531,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                 )}
                   {/* Note Card */}
                 {selectedProject.note && (
-                    <div className="col-span-2 max-sm:col-span-2 lg:col-span-7 bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
+                    <div className="col-span-2 max-sm:col-span-3 lg:col-span-7 bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                       <span className="text-xs text-blue-600 font-medium">Note</span>
                       <p className="text-[11px] sm:text-sm text-black whitespace-pre-wrap mt-1">{selectedProject.note}</p>
                   </div>
@@ -580,7 +586,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
               </div>
 
               {/* Tables Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <div className="columns-1 lg:columns-2 gap-4 sm:gap-6 space-y-4 sm:space-y-6 [&>*]:break-inside-avoid-column">
                 {/* All Items Table */}
                 <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
                   <div className="flex justify-between items-center mb-2">
@@ -602,6 +608,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                       <thead className="bg-blue-400 text-white">
                         <tr>
                           <th className="p-1 sm:p-2 text-left">Item</th>
+                          <th className="p-1 sm:p-2 text-left">Budget</th>
                           <th className="p-1 sm:p-2 text-left">Price</th>
                           <th className="p-1 sm:p-2 text-left">Quantity</th>
                         </tr>
@@ -611,16 +618,41 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                           selectedProject.all_items.map((item: any, idx: number) => (
                             <tr key={idx} className="border-b border-gray-200">
                               <td className="p-1 sm:p-2 text-left">{item.item}</td>
+                              <td className="p-1 sm:p-2 text-left">₦{formatNumber(parseFloat(item.budget || '0'))}</td>
                               <td className="p-1 sm:p-2 text-left">₦{formatNumber(parseFloat(item.price || '0'))}</td>
                               <td className="p-1 sm:p-2 text-left">{item.quantity || 1}</td>
                             </tr>
                           ))
                         ) : (
                           <tr>
-                            <td colSpan={3} className="p-2 text-center text-gray-500">No items found</td>
+                            <td colSpan={4} className="p-2 text-center text-gray-500">No items found</td>
                           </tr>
                         )}
                       </tbody>
+                      <tfoot className="bg-gray-100">
+                        <tr className="font-semibold">
+                          <td className="p-1 sm:p-2 text-left">Total</td>
+                          <td className="p-1 sm:p-2 text-left">
+                            ₦{formatNumber(
+                              Array.isArray(selectedProject.all_items)
+                                ? selectedProject.all_items.reduce((sum, item) => sum + (parseFloat(item.budget || '0')), 0)
+                                : 0
+                            )}
+                          </td>
+                          <td className="p-1 sm:p-2 text-left">
+                            ₦{formatNumber(
+                              Array.isArray(selectedProject.all_items)
+                                ? selectedProject.all_items.reduce((sum, item) => sum + (parseFloat(item.price || '0') * (parseInt(item.quantity) || 1)), 0)
+                                : 0
+                            )}
+                          </td>
+                          <td className="p-1 sm:p-2 text-left">
+                            {Array.isArray(selectedProject.all_items)
+                              ? selectedProject.all_items.reduce((sum, item) => sum + (parseInt(item.quantity) || 1), 0)
+                              : 0}
+                          </td>
+                        </tr>
+                      </tfoot>
                     </table>
                   </div>
                 </div>
@@ -749,8 +781,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                 </div>
 
                 {/* Sold Items Table */}
-                {selectedProject.sold_items?.sold_items?.length > 0 && (
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                     <h4 className="text-md font-semibold text-gray-700 mb-2">
                       Sold Items
                     </h4>
@@ -799,11 +830,9 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                     </table>
                     </div>
                     </div>
-                )}
 
                 {/* Expenses Table */}
-                {selectedProject.expenses?.expenses?.length > 0 && (
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                     <h4 className="text-md font-semibold text-gray-700 mb-2">
                       Expenses
                     </h4>
@@ -839,11 +868,9 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                       </table>
                     </div>
                     </div>
-                )}
 
                 {/* Other Productions Table */}
-                {selectedProject.other_productions?.other_productions?.length > 0 && (
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="text-md font-semibold text-gray-700">
                       Other Productions
@@ -895,7 +922,6 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                       </table>
                     </div>
                   </div>
-                )}
               </div>
             </div>
           )}

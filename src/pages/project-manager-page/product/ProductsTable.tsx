@@ -936,7 +936,7 @@ const ProductsTable: React.FC = () => {
   }, [showWorkersModal, selectedProduct?.id]);
 
   return (
-    <div className="wrapper w-11/12 mx-auto my-0 pl-1 pt-2 mb-10 md:mb-2 ">
+    <div className="wrapper w-full mx-auto my-0 pt-2 mb-20 md:mb-4 ">
       {/* Blur only the background content when showTasksModal is true */}
       <div className={showTasksModal ? "blur-sm" : ""}>
       {/* Heading and Add Product button in grid */}

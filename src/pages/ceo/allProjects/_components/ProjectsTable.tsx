@@ -69,7 +69,7 @@ interface Project {
   customer_detail: CustomerDetail;
   products: {
     progress: number | null;
-    total_project_selling_price: number;
+    total_product_selling_price: number;
     total_production_cost: number;
     total_artisan_cost: number;
     total_overhead_cost: number;

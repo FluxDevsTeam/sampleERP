@@ -91,12 +91,12 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
   const handleAddItem = () => {
     // Only add a new item if there is no empty item at the end
     if (items.length > 0 && (!items[items.length - 1].item || items[items.length - 1].item.trim() === "")) return;
-    setItems((prev) => [...prev, { item: "", price: "", quantity: 1 }]);
+    setItems((prev) => [...prev, { item: "", price: "", budget: "", quantity: 1 }]);
     setUserTyped(false);
     setEditingAll(true);
   };
   // Edit Item
-  const handleItemChange = (idx: number, field: "item" | "price" | "quantity", value: any) => {
+  const handleItemChange = (idx: number, field: "item" | "price" | "budget" | "quantity", value: any) => {
     setUserTyped(true);
     setItems((prev) => prev.map((itm, i) => i === idx ? { ...itm, [field]: value } : itm));
   };
@@ -139,7 +139,7 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
           )}
           {Array.isArray(items) && items.map((itm, idx) => (
             <div key={idx} className="bg-white border border-gray-200 rounded-xl p-2 shadow group flex flex-col gap-2 relative transition-all hover:shadow-lg">
-              <div className="grid grid-cols-3 md:grid-cols-3 gap-4 mb-2">
+              <div className="grid grid-cols-4 md:grid-cols-4 gap-4 mb-2">
                 <div className="flex flex-col">
                   <label className="text-xs font-semibold text-black-400 mb-1">Name</label>
                   {editingAll ? (
@@ -151,6 +151,21 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
                     />
                   ) : (
                     <span className="font-semibold text-md text-black-400 px-2 py-2">{itm.item || <span className='text-gray-300'>—</span>}</span>
+                  )}
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs font-semibold text-black-400 mb-1">Budget</label>
+                  {editingAll ? (
+                    <input
+                      className="text-md border-b-2 border-blue-400 focus:border-blue-600 outline-none bg-transparent w-full px-2 py-2 text-black-400 placeholder-black-400 transition-all"
+                      value={itm.budget}
+                      placeholder="Budget"
+                      type="number"
+                      min="0"
+                      onChange={e => handleItemChange(idx, "budget", e.target.value)}
+                    />
+                  ) : (
+                    <span className="text-md text-black-400 px-2 py-2">{itm.budget ? `₦${itm.budget}` : <span className='text-gray-300'>—</span>}</span>
                   )}
                 </div>
                 <div className="flex flex-col">
