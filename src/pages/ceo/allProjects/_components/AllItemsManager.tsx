@@ -91,15 +91,17 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
   const handleAddItem = () => {
     // Only add a new item if there is no empty item at the end
     if (items.length > 0 && (!items[items.length - 1].item || items[items.length - 1].item.trim() === "")) return;
-    setItems((prev) => [...prev, { item: "", price: "", budget: "", quantity: 1 }]);
+    setItems((prev) => [...prev, { item: "", price: "0", budget: "0", quantity: 1 }]);
     setUserTyped(false);
     setEditingAll(true);
   };
+
   // Edit Item
   const handleItemChange = (idx: number, field: "item" | "price" | "budget" | "quantity", value: any) => {
     setUserTyped(true);
     setItems((prev) => prev.map((itm, i) => i === idx ? { ...itm, [field]: value } : itm));
   };
+
   // Delete Item (CEO only)
   const handleRemoveItem = (idx: number) => {
     if (userRole !== "ceo") return;
@@ -111,7 +113,7 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
       <div className="bg-white rounded-2xl p-2 sm:p-8 max-w-4xl min-h-[400px] w-full relative shadow-2xl flex flex-col max-h-[98vh] overflow-y-auto">
         {/* Sticky Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between px-8 py-6 border-b bg-white rounded-t-2xl">
-          <h2 className="text-xl md:text-2xl  font-bold tracking-tight text-black-200">All Items for <span className="text-blue-400">{project.name}</span></h2>
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-black-200">All Items for <span className="text-blue-400">{project.name}</span></h2>
           <div className="flex gap-2 items-center">
             <button
               className={`p-2 border-2 rounded-full flex items-center justify-center transition-all
@@ -159,13 +161,13 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
                     <input
                       className="text-md border-b-2 border-blue-400 focus:border-blue-600 outline-none bg-transparent w-full px-2 py-2 text-black-400 placeholder-black-400 transition-all"
                       value={itm.budget}
-                      placeholder="Budget"
+                      placeholder="0"
                       type="number"
                       min="0"
                       onChange={e => handleItemChange(idx, "budget", e.target.value)}
                     />
                   ) : (
-                    <span className="text-md text-black-400 px-2 py-2">{itm.budget ? `₦${itm.budget}` : <span className='text-gray-300'>—</span>}</span>
+                    <span className="text-md text-black-400 px-2 py-2">{itm.budget ? `₦${itm.budget}` : '₦0'}</span>
                   )}
                 </div>
                 <div className="flex flex-col">
@@ -174,13 +176,13 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
                     <input
                       className="text-md border-b-2 border-blue-400 focus:border-blue-600 outline-none bg-transparent w-full px-2 py-2 text-black-400 placeholder-black-400 transition-all"
                       value={itm.price}
-                      placeholder="Price"
+                      placeholder="0"
                       type="number"
                       min="0"
                       onChange={e => handleItemChange(idx, "price", e.target.value)}
                     />
                   ) : (
-                    <span className="text-md text-black-400 px-2 py-2">{itm.price ? `₦${itm.price}` : <span className='text-gray-300'>—</span>}</span>
+                    <span className="text-md text-black-400 px-2 py-2">{itm.price ? `₦${itm.price}` : '₦0'}</span>
                   )}
                 </div>
                 <div className="flex flex-col">
@@ -237,4 +239,4 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
   );
 };
 
-export default AllItemsManager; 
+export default AllItemsManager;
