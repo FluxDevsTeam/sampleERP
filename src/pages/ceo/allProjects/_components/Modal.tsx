@@ -411,7 +411,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                   }}
                   className="text-xs md:text-sm px-1 md:px-3 py-1 md:py-2"
                 >
-                  + Item
+                  +Item
                 </Button>
                 <Button
                   variant="outline"

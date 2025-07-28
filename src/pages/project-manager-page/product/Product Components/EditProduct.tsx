@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Modal from "@/pages/shop/Modal";
 import SearchablePaginatedProjectDropdown from '../SearchablePaginatedProjectDropdown';
+import { formatNaira } from '@/lib/utils';
 
 const EditProduct: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +37,8 @@ const EditProduct: React.FC = () => {
     image: null,
     sketch: null,
   });
+
+  const [fetchedOverheadCost, setFetchedOverheadCost] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch product details
@@ -104,6 +107,30 @@ const EditProduct: React.FC = () => {
 
     fetchProductDetails();
     fetchProjects();
+
+    const fetchOverheadCost = async () => {
+      try {
+        const response = await fetch(
+          "https://backend.kidsdesigncompany.com/api/overhead-cost/",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch overhead cost");
+        }
+        const data = await response.json();
+        setFetchedOverheadCost(data.overhead_cost_base);
+      } catch (error) {
+        console.error("Error fetching overhead cost:", error);
+      }
+    };
+
+    fetchOverheadCost();
   }, [id]);
 
   const handleInputChange = (
@@ -370,7 +397,7 @@ const EditProduct: React.FC = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Overhead Cost
+                Overhead Cost {fetchedOverheadCost && `(${formatNaira(fetchedOverheadCost)})`}
               </label>
               <input
                 type="number"

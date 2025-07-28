@@ -25,6 +25,7 @@ interface ExpenseFormData {
   selectedItem: string | null;
   category: number | null;
   date?: string;
+  product?: number | null; // Add product field
 }
 
 interface Project {
@@ -60,6 +61,10 @@ interface Expense {
     id: number;
     name: string;
   };
+  product?: {
+    id: number;
+    name: string;
+  }; // Add product field to Expense interface
 }
 
 interface EditExpenseModalProps {
@@ -151,6 +156,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
     selectedItem: null,
     category: null,
     date: "",
+    product: null,
   });
 
   useEffect(() => {
@@ -165,7 +171,10 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
       } else if (expense.shop) {
         selectedType = "shop";
         selectedItem = expense.shop.id.toString();
-      } else if (expense.category && !expense.project && !expense.shop) {
+      } else if (expense.product) {
+        selectedType = "product";
+        selectedItem = expense.product.id.toString();
+      } else if (expense.category && !expense.project && !expense.shop && !expense.product) {
         selectedType = "other";
       }
       
@@ -173,11 +182,12 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
         name: expense.name || "",
         description: expense.description || "",
         amount: expense.amount || "",
-        quantity: expense.quantity || "",
+        quantity: String(expense.quantity) || "", // Ensure quantity is string
         selectedType,
         selectedItem,
         category: expense.category?.id || null,
-        date: expense.date ? expense.date : "",
+        date: expense.date ? new Date(expense.date).toISOString().split('T')[0] : "", // Ensure YYYY-MM-DD format
+        product: expense.product?.id || null, // Populate product field
       });
     }
   }, [expense]);
@@ -193,12 +203,14 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
         category: data.category,
         project: data.selectedType === "project" && data.selectedItem ? Number(data.selectedItem) : null,
         shop: data.selectedType === "shop" && data.selectedItem ? Number(data.selectedItem) : null,
+        product: data.selectedType === "product" && data.selectedItem ? Number(data.selectedItem) : null, // Change to 'product'
         date: data.date || undefined,
       };
 
       if (data.selectedType === "other") {
         formattedData.project = null;
         formattedData.shop = null;
+        formattedData.product = null; // Clear 'product' as well
       }
 
       console.log("Sending update data to API:", formattedData);
@@ -241,7 +253,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
   };
 
   const handleInputChange = (name: string, value: string) => {
-    if (name === "project" || name === "shop") {
+    if (name === "project" || name === "shop" || name === "product") { // Include product
       setFormData((prev) => ({
         ...prev,
         selectedType: name,
@@ -315,10 +327,11 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                   <option value="">Select Item Type</option>
                   <option value="project">Project</option>
                   <option value="shop">Shop Item</option>
+                  <option value="product">Product</option>
                   <option value="other">None</option>
                 </select>
                 <div className="grid grid-cols-2 gap-4 mt-2">
-                  {formData.selectedType === "project" && (
+                  {(!formData.selectedType || formData.selectedType === "project") && (
                     <div className="col-span-2">
                       <SearchablePaginatedDropdown
                         endpoint="https://backend.kidsdesigncompany.com/api/project/"
@@ -326,13 +339,13 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                         name="project"
                         onChange={handleInputChange}
                         resultsKey="all_projects"
-                        selectedValue={formData.selectedItem}
+                        selectedValue={formData.selectedType === "project" ? formData.selectedItem : null}
                         selectedName={expense?.project?.name || null}
                       />
                     </div>
                   )}
 
-                  {formData.selectedType === "shop" && (
+                  {(!formData.selectedType || formData.selectedType === "shop") && (
                     <div className="col-span-2">
                       <SearchablePaginatedDropdown
                         endpoint="https://backend.kidsdesigncompany.com/api/sold/"
@@ -356,15 +369,36 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                           });
                           return items;
                         }}
-                        selectedValue={formData.selectedItem}
+                        selectedValue={formData.selectedType === "shop" ? formData.selectedItem : null}
                         selectedName={expense?.shop?.name || null}
                       />
                     </div>
                   )}
+
+                  {(!formData.selectedType || formData.selectedType === "product") && (
+                    <div className="col-span-2">
+                      <SearchablePaginatedDropdown
+                        endpoint="https://backend.kidsdesigncompany.com/api/product/"
+                        label="Product"
+                        name="product"
+                        onChange={handleInputChange}
+                        resultsKey="results"
+                        selectedValue={formData.selectedType === "product" ? formData.selectedItem : null}
+                        selectedName={expense?.product?.name || null}
+                      />
+                    </div>
+                  )}
                 </div>
-                {formData.selectedType && (formData.selectedType !== "other") && ( // Only show if an item is selected
+                {formData.selectedType && (formData.selectedType !== "other") && (
                   <p className="text-sm text-blue-600 mt-1">
-                    Selected {formData.selectedType === "project" ? "Project" : "Shop Item"}
+                    Selected {formData.selectedType === "project" ? "Project" : formData.selectedType === "shop" ? "Shop Item" : "Product"}
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, selectedType: "", selectedItem: null }))}
+                      className="ml-2 text-red-500 hover:text-red-700 focus:outline-none"
+                    >
+                      (Clear)
+                    </button>
                   </p>
                 )}
               </div>
@@ -399,7 +433,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                 <Input
                   id="quantity"
                   name="quantity"
-                  type="number"
+                  type="text"
                   value={formData.quantity}
                   onChange={(e) => handleInputChange(e.target.name, e.target.value)}
                 className="w-full"

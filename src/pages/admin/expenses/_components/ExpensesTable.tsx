@@ -50,6 +50,11 @@ interface SoldItem {
   total_price: number;
 }
 
+interface LinkedProduct {
+  id: number;
+  name: string;
+}
+
 interface Entry {
   id: number;
   name: string;
@@ -57,6 +62,7 @@ interface Entry {
   description: string;
   linked_project: LinkedProject | null;
   sold_item: SoldItem | null;
+  linked_product: LinkedProduct | null; // Add linked_product to Entry interface
   amount: string;
   quantity: string;
   date: string;
@@ -74,6 +80,7 @@ interface ExpensesData {
   daily_total: number;
   monthly_project_expenses_total: number;
   monthly_shop_expenses_total: number;
+  current_month_product_total: number; // Add current_month_product_total
   daily_data: DailyData[];
 }
 
@@ -96,6 +103,11 @@ interface Expense {
     id: number;
     name: string;
   };
+  product?: {
+    id: number;
+    name: string;
+  }; // Add product to Expense interface
+  date?: string; // Add date to Expense interface
 }
 
 interface ExpensesTableProps {
@@ -273,11 +285,19 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
             name: entry.sold_item.name || "Shop Item",
           }
         : undefined,
+      product: entry.linked_product // Map linked_product to product
+        ? {
+            id: entry.linked_product.id,
+            name: entry.linked_product.name,
+          }
+        : undefined,
+      date: entry.date, // Map date to expense.date
     };
   };
 
   // Event handlers
   const handleRowClick = (entry: Entry) => {
+    console.log("Entry object in handleRowClick:", entry); // Add this line
     setSelectedEntry(entry);
     setIsViewModalOpen(true);
   };
@@ -444,6 +464,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell">Category</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Project</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Shop Item</th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Product</th> {/* Add Product column */}
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Amount</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">Qty</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Details</th>
@@ -464,6 +485,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">{entry.expense_category?.name || "N/A"}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.linked_project?.name || "N/A"}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.sold_item?.name || "N/A"}</td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.linked_product?.name || "N/A"}</td> {/* Display Product */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium">₦ {formatNumber(entry.amount)}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{entry.quantity}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
@@ -517,12 +539,16 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
                 <span className="text-base font-bold text-black">{selectedEntry.linked_project?.name || "N/A"}</span>
               </div>
               <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Linked Product</span> {/* Add Linked Product display */}
+                <span className="text-base font-bold text-black">{selectedEntry.linked_product?.name || "N/A"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Sold Item</span>
                 <span className="text-base font-bold text-black">{selectedEntry.sold_item?.name || "N/A"}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Date</span>
-                <span className="text-base font-bold text-black">{new Date(selectedEntry.date).toLocaleDateString()}</span>
+                <span className="text-base font-bold text-black">{new Date(selectedEntry.date || '').toLocaleDateString()}</span>
               </div>
             </div>
           )}
@@ -559,7 +585,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="w-[95vw] max-w-md mx-auto p-4 sm:p-6">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>

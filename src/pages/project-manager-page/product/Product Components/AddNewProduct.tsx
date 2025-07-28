@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import SearchablePaginatedProjectDropdown from '../SearchablePaginatedProjectDropdown';
+import { formatNaira } from '@/lib/utils';
 
 const Modal = ({
   isOpen,
@@ -70,6 +71,7 @@ const AddNewProductPage = () => {
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [fetchedOverheadCost, setFetchedOverheadCost] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -96,6 +98,30 @@ const AddNewProductPage = () => {
     };
 
     fetchData();
+
+    const fetchOverheadCost = async () => {
+      try {
+        const response = await fetch(
+          "https://backend.kidsdesigncompany.com/api/overhead-cost/",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch overhead cost");
+        }
+        const data = await response.json();
+        setFetchedOverheadCost(data.overhead_cost_base);
+      } catch (error) {
+        console.error("Error fetching overhead cost:", error);
+      }
+    };
+
+    fetchOverheadCost();
   }, []);
 
   useEffect(() => {
@@ -314,7 +340,7 @@ const AddNewProductPage = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Overhead Cost
+                Overhead Cost {fetchedOverheadCost && `(${formatNaira(fetchedOverheadCost)})`}
               </label>
               <input
                 type="number"

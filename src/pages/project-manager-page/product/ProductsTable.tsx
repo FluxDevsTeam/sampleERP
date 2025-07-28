@@ -1312,10 +1312,9 @@ const ProductsTable: React.FC = () => {
                     </div>
                   </>
                 )}
-                <div className="flex flex-col-reverse md:flex-row gap-1">
-                  {/* LEFT: Details */}
-                  <div className="flex-1">
-                    <div className="bg-white rounded-xl border border-blue-100 md:border-0 max-sm:shadow lg:pe-10 p-4 mb-6">
+                <div className="columns-1 lg:columns-2 gap-4 sm:gap-6 space-y-4 sm:space-y-6 [&>*]:break-inside-avoid-column mt-6">
+                  {/* Details Card */}
+                  <div className="bg-white rounded-xl border border-blue-100 max-sm:shadow lg:pe-10 p-4 mb-6 break-inside-avoid-column">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
                   <div>
                           <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Colour</span>
@@ -1335,26 +1334,192 @@ const ProductsTable: React.FC = () => {
                         </div>
                         <div>
                           <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Overhead Cost</span>
-                          <span className="block text-sm sm:text-base font-bold text-black">₦ {selectedProduct.overhead_cost || "No overhead cost added"}</span>
+                          <span className="block text-sm sm:text-base font-bold text-black">{selectedProduct.overhead_cost || "No overhead cost added"}</span>
                         </div>
                         <div>
                           <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Overhead Cost Base at Creation</span>
-                          <span className="block text-sm sm:text-base font-bold text-black">{selectedProduct.overhead_cost_base_at_creation || "-"}</span>
+                          <span className="block text-sm sm:text-base font-bold text-black">₦ {selectedProduct.overhead_cost_base_at_creation || "-"}</span>
                         </div>
                         <div className="sm:col-span-2">
                           <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Production Note</span>
                           <span className="block text-sm sm:text-base font-bold text-black">{selectedProduct.production_note || "-"}</span>
                         </div>
-                        <div className="sm:col-span-2">
+                      <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                        <div>
                           <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Linked Project</span>
                           <span className="block text-sm sm:text-base font-bold text-black">{selectedProduct.linked_project?.name || "-"}</span>
                         </div>
+                        <div>
+                          <span className="block text-xs sm:text-sm font-bold text-blue-400 uppercase mb-1">Product Image</span>
+                          {selectedProduct.images ? (
+                            <button
+                              className="text-blue-500 underline hover:text-blue-700 focus:outline-none text-sm sm:text-base"
+                              onClick={() => setExpandedImage(selectedProduct.images)}
+                            >
+                              View Product Image
+                            </button>
+                          ) : (
+                            <span className="text-gray-400 italic">No image</span>
+                          )}
                       </div>
                     </div>
                   </div>
-                  {/* RIGHT: Progress and Images */}
-                  <div className="flex flex-col items-center md:w-1/2 w-full">
-                    {/* Progress Bar */}
+                  </div>
+                  {/* Quotations Table */}
+                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
+                    <h4 className="text-md font-semibold text-gray-700 mb-2">Quotations</h4>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm">
+                        <thead className="bg-blue-400 text-white">
+                          <tr>
+                            <th className="p-2 max-sm:text-xs text-left">Department</th>
+                            <th className="p-2 max-sm:text-xs text-left">Workers</th>
+                            <th className="p-2 max-sm:text-xs text-left">Items & Quantity</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedProduct.quotation && selectedProduct.quotation.length > 0 ? (
+                            selectedProduct.quotation.map((q: any, idx: number) => {
+                              // Calculate total quantity for this quotation
+                              const totalQuantity = Array.isArray(q.quotation)
+                                ? q.quotation.reduce((sum: number, item: any) => sum + (parseFloat(item.quantity) || 0), 0)
+                                : 0;
+                              return (
+                                <tr
+                                  key={q.id || idx}
+                                  className={(selectedProduct.quotation.length > 1 && idx !== selectedProduct.quotation.length - 1) ? "border-b-4 border-blue-400" : ""}
+                                  style={{ verticalAlign: 'top' }}
+                                >
+                                  <td className="p-2 text-left max-sm:text-xs align-top">{q.department || '-'}</td>
+                                  <td className="p-2 text-left align-top w-48">
+                                    {(() => {
+                                      const workers = [];
+                                      if (Array.isArray(q.salary_worker) && q.salary_worker.length > 0) {
+                                        workers.push(...q.salary_worker.map((w: any) => w.name));
+                                      }
+                                      if (Array.isArray(q.contractor) && q.contractor.length > 0) {
+                                        workers.push(...q.contractor.map((c: any) => c.name));
+                                      }
+                                      return workers.length > 0 ? (
+                                        <ul className="ml-2 max-sm:text-xs">
+                                          {workers.map((name, i) => (
+                                            <li key={i}>{name}</li>
+                                          ))}
+                                        </ul>
+                                      ) : '-';
+                                    })()}
+                                  </td>
+                                  <td className="p-2 text-left align-top w-72">
+                                    {Array.isArray(q.quotation) && q.quotation.length > 0 ? (
+                                      <table className="w-full">
+                                        <tbody>
+                                          {q.quotation.map((item: any, i: number) => (
+                                            <tr key={i}>
+                                              <td className="align-top pr-4 font-semibold break-words max-w-[180px] max-sm:text-xs">{item.name}</td>
+                                              <td className="align-top text-blue-700 font-bold whitespace-nowrap max-sm:text-xs">{item.quantity}</td>
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+                                    ) : <span className="text-gray-400 italic">No items</span>}
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          ) : (
+                            <tr><td colSpan={4} className="p-2 text-center text-gray-500">No quotations found</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                  </div>
+                </div>
+                  {/* Raw Materials Table */}
+                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
+                    <h4 className="text-md font-semibold text-gray-700 mb-2">Raw Materials Used</h4>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm">
+                        <thead className="bg-blue-400 text-white">
+                          <tr>
+                            <th className="p-2 text-left">Name</th>
+                            <th className="p-2 text-left">Quantity</th>
+                            <th className="p-2 text-left">Price</th>
+                            <th className="p-2 text-left">Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedProduct.raw_materials && selectedProduct.raw_materials.length > 0 ? (
+                            selectedProduct.raw_materials.map((rm: any, idx: number) => (
+                              <tr key={idx} className="border-b border-gray-200">
+                                <td className="p-2 text-left">{rm.name || rm.raw_material?.name || '-'}</td>
+                                <td className="p-2 text-left">{rm.quantity}</td>
+                                <td className="p-2 text-left">₦{Number(rm.price).toLocaleString('en-NG')}</td>
+                                <td className="p-2 text-left">{rm.date ? new Date(rm.date).toLocaleDateString('en-GB') : '-'}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr><td colSpan={4} className="p-2 text-center text-gray-500">No raw materials found</td></tr>
+                          )}
+                        </tbody>
+                        {selectedProduct.raw_materials && selectedProduct.raw_materials.length > 0 && (
+                          <tfoot className="bg-gray-100">
+                            <tr className="font-semibold">
+                              <td className="p-2 text-left">Total</td>
+                              <td className="p-2 text-left"></td>
+                              <td className="p-2 text-left">
+                                ₦{selectedProduct.raw_materials.reduce((sum: number, rm: any) => sum + (parseFloat(rm.price || '0') * (parseFloat(rm.quantity || '1'))), 0).toLocaleString('en-NG')}
+                              </td>
+                              <td className="p-2 text-left"></td>
+                            </tr>
+                          </tfoot>
+                        )}
+                      </table>
+                    </div>
+                  </div>
+                  {/* Expenses Table */}
+                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
+                    <h4 className="text-md font-semibold text-gray-700 mb-2">Expenses</h4>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm">
+                        <thead className="bg-blue-400 text-white">
+                          <tr>
+                            <th className="p-2 text-left">Name</th>
+                            <th className="p-2 text-left">Amount</th>
+                            <th className="p-2 text-left">Quantity</th>
+                            <th className="p-2 text-left">Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedProduct.expensis && selectedProduct.expensis.length > 0 ? (
+                            selectedProduct.expensis.map((expense: any, idx: number) => (
+                              <tr key={idx} className="border-b border-gray-200">
+                                <td className="p-2 text-left">{expense.name || '-'}</td>
+                                <td className="p-2 text-left">₦{Number(expense.amount).toLocaleString('en-NG')}</td>
+                                <td className="p-2 text-left">{expense.quantity || '-'}</td>
+                                <td className="p-2 text-left">{expense.date ? new Date(expense.date).toLocaleDateString('en-GB') : '-'}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr><td colSpan={4} className="p-2 text-center text-gray-500">No expenses found</td></tr>
+                          )}
+                        </tbody>
+                        {selectedProduct.expensis && selectedProduct.expensis.length > 0 && (
+                          <tfoot className="bg-gray-100">
+                            <tr className="font-semibold">
+                              <td className="p-2 text-left">Total</td>
+                              <td className="p-2 text-left">
+                                ₦{selectedProduct.expensis.reduce((sum: number, expense: any) => sum + parseFloat(expense.amount || '0'), 0).toLocaleString('en-NG')}
+                              </td>
+                              <td className="p-2 text-left"></td>
+                              <td className="p-2 text-left"></td>
+                            </tr>
+                          </tfoot>
+                        )}
+                      </table>
+                    </div>
+                  </div>
+                  {/* Task Table with Progress rate inside */}
+                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mt-6 w-full">
+                    {/* Progress Bar inside Tasks Card */}
                     <div className="text-sm text-gray-20 mb-3 w-full">
                       <span className="font-bold">Progress rate:</span>
                       {!editingProgress ? (
@@ -1417,27 +1582,6 @@ const ProductsTable: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    {/* Thumbnails for Sketch and Image */}
-                    <div className="flex gap-4 mb-4">
-                      {selectedProduct.sketch && (
-                        <img
-                          src={selectedProduct.sketch}
-                          alt={`${selectedProduct.name} sketch`}
-                          className="w-24 h-24 object-cover rounded shadow cursor-pointer border border-gray-200 hover:scale-105 transition-transform"
-                          onClick={() => setExpandedImage(selectedProduct.sketch)}
-                        />
-                      )}
-                      {selectedProduct.images && (
-                        <img
-                          src={selectedProduct.images}
-                          alt={`${selectedProduct.name} image`}
-                          className="w-24 h-24 object-cover rounded shadow cursor-pointer border border-gray-200 hover:scale-105 transition-transform"
-                          onClick={() => setExpandedImage(selectedProduct.images)}
-                        />
-                      )}
-                    </div>
-                    {/* Task Table under Progress rate */}
-                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mt-6 w-full">
                       <div className="flex justify-between items-center mb-2">
                         <h4 className="text-md font-semibold text-gray-700">Tasks</h4>
                         <button
@@ -1492,40 +1636,70 @@ const ProductsTable: React.FC = () => {
                         </table>
                       </div>
                     </div>
+                  {/* Salary Workers Table */}
+                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
+                    <h4 className="text-md font-semibold text-gray-700 mb-2">Salary Workers</h4>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm">
+                        <thead className="bg-blue-400 text-white">
+                          <tr>
+                            <th className="p-2 text-left">Name</th>
+                            <th className="p-2 text-left">Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedProduct.salary_workers && selectedProduct.salary_workers.length > 0 ? (
+                            selectedProduct.salary_workers.map((sw: any, idx: number) => (
+                              <tr key={idx} className="border-b border-gray-200">
+                                <td className="p-2 text-left">{sw.linked_salary_worker ? `${sw.linked_salary_worker.first_name} ${sw.linked_salary_worker.last_name}` : '-'}</td>
+                                <td className="p-2 text-left">{sw.date ? new Date(sw.date).toLocaleDateString('en-GB') : '-'}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr><td colSpan={2} className="p-2 text-center text-gray-500">No salary workers found</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-
-                {/* Product detail EDIT AND DELETE ICONS */}
-                <div className="mt-6 flex items-center justify-between">
-                  <div className="flex space-x-2">
-                    {user?.role === 'ceo' && (
-                      <>
-                        <button
-                          onClick={() =>
-                            navigate(
-                              `/project-manager/edit-product/${selectedProduct.id}`
-                            )
-                          }
-                          className="p-2 pr-3 text-blue-400 rounded-lg border-2 border-blue-400 font-bold"
-                        >
-                          <FontAwesomeIcon
-                            className="mr-1 text-xs text-blue-400"
-                            icon={faPencil}
-                          />
-                          <span>Update</span>
-                        </button>
-                        <button
-                          onClick={() => confirmDeleteProduct(selectedProduct.id)}
-                          className="p-2 pr-3 text-red-400 rounded-lg border-2 border-red-400 font-bold"
-                        >
-                          <FontAwesomeIcon
-                            className="mr-1 text-xs text-red-400"
-                            icon={faTrash}
-                          />
-                          <span>Delete</span>
-                        </button>
-                      </>
-                    )}
+                  {/* Contractors Table */}
+                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
+                    <h4 className="text-md font-semibold text-gray-700 mb-2">Contractors</h4>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm">
+                        <thead className="bg-blue-400 text-white">
+                          <tr>
+                            <th className="p-2 text-left">Name</th>
+                            <th className="p-2 text-left">Cost</th>
+                            <th className="p-2 text-left">Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedProduct.contractors && selectedProduct.contractors.length > 0 ? (
+                            selectedProduct.contractors.map((c: any, idx: number) => (
+                              <tr key={idx} className="border-b border-gray-200">
+                                <td className="p-2 text-left">{c.linked_contractor ? `${c.linked_contractor.first_name} ${c.linked_contractor.last_name}` : '-'}</td>
+                                <td className="p-2 text-left">₦{c.cost || '-'}</td>
+                                <td className="p-2 text-left">{c.date ? new Date(c.date).toLocaleDateString('en-GB') : '-'}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr><td colSpan={3} className="p-2 text-center text-gray-500">No contractors found</td></tr>
+                          )}
+                        </tbody>
+                        {selectedProduct.contractors && selectedProduct.contractors.length > 0 && (
+                          <tfoot className="bg-gray-100">
+                            <tr className="font-semibold">
+                              <td className="p-2 text-left">Total</td>
+                              <td className="p-2 text-left">
+                                ₦{selectedProduct.contractors.reduce((sum: number, c: any) => sum + parseFloat(c.cost || '0'), 0).toLocaleString('en-NG')}
+                              </td>
+                              <td className="p-2 text-left"></td>
+                            </tr>
+                          </tfoot>
+                        )}
+                      </table>
+                    </div>
                   </div>
                 </div>
               </>
@@ -1873,8 +2047,7 @@ const ProductsTable: React.FC = () => {
                       <th className="py-1 px-2 text-left font-bold">Department</th>
                         <th className="py-1 px-2 text-left font-bold hidden sm:table-cell">Project</th>
                       <th className="py-1 px-2 text-left font-bold">Workers</th>
-                      <th className="py-1 px-2 text-left font-bold">Contractors</th>
-                      <th className="py-1 px-2 text-left font-bold">Items</th>
+                      <th className="py-1 px-2 text-left font-bold">Items & Quantity</th>
                       {user?.role === 'ceo' && (
                         <th className="py-1 px-2 text-left font-bold">Actions</th>
                       )}
@@ -1889,13 +2062,6 @@ const ProductsTable: React.FC = () => {
                           <div className="flex flex-col gap-1">
                             {item.salary_worker.map((w: any, i: number) => (
                               <span key={i}>{w.name}</span>
-                            ))}
-                      </div>
-                        ) : '-'}</td>
-                        <td className="py-1 px-2">{item.contractor?.length > 0 ? (
-                          <div className="flex flex-col gap-1">
-                            {item.contractor.map((c: any, i: number) => (
-                              <span key={i}>{c.name}</span>
                             ))}
                     </div>
                         ) : '-'}</td>

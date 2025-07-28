@@ -75,6 +75,7 @@ interface ExpenseFormData {
   category: number | null;
   description: string;
   date?: string;
+  product?: number | null; // Add product field
 }
 
 interface AddPaymentModalProps {
@@ -97,15 +98,24 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
 }) => {
   const queryClient = useQueryClient();
 
-  const [formData, setFormData] = useState<ExpenseFormData>({
-    name: "",
-    amount: "",
-    quantity: "",
-    selectedItem: null,
-    selectedType: "",
-    category: null,
-    description: "",
-    date: "",
+  const [formData, setFormData] = useState<ExpenseFormData>(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayFormatted = `${year}-${month}-${day}`;
+
+    return {
+      name: "",
+      amount: "",
+      quantity: "",
+      selectedItem: null,
+      selectedType: "",
+      category: null,
+      description: "",
+      date: todayFormatted,
+      product: null,
+    };
   });
   const [userRole, setUserRole] = useState<string | null>(null);
 
@@ -130,6 +140,10 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
             : null,
         shop:
           newExpense.selectedType === "shop" && newExpense.selectedItem
+            ? Number(newExpense.selectedItem)
+            : null,
+        product:
+          newExpense.selectedType === "product" && newExpense.selectedItem
             ? Number(newExpense.selectedItem)
             : null,
         date: newExpense.date || undefined,
@@ -166,6 +180,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
         category: null,
         description: "",
         date: "",
+        product: null, // Reset product
       });
       if (onSuccess) onSuccess();
     },
@@ -182,7 +197,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
   const handleInputChange = (name: string, value: string) => {
     if (name === "category") {
       setFormData((prev) => ({ ...prev, [name]: Number(value) }));
-    } else if (name === "project" || name === "shop") {
+    } else if (name === "project" || name === "shop" || name === "product") {
       setFormData((prev) => ({
         ...prev,
         selectedType: name,
@@ -257,7 +272,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
               <Input
                 id="quantity"
                 name="quantity"
-                type="number"
+                type="text"
                 value={formData.quantity}
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, quantity: e.target.value }))
@@ -270,46 +285,73 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
           <div className="space-y-1">
             <Label className="text-lg font-medium">Item Type (Optional)</Label>
             <div className="grid grid-cols-2 gap-4 mt-2">
-              <div className="col-span-1">
-                <SearchablePaginatedDropdown
-                  endpoint="https://backend.kidsdesigncompany.com/api/project/"
-                  label="Project"
-                  name="project"
-                  onChange={handleInputChange}
-                  resultsKey="all_projects"
-                />
-              </div>
+              {!formData.selectedType || formData.selectedType === "project" ? (
+                <div className="col-span-1">
+                  <SearchablePaginatedDropdown
+                    endpoint="https://backend.kidsdesigncompany.com/api/project/"
+                    label="Project"
+                    name="project"
+                    onChange={handleInputChange}
+                    resultsKey="all_projects"
+                    selectedValue={formData.selectedType === "project" ? formData.selectedItem : null}
+                  />
+                </div>
+              ) : null}
 
-              <div className="col-span-1">
-                <SearchablePaginatedDropdown
-                  endpoint="https://backend.kidsdesigncompany.com/api/sold/"
-                  label="Shop Item"
-                  name="shop"
-                  onChange={handleInputChange}
-                  resultsKey="daily_data"
-                  dataMapper={(data: any[]) => {
-                    const items: { id: number; name: string }[] = [];
-                    data.forEach((day: any) => {
-                      if (day.entries && Array.isArray(day.entries)) {
-                        day.entries.forEach((entry: any) => {
-                          if (!items.some(item => item.id === entry.id)) {
-                            items.push({
-                              id: entry.id,
-                              name: entry.name || "Unnamed item"
-                            });
-                          }
-                        });
-                      }
-                    });
-                    return items;
-                  }}
-                />
-              </div>
+              {!formData.selectedType || formData.selectedType === "shop" ? (
+                <div className="col-span-1">
+                  <SearchablePaginatedDropdown
+                    endpoint="https://backend.kidsdesigncompany.com/api/sold/"
+                    label="Shop Item"
+                    name="shop"
+                    onChange={handleInputChange}
+                    resultsKey="daily_data"
+                    dataMapper={(data: any[]) => {
+                      const items: { id: number; name: string }[] = [];
+                      data.forEach((day: any) => {
+                        if (day.entries && Array.isArray(day.entries)) {
+                          day.entries.forEach((entry: any) => {
+                            if (!items.some(item => item.id === entry.id)) {
+                              items.push({
+                                id: entry.id,
+                                name: entry.name || "Unnamed item"
+                              });
+                            }
+                          });
+                        }
+                      });
+                      return items;
+                    }}
+                    selectedValue={formData.selectedType === "shop" ? formData.selectedItem : null}
+                  />
+                </div>
+              ) : null}
+            </div>
+            <div className="grid grid-cols-1 gap-4 mt-2">
+              {!formData.selectedType || formData.selectedType === "product" ? (
+                <div className="col-span-1">
+                  <SearchablePaginatedDropdown
+                    endpoint="https://backend.kidsdesigncompany.com/api/product/"
+                    label="Product"
+                    name="product"
+                    onChange={handleInputChange}
+                    resultsKey="results"
+                    selectedValue={formData.selectedType === "product" ? formData.selectedItem : null}
+                  />
+                </div>
+              ) : null}
             </div>
             {formData.selectedType && (
               <p className="text-sm text-blue-600 mt-1">
                 Selected{" "}
-                {formData.selectedType === "project" ? "Project" : "Shop Item"}
+                {formData.selectedType === "project" ? "Project" : formData.selectedType === "shop" ? "Shop Item" : "Product"}
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, selectedType: "", selectedItem: null }))}
+                  className="ml-2 text-red-500 hover:text-red-700 focus:outline-none"
+                >
+                  (Clear)
+                </button>
               </p>
             )}
           </div>

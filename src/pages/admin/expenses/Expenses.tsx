@@ -29,9 +29,7 @@ const Expenses = () => {
       setTotalProjectExpenses(data.monthly_project_expenses_total);
       setTotalShopExpenses(data.monthly_shop_expenses_total);
       // Calculate total other expenses
-      setTotalOtherExpenses(
-        data.monthly_total - (data.monthly_project_expenses_total + data.monthly_shop_expenses_total)
-      );
+      setTotalOtherExpenses(data.current_month_product_total);
     }
   }, [data]);
 
@@ -46,7 +44,7 @@ const Expenses = () => {
         <ExpensesData info="Total Expenses" digits={totalExpenses} currency="₦ " />
         <ExpensesData info="Total Project Expenses" digits={totalProjectExpenses} currency="₦ " />
         <ExpensesData info="Total Shop Expenses" digits={totalShopExpenses} currency="₦ " />
-        <ExpensesData info="Total Other Expenses" digits={totalOtherExpenses} currency="₦ " />
+        <ExpensesData info="Total Product Expenses" digits={totalOtherExpenses} currency="₦ " />
       </div>
 
       <div>
