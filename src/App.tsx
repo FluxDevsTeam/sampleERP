@@ -90,6 +90,7 @@ import ContractorRecords from "./pages/admin/workers/_records/_contractorsRecord
 import AddProject from "./pages/ceo/allProjects/_pages/AddProject";
 import EditProject from "./pages/ceo/allProjects/_pages/EditProject";
 import OtherProductionRecords from "./pages/ceo/allProjects/_pages/OtherProductionRecords";
+import Income from './pages/admin/income/Income';
 
 import Shop from "./pages/shop/shop.tsx";
 import Product from "./pages/product/product.tsx";
@@ -131,6 +132,10 @@ const router = createBrowserRouter([
       {
         path: "dashboard",
         element: <CEODashboard />,
+      },
+      {
+        path: "income",
+        element: <Income />,
       },
       // Project Manager routes (shared)
       {
@@ -215,6 +220,14 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "factory-manager/income",
+        element: (
+          <ProtectedRoute allowedRoles={["ceo", "factory_manager"]}>
+            <Income />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "factory-manager/projects",
         element: (
           <ProtectedRoute allowedRoles={["ceo", "factory_manager"]}>
@@ -260,6 +273,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={["ceo", "admin"]}>
             <Expenses />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "admin/income",
+        element: (
+          <ProtectedRoute allowedRoles={["ceo", "admin"]}>
+            <Income />
           </ProtectedRoute>
         ),
       },
@@ -405,6 +426,10 @@ const router = createBrowserRouter([
       {
         path: "expenses",
         element: <Expenses />,
+      },
+      {
+        path: "income",
+        element: <Income />,
       },
       // Store routes
       {
@@ -707,6 +732,10 @@ const router = createBrowserRouter([
         element: <Expenses />,
       },
       {
+        path: "income",
+        element: <Income />,
+      },
+      {
         path: "workers",
         element: <Workers />,
       },
@@ -839,6 +868,10 @@ const router = createBrowserRouter([
       {
         path: "dashboard",
         element: <AccountantDashboard />,
+      },
+      {
+        path: "income",
+        element: <Income />,
       },
     ],
   },

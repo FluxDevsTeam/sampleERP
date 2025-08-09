@@ -56,6 +56,7 @@ import {
   faCheckCircle,
   faExclamationTriangle,
   faInfoCircle,
+  faMoneyBillTrendUp
 } from "@fortawesome/free-solid-svg-icons";
 
 export interface SidebarProps {
@@ -138,6 +139,12 @@ export const sidebarLink: SidebarProps[] = [
       },
       {
         id: nanoid(),
+        text: "Income",
+        href: "/ceo/factory-manager/income",
+        icon: <FontAwesomeIcon icon={faMoneyBillTrendUp} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
         text: "Expenses",
         href: "/ceo/factory-manager/expenses",
         icon: <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-lg" />,
@@ -176,6 +183,12 @@ export const sidebarLink: SidebarProps[] = [
       },
       {
         id: nanoid(),
+        text: "Income",
+        href: "/admin/income",
+        icon: <FontAwesomeIcon icon={faMoneyBillTrendUp} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
         text: "Expenses",
         href: "/admin/expenses",
         icon: <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-lg" />,
@@ -211,6 +224,12 @@ export const sidebarLink: SidebarProps[] = [
         text: "Assets",
         href: "/admin/assets",
         icon: <FontAwesomeIcon icon={faBuilding} className="text-lg" />,
+      },
+      {
+        id: nanoid(),
+        text: "Income",
+        href: "/admin/income",
+        icon: <FontAwesomeIcon icon={faMoneyBillTrendUp} className="text-lg" />,
       },
       {
         id: nanoid(),
@@ -415,6 +434,12 @@ export const FactoryManagerSidebarLink: SidebarProps[] = [
   },
   {
     id: nanoid(),
+    text: "Income",
+    href: "/factory-manager/income",
+    icon: <FontAwesomeIcon icon={faMoneyBillTrendUp} className="text-lg" />,
+  },
+  {
+    id: nanoid(),
     text: "Assets",
     href: "/factory-manager/assets",
     icon: <FontAwesomeIcon icon={faBuilding} className="text-lg" />,
@@ -430,6 +455,12 @@ export const FactoryManagerSidebarLink: SidebarProps[] = [
     text: "Expenses",
     href: "/factory-manager/expenses",
     icon: <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-lg" />,
+  },
+  {
+    id: nanoid(),
+    text: "Income",
+    href: "/factory-manager/income",
+    icon: <FontAwesomeIcon icon={faMoneyBillTrendUp} className="text-lg" />,
   },
   {
     id: nanoid(),
@@ -586,6 +617,12 @@ export const adminSidebarLink: SidebarProps[] = [
     text: "Expenses",
     href: "/admin/expenses",
     icon: <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-lg" />,
+  },
+  {
+    id: nanoid(),
+    text: "Income",
+    href: "/admin/income",
+    icon: <FontAwesomeIcon icon={faMoneyBillTrendUp} className="text-lg" />,
   },
   {
     id: nanoid(),
