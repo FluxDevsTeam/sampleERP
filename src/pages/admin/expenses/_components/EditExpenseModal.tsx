@@ -19,7 +19,7 @@ import CategoryDropdown from "./Category";
 interface ExpenseFormData {
   name: string;
   amount: number | "";
-  quantity: string;
+  quantity?: string; // Make quantity optional
   description: string | undefined;
   selectedType: string;
   selectedItem: string | null;
@@ -186,7 +186,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
         name: expense.name || "",
         description: expense.description || "",
         amount: expense.amount || "",
-        quantity: String(expense.quantity ?? "") || "",
+        quantity: String(expense.quantity ?? "") || undefined, // Initialize as undefined if null or empty
         selectedType,
         selectedItem,
         category: expense.category?.id || null,
@@ -204,7 +204,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
         name: data.name,
         description: data.description || "",
         amount: Number(data.amount) || 0,
-        quantity: data.quantity,
+        quantity: data.quantity || null, // Send null if quantity is empty
         category: data.category,
         project: data.selectedType === "project" && data.selectedItem ? Number(data.selectedItem) : null,
         shop: data.selectedType === "shop" && data.selectedItem ? Number(data.selectedItem) : null,
@@ -297,7 +297,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                   value={formData.name}
                   onChange={(e) => handleInputChange(e.target.name, e.target.value)}
                 className="w-full"
-                  required
+                
                 />
               </div>
 
@@ -310,7 +310,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                   value={formData.amount}
                   onChange={(e) => handleInputChange(e.target.name, e.target.value)}
                 className="w-full"
-                  required
+                
                 />
               </div>
             </div>
@@ -339,15 +339,14 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                 </select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="quantity">Quantity</Label>
+                <Label htmlFor="quantity">Quantity (Optional)</Label>
                 <Input
                   id="quantity"
                   name="quantity"
                   type="text"
-                  value={formData.quantity}
+                  value={formData.quantity || ""} // Handle undefined quantity
                   onChange={(e) => handleInputChange(e.target.name, e.target.value)}
                 className="w-full"
-                required
               />
               </div>
             </div>

@@ -64,7 +64,7 @@ interface Entry {
   sold_item: SoldItem | null;
   linked_product: LinkedProduct | null; // Add linked_product to Entry interface
   amount: string;
-  quantity: string;
+  quantity: string | null; // Quantity can be null
   payment_method?: string;
   date: string;
 }
@@ -268,7 +268,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
       name: entry.name,
       description: entry.description,
       amount: parseFloat(entry.amount) || 0,
-      quantity: parseFloat(entry.quantity) || 0,
+      quantity: entry.quantity ? parseFloat(entry.quantity) : undefined, // Set to undefined if null
       category: entry.expense_category
         ? {
             id: entry.expense_category.id,
@@ -492,7 +492,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.sold_item?.name || "N/A"}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.linked_product?.name || "N/A"}</td> {/* Display Product */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium">₦ {formatNumber(entry.amount)}</td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{entry.quantity}</td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{entry.quantity || "-"}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
                               <button
                                 onClick={() => handleRowClick(entry)}

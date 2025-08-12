@@ -69,7 +69,7 @@ interface ShopItem {
 interface ExpenseFormData {
   name: string;
   amount: string;
-  quantity: string;
+  quantity?: string; // Make quantity optional
   selectedItem: string | null;
   selectedType: string;
   category: number | null;
@@ -109,7 +109,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
     return {
       name: "",
       amount: "",
-      quantity: "",
+      quantity: undefined, // Initialize as undefined
       selectedItem: null,
       selectedType: "",
       category: null,
@@ -133,7 +133,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
       const formattedData = {
         name: newExpense.name,
         amount: Number(newExpense.amount),
-        quantity: newExpense.quantity,
+        quantity: newExpense.quantity || null, // Send null if quantity is empty
         category: newExpense.category,
         description: newExpense.description || "",
         project:
@@ -177,13 +177,13 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
       setFormData({
         name: "",
         amount: "",
-        quantity: "",
-        selectedItem: null,
-        selectedType: "",
-        category: null,
-        description: "",
-        date: "",
-        product: null, // Reset product
+      quantity: undefined, // Reset quantity
+      selectedItem: null,
+      selectedType: "",
+      category: null,
+      description: "",
+      date: "",
+      product: null, // Reset product
           payment_method: "CASH",
       });
       if (onSuccess) onSuccess();
@@ -272,16 +272,15 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
             </div>
 
             <div>
-              <Label htmlFor="quantity">Quantity</Label>
+              <Label htmlFor="quantity">Quantity (Optional)</Label>
               <Input
                 id="quantity"
                 name="quantity"
                 type="text"
-                value={formData.quantity}
+                value={formData.quantity || ""} // Handle undefined quantity
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, quantity: e.target.value }))
                 }
-                required
               />
             </div>
           </div>
