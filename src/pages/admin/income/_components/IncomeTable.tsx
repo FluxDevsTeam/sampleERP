@@ -219,7 +219,7 @@ const IncomeTable: React.FC<IncomeTableProps> = ({ isTableModalOpen }) => {
         </div>
       </div>
 
-      <div className={`overflow-x-auto pb-8 ${isTableModalOpen || isViewModalOpen || isEditModalOpen || isDeleteDialogOpen || isAddModalOpen ? 'blur-md' : ''}`}>
+      <div className={`overflow-x-auto pb-8 ${isTableModalOpen || isViewModalOpen || isEditModalOpen || isDeleteDialogOpen || isAddModalOpen ? 'blur-md' : ''}`} style={{ maxWidth: '100vw' }}>
         {(!data?.daily_data || data.daily_data.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10 m-2">
             <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
@@ -227,7 +227,7 @@ const IncomeTable: React.FC<IncomeTableProps> = ({ isTableModalOpen }) => {
                 <path d="M3 10h18M3 6h18M3 14h18M3 18h18" stroke="currentColor" strokeWidth="2" />
               </svg>
             </div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-1">No income found</h2>
+            <h2 className="text-lg font-semibold text-teal-400 mb-1">No income found</h2>
             <p className="text-gray-500 mb-6 text-center max-w-xs">All your income records will show up here. Add a new income to get started.</p>
           </div>
         ) : (
@@ -242,15 +242,15 @@ const IncomeTable: React.FC<IncomeTableProps> = ({ isTableModalOpen }) => {
               </div>
               {!collapsed[dayData.date] && (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full">
+                  <table className="min-w-full table-fixed">
                     <thead className="bg-gray-800">
                       <tr>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">Date</th>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Name</th>
+                        <th className="px-2 sm:px-2 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 w-2/5 sm:w-auto">Name</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell">Category</th>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Amount</th>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">Method</th>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Details</th>
+                        <th className="px-2 sm:px-2 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 w-24 sm:w-auto">Amount</th>
+                        <th className="px-2 sm:px-2 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell w-20 sm:w-auto">Method</th>
+                        <th className="px-1 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 w-[64px] sm:w-auto">Details</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -264,9 +264,9 @@ const IncomeTable: React.FC<IncomeTableProps> = ({ isTableModalOpen }) => {
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{new Date(entry.date).toLocaleDateString()}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium">{entry.name}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">{getCategoryName(entry.category)}</td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium">₦ {formatNumber(entry.amount)}</td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{entry.cash ? "Cash" : "Bank"}</td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
+                            <td className="px-2 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-medium whitespace-nowrap">₦ {formatNumber(entry.amount)}</td>
+                            <td className="px-2 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell whitespace-nowrap">{entry.cash ? "Cash" : "Bank"}</td>
+                            <td className="px-1 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
                               <button onClick={() => { 
                                 const rid = getEntryId(entry);
                                 if (rid) {
@@ -275,7 +275,7 @@ const IncomeTable: React.FC<IncomeTableProps> = ({ isTableModalOpen }) => {
                                 } else {
                                   toast.error('Missing entry ID; cannot open.');
                                 }
-                              }} className="px-2 sm:px-3 py-1 text-blue-400 border-2 border-blue-400 rounded text-xs sm:text-sm">View</button>
+                              }} className="px-2 sm:px-2 py-1 text-blue-400 border-2 border-blue-400 rounded text-xs sm:text-sm">View</button>
                             </td>
                           </tr>
                         ))

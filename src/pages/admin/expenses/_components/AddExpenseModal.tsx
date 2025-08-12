@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
@@ -76,6 +76,7 @@ interface ExpenseFormData {
   description: string;
   date?: string;
   product?: number | null; // Add product field
+  payment_method: string;
 }
 
 interface AddPaymentModalProps {
@@ -115,12 +116,13 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
       description: "",
       date: todayFormatted,
       product: null,
+      payment_method: "CASH",
     };
   });
   const [userRole, setUserRole] = useState<string | null>(null);
 
   // Set user role on mount
-  useState(() => {
+  useEffect(() => {
     setUserRole(localStorage.getItem('user_role'));
   }, []);
 
@@ -147,6 +149,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
             ? Number(newExpense.selectedItem)
             : null,
         date: newExpense.date || undefined,
+        payment_method: newExpense.payment_method || undefined,
       };
 
       console.log("Sending data to API:", formattedData);
@@ -181,6 +184,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
         description: "",
         date: "",
         product: null, // Reset product
+          payment_method: "CASH",
       });
       if (onSuccess) onSuccess();
     },
@@ -282,6 +286,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
             </div>
           </div>
 
+
           <div className="space-y-1">
             <Label className="text-lg font-medium">Item Type (Optional)</Label>
             <div className="grid grid-cols-2 gap-4 mt-2">
@@ -363,9 +368,25 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
             }
           />
 
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="payment_method">Payment Method</Label>
+              <select
+                id="payment_method"
+                name="payment_method"
+                value={formData.payment_method}
+                onChange={(e) => setFormData(prev => ({ ...prev, payment_method: e.target.value }))}
+                className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              >
+                <option value="CASH">CASH</option>
+                <option value="BANK">BANK</option>
+                <option value="DEBT">DEBT</option>
+              </select>
+            </div>
           {/* Add date field for CEO only */}
           {userRole === 'ceo' && (
-            <div className="space-y-2">
+            <div className="col-span-1">
               <Label htmlFor="date">Date</Label>
               <Input
                 id="date"
@@ -378,6 +399,7 @@ const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
               />
             </div>
           )}
+          </div>
 
           <DialogFooter>
             <Button

@@ -1,21 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { fetchData } from "./api";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import img from "./ìmg/hi.jpg"; // Ensure the correct file path
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight, faAnglesLeft, faAnglesRight } from "@fortawesome/free-solid-svg-icons";
+import { ThreeDots } from "react-loader-spinner";
 
 const FactoryManagerCustomers = () => {
   const [customers, setCustomers] = useState<unknown[]>([]);
   const [totalCustomers, setTotalCustomers] = useState<number>(0);
   const [activeCustomers, setActiveCustomers] = useState<number>(0);
+  const [owingCustomers, setOwingCustomers] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [nextPage, setNextPage] = useState<string | null>(null);
   const [previousPage, setPreviousPage] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [filter, setFilter] = useState<"all" | "active" | "owing">("all");
 
   const [showModal, setShowModal] = useState(false);
   const [newCustomer, setNewCustomer] = useState({
@@ -38,8 +39,8 @@ const FactoryManagerCustomers = () => {
   };
 
   useEffect(() => {
-    const { name, email, phone_number, address } = newCustomer;
-    setIsFormValid(name.trim() !== '' && email.trim() !== '' && phone_number.trim() !== '' && address.trim() !== '');
+    const { name, phone_number, address } = newCustomer;
+    setIsFormValid(name.trim() !== '' && phone_number.trim() !== '' && address.trim() !== '');
   }, [newCustomer]);
 
   useEffect(() => {
@@ -104,6 +105,7 @@ const FactoryManagerCustomers = () => {
         setCustomers(Array.isArray(data.results.all_customers) ? data.results.all_customers : []);
         setTotalCustomers(data.results.all_customers_count || 0);
         setActiveCustomers(data.results.active_customers || 0);
+        setOwingCustomers(data.results.owing_customers || 0);
         setNextPage(data.next);
         setPreviousPage(data.previous);
       } else {
@@ -117,32 +119,42 @@ const FactoryManagerCustomers = () => {
     }
   };
 
+  const buildUrl = (page?: number) => {
+    const baseUrl = `https://backend.kidsdesigncompany.com/api/customer/`;
+    const params = new URLSearchParams();
+    if (searchTerm.trim()) params.set("search", searchTerm.trim());
+    if (filter === "active") params.set("active", "true");
+    if (filter === "owing") params.set("owing", "true");
+    if (page) params.set("page", String(page));
+    const query = params.toString();
+    return query ? `${baseUrl}?${query}` : baseUrl;
+  };
+
+  const loadPage = (page?: number) => {
+    const url = buildUrl(page);
+    fetchCustomers(url);
+  };
+
   useEffect(() => {
-    const initialUrl = `https://backend.kidsdesigncompany.com/api/customer/`;
-    fetchCustomers(initialUrl);
-  }, []);
+    loadPage(1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter]);
 
   const handleSearch = () => {
-    const searchUrl = `https://backend.kidsdesigncompany.com/api/customer/?search=${searchTerm}`;
-    fetchCustomers(searchUrl);
-    setCurrentPage(1); 
+    setCurrentPage(1);
+    loadPage(1);
   };
 
   const clearSearch = () => {
     setSearchTerm("");
-    const initialUrl = `https://backend.kidsdesigncompany.com/api/customer/`;
-    fetchCustomers(initialUrl);
     setCurrentPage(1);
+    loadPage(1);
   };
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4">
-        <div className="animate-pulse space-y-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-24 bg-gray-200 rounded"></div>
-          ))}
-        </div>
+      <div className="w-full h-[60vh] flex items-center justify-center">
+        <ThreeDots visible={true} height="80" width="80" color="#60A5FA" radius="9" ariaLabel="three-dots-loading" />
       </div>
     );
   }
@@ -152,18 +164,41 @@ const FactoryManagerCustomers = () => {
   }
 
   const itemsPerPage = 10;
+  const totalForPagination = filter === "all" ? totalCustomers : filter === "active" ? activeCustomers : owingCustomers;
 
   return (
     <div className="px-0 md:px-10 pt-3 mb-20 md:mb-10 text-[#0A0A0A]">
 
-      <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-8 w-full">
-        <article className="border rounded-lg p-2 sm:p-4 shadow-md flex flex-col items-center justify-center">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-8 w-full">
+        <article
+          onClick={() => {
+            setFilter("all");
+            setCurrentPage(1);
+          }}
+          className={`border rounded-lg p-2 sm:p-4 shadow-md flex flex-col items-center justify-center cursor-pointer ${filter === "all" ? "ring-2 ring-blue-400 bg-blue-50" : ""}`}
+        >
           <p className="font-bold text-[11px] sm:text-[14px] text-[#767676] mb-1 sm:mb-2">Total Customers</p>
           <p className="text-[#0178A3] text-[20px] sm:text-[36px] font-bold">{totalCustomers}</p>
         </article>
-        <article className="border rounded-lg p-2 sm:p-4 shadow-md flex flex-col items-center justify-center">
+        <article
+          onClick={() => {
+            setFilter("active");
+            setCurrentPage(1);
+          }}
+          className={`border rounded-lg p-2 sm:p-4 shadow-md flex flex-col items-center justify-center cursor-pointer ${filter === "active" ? "ring-2 ring-blue-400 bg-blue-50" : ""}`}
+        >
           <p className="font-bold text-[11px] sm:text-[14px] text-[#767676] mb-1 sm:mb-2">Active Customers</p>
           <p className="text-[#0178A3] text-[20px] sm:text-[36px] font-bold">{activeCustomers}</p>
+        </article>
+        <article
+          onClick={() => {
+            setFilter("owing");
+            setCurrentPage(1);
+          }}
+          className={`border rounded-lg p-2 sm:p-4 shadow-md flex flex-col items-center justify-center cursor-pointer ${filter === "owing" ? "ring-2 ring-blue-400 bg-blue-50" : ""}`}
+        >
+          <p className="font-bold text-[11px] sm:text-[14px] text-[#767676] mb-1 sm:mb-2">Owing Customers</p>
+          <p className="text-[#0178A3] text-[20px] sm:text-[36px] font-bold">{owingCustomers}</p>
         </article>
       </div>
 
@@ -191,7 +226,8 @@ const FactoryManagerCustomers = () => {
           <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-xs sm:max-w-sm w-full mx-auto">
             <h2 className="text-xl font-bold mb-4">Add New Customer</h2>
             <input type="text" name="name" placeholder="Name" value={newCustomer.name} onChange={handleInputChange} className="border p-2 w-full mb-2" />
-            <input type="email" name="email" placeholder="Email" value={newCustomer.email} onChange={handleInputChange} className="border p-2 w-full mb-2" />
+            <label className="text-sm font-medium text-gray-700">Email (optional)</label>
+            <input type="email" name="email" placeholder="Email (optional)" value={newCustomer.email} onChange={handleInputChange} className="border p-2 w-full mb-2" />
             <input type="tel" name="phone_number" placeholder="Phone Number" value={newCustomer.phone_number} onChange={handleInputChange} className="border p-2 w-full mb-2" />
             <input type="text" name="address" placeholder="Address" value={newCustomer.address} onChange={handleInputChange} className="border p-2 w-full mb-2" />
             {userRole === 'ceo' && (
@@ -231,23 +267,40 @@ const FactoryManagerCustomers = () => {
             </tr>
           </thead>
           <tbody>
-            {customers.map((customer: any) => (
-              <tr key={customer.id} className="hover:bg-gray-100">
-                <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 capitalize border-r border-gray-200">{customer.name}</td>
-                <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 border-r border-gray-200 hidden sm:table-cell">{customer.email}</td>
-                <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 border-r border-gray-200">{customer.phone_number}</td>
-                <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 border-r border-gray-200 hidden md:table-cell">{customer.address}</td>
-                <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 w-32 border-r border-gray-200 hidden md:table-cell">{formatDate(customer.created_at)}</td>
-                <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 text-center">
-                  <button
-                    onClick={() => navigate(`/factory-manager/customers/${customer.id}`)}
-                    className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded hover:bg-blue-50 transition-colors"
-                  >
-                    Details
-                  </button>
+            {customers.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="p-0">
+                  <div className="flex flex-col items-center justify-center py-10 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                      <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                        <path d="M16 3v4M8 3v4M3 7h18" stroke="currentColor" strokeWidth="2" />
+                      </svg>
+                    </div>
+                    <h2 className="text-lg font-semibold text-teal-800 mb-1">No customers found</h2>
+                    <p className="text-gray-500 mb-2 text-center max-w-xs">All your customer records will show up here. Add a new customer to get started.</p>
+                  </div>
                 </td>
               </tr>
-            ))}
+            ) : (
+              customers.map((customer: any) => (
+                <tr key={customer.id} className="hover:bg-gray-100">
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 capitalize border-r border-gray-200">{customer.name}</td>
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 border-r border-gray-200 hidden sm:table-cell">{customer.email ? customer.email : '-'}</td>
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 border-r border-gray-200">{customer.phone_number}</td>
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 border-r border-gray-200 hidden md:table-cell">{customer.address}</td>
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 w-32 border-r border-gray-200 hidden md:table-cell">{formatDate(customer.created_at)}</td>
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 text-center">
+                    <button
+                      onClick={() => navigate(`/factory-manager/customers/${customer.id}`)}
+                      className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded hover:bg-blue-50 transition-colors"
+                    >
+                      Details
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -256,7 +309,7 @@ const FactoryManagerCustomers = () => {
         <button
           onClick={() => {
             if (currentPage > 1 && previousPage) {
-              fetchCustomers(`https://backend.kidsdesigncompany.com/api/customer/?page=1`);
+              loadPage(1);
               setCurrentPage(1);
             }
           }}
@@ -277,7 +330,7 @@ const FactoryManagerCustomers = () => {
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-        <span className="mx-4 text-md ">Page {currentPage} of {Math.max(1, Math.ceil(totalCustomers / itemsPerPage))}</span>
+        <span className="mx-4 text-md ">Page {currentPage} of {Math.max(1, Math.ceil(totalForPagination / itemsPerPage))}</span>
         <button
           onClick={() => {
             if (nextPage) {
@@ -310,7 +363,7 @@ const FactoryManagerCustomers = () => {
                   lastPage++;
                 }
               }
-              fetchCustomers(`https://backend.kidsdesigncompany.com/api/customer/?page=${lastPage}`);
+              loadPage(lastPage);
               setCurrentPage(lastPage);
             }
           }}

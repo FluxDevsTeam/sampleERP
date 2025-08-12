@@ -14,9 +14,12 @@ interface SearchableCategoryDropdownProps {
   selectedValue?: string | null;
   selectedName?: string | null;
   disabled?: boolean;
+  refreshTrigger?: number; // New prop to trigger re-fetch
 }
 
-const SearchableCategoryDropdown: React.FC<SearchableCategoryDropdownProps> = ({ endpoint, label, onChange, name, resultsKey, dataMapper, selectedValue, selectedName, disabled }) => {
+const SearchableCategoryDropdown: React.FC<SearchableCategoryDropdownProps> = ({ endpoint, label, onChange, name, resultsKey, dataMapper, selectedValue, selectedName, disabled, refreshTrigger }) => {
+
+
   const [items, setItems] = useState<DropdownItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(''); 
@@ -125,7 +128,7 @@ const SearchableCategoryDropdown: React.FC<SearchableCategoryDropdownProps> = ({
   useEffect(() => {
     const fullEndpoint = searchTerm ? `${endpoint}?search=${encodeURIComponent(searchTerm)}` : endpoint;
     fetchData(fullEndpoint);
-  }, [endpoint, searchTerm]);
+  }, [endpoint, searchTerm, refreshTrigger]); // Add refreshTrigger to dependencies
 
   const handleSelect = (item: DropdownItem) => {
     onChange(name, String(item.id));

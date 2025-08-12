@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FaUser, FaEdit, FaCheck, FaTimes, FaTrash } from "react-icons/fa";
+import { FaEdit, FaCheck, FaTimes, FaTrash } from "react-icons/fa";
 import { CustomerResponse } from "./Interfaces"
 
 const CustomerProfile = () => {
@@ -215,9 +215,11 @@ const CustomerProfile = () => {
                   value={editedName}
                   onChange={(e) => setEditedName(e.target.value)}
                 />
+                <label className="text-sm font-medium text-gray-700">Email (optional)</label>
                 <input
                   type="email"
                   className="border p-2 rounded w-full"
+                  placeholder="Email (optional)"
                   value={editedEmail}
                   onChange={(e) => setEditedEmail(e.target.value)}
                 />
@@ -259,7 +261,7 @@ const CustomerProfile = () => {
             ) : (
               <>
                 <h2 className="text-2xl font-bold text-[#0178A3] uppercase">{customer.customer_details.name}</h2>
-                <p>{customer.customer_details.email}</p>
+                <p>{customer.customer_details.email || '-'}</p>
                 <p>{customer.customer_details.phone_number}</p>
                 <p>Address: {customer.customer_details.address || "N/A"}</p>
                 <p>Created: {new Date(customer.customer_details.created_at).toLocaleDateString()}</p>

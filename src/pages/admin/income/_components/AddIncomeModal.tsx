@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 // import CategoryDropdown from "./Category";
 import SearchableCategoryDropdown from "./SearchableCategoryDropdown";
 
@@ -45,6 +45,14 @@ const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose, onSucc
   useEffect(() => {
     setUserRole(localStorage.getItem("user_role"));
   }, []);
+
+  // Income category create/delete controls
+  const [isCatDialogOpen, setIsCatDialogOpen] = useState(false);
+  const [newCatName, setNewCatName] = useState("");
+  const [catActionLoading, setCatActionLoading] = useState(false);
+  const [categoryRefreshTrigger, setCategoryRefreshTrigger] = useState(0);
+
+  // No local quick actions; handled by CategoryDropdown component
 
   const isUuid = (value: string | null | undefined) => !!value && /^(?:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$/.test(value);
   const isNumericId = (value: string | null | undefined) => !!value && /^\d+$/.test(value);
@@ -204,17 +212,99 @@ const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose, onSucc
           </div>
 
           <SearchableCategoryDropdown
-            endpoint="https://backend.kidsdesigncompany.com/api/income-category/"
+            endpoint="https://backend.kidsdesignCompany.com/api/income-category/"
             label="Category"
             name="category"
             resultsKey={undefined}
-            onChange={(field, val) => {
+            onChange={(_field, val) => {
               const value = val && val !== 'undefined' && val !== '' ? val : null;
               setFormData((p) => ({ ...p, category: value }));
-              console.log('[Income] Category change:', { field, val, normalized: value });
             }}
             selectedValue={formData.category}
+            refreshTrigger={categoryRefreshTrigger}
           />
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex gap-2">
+              <Dialog open={isCatDialogOpen} onOpenChange={setIsCatDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button type="button" variant="outline" size="sm">Create New</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-sm">
+                  <DialogHeader>
+                    <DialogTitle>Create New Income Category</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-2">
+                    <Label htmlFor="newIncomeCategory">Category Name</Label>
+                    <Input id="newIncomeCategory" value={newCatName} onChange={(e) => setNewCatName(e.target.value)} />
+                  </div>
+                  <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => setIsCatDialogOpen(false)}>Cancel</Button>
+                    <Button
+                      type="button"
+                      disabled={catActionLoading || !newCatName.trim()}
+                      onClick={async () => {
+                        if (!newCatName.trim()) return;
+                        setCatActionLoading(true);
+                        try {
+                          const token = localStorage.getItem('accessToken');
+                          const res = await axios.post(
+                            'https://backend.kidsdesigncompany.com/api/income-category/',
+                            { name: newCatName.trim() },
+                            { headers: { Authorization: `JWT ${token}` } }
+                          );
+                          const created = res.data || {};
+                          const createdId = String(created?.id ?? created?.uuid ?? created?.pk ?? created?.name ?? '');
+                          if (createdId) {
+                            setFormData((p) => ({ ...p, category: createdId }));
+                            toast.success('Category created');
+                            setIsCatDialogOpen(false);
+                            setNewCatName('');
+                            setCategoryRefreshTrigger(prev => prev + 1);
+                          } else {
+                            toast.error('Created category but no identifier returned');
+                          }
+                        } catch (err: any) {
+                          toast.error(err?.response?.data?.message || 'Failed to create category');
+                        } finally {
+                          setCatActionLoading(false);
+                        }
+                      }}
+                    >
+                      {catActionLoading ? 'Creating...' : 'Create'}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              disabled={!formData.category || catActionLoading}
+              onClick={async () => {
+                if (!formData.category) return;
+                if (!confirm('Delete this category? This cannot be undone.')) return;
+                setCatActionLoading(true);
+                try {
+                  const token = localStorage.getItem('accessToken');
+                  await axios.delete(
+                    `https://backend.kidsdesigncompany.com/api/income-category/${formData.category}/`,
+                    { headers: { Authorization: `JWT ${token}` } }
+                  );
+                  toast.success('Category deleted');
+                  setFormData((p) => ({ ...p, category: null }));
+                  setCategoryRefreshTrigger(prev => prev + 1);
+                } catch (err: any) {
+                  toast.error(err?.response?.data?.message || 'Failed to delete category');
+                } finally {
+                  setCatActionLoading(false);
+                }
+              }}
+            >
+              Delete
+            </Button>
+          </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>

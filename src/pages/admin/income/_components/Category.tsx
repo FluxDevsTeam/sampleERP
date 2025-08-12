@@ -21,17 +21,38 @@ interface CategoryDropdownProps {
   onCategoryChange: (categoryId: string | null) => void;
 }
 
-const fetchCategories = async (): Promise<Category[]> => {
+interface CategoryPage {
+  items: Category[];
+  next: string | null;
+  previous: string | null;
+  count: number;
+}
+
+const fetchCategories = async (search: string, page: number): Promise<CategoryPage> => {
   const token = localStorage.getItem("accessToken");
-  const { data } = await axios.get<Category[]>(
+  const { data } = await axios.get(
     "https://backend.kidsdesigncompany.com/api/income-category/",
     {
+      params: {
+        search: search || undefined,
+        page: page || undefined,
+      },
       headers: {
         Authorization: `JWT ${token}`,
       },
     }
   );
-  return data;
+  // Handle both array and paginated responses
+  if (Array.isArray(data)) {
+    return { items: data as Category[], next: null, previous: null, count: (data as Category[]).length };
+  }
+  const items: Category[] = Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [];
+  return {
+    items,
+    next: data?.next ?? null,
+    previous: data?.previous ?? null,
+    count: typeof data?.count === 'number' ? data.count : items.length,
+  };
 };
 
 const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, onCategoryChange }) => {
@@ -39,13 +60,12 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState<NewCategoryData>({ name: "" });
   const [isDeletingLocal, setIsDeletingLocal] = useState(false);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
-  const { data: categories = [], isLoading } = useQuery<Category[]>({
-    queryKey: ["income-categories"],
-    queryFn: async () => {
-      const list = await fetchCategories();
-      return Array.isArray(list) ? list : [];
-    },
+  const { data, isLoading } = useQuery<CategoryPage>({
+    queryKey: ["income-categories", search, page],
+    queryFn: async () => fetchCategories(search, page),
   });
 
   const addCategoryMutation = useMutation({
@@ -67,10 +87,8 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
         toast.error("Failed to retrieve category ID.");
         return;
       }
-      queryClient.setQueryData(["income-categories"], (oldData: Category[] = []) => [
-        ...oldData,
-        data,
-      ]);
+      // Invalidate to refresh paginated list, then select the new category
+      queryClient.invalidateQueries({ queryKey: ["income-categories"] });
       onCategoryChange(data.id);
       toast.success("Category added successfully!");
       setNewCategory({ name: "" });
@@ -182,6 +200,13 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
         </div>
       </div>
 
+      {/* Search */}
+      <Input
+        placeholder="Search category..."
+        value={search}
+        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+      />
+
       <select
         id="income-category"
         name="category"
@@ -193,8 +218,8 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
         <option value="">Select Category</option>
         {isLoading ? (
           <option disabled>Loading...</option>
-        ) : Array.isArray(categories) ? (
-          categories.map((category) => (
+        ) : Array.isArray(data?.items) && data.items.length > 0 ? (
+          data.items.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
             </option>
@@ -203,6 +228,29 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
           <option disabled>No categories</option>
         )}
       </select>
+
+      {/* Pagination controls */}
+      <div className="flex items-center justify-between">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!data?.previous}
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+        >
+          Prev
+        </Button>
+        <span className="text-xs text-gray-500">Page {page}</span>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!data?.next}
+          onClick={() => setPage((p) => p + 1)}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 };

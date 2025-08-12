@@ -65,6 +65,7 @@ interface Entry {
   linked_product: LinkedProduct | null; // Add linked_product to Entry interface
   amount: string;
   quantity: string;
+  payment_method?: string;
   date: string;
 }
 
@@ -108,6 +109,7 @@ interface Expense {
     name: string;
   }; // Add product to Expense interface
   date?: string; // Add date to Expense interface
+  payment_method?: string; // Add payment method to Expense interface
 }
 
 interface ExpensesTableProps {
@@ -292,6 +294,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
           }
         : undefined,
       date: entry.date, // Map date to expense.date
+      payment_method: entry.payment_method || undefined, // Map payment method
     };
   };
 
@@ -462,6 +465,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">Date</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Name</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell">Category</th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Payment</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Project</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Shop Item</th>
                         <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Product</th> {/* Add Product column */}
@@ -483,6 +487,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{new Date(entry.date).toLocaleDateString()}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium">{entry.name}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">{entry.expense_category?.name || "N/A"}</td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.payment_method || '-'}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.linked_project?.name || "N/A"}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.sold_item?.name || "N/A"}</td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.linked_product?.name || "N/A"}</td> {/* Display Product */}
@@ -517,7 +522,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
           </DialogHeader>
 
           {selectedEntry && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow">
+            <div className="grid grid-cols-2 gap-4 bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow overflow-y-auto">
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Name</span>
                 <span className="text-base font-bold text-black">{selectedEntry.name}</span>
@@ -533,6 +538,10 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Category</span>
                 <span className="text-base font-bold text-black">{selectedEntry.expense_category?.name || "N/A"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-black uppercase">Payment Method</span>
+                <span className="text-base font-bold text-black">{selectedEntry.payment_method || '-'}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Linked Project</span>

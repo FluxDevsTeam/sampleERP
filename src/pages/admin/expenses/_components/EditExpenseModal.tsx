@@ -19,13 +19,14 @@ import CategoryDropdown from "./Category";
 interface ExpenseFormData {
   name: string;
   amount: number | "";
-  quantity: number | "";
+  quantity: string;
   description: string | undefined;
   selectedType: string;
   selectedItem: string | null;
   category: number | null;
   date?: string;
   product?: number | null; // Add product field
+  payment_method?: string;
 }
 
 interface Project {
@@ -65,6 +66,8 @@ interface Expense {
     id: number;
     name: string;
   }; // Add product field to Expense interface
+  date?: string;
+  payment_method?: string;
 }
 
 interface EditExpenseModalProps {
@@ -157,6 +160,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
     category: null,
     date: "",
     product: null,
+    payment_method: "CASH",
   });
 
   useEffect(() => {
@@ -182,12 +186,13 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
         name: expense.name || "",
         description: expense.description || "",
         amount: expense.amount || "",
-        quantity: String(expense.quantity) || "", // Ensure quantity is string
+        quantity: String(expense.quantity ?? "") || "",
         selectedType,
         selectedItem,
         category: expense.category?.id || null,
         date: expense.date ? new Date(expense.date).toISOString().split('T')[0] : "", // Ensure YYYY-MM-DD format
         product: expense.product?.id || null, // Populate product field
+        payment_method: expense.payment_method || "CASH",
       });
     }
   }, [expense]);
@@ -205,6 +210,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
         shop: data.selectedType === "shop" && data.selectedItem ? Number(data.selectedItem) : null,
         product: data.selectedType === "product" && data.selectedItem ? Number(data.selectedItem) : null, // Change to 'product'
         date: data.date || undefined,
+        payment_method: data.payment_method || undefined,
       };
 
       if (data.selectedType === "other") {
@@ -277,7 +283,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[650px]">
+      <DialogContent className="sm:max-w-[650px] max-sm:px-3 overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Expense</DialogTitle>
         </DialogHeader>
@@ -309,7 +315,8 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label className="text-lg font-medium">Item Type (optional)</Label>
                 <select
                   id="selectedType"
@@ -330,6 +337,20 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                   <option value="product">Product</option>
                   <option value="other">None</option>
                 </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="quantity">Quantity</Label>
+                <Input
+                  id="quantity"
+                  name="quantity"
+                  type="text"
+                  value={formData.quantity}
+                  onChange={(e) => handleInputChange(e.target.name, e.target.value)}
+                className="w-full"
+                required
+              />
+              </div>
+            </div>
                 <div className="grid grid-cols-2 gap-4 mt-2">
                   {(!formData.selectedType || formData.selectedType === "project") && (
                     <div className="col-span-2">
@@ -401,7 +422,6 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                     </button>
                   </p>
                 )}
-              </div>
 
             <div className="space-y-2">
               <Label htmlFor="description">Description (Optional)</Label>
@@ -413,7 +433,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                 className="w-full"
                 />
             </div>
-
+            <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="date">Date</Label>
               <Input
@@ -427,20 +447,24 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="quantity">Quantity</Label>
-                <Input
-                  id="quantity"
-                  name="quantity"
-                  type="text"
-                  value={formData.quantity}
-                  onChange={(e) => handleInputChange(e.target.name, e.target.value)}
-                className="w-full"
+            <div className="space-y-2">
+              <Label htmlFor="payment_method">Payment Method</Label>
+              <select
+                id="payment_method"
+                name="payment_method"
+                value={formData.payment_method}
+                onChange={(e) => handleInputChange(e.target.name, e.target.value)}
+                className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
-              />
-              </div>
+              >
+                <option value="CASH">CASH</option>
+                <option value="BANK">BANK</option>
+                <option value="DEBT">DEBT</option>
+              </select>
+            </div>
+            </div>
 
+            <div>
               <CategoryDropdown
                 selectedCategory={formData.category}
                 onCategoryChange={(categoryId) => setFormData((prev) => ({ ...prev, category: categoryId }))}
