@@ -17,7 +17,7 @@ export default defineConfig({
         description: 'An ERP for Kids Design Company factory',
         theme_color: '#000000', // Theme color for the app (changed to black for contrast)
         background_color: '#ffffff', // Background color for the splash screen (kept white)
-        display: 'standalone', 
+        display: 'fullscreen', 
         scope: '/', // Scope of the PWA
         start_url: '/', // URL to open when the app is launched
         icons: [
