@@ -22,32 +22,32 @@ export default defineConfig({
         start_url: '/', // URL to open when the app is launched
         icons: [
           {
-            src: '/src/assets/images/favicon_io/android-chrome-192x192.png',
+            src: '/favicon_io/android-chrome-192x192.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: '/src/assets/images/favicon_io/android-chrome-512x512.png',
+            src: '/favicon_io/android-chrome-512x512.png',
             sizes: '512x512',
             type: 'image/png',
           },
           {
-            src: '/src/assets/images/favicon_io/apple-touch-icon.png',
+            src: '/favicon_io/apple-touch-icon.png',
             sizes: '180x180',
             type: 'image/png',
           },
           {
-            src: '/src/assets/images/favicon_io/favicon-32x32.png',
+            src: '/favicon_io/favicon-32x32.png',
             sizes: '32x32',
             type: 'image/png',
           },
           {
-            src: '/src/assets/images/favicon_io/favicon-16x16.png',
+            src: '/favicon_io/favicon-16x16.png',
             sizes: '16x16',
             type: 'image/png',
           },
           {
-            src: '/src/assets/images/favicon_io/favicon.ico',
+            src: '/favicon_io/favicon.ico',
             sizes: '48x48',
             type: 'image/x-icon',
           },
