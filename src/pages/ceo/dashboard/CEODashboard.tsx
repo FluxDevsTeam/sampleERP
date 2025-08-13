@@ -4,7 +4,7 @@ import AreaCharts from "./_charts/AreaCharts"
 import Header from "./_components/Header"
 const CEODashboard = () => {
   return (
-    <div className="bg-white p-2 mb-20 sm:p-4 min-h-screen">
+    <div className="bg-white p-2 mb-20 sm:p-2 min-h-screen">
       <Header />
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mb-8">
         {/* Add CEO dashboard cards here if any */}

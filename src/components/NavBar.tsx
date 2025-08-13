@@ -3,6 +3,7 @@ import Logo from "./Logo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faUser, faCog, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";
+import { useState, useEffect } from 'react';
 
 export interface NavBarProps {
   toggleSidebar: () => void;
@@ -20,7 +21,20 @@ const NavBar = ({ toggleSidebar, isSidebarOpen, title }: NavBarProps) => {
   };
 
   const formattedRole = formatRole(userRole);
-  const displayTitle = title || `Welcome, ${formattedRole}`;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640); // Tailwind's 'sm' breakpoint is 640px
+    };
+
+    handleResize(); // Set initial value
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const displayTitle = title || (isMobile ? formattedRole : `Welcome, ${formattedRole}`);
   
   return (
     <nav className="h-[60px] sm:h-[70px] lg:h-[77px] bg-white border-b border-gray-200 flex items-center px-3 sm:px-4 lg:px-6 w-full shadow-sm z-50">

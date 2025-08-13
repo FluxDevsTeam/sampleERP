@@ -11,16 +11,11 @@ const DashboardData = (DashboardData: DashboardDataProps) => {
   // Format the digits with thousand separators, handling null or undefined values
   const formattedDigits = (DashboardData.digits ?? 0).toLocaleString();
   return (
-    <div className="bg-white shadow-2xl grid items-center py-3 sm:py-6 pl-2 sm:pl-3">
-      <p className="text-xs font-semibold"
-        style={{ fontSize: "clamp(12px, 3vw, 16px)" }}
-        >{DashboardData.info}</p>
-      <h2
-        className="text-blue-400 font-bold"
-        style={{ fontSize: "clamp(10px, 3vw, 23px)" }}
-      >
+    <div className="p-3 sm:p-4 border rounded-lg shadow-md flex flex-col items-center justify-center min-h-[80px] sm:min-h-[100px]">
+      <div className="text-xs sm:text-sm lg:text-base font-medium text-center mb-1 leading-tight">{DashboardData.info}</div>
+      <div className="text-sm sm:text-base lg:text-lg font-semibold text-blue-400 text-center">
         {DashboardData.currency}{formattedDigits}
-      </h2>
+      </div>
     </div>
   );
 };
