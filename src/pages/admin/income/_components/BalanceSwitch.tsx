@@ -13,7 +13,7 @@ const BalanceSwitch: React.FC = () => {
       {/* Button to open the Balance Switch Table Modal */}
       <Button
         onClick={() => setIsTableModalOpen(true)}
-        className="bg-blue-400 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-md"
+        className="border border-blue-400 bg-white text-blue-400 hover:bg-blue-400 hover:text-white font-medium py-2 px-4 rounded-md"
       >
         Balance
       </Button>
@@ -24,14 +24,14 @@ const BalanceSwitch: React.FC = () => {
           <DialogHeader className="px-6">
             <div className="flex justify-between items-center">
               <div>
-                <DialogTitle className="text-lg sm:text-xl">Balance Switch Records</DialogTitle>
-                <DialogDescription className="text-sm">View and manage your balance switch records.</DialogDescription>
+                <DialogTitle className="text-base sm:text-xl">Balance Switch Records</DialogTitle>
+                <DialogDescription className="text-sm hidden sm:block">View and manage your balance switch records.</DialogDescription>
               </div>
               <Button
                 onClick={() => {
                   setIsAddModalOpen(true);
                 }}
-                className="bg-blue-400 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-md"
+                className="border border-blue-400 bg-white text-blue-400 hover:bg-blue-400 hover:text-white font-medium py-2 px-4 rounded-md"
               >
                 Add New
               </Button>

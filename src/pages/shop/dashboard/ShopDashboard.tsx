@@ -50,10 +50,9 @@ const ShopDashboard = () => {
   }, []);
 
   return (
-    <div className="w-full sm:w-11/12 mx-auto mt-3 sm:mt-6 pl-1 pt-2 mb-20">
+    <div className="w-full sm:w-11/12 mx-auto sm:mt-6 pl-1 pt-2 mb-20">
       <div className="mb-8 sm:mb-16">
-        <h2 className="text-lg sm:text-2xl font-bold mb-4">Shop Overview</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-2 md:mb-6">
           <DashboardData
             info="Total shop value"
             digits={dashboardData?.total_shop_value}
@@ -69,24 +68,24 @@ const ShopDashboard = () => {
               digits={dashboardData?.total_profit_potential}
               currency="₦ "
             />
+            <DashboardData
+              info="Yearly added value"
+              digits={dashboardData?.yearly_added_value}
+              currency="₦ "
+            />
           <DashboardData
-            info="Monthly Stock Added"
+            info="Monthly Added Value"
             digits={dashboardData?.total_added_this_month}
             currency="₦ "
           />
           <DashboardData
-            info="Total sold this month"
+            info="Total Monthly Sales"
             digits={dashboardData?.total_sold_this_month}
             currency="₦ "
           />
           <DashboardData
-            info="Total Profit this month"
+            info="Monthly Profit"
             digits={dashboardData?.total_profit_this_month}
-            currency="₦ "
-          />
-          <DashboardData
-            info="Yearly added value"
-            digits={dashboardData?.yearly_added_value}
             currency="₦ "
           />
           <DashboardData

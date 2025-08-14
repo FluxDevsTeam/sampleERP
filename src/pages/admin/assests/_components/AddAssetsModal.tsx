@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCreateAsset, type AssetData } from "../_api/apiService";
 import { toast } from "sonner";
+import { useAuth } from "../../../AuthPages/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -28,6 +29,7 @@ const initialFormData: AssetData & { date_added?: string; note?: string } = {
 const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useCreateAsset();
+  const { userRole } = useAuth();
 
   const [formData, setFormData] = useState<AssetData & { date_added?: string; note?: string }>(initialFormData);
 
@@ -37,6 +39,12 @@ const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
       setFormData(initialFormData);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (userRole !== 'ceo') {
+      setFormData(prev => ({ ...prev, date_added: undefined }));
+    }
+  }, [userRole]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -99,17 +107,19 @@ const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="date_added">Date Added</Label>
-              <Input
-                id="date_added"
-                name="date_added"
-                type="date"
-                value={formData.date_added || ""}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            {userRole === 'ceo' && (
+              <div className="space-y-2">
+                <Label htmlFor="date_added">Date Added</Label>
+                <Input
+                  id="date_added"
+                  name="date_added"
+                  type="date"
+                  value={formData.date_added || ""}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            )}
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"

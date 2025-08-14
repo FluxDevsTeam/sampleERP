@@ -9,23 +9,13 @@ const AssetsData = (AssetsData: AssetsDataProps) => {
   const formattedDigits = (AssetsData.digits ?? 0).toLocaleString('en-NG');
 
   return (
-    <div>
-      <div className="bg-white rounded pl-4 py-5 shadow grid items-center h-full">
-        <p
-          style={{ fontSize: "clamp(10px, 3vw, 20px)" }}
-          className="text-blue-400 font-bold"
-        >
-          {AssetsData.info}
-        </p>
-        <p
-          style={{ fontSize: "clamp(10px, 3vw, 24px)" }}
-          className="font-medium "
-        >
-          {AssetsData.currency? `${AssetsData.currency} ` : ''}{formattedDigits}
-        </p>
+    <div className="p-2 sm:p-4 border rounded-lg shadow-md flex flex-col items-center justify-center py-4">
+      <div className="text-xs sm:text-sm lg:text-base font-medium text-center mb-2 leading-tight">{AssetsData.info}</div>
+      <div className="text-sm sm:text-base lg:text-lg font-semibold text-blue-400 text-center">
+        {AssetsData.currency}{formattedDigits}
       </div>
     </div>
   );
 };
 
-export default AssetsData; 
+export default AssetsData;

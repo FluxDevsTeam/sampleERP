@@ -32,9 +32,9 @@ const Paid = () => {
       <div
         className={`grid grid-cols-3 md:gap-4 gap-2 mb-2 mt-4 ${isTableModalOpen ? "blur-md" : ""}`}
       >
-        <PaidData info="Total Paid" digits={totalPaid} currency="\u20a6 " />
-        <PaidData info="Salary Paid This Month" digits={totalSalaryPaid} currency="\u20a6 " />
-        <PaidData info="Contr. Paid This Month" digits={totalContractorsPaid} currency="\u20a6 " />
+        <PaidData info="Total Paid This Month" digits={totalPaid} currency="₦ " />
+        <PaidData info="Salary Paid This Month" digits={totalSalaryPaid} currency="₦ " />
+        <PaidData info="Contr. Paid This Month" digits={totalContractorsPaid} currency="₦ " />
       </div>
 
       <div className="w-full">

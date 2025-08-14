@@ -10,11 +10,11 @@ const AccountantDashboardCard: React.FC<AccountantDashboardCardProps> = ({ title
   // Format the value with thousand separators, handling null or undefined values
   const formattedValue = (value ?? 0).toLocaleString();
   return (
-    <div className="relative flex flex-col justify-between rounded-lg border border-gray-200 bg-white p-4 shadow-md transition-all duration-300 hover:shadow-lg sm:p-6">
-      <p className="mb-2 text-sm font-medium text-gray-500 sm:text-base">{title}</p>
-      <h2 className="text-xl font-bold text-blue-600 sm:text-2xl">
+    <div className="p-2 sm:p-4 border rounded-lg shadow-md flex flex-col items-center justify-center py-4">
+      <div className="text-xs sm:text-sm lg:text-base font-medium text-center mb-2 leading-tight">{title}</div>
+      <div className="text-sm sm:text-base lg:text-lg font-semibold text-blue-400 text-center">
         {currency}{formattedValue}
-      </h2>
+      </div>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "../../../AuthPages/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -64,10 +65,16 @@ const AddNewSoldItemPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [itemDetails, setItemDetails] = useState<{ quantity: number; price: number } | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     console.log("Form data updated:", formData);
   }, [formData]);
+
+  useEffect(() => {
+    const role = localStorage.getItem("user_role");
+    setUserRole(role);
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -239,7 +246,7 @@ const AddNewSoldItemPage = () => {
             disabled={!formData.item}
           />
         </div>
-
+        {userRole === 'ceo' && (
         <div>
           <label className="block mb-1">Date:</label>
           <input
@@ -251,7 +258,7 @@ const AddNewSoldItemPage = () => {
             required
           />
         </div>
-
+        )}
         {/* CUSTOMER SALE TYPE */}
         {saleType === "customer" && (
           <>

@@ -10,6 +10,8 @@ export const Sold = () => {
   const [thisMonthProjectSales, setThisMonthProjectSales] = useState(0);
   const [thisMonthSales, setThisMonthSales] = useState(0);
   const [thisMonthSalesCount, setThisMonthSalesCount] = useState(0);
+  const [thisYearSoldCount, setThisYearSoldCount] = useState(0);
+  const [thisYearSales, setThisYearSales] = useState(0);
 
 
   useEffect(() => {
@@ -38,6 +40,8 @@ export const Sold = () => {
           setThisMonthProjectSales(logData.this_month_project_sales);
           setThisMonthSales(logData.this_month_sales);
           setThisMonthSalesCount(logData.this_month_sales_count);
+          setThisYearSoldCount(logData.this_year_sold_count);
+          setThisYearSales(logData.this_year_sales);
 
         } catch (error) {
           console.error("Error fetching items:", error);
@@ -71,17 +75,11 @@ export const Sold = () => {
 
   return (
     <div className="wrapper w-full mx-auto my-0 pl-1 mb-20 pt-2">
-        <h4>Monthly Sales Dashboard</h4>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 max-sm:gap-1 mb-0 md:mb-6 mt-2">
-        <InventoryData info="Sales Count" digits={thisMonthSalesCount}></InventoryData>
-        <InventoryData info="Non-Project Sales" digits={thisMonthNonProjectSales} currency="₦ "></InventoryData>
-        <InventoryData info="Project Sales" digits={thisMonthProjectSales} currency="₦ "></InventoryData>
-        <div className="md:col-span-1 lg:col-span-1">
-          <InventoryData info="Total Sales" digits={thisMonthSales} currency="₦ "></InventoryData>
-        </div>
-        <div className="col-span-2 md:col-span-2 lg:col-span-1">
-          <InventoryData info="Profit" digits={thisMonthProfit} currency="₦ "></InventoryData>
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-4  gap-2 max-sm:gap-1 mb-0 md:mb-6 md:mt-2">
+        <InventoryData info="Yearly Sales Count" digits={thisYearSoldCount}></InventoryData>
+        <InventoryData info="Monthly Sales Count" digits={thisMonthSalesCount}></InventoryData>
+        <InventoryData info="Yearly Sales" digits={thisYearSales} currency="₦ "></InventoryData>
+        <InventoryData info="Monthly Sales" digits={thisMonthSales} currency="₦ "></InventoryData>
       </div>
       <div>
         <SoldTable />

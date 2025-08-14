@@ -4,7 +4,7 @@ import {
   Bar,
   XAxis,
   YAxis,
-  Cell,
+  // Cell,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
@@ -185,23 +185,23 @@ const MonthlyAddedValueSpikedChart = () => {
         Monthly Added Value
       </h1>
       <ResponsiveContainer width="100%" height={340}>
-        <BarChart data={data} margin={{ left: 0, right: 14, top: 10, bottom: 9 }}>
+        <BarChart data={data} className="bg-white" margin={{ left: 0, right: 14, top: 10, bottom: 9 }}>
+          <defs>
+            <linearGradient id="addedValueGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="10%" stopColor="#ffc658" stopOpacity={1} />
+              <stop offset="90%" stopColor="#ffc658" stopOpacity={0.2} />
+            </linearGradient>
+          </defs>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
           <YAxis tickFormatter={formatNairaCompact} width={60} />
           <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
           <Bar
             dataKey="value"
-            stroke="black"
+            stroke="#0178a3"
             fillOpacity={1}
-            fill="green"
-            shape={<TriangleBar />}
-            label={{ position: "top", formatter: formatNairaCompact }}
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={colors[index % 20]} />
-            ))}
-          </Bar>
+            fill="url(#addedValueGradient)"
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>

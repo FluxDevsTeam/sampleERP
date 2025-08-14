@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
 import {
-  ComposedChart,
-  Line,
-  Area,
+  BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Scatter,
   ResponsiveContainer,
 } from "recharts";
 
@@ -151,17 +148,24 @@ const MonthlyProfitChart = () => {
         Monthly Profit
       </h1>
       <ResponsiveContainer width="100%" height={340}>
-        <ComposedChart data={data} margin={{ left: 0, right: 14, top: 10, bottom: 9 }}>
-          <CartesianGrid stroke="#f5f5"></CartesianGrid>
-          <XAxis dataKey="month"></XAxis>
-          <YAxis tickFormatter={formatNairaCompact} width={60}></YAxis>
-          <Tooltip formatter={(value: number) => formatNairaCompact(value)}></Tooltip>
-          {/* <Legend></Legend> */}
-          <Area type="monotone" dataKey="value" fill="gray" stroke="#8884d8" />
-          <Bar dataKey="value" barSize={30} fill="#413ea0" />
-          <Line type="monotone" dataKey="value" stroke="gray" />
-          <Scatter dataKey="value" fill="red" />
-        </ComposedChart>
+        <BarChart data={data} className="bg-white" margin={{ left: 0, right: 14, top: 10, bottom: 9 }}>
+          <defs>
+            <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="10%" stopColor="#82ca9d" stopOpacity={1} />
+              <stop offset="90%" stopColor="#82ca9d" stopOpacity={0.2} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="month" />
+          <YAxis tickFormatter={formatNairaCompact} width={60} />
+          <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
+          <Bar
+            dataKey="value"
+            stroke="#0178a3"
+            fillOpacity={1}
+            fill="url(#profitGradient)"
+          />
+        </BarChart>
       </ResponsiveContainer>
     </div>
   );

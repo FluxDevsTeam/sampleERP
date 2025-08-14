@@ -65,16 +65,16 @@ const Assets = () => {
   if (error) return <p>Error loading assets: {error.message}</p>;
 
   return (
-    <div className="wrapper w-full mb-20 md:md-2 mx-auto my-2 pl-1 pt-4">
+    <div className="wrapper w-full mb-20 md:mb-2 mx-auto md:pt-4">
       {/* Asset Summary Cards */}
       <div
-        className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4 sm:mb-6 ${
+        className={`grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mb-4 sm:mb-6 ${
           isAddModalOpen || isTableModalOpen ? "blur-md" : ""
         }`}
       >
         <AssetsDataCard info="Total Assets Count" digits={totalAssetsCount} />
         <AssetsDataCard info="Good Assets Count" digits={goodAssetsCount} />
-        <AssetsDataCard info="Depreciated Assets Count" digits={depreciatedAssetsCount} />
+        <AssetsDataCard info="deprecated Assets Count" digits={depreciatedAssetsCount} />
         <AssetsDataCard info="Good Assets Value" digits={goodAssetsValue} currency="₦ " />
       </div>
 

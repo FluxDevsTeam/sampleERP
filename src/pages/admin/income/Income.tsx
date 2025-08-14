@@ -41,8 +41,8 @@ const Income = () => {
   if (error) return <p>Error loading income: {error.message}</p>;
 
   return (
-    <div className="wrapper w-full mx-auto my-0 md:mb-2 mb-20 pt-2">
-      <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-2 mt-4 ${isTableModalOpen ? 'blur-md' : ''}`}>
+    <div className="wrapper w-full mx-auto my-0 md:mb-2 mb-20 md:pt-2">
+      <div className={`grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mb-2 md:mt-4 ${isTableModalOpen ? 'blur-md' : ''}`}>
         <IncomeData info="Cash at Hand" digits={cashAtHand} currency="₦ " icon={<FontAwesomeIcon icon={faWallet} />} />
         <IncomeData info="Money in Bank" digits={moneyInBank} currency="₦ " icon={<FontAwesomeIcon icon={faUniversity} />} />
         <IncomeData info="Debt" digits={debt} currency="₦ " icon={<FontAwesomeIcon icon={faCreditCard} />} />
@@ -59,8 +59,8 @@ const Income = () => {
           <div className="flex justify-end gap-2 ">
             <BalanceSwitch />
             <Button
-              onClick={() => setIsAddModalOpen(true)}
-              className="bg-blue-400 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-md flex items-center gap-2">
+                onClick={() => setIsAddModalOpen(true)}
+              className="border border-blue-400 text-blue-400 bg-white hover:bg-blue-400 hover:text-white font-medium py-2 px-4 rounded-md flex items-center gap-2">
               <FontAwesomeIcon icon={faPlus} />
               Add Income
             </Button>

@@ -9,21 +9,13 @@ const WorkersData = (WorkersData: WorkersDataProps) => {
   const formattedDigits = (WorkersData.digits ?? 0).toLocaleString('en-NG');
 
   return (
-    <div>
-      <div className="bg-white rounded pl-4 py-2 sm:py-5 shadow grid items-center h-full">
-        <p
-          className="text-blue-400 font-bold text-xs"
-        >
-          {WorkersData.info}
-        </p>
-        <p
-          className="font-medium text-base"
-        >
-          {WorkersData.currency? `${WorkersData.currency} ` : ''}{formattedDigits}
-        </p>
+    <div className="p-2 sm:p-4 border rounded-lg shadow-md flex flex-col items-center justify-center py-4">
+      <div className="text-xs sm:text-sm lg:text-base font-medium text-center mb-2 leading-tight">{WorkersData.info}</div>
+      <div className="text-sm sm:text-base lg:text-lg font-semibold text-blue-400 text-center">
+        {WorkersData.currency}{formattedDigits}
       </div>
     </div>
   );
 };
 
-export default WorkersData; 
+export default WorkersData;

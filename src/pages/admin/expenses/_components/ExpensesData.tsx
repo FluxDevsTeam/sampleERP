@@ -8,23 +8,13 @@ const ExpensesData = (ExpensesData: ExpensesDataProps) => {
   const formattedDigits = (ExpensesData.digits ?? 0).toLocaleString();
 
   return (
-    <div>
-      <div className="bg-white rounded pl-4 py-5 shadow grid items-center h-full">
-        <p
-          style={{ fontSize: "clamp(10px, 3vw, 20px)" }}
-          className="text-blue-400 font-bold"
-        >
-          {ExpensesData.info}
-        </p>
-        <p
-          style={{ fontSize: "clamp(10px, 3vw, 24px)" }}
-          className="font-medium "
-        >
-          {ExpensesData.currency? `${ExpensesData.currency} ` : ''}{formattedDigits}
-        </p>
+    <div className="p-2 sm:p-4 border rounded-lg shadow-md flex flex-col items-center justify-center py-4">
+      <div className="text-xs sm:text-sm lg:text-base font-medium text-center mb-2 leading-tight">{ExpensesData.info}</div>
+      <div className="text-sm sm:text-base lg:text-lg font-semibold text-blue-400 text-center">
+        {ExpensesData.currency}{formattedDigits}
       </div>
     </div>
   );
 };
 
-export default ExpensesData; 
+export default ExpensesData;

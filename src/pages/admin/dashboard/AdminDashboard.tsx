@@ -55,25 +55,23 @@ const cardNameMap: Record<string, string> = {
   salary: "Salary Paid",
   contractors: "Contractors Paid",
   sales_count: "Sales Count",
+  "total_salary_workers_monthly_pay": "Fixed Monthly Salary",
+  "total_contractors_monthly_pay": "Monthly Contractors Pay",
+  "total_contractors_weekly_pay": "Weekly Contractors Pay",
+  "total_paid": "Monthly Salary Pay",
   // ...add more as needed
 };
 
 // Custom order for cards
 const cardOrder = [
-  "Active Assets",
-  "Deprecated Assets",
-  "Active Salary Workers",
-  "Active Contractors",
+  "Total Expenses",
+  "Monthly Salary Pay",
+  "Monthly Contractors Pay",
   "Total Income",
   "Total Profit",
   "Total Assets",
   "Total Shop Value",
-  "Total Expenses",
-  "Total Paid",
-  "Monthly Total Paid",
-  "Total Salary Workers Monthly Pay",
-  "Total Contractors Monthly Pay",
-  "Total Contractors Weekly Pay",
+
   "Yearly Total Paid",
   "Salary Paid",
   "Contractors Paid",
@@ -100,18 +98,21 @@ const AdminDashboard = () => {
     ? Object.entries(data.financial_health).map(([key, value]) => {
         const title = cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
         // Remove naira sign for Deprecated Assets and Active Assets
-        const noNaira = ["Deprecated Assets", "Active Assets"].includes(title);
+        if (title === "Active Assets" || title === "Deprecated Assets") {
+          return null; // Exclude these cards
+        }
         return {
           key: `financialHealth-${key}`,
           title,
           value: value === undefined || value === null ? 0 : Number(value),
-          currency: !noNaira && isMonetary(key) ? "₦ " : undefined,
+          currency: isMonetary(key) ? "₦ " : undefined,
         };
       })
+    .filter(card => card !== null)
     : [];
   const workersCards = data?.workers
     ? Object.entries(data.workers)
-        .filter(([key]) => !['contractors_count', 'salary_workers_count', 'all_contractors_count'].includes(key))
+        .filter(([key]) => !['contractors_count', 'salary_workers_count', 'all_contractors_count', 'active_salary_workers_count', 'all_active_contractors_count', 'total_salary_workers_monthly_pay'].includes(key))
         .map(([key, value]) => ({
         key: `workers-${key}`,
         title: cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
@@ -121,7 +122,7 @@ const AdminDashboard = () => {
     : [];
   const paidCards = data?.paid
     ? Object.entries(data.paid)
-        .filter(([key]) => !['weekly_total_paid'].includes(key))
+        .filter(([key]) => !['weekly_total_paid', 'total_contractors_weekly_pay'].includes(key))
         .map(([key, value]) => ({
         key: `paid-${key}`,
         title: cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
@@ -279,7 +280,7 @@ const AdminDashboard = () => {
     <div className="p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6 mb-20">
       {/* Card grid for all data */}
       <div className="mb-10">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 p-1 sm:p-2 overflow-x-auto">
+       <div className="grid grid-cols-2  md:grid-cols-4 gap-4">
           {visibleCards.map(card => (
             <AdminDashboardCard key={card.key} title={card.title} value={card.value} currency={card.currency} />
           ))}
@@ -400,47 +401,13 @@ const AdminDashboard = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* Single Bar Chart for Monthly Income Trend */}
-      <div className="bg-white rounded-lg shadow p-2 sm:p-4 w-full overflow-x-auto mt-6">
-        <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 ml-4">Monthly Income Trend</h2>
-        <ResponsiveContainer width="100%" height={400} className="sm:h-[300px]">
-          <BarChart data={data?.monthly_income_trend || []} margin={{ top: 10, right: 10, left: 0, bottom: 30 }}>
-            <defs>
-              <linearGradient id="monthlyIncomeGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#82ca9d" stopOpacity={0.9} />
-                <stop offset="100%" stopColor="#388e3c" stopOpacity={0.9} />
-              </linearGradient>
-            </defs>
-            <XAxis dataKey="month" tick={{ fontSize: 12 }} interval={isMobile ? 2 : isTablet ? 1 : 0} angle={-20} textAnchor="end" height={60} />
-            <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} />
-            <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
-            <Legend wrapperStyle={{ fontSize: '12px' }} />
-            <Bar dataKey="total_income" fill="url(#monthlyIncomeGradient)" name="Total Income" barSize={42} label={{ position: "top", formatter: formatNairaCompact }} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
 
-      {/* Single Bar Chart for Monthly Profit Trend */}
-      <div className="bg-white rounded-lg shadow p-2 sm:p-4 w-full overflow-x-auto mt-6">
-        <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 ml-4">Monthly Profit Trend</h2>
-        <ResponsiveContainer width="100%" height={400} className="sm:h-[300px]">
-          <BarChart data={data?.monthly_profit_trend || []} margin={{ top: 10, right: 10, left: 0, bottom: 30 }}>
-            <defs>
-              <linearGradient id="monthlyProfitGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#8884d8" stopOpacity={0.9} />
-                <stop offset="100%" stopColor="#4a148c" stopOpacity={0.9} />
-              </linearGradient>
-            </defs>
-            <XAxis dataKey="month" tick={{ fontSize: 12 }} interval={isMobile ? 2 : isTablet ? 1 : 0} angle={-20} textAnchor="end" height={60} />
-            <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} />
-            <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
-            <Legend wrapperStyle={{ fontSize: '12px' }} />
-            <Bar dataKey="profit" fill="url(#monthlyProfitGradient)" name="Profit" barSize={42} label={{ position: "top", formatter: formatNairaCompact }} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+
+
+
+
+
+
     </div>
   );
 };

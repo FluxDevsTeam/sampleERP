@@ -37,9 +37,9 @@ const Expenses = () => {
   if (error) return <p>Error loading expenses: {error.message}</p>;
 
   return (
-    <div className="wrapper w-full mx-auto my-0 pl-1 md:mb-2 mb-20 pt-2">
+    <div className="wrapper w-full mx-auto my-0 md:mb-2 mb-20 md:pt-2">
       <div
-        className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-2 mt-4 ${isTableModalOpen ? "blur-md" : ""}`}
+        className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-2 md:mt-4 ${isTableModalOpen ? "blur-md" : ""}`}
       >
         <ExpensesData info="Total Expenses" digits={totalExpenses} currency="₦ " />
         <ExpensesData info="Total Project Expenses" digits={totalProjectExpenses} currency="₦ " />
