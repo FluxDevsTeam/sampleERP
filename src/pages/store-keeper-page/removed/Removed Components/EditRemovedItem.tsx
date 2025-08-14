@@ -33,6 +33,7 @@ const EditRemovedItem: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
 
   const [formData, setFormData] = useState({
@@ -181,6 +182,12 @@ const EditRemovedItem: React.FC = () => {
     fetchItem();
   }, [id]);
 
+  useEffect(() => {
+    // Fetch user role from local storage or context
+    const role = localStorage.getItem("user_role"); // Assuming role is stored here
+    setUserRole(role);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -324,15 +331,19 @@ const EditRemovedItem: React.FC = () => {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {loading ? "Updating..." : "Update Item"}
-            </button>
+            {userRole === 'ceo' && (
+              <>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {loading ? "Updating..." : "Update Item"}
+                </button>
+              </>
+            )}
           </div>
         </form>
       </div>

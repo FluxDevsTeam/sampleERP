@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/pages/AuthPages/AuthContext";
 import { ThreeDots } from "react-loader-spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -8,6 +9,19 @@ import SearchablePaginatedProjectDropdown from '../SearchablePaginatedProjectDro
 import { formatNaira } from '@/lib/utils';
 
 const EditProduct: React.FC = () => {
+  const { user } = useAuth();
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      setUserRole(user.role);
+    } else {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUserRole(JSON.parse(storedUser).role);
+      }
+    }
+  }, [user]);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -295,6 +309,7 @@ const EditProduct: React.FC = () => {
               onChange={(value) => setFormData((prev) => ({ ...prev, project: value }))}
               selectedValue={formData.project}
               selectedName={projects && projects.find((p: any) => String(p.id) === formData.project)?.name}
+              readOnly={userRole === "storekeeper"}
             />
           </div>
 
@@ -324,6 +339,7 @@ const EditProduct: React.FC = () => {
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
                 required
                 min="1"
+                readOnly={userRole === "storekeeper"}
               />
             </div>
           </div>
@@ -365,6 +381,7 @@ const EditProduct: React.FC = () => {
               onChange={handleInputChange}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
               rows={4}
+              readOnly={userRole === "storekeeper"}
             />
           </div>
 
@@ -440,9 +457,9 @@ const EditProduct: React.FC = () => {
           <div className="md:col-span-2 flex justify-end">
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || userRole === "storekeeper"}
               className={`px-6 py-2 md:py-3 bg-blue-400 text-white rounded-lg hover:bg-blue-500 md:text-lg text-md font-semibold shadow ${
-                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                isSubmitting || userRole === "storekeeper" ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
               {isSubmitting ? "Updating Product..." : "Update Product"}

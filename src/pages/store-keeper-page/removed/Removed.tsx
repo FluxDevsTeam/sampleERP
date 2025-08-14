@@ -39,13 +39,13 @@ export const Removed = () => {
 
   return (
     <div className="wrapper w-full mx-auto my-0 mb-20 md:mb-4 pt-2">
-      <div className="grid grid-cols-2  gap-2 md:gap-10 mb-4 mt-4">
+      <div className="grid grid-cols-2  gap-2 md:gap-10 md:mt-2">
         <InventoryData
-          info="This Month's Removed Count"
+          info="Monthly Removed Count"
           digits={thisMonthRemovedCount}
         ></InventoryData>
         <InventoryData
-          info="This Month's Removed"
+          info="Monthly Removed Cost"
           digits={thisMonthRemoved}
           currency="₦"
         ></InventoryData>

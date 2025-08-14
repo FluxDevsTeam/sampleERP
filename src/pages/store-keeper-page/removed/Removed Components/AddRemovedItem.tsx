@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -8,6 +8,7 @@ import SearchablePaginatedDropdown from "../../raw-materials/Raw Materials Compo
 const AddRemovedItem: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     material: "",
     product: "",
@@ -51,6 +52,12 @@ const AddRemovedItem: React.FC = () => {
       }
     }
   };
+
+  useEffect(() => {
+    // Fetch user role from local storage or context
+    const role = localStorage.getItem("user_role");
+    setUserRole(role);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,7 +180,7 @@ const AddRemovedItem: React.FC = () => {
               <div className="text-xs text-black mt-1">Max: {materialDetails.quantity.toLocaleString()}</div>
             )}
           </div>
-
+          {userRole === 'ceo' && (
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Date
@@ -186,6 +193,7 @@ const AddRemovedItem: React.FC = () => {
               required
             />
           </div>
+          )}
 
 
           <div className="flex justify-end space-x-3 mt-6">
@@ -196,15 +204,19 @@ const AddRemovedItem: React.FC = () => {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {loading ? "Adding..." : "Add Item"}
-            </button>
+            
+              <>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {loading ? "Adding..." : "Add Item"}
+                </button>
+              </>
+            
           </div>
         </form>
       </div>

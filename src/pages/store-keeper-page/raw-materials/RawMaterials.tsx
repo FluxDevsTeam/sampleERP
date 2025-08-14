@@ -67,12 +67,7 @@ export const RawMaterials: React.FC = () => {
   const handleSearch = async () => {
     setSearchLoading(true);
     try {
-      // Simulate search delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const filtered = rawMaterials.filter((material) =>
-        material.name.toLowerCase().includes(searchInput.toLowerCase())
-      );
-      setFilteredMaterials(filtered);
+      setSearchQuery(searchInput);
       setCurrentPage(1);
     } finally {
       setSearchLoading(false);
@@ -82,12 +77,9 @@ export const RawMaterials: React.FC = () => {
   const handleClear = async () => {
     setSearchLoading(true);
     try {
-      // Simulate clear delay
-      await new Promise(resolve => setTimeout(resolve, 300));
       setSearchInput("");
-      setFilteredMaterials(rawMaterials);
+      setSearchQuery("");
       setCurrentPage(1);
-      // Clear filters too
       setArchived(false);
       setEmptyStock(false);
       setLowStock(false);

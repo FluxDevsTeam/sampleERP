@@ -399,22 +399,22 @@ const RecordRemovedTable: React.FC = () => {
                 </div>
 
                 {openDates[dayData.date] && (
-                  <table className="min-w-full overflow-auto">
-                    <thead className="bg-blue-400 text-white">
+                  <table className="min-w-full overflow-auto table-fixed">
+                    <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-bold hidden sm:table-cell">Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-bold">Material</th>
-                        <th className="px-4 py-3 text-left text-xs font-bold">Quantity</th>
-                        <th className="px-4 py-3 text-left text-xs font-bold">Details</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold w-1/4 hidden sm:table-cell">Date</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold w-1/4">Material</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold w-1/4">Quantity</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold w-1/4">Details</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {dayData.entries.map((entry) => (
                         <tr key={entry.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm hidden sm:table-cell">{entry.date ? new Date(entry.date).toLocaleDateString() : "-"}</td>
-                          <td className="px-4 py-3 text-sm">{entry.material?.name || "N/A"}</td>
-                          <td className="px-4 py-3 text-sm">{formatNumber(entry.quantity)}</td>
-                          <td className="px-4 py-3 text-sm text-blue-600">
+                          <td className="px-4 py-3 text-sm w-1/4 hidden sm:table-cell">{entry.date ? new Date(entry.date).toLocaleDateString() : "-"}</td>
+                          <td className="px-4 py-3 text-sm w-1/4">{entry.material?.name || "N/A"}</td>
+                          <td className="px-4 py-3 text-sm w-1/4">{formatNumber(entry.quantity)}</td>
+                          <td className="px-4 py-3 text-sm text-blue-600 w-1/4">
                             <button
                               className="px-2 py-1 border border-blue-400 text-blue-400 bg-white rounded hover:bg-blue-50 text-xs sm:text-sm"
                               onClick={() => setSelectedEntry(entry)}

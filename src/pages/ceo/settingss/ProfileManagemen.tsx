@@ -173,7 +173,8 @@ const ProfileManagement = () => {
           Authorization: `JWT ${accessToken}`,
         },
       });
-      setDeleteUserId(null);
+      setDeleteUserId(null); // Close the delete confirmation dialog
+      setSelectedUser(null); // Close the user details modal if open
       refetch();
       toast.success("Profile deleted successfully!");
     } catch (error) {

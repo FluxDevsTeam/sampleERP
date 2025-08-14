@@ -374,22 +374,17 @@ const RemovedTable: React.FC = () => {
                 {openSections.includes(dayData.date) && (
                   <div className="transition-max-height duration-500 ease-in-out overflow-hidden">
                     <div className="p-2 sm:p-4 overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
+                      <table className="min-w-full divide-y divide-gray-200 table-fixed">
                         <thead className="bg-gray-50">
                           <tr>
                             {/* Name - always visible */}
-                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Name</th>
-                            {/* Qty - visible on mobile and desktop */}
-                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Qty</th>
-                            {/* Product - visible on mobile only, desktop version is below */}
-                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 max-md:table-cell hidden">Product</th>
-                            {/* Desktop only columns */}
-                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">Cost/Unit</th>
-                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">Total</th>
-                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell">Product</th>
-                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Progress</th>
-                            {/* Actions - always at the end */}
-                            {userRole === 'ceo' && <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Actions</th>}
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 w-1/5">Name</th>
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 w-1/5">Qty</th>
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 max-md:table-cell hidden w-1/5">Product</th>
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell w-1/5">Cost/Unit</th>
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell w-1/5">Total</th>
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell w-1/5">Product</th>
+                            {userRole === 'ceo' && <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 w-1/6">Actions</th>}
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -403,17 +398,12 @@ const RemovedTable: React.FC = () => {
                             dayData.entries.map((entry: any) => (
                               <tr key={entry.id} className="hover:bg-gray-50">
                                 {/* Name - always visible */}
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm cursor-pointer hover:text-blue-600">{entry.name}</td>
-                                {/* Qty - always visible */}
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{formatNumber(entry.quantity)}</td>
-                                {/* Product - visible on mobile only */}
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm max-md:table-cell hidden">{entry.product_its_used.name || "—"}</td>
-                                {/* Desktop only columns */}
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{formatCurrency(entry.price)}</td>
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{formatCurrency(parseFloat(entry.price) * parseFloat(entry.quantity))}</td>
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">{entry.product_its_used.name || "—"}</td>
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.product_its_used.progress}%</td>
-                                {/* Actions - always at the end */}
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm cursor-pointer hover:text-blue-600 w-1/5">{entry.name}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm w-1/5">{formatNumber(entry.quantity)}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm max-md:table-cell hidden w-1/5">{entry.product_its_used.name || "—"}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell w-1/5">{formatCurrency(entry.price)}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell w-1/5">{formatCurrency(parseFloat(entry.price) * parseFloat(entry.quantity))}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell w-1/5">{entry.product_its_used.name || "—"}</td>
                                 {userRole === 'ceo' && (
                                   <td className="flex justify-evenly px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-blue-600">
                                     <>

@@ -229,7 +229,7 @@ const StoreKeeperDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6 pb-20">
+    <div className="min-h-screen bg-gray-50 p-0 sm:p-4 md:p-6 pb-20">
       <div className="mb-8 sm:mb-16">
         {/* Responsive card grid */}
         <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-6 sm:mb-20">
@@ -237,29 +237,29 @@ const StoreKeeperDashboard: React.FC = () => {
             info="Total Raw Material Types"
             digits={dashboardData?.total_raw_materials}
           />
+                <DashboardData
+                  info="Total Inventory Value"
+                  digits={dashboardData?.total_value}
+                  currency="₦"
+                />
               <DashboardData
-                info="Raw Materials Added (This Year)"
+                info="Yearly Materials Added"
                 digits={dashboardData?.added_amount_this_year}
                 currency="₦"
               />
             <DashboardData
-              info="Raw Materials Removed (This Year)"
+              info="Yearly Materials Used"
               digits={dashboardData?.removed_amount_year}
               currency="₦"
             />
           <DashboardData
-            info="Raw Materials Added (This Month)"
+            info="Monthly Materials Added"
             digits={dashboardData?.added_amount_this_month}
             currency="₦"
           />
           <DashboardData
-            info="Cost of Materials Removed (This Month)"
+            info="Monthly Materials Used"
             digits={dashboardData?.removed_cost_month}
-            currency="₦"
-          />
-          <DashboardData
-            info="Total Inventory Value"
-            digits={dashboardData?.total_value}
             currency="₦"
           />
         </div>

@@ -39,7 +39,18 @@ interface TableData {
 
 const ProductsTable: React.FC = () => {
   const { user } = useAuth();
-  const headers = [
+  // USER ROLE
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  const headers = userRole === "storekeeper" ? [
+    "Product",
+    "Linked Project",
+    "Quantity",
+    "Progress",
+    "Task",
+    "Quotation",
+    "Details",
+  ] : [
     "Product",
     "Linked Project",
     "Selling price",
@@ -49,6 +60,7 @@ const ProductsTable: React.FC = () => {
     "Quotation",
     "Details",
   ];
+
   // TABLE DATA
   const [tableData, setTableData] = useState<TableData[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -65,9 +77,6 @@ const ProductsTable: React.FC = () => {
   const [isSavingContractor, setIsSavingContractor] = useState(false);
   const [isSavingWorker, setIsSavingWorker] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
-
-  // USER ROLE
-  const [userRole, setUserRole] = useState<string | null>(null);
 
   // SEARCH
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -238,7 +247,7 @@ const ProductsTable: React.FC = () => {
           </div>
         ),
         "Linked Project": item.linked_project?.name || "-",
-        "Selling price": `₦${Number(item.selling_price).toLocaleString()}`,
+        "Selling price": userRole === "storekeeper" ? null : `₦${Number(item.selling_price).toLocaleString()}`,
         Quantity: item.quantity || "-",
         Progress: (
           <div className="w-full bg-gray-200 h-4 relative">
@@ -867,9 +876,9 @@ const ProductsTable: React.FC = () => {
       prevTableData.map((product) =>
         product.id === updatedProduct.id
           ? { ...product, Progress: (
-              <div className="w-full bg-gray-200 rounded-full h-3 relative">
+              <div className="w-full bg-gray-200 h-4 relative">
                 <div
-                  className={`bg-blue-400 h-3 rounded-full`}
+                  className={`bg-blue-100 h-4`}
                   style={{ width: `${updatedProduct.progress}%` }}
                 ></div>
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -949,14 +958,16 @@ const ProductsTable: React.FC = () => {
           <span className="hidden sm:block">Products Management</span>
       </h1>
         <div className="flex justify-end w-full">
-          <button
-            onClick={() => navigate("/project-manager/add-product")}
-            className="bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap w-full sm:w-auto"
-            style={{ display: (user?.role === 'ceo' || user?.role === 'project_manager' || user?.role === 'factory_manager') ? 'inline-flex' : 'none' }}
-          >
-            <FontAwesomeIcon icon={faPlus} className="mr-2" />
-            Add Product
-          </button>
+          {userRole !== "storekeeper" && (
+            <button
+              onClick={() => navigate("/project-manager/add-product")}
+              className="bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap w-full sm:w-auto"
+              style={{ display: (user?.role === 'ceo' || user?.role === 'project_manager' || user?.role === 'factory_manager') ? 'inline-flex' : 'none' }}
+            >
+              <FontAwesomeIcon icon={faPlus} className="mr-2" />
+              Add Product
+            </button>
+          )}
           </div>
       </div>
       {/* Responsive search and filter controls right-aligned in grid */}
@@ -1200,7 +1211,7 @@ const ProductsTable: React.FC = () => {
         >
           <div
             ref={modalContentRef}
-            className="bg-white overflow-scroll rounded-2xl p-4 sm:p-10 max-h-[90vh] max-w-5xl w-[95vw] sm:w-full mx-4 border border-gray-200 shadow-2xl relative z-[100]"
+            className="bg-white overflow-scroll rounded-2xl p-2  sm:p-10 max-h-[96vh] max-w-5xl w-full mx-2 md:mx-4 border border-gray-200 shadow-2xl relative z-[100]"
           >
             {modalLoading || !selectedProduct ? (
               <div className="flex flex-col items-center justify-center h-96">
@@ -1224,7 +1235,7 @@ const ProductsTable: React.FC = () => {
                 {/* Calculation Cards */}
                 {selectedProduct.calculations && (
                   <>
-                    <div className="w-full mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 justify-center">
+                    <div className={`w-full mb-6 grid grid-cols-2 ${userRole === "storekeeper" ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-3 lg:grid-cols-6"} gap-2 sm:gap-4 justify-center`}>
                         <div className="bg-white rounded shadow border border-blue-100 flex flex-col items-center py-2 px-1 sm:py-4 sm:px-2">
                           <p className="text-blue-400 font-bold text-xs sm:text-sm mb-1">Raw material cost</p>
                           <p className="font-medium text-sm md:text-base lg:text-lg">₦ {Number(selectedProduct.calculations.total_raw_material_cost).toLocaleString('en-NG')}</p>
@@ -1241,14 +1252,24 @@ const ProductsTable: React.FC = () => {
                           <p className="text-blue-400 font-bold text-xs sm:text-sm mb-1">Quantity</p>
                           <p className="font-medium text-base sm:text-lg">{Number(selectedProduct.calculations.quantity).toLocaleString('en-NG')}</p>
                         </div>
+                        {userRole !== "storekeeper" && (
                         <div className="bg-white rounded shadow border border-blue-100 flex flex-col items-center py-2 px-1 sm:py-4 sm:px-2">
-                          <p className="text-blue-400 font-bold text-xs sm:text-sm mb-1">Profit</p>
-                          <p className="font-medium text-base sm:text-lg">₦ {Number(selectedProduct.calculations.profit).toLocaleString('en-NG')}</p>
+            <>
+              <p className="text-blue-400 font-bold text-xs sm:text-sm mb-1">Profit</p>
+              <p className="font-medium text-base sm:text-lg">₦ {Number(selectedProduct.calculations.profit).toLocaleString('en-NG')}</p>
+            </>
+          
                         </div>
+                      )}
+  {userRole !== "storekeeper" && (
+
                         <div className="bg-white rounded shadow border border-blue-100 flex flex-col items-center py-2 px-1 sm:py-4 sm:px-2">
-                          <p className="text-blue-400 font-bold text-xs sm:text-sm mb-1">Profit per item</p>
-                          <p className="font-medium text-base sm:text-lg">₦ {Number(selectedProduct.calculations.profit_per_item).toLocaleString('en-NG')}</p>
+            <>
+              <p className="text-blue-400 font-bold text-xs sm:text-sm mb-1">Profit per item</p>
+              <p className="font-medium text-base sm:text-lg">₦ {Number(selectedProduct.calculations.profit_per_item).toLocaleString('en-NG')}</p>
+            </>
                         </div>
+                      )}
                     </div>
                     {/* Action Buttons Row */}
                     <div className="flex flex-wrap md:flex-nowrap gap-2 md:gap-3 justify-end mb-6 sm:mb-8 max-sm:justify-center overflow-x-auto">
@@ -1366,7 +1387,7 @@ const ProductsTable: React.FC = () => {
                   </div>
                   </div>
                   {/* Quotations Table */}
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
+                  <div className="bg-white py-4 px-2 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
                     <h4 className="text-md font-semibold text-gray-700 mb-2">Quotations</h4>
                     <div className="overflow-x-auto">
                       <table className="min-w-full text-sm">
@@ -1434,7 +1455,7 @@ const ProductsTable: React.FC = () => {
                   </div>
                 </div>
                   {/* Raw Materials Table */}
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
+                  <div className="bg-white py-4 px-2 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
                     <h4 className="text-md font-semibold text-gray-700 mb-2">Raw Materials Used</h4>
                     <div className="overflow-x-auto">
                       <table className="min-w-full text-sm">
@@ -1476,7 +1497,7 @@ const ProductsTable: React.FC = () => {
                     </div>
                   </div>
                   {/* Expenses Table */}
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
+                  <div className="bg-white py-4 px-2 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
                     <h4 className="text-md font-semibold text-gray-700 mb-2">Expenses</h4>
                     <div className="overflow-x-auto">
                       <table className="min-w-full text-sm">
@@ -1518,7 +1539,7 @@ const ProductsTable: React.FC = () => {
                     </div>
                   </div>
                   {/* Task Table with Progress rate inside */}
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mt-6 w-full">
+                  <div className="bg-white py-4 px-2 rounded-lg shadow-sm border border-gray-200 mt-6 w-full">
                     {/* Progress Bar inside Tasks Card */}
                     <div className="text-sm text-gray-20 mb-3 w-full">
                       <span className="font-bold">Progress rate:</span>
@@ -1584,6 +1605,7 @@ const ProductsTable: React.FC = () => {
                     </div>
                       <div className="flex justify-between items-center mb-2">
                         <h4 className="text-md font-semibold text-gray-700">Tasks</h4>
+                        {userRole !== "storekeeper" && (
                         <button
                           onClick={() => {
                             setShowProductDetailsModal(false);
@@ -1596,6 +1618,7 @@ const ProductsTable: React.FC = () => {
                         >
                           + Task
                         </button>
+                        )}
                       </div>
                       <div className="overflow-x-auto">
                         <table className="min-w-full text-sm">
@@ -1613,14 +1636,14 @@ const ProductsTable: React.FC = () => {
                                     <tr className="border-b border-gray-200">
                                       <td className="p-2 text-left font-medium">{task?.title}</td>
                                       <td className="p-2 text-left">
-                                        <input type="checkbox" checked={task?.checked} onChange={e => { e.stopPropagation(); handleTaskCompletionToggle(idx); }} />
+                                        <input type="checkbox" checked={task?.checked} readOnly={userRole === "storekeeper"} onChange={e => { if (userRole !== "storekeeper") { e.stopPropagation(); handleTaskCompletionToggle(idx); } }} />
                                       </td>
                                     </tr>
                                     {Array.isArray(task.subtasks) && task.subtasks.length > 0 && task.subtasks.map((sub: any, subIdx: number) => (
                                       <tr key={sub.id || sub.title || `${idx}-${subIdx}`} className="border-b border-gray-100">
                                         <td className="p-2 pl-8 text-left text-blue-400">• {sub.title}</td>
                                         <td className="p-2 text-left">
-                                          <input type="checkbox" checked={sub.checked} onChange={e => { e.stopPropagation(); handleTaskCompletionToggle(idx, subIdx); }} />
+                                          <input type="checkbox" checked={sub.checked} readOnly={userRole === "storekeeper"} onChange={e => { if (userRole !== "storekeeper") { e.stopPropagation(); handleTaskCompletionToggle(idx, subIdx); } }} />
                                         </td>
                                       </tr>
                                     ))}
@@ -1637,7 +1660,7 @@ const ProductsTable: React.FC = () => {
                       </div>
                     </div>
                   {/* Salary Workers Table */}
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
+                  <div className="bg-white py-4 px-2  rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
                     <h4 className="text-md font-semibold text-gray-700 mb-2">Salary Workers</h4>
                     <div className="overflow-x-auto">
                       <table className="min-w-full text-sm">
@@ -1663,7 +1686,7 @@ const ProductsTable: React.FC = () => {
                     </div>
                   </div>
                   {/* Contractors Table */}
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
+                  <div className="bg-white py-4 px-2 rounded-lg shadow-sm border border-gray-200 break-inside-avoid-column">
                     <h4 className="text-md font-semibold text-gray-700 mb-2">Contractors</h4>
                     <div className="overflow-x-auto">
                       <table className="min-w-full text-sm">

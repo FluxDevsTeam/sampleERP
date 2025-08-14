@@ -48,11 +48,11 @@ const RecordOfRMAdded: React.FC = () => {
   return (
     <div className="wrapper w-full mx-auto my-0 mb-20 pt-2">
       {/* <h4>Removed Dashboard</h4> */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 max-sm:gap-1 mb-0 md:mb-6 mt-2">
-        <InventoryData info="Total Raw Materials Added (Year)" digits={yearly_added_material_count} trend="" />
-        <InventoryData info="Total Raw Materials Added (Month)" digits={monthly_added_material_count} trend="" />
-        <InventoryData info="Total Cost of Raw Materials (Year)" digits={yearly_added_total_cost} currency="₦" trend="" />
-        <InventoryData info="Total Cost of Raw Materials (Month)" digits={monthly_added_total_cost} currency="₦" trend="" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 max-sm:gap-1 mb-0 md:mb-6 md:mt-2">
+        <InventoryData info="Yearly Materials Added " digits={yearly_added_material_count} trend="" />
+        <InventoryData info="Monthly Materials Added" digits={monthly_added_material_count} trend="" />
+        <InventoryData info="Yearly Materials Cost" digits={yearly_added_total_cost} currency="₦" trend="" />
+        <InventoryData info="Monthly Materials Cost" digits={monthly_added_total_cost} currency="₦" trend="" />
       </div>
 
       <div>
