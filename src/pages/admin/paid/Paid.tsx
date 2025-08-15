@@ -30,7 +30,7 @@ const Paid = () => {
   return (
     <div className="wrapper w-full max-w-[98vw] sm:w-full mx-auto px-1 md:pt-2 mb-20 md:mb-4">
       <div
-        className={`grid grid-cols-3 md:gap-4 gap-2 mb-2 mt-4 ${isTableModalOpen ? "blur-md" : ""}`}
+        className={`grid grid-cols-3 md:gap-4 gap-2 mb-2 md:mt-4 ${isTableModalOpen ? "blur-md" : ""}`}
       >
         <PaidData info="Total Paid This Month" digits={totalPaid} currency="₦ " />
         <PaidData info="Salary Paid This Month" digits={totalSalaryPaid} currency="₦ " />

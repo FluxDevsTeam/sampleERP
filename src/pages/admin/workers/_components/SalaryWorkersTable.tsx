@@ -219,13 +219,18 @@ const SalaryWorkersTable = ({
                     {`₦ ${formatNumber(parseFloat(worker.salary ?? '0'))}`}
                   </td>
                   {/* Record column hidden on mobile - moved before Details */}
-                  <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden sm:table-cell">
-                    <button
-                      onClick={() => navigate(`/admin/salary-workers/${worker.id}/records`)}
-                      className="px-3 py-1 text-green-400 border-2 border-green-400 rounded hover:bg-green-300 hover:text-white transition-colors"
-                    >
-                      Record
-                    </button>
+                  <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden sm:table-cell">
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/admin/salary-workers/${worker.id}/records`);
+                        }}
+                        className="px-3 py-1 text-green-400 border-2 border-green-400 rounded hover:bg-green-300 hover:text-white transition-colors"
+                      >
+                        Record
+                      </button>
+                    </div>
                   </td>
                   {/* Details column always visible - moved after Record */}
                   <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
@@ -394,17 +399,29 @@ const SalaryWorkersTable = ({
               >
                 Close
               </Button>
-              {selectedWorker && (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIsViewModalOpen(false);
-                    navigate(`/admin/salary-workers/${selectedWorker.id}/records`);
-                  }}
-                >
-                  Record
-                </Button>
-              )}
+
+                {selectedWorker && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsViewModalOpen(false);
+                      navigate(`/admin/salary-workers/${selectedWorker.id}/work`);
+                    }}
+                  >
+                    Work
+                  </Button>
+                )}
+                {selectedWorker && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsViewModalOpen(false);
+                      navigate(`/admin/salary-workers/${selectedWorker.id}/records`);
+                    }}
+                  >
+                    Record
+                  </Button>
+                )}
             </div>
           </DialogFooter>
         </DialogContent>

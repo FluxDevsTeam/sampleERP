@@ -207,15 +207,18 @@ const ContractorsTable = ({
                   </td>
                   {/* Record column hidden on mobile - moved before Details */}
                   <td className="py-2 px-2 sm:py-3 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden sm:table-cell">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/admin/contractors/${worker.id}/records`);
-                      }}
-                      className="px-3 py-1 text-green-400 border-2 border-green-400 rounded hover:bg-green-300 hover:text-white transition-colors"
-                    >
-                      Record
-                    </button>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/admin/contractors/${worker.id}/records`);
+                        }}
+                        className="px-3 py-1 text-green-400 border-2 border-green-400 rounded hover:bg-green-300 hover:text-white transition-colors"
+                      >
+                        Record
+                      </button>
+
+                    </div>
                   </td>
                   {/* Details column always visible - moved after Record */}
                   <td className="py-2 px-2 sm:py-3 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
@@ -389,6 +392,17 @@ const ContractorsTable = ({
                   }}
                 >
                   Record
+                </Button>
+              )}
+              {selectedWorker && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsViewModalOpen(false);
+                    navigate(`/admin/contractors/${selectedWorker.id}/work`);
+                  }}
+                >
+                  Work
                 </Button>
               )}
             </div>

@@ -197,7 +197,7 @@ const Workers = () => {
             </svg>
           </button>
           {isSalaryFilterOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-xl z-10">
+            <div className="fixed right-0 mt-2 w-48 bg-white border rounded-lg shadow-xl z-10 origin-top-right">
               <div className="p-4">
                 <label className="flex items-center cursor-pointer mb-2">
                   <input

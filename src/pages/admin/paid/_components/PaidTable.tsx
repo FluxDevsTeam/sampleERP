@@ -198,12 +198,12 @@ const PaidTable: React.FC<PaidTableProps> = ({
   return (
     <div className={`relative ${!data?.daily_data?.length ? 'min-h-[300px]' : ''}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
-        <Button onClick={() => setIsAddModalOpen(true)} className="px-3 py-2 sm:px-4 sm:py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-sm">
+        <Button onClick={() => setIsAddModalOpen(true)} className="px-3 py-2 sm:px-4 sm:py-2 text-blue-400 bg-white border-2 border-blue-400 rounded hover:bg-blue-400 hover:text-white transition-colors text-sm">
           Record Payment
         </Button>
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           {/* Year Dropdown */}
-          <div className="relative w-20 sm:w-24" ref={yearRef}>
+          <div className="relative w-16 sm:w-24" ref={yearRef}>
             <button
               onClick={() => setIsYearOpen(!isYearOpen)}
               className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm"
@@ -226,7 +226,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
             )}
           </div>
           {/* Month Dropdown */}
-          <div className="relative w-24 sm:w-32" ref={monthRef}>
+          <div className="relative w-20 sm:w-32" ref={monthRef}>
             <button
               onClick={() => setIsMonthOpen(!isMonthOpen)}
               className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm"
@@ -246,7 +246,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
             )}
           </div>
           {/* Day Dropdown */}
-          <div className="relative w-16 sm:w-24" ref={dayRef}>
+          <div className="relative w-14 sm:w-24" ref={dayRef}>
             <button
               onClick={() => setIsDayOpen(!isDayOpen)}
               className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm"
@@ -265,7 +265,7 @@ const PaidTable: React.FC<PaidTableProps> = ({
               </ul>
             )}
           </div>
-          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["paid"] })} disabled={isLoading} className="px-1 py-1 md:px-4 md:py-2 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-xs md:text-sm">Filter</Button>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["paid"] })} disabled={isLoading} className="px-1 bg-white py-1 md:px-4 md:py-2 text-blue-400 border-2 border-blue-400 rounded hover:bg-blue-500 hover:text-white transition-colors text-xs md:text-sm">Filter</Button>
           <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["paid"] }); }} disabled={isLoading} className="px-1 py-1 md:px-4 md:py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-xs md:text-sm">Clear</Button>
         </div>
       </div>

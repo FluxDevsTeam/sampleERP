@@ -87,6 +87,7 @@ import EditSalaryWorker from "./pages/admin/workers/_pages/_salaryWorkers/EditSa
 import EditContractor from "./pages/admin/workers/_pages/_contractors/EditContractor";
 import SalaryWorkerRecords from "./pages/admin/workers/_records/_salaryWorksRecords/SalaryWorkersecord";
 import ContractorRecords from "./pages/admin/workers/_records/_contractorsRecords/ContractorRecords";
+import WorkDetails from "./pages/admin/workers/_pages/WorkDetails";
 import AddProject from "./pages/ceo/allProjects/_pages/AddProject";
 import EditProject from "./pages/ceo/allProjects/_pages/EditProject";
 import OtherProductionRecords from "./pages/ceo/allProjects/_pages/OtherProductionRecords";
@@ -790,6 +791,10 @@ const router = createBrowserRouter([
       {
         path: "contractors/:id/records",
         element: <ContractorRecords />,
+      },
+      {
+        path: ":workerType/:id/work",
+        element: <WorkDetails />,
       },
       {
         path: "projects",
