@@ -138,7 +138,7 @@ const FactoryManagerDashboard = () => {
   return (
     <div className="relative z-10 sm:p-3 lg:p-4 w-full min-w-0 mb-20">
       {/* Collapsible Section Headers Row */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:flex gap-2 mb-3 px-0 py-1 w-full min-w-0">
+      <div className="grid grid-cols-2  lg:flex gap-2 mb-3 px-0 py-1 w-full min-w-0">
 
         <button
           className={`w-full flex-1 flex-shrink min-w-0 flex items-center justify-between px-2 py-6 rounded-lg shadow bg-blue-50/60 hover:bg-blue-100 transition font-semibold text-blue-700 text-[11px] sm:text-xs ${openSection === 'salesProjectMetrics' ? 'ring-2 ring-blue-400' : ''}`}
@@ -165,7 +165,7 @@ const FactoryManagerDashboard = () => {
 
       {openSection === 'salesProjectMetrics' && (
          <section className="mb-6 sm:mb-8 bg-blue-50/60 rounded-2xl shadow p-1 sm:p-4 lg:p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-1 sm:gap-3 lg:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 sm:gap-3 lg:gap-4">
             {salesProjectMetricsCards.map(card => (
               <DashboardCard key={card.key} label={card.label} value={card.value} />
             ))}
@@ -175,7 +175,7 @@ const FactoryManagerDashboard = () => {
 
       {openSection === 'operationalAndCustomerMetrics' && (
         <section className="mb-6 sm:mb-8 bg-teal-50/60 rounded-2xl shadow p-1 sm:p-4 lg:p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-1 sm:gap-3 lg:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 sm:gap-3 lg:gap-4">
             {operationalAndCustomerMetricsCards.map(card => (
               <DashboardCard key={card.key} label={card.label} value={card.value} />
             ))}
