@@ -43,65 +43,20 @@ const Header = () => {
     { label: "All Time Projects", value: data.all_time_projects_count },
     { label: "All Active Projects", value: data.all_projects_count },
     { label: "Completed Projects", value: data.completed_projects_count },
-    { label: "Ongoing Projects", value: data.ongoing_projects_count },
     { label: "Average Progress", value: `${data.average_progress}%` },
   ];
 
   return (
-    <div className="py-6">
+    <div className="">
       {/* <p className="md:text-3xl text-black font-bold py-6">Project Overview</p> */}
 
-      <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {summaryItems.slice(0, 3).map((item, index) => (
-          <div key={index} className="bg-white rounded pl-4 py-5 shadow grid items-center h-full">
-            <p
-              style={{ fontSize: "clamp(10px, 3vw, 20px)" }}
-              className="text-blue-400 font-bold"
-            >
-              {item.label}
-            </p>
-            <p
-              style={{ fontSize: "clamp(10px, 3vw, 24px)" }}
-              className="font-medium"
-            >
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-1 md:gap-4">
+        {summaryItems.map((item, index) => (
+          <div key={index} className="p-2 sm:p-4 border rounded-lg shadow-md flex flex-col items-center justify-center py-4">
+            <div className="text-xs sm:text-sm lg:text-base font-medium text-center mb-2 leading-tight">{item.label}</div>
+            <div className="text-sm sm:text-base lg:text-lg font-semibold text-blue-400 text-center">
               {item.value}
-            </p>
-          </div>
-        ))}
-        {/* Desktop-only items (hidden on mobile/tablet) */}
-        {summaryItems.slice(3).map((item, index) => (
-          <div key={index + 3} className="hidden lg:block bg-white rounded pl-4 py-5 shadow grid items-center h-full">
-            <p
-              style={{ fontSize: "clamp(10px, 3vw, 20px)" }}
-              className="text-blue-400 font-bold"
-            >
-              {item.label}
-            </p>
-            <p
-              style={{ fontSize: "clamp(10px, 3vw, 24px)" }}
-              className="font-medium"
-            >
-              {item.value}
-            </p>
-          </div>
-        ))}
-      </div>
-      {/* Mobile/Tablet second row (hidden on desktop) */}
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:hidden gap-4 mt-4">
-        {summaryItems.slice(3).map((item, index) => (
-          <div key={index + 3} className="bg-white rounded pl-4 py-5 shadow grid items-center h-full">
-            <p
-              style={{ fontSize: "clamp(10px, 3vw, 20px)" }}
-              className="text-blue-400 font-bold"
-            >
-              {item.label}
-            </p>
-            <p
-              style={{ fontSize: "clamp(10px, 3vw, 24px)" }}
-              className="font-medium"
-            >
-              {item.value}
-            </p>
+            </div>
           </div>
         ))}
       </div>

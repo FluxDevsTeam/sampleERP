@@ -159,7 +159,7 @@ const AmountSoldMonthlyBarChart = () => {
       <h1 className="ml-5" style={{ fontSize: "clamp(12px, 2vw, 16px)" }}>
         Added Amount Monthly
       </h1>
-      <ResponsiveContainer width="100%" height={340}>
+      <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} margin={{ left: 0, right: 14, top: 10, bottom: 9 }}>
           <defs>
             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
@@ -169,7 +169,7 @@ const AmountSoldMonthlyBarChart = () => {
           </defs>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
-          <YAxis tickFormatter={formatNairaCompact} width={60} />
+          <YAxis tickFormatter={formatNairaCompact} width={64} />
           <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
           <Bar
             // type="monotone"

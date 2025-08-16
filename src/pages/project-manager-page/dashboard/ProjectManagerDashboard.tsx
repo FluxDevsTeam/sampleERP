@@ -7,21 +7,23 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
-  Legend,
 } from "recharts";
-import { Accordion } from "rsuite";
-import { RoundedBar, CustomTooltip } from "../../../components/CustomChartComponents";
-import DashboardCard from "../../factory-manager-page/dashboard/DashboardCard";
+import { MdExpandMore, MdExpandLess } from "react-icons/md";
+import { CustomTooltip } from "../../../components/CustomChartComponents";
+import ProjectDashboardCard from "./ProjectDashboardCard";
 
 const ProjectManagerDashboard = () => {
-  document.title = "Product Dashboard - KDC Admin";
+  document.title = "Project Dashboard - KDC Admin";
 
   const [apiData, setApiData] = useState<any | null>(null);
-  const [showAllCards, setShowAllCards] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [openSection, setOpenSection] = useState<"breakdownMetrics" | "expenseAndKeyMetrics">("breakdownMetrics");
 
   useEffect(() => {
     async function fetchInfo() {
       try {
+        setLoading(true);
         const response = await fetch(
           "https://backend.kidsdesigncompany.com/api/project-manager-dashboard/",
           {
@@ -42,153 +44,178 @@ const ProjectManagerDashboard = () => {
         console.log(logData);
       } catch (error) {
         console.error("Error fetching dashboard:", error);
-        setApiData({});
+        setError("Failed to load dashboard data.");
+      } finally {
+        setLoading(false);
       }
     }
     fetchInfo();
   }, []);
 
-  // Helper: Format number with naira sign, commas, and compact notation (with negative handling)
+  // Helper: Format number with naira sign and commas for cards (no k, m, b)
+  const formatNaira = (value: number) => {
+    const sign = value < 0 ? "-" : "";
+    return `${sign}₦${Math.abs(value).toLocaleString("en-NG")}`;
+  };
+
+  // Helper: Format number with naira sign and compact k, m, b for charts
   const formatNairaCompact = (value: number) => {
     const absValue = Math.abs(value);
-    const sign = value < 0 ? '-' : '';
+    const sign = value < 0 ? "-" : "";
     if (absValue >= 1_000_000_000) {
-      return `${sign}₦${(absValue / 1_000_000_000).toFixed(1).replace(/\.0$/, '')}b`;
+      return `${sign}₦${(absValue / 1_000_000_000).toFixed(1).replace(/\.0$/, "")}b`;
     } else if (absValue >= 1_000_000) {
-      return `${sign}₦${(absValue / 1_000_000).toFixed(1).replace(/\.0$/, '')}m`;
+      return `${sign}₦${(absValue / 1_000_000).toFixed(1).replace(/\.0$/, "")}m`;
     } else if (absValue >= 1_000) {
-      return `${sign}₦${(absValue / 1_000).toFixed(1).replace(/\.0$/, '')}k`;
+      return `${sign}₦${(absValue / 1_000).toFixed(1).replace(/\.0$/, "")}k`;
     }
-    return `${sign}₦${absValue?.toLocaleString?.() ?? absValue}`;
+    return `${sign}₦${absValue.toLocaleString("en-NG")}`;
   };
 
   // Helper to determine if a key is monetary
   const isMonetary = (key: string) => {
     const excluded = [
-      'projects_count_year', 'projects_count_month',
-      'percentage_projects', 'percentage_shop',
+      "projects_count_year",
+      "projects_count_month",
+      "percentage_projects",
+      "percentage_shop",
+      "all_customers_count",
+      "active_customers_count",
+      "owing_customers_count",
+      "active_employees",
     ];
-    if (key.toLowerCase() === 'other_production_expensis') return true;
+    if (key.toLowerCase() === "other_production_expensis") return true;
     if (excluded.includes(key.toLowerCase())) return false;
-    return /amount|income|profit|expenses|cost|price|total|contractors|overhead|materials|sold|value|pay|shop/i.test(key);
+    return /amount|income|profit|expenses|cost|price|total|contractors|overhead|materials|sold|value|pay|shop/i.test(
+      key
+    );
   };
 
   // Helper to filter out percentage cards
-  const isPercentageKey = (key: string) => ['percentage_projects', 'percentage_shop'].includes(key.toLowerCase());
+  const isPercentageKey = (key: string) =>
+    ["percentage_projects", "percentage_shop"].includes(key.toLowerCase());
 
-  // Card name mapping for user-friendly display
+  // Card name mapping for user-friendly display with shortened names
   const cardNameMap: Record<string, string> = {
-    // Yearly/Monthly Breakdown
-    projects_count_year: "Projects (Year)",
-    total_projects_income_year: "Total Project Income (Year)",
-    no_shop_projects_year: "Non-Shop Project Income (Year)",
-    project_shop_income_year: "Shop Project Income (Year)",
-    project_expenses_year: "Project Expenses (Year)",
-    profit_year: "Profit (Year)",
-    projects_count_month: "Projects (Month)",
-    total_projects_income_month: "Total Project Income (Month)",
-    no_shop_projects_month: "Non-Shop Project Income (Month)",
-    project_shop_income_month: "Shop Project Income (Month)",
-    project_expenses_month: "Project Expenses (Month)",
-    profit_month: "Profit (Month)",
-    // Expenses
-    contractors: "Contractors",
-    raw_materials: "Raw Materials",
-    overhead: "Overhead",
-    factory_expenses: "Factory Expenses",
-    other_production_expensis: "Other Production Expenses",
-    sold_cost: "Sold Cost",
-    yearly_sold_cost_price: "Yearly Sold Cost Price",
-    total_project_expenses_year: "Total Project Expenses (Year)",
-    monthly_sold_cost_price: "Monthly Sold Cost Price",
-    total_project_expenses_month: "Total Project Expenses (Month)",
-    // Key Metrics
+    projects_count_year: "Project Count (Yr)",
+    total_projects_income_year: "Tot. Proj. Inc. (Yr)",
+    no_shop_projects_year: "Non-Shp. Inc. (Yr)",
+    project_shop_income_year: "Shp. Inc. (Yr)",
+    project_expenses_year: "Proj. Exp. (Yr)",
+    profit_year: "Profit (Yr)",
+    projects_count_month: "Project Count (Mo)",
+    total_projects_income_month: "Tot. Proj. Inc. (Mo)",
+    no_shop_projects_month: "Non-Shp. Inc. (Mo)",
+    project_shop_income_month: "Shp. Inc. (Mo)",
+    project_expenses_month: "Proj. Exp. (Mo)",
+    profit_month: "Profit (Mo)",
+    contractors: "Contractors (Mo)",
+    raw_materials: "Raw Materials (Mo)",
+    overhead: "Overhead (Mo)",
+    factory_expenses: "Factory Exp. (Mo)",
+    other_production_expensis: "Other Prod. Exp. (Mo)",
+    sold_cost: "Sold Cst. (Mo)",
+    yearly_sold_cost_price: "Sold Cst. Prc. (Yr)",
+    total_project_expenses_year: "Tot. Proj. Exp. (Yr)",
+    monthly_sold_cost_price: "Sold Cst. Prc. (Mo)",
+    total_project_expenses_month: "Tot. Proj. Exp. (Mo)",
     overhead_cost: "Overhead Cost",
-    // Add more as needed
+    all_customers_count: "All Customers",
+    active_customers_count: "Active Customers",
+    owing_customers_count: "Owing Customers",
+    active_employees: "Active Employees",
   };
 
   // Card data
-  const keyMetricsCards = apiData?.key_metrics ? Object.entries(apiData.key_metrics).map(([key, value]) => ({
-    key: `keyMetrics-${key}`,
-    title: cardNameMap[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-    value: Number(value) || 0,
-    currency: isMonetary(key) ? '₦ ' : undefined
-  })) : [];
+  const yearlyBreakdownCards = apiData?.breakdown_year
+    ? Object.entries(apiData.breakdown_year)
+        .filter(([key]) => !isPercentageKey(key))
+        .map(([key, value]) => ({
+          key: `breakdownYear-${key}`,
+          title: cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+          value: Number(value) || 0,
+        }))
+    : [];
 
-  const yearlyBreakdownCards = apiData?.breakdown_year ? Object.entries(apiData.breakdown_year)
-    .filter(([key]) => !isPercentageKey(key))
-    .map(([key, value]) => ({
-      key: `breakdownYear-${key}`,
-      title: cardNameMap[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-      value: Number(value) || 0,
-      currency: isMonetary(key) ? '₦ ' : undefined
-    })) : [];
+  const monthlyBreakdownCards = apiData?.breakdown_month
+    ? Object.entries(apiData.breakdown_month)
+        .filter(([key]) => !isPercentageKey(key))
+        .map(([key, value]) => ({
+          key: `breakdownMonth-${key}`,
+          title: cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+          value: Number(value) || 0,
+        }))
+    : [];
 
-  const monthlyBreakdownCards = apiData?.breakdown_month ? Object.entries(apiData.breakdown_month)
-    .filter(([key]) => !isPercentageKey(key))
-    .map(([key, value]) => ({
-      key: `breakdownMonth-${key}`,
-      title: cardNameMap[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-      value: Number(value) || 0,
-      currency: isMonetary(key) ? '₦ ' : undefined
-    })) : [];
+  const yearlyExpenseCards = apiData?.expense_breakdown_year
+    ? Object.entries(apiData.expense_breakdown_year).map(([key, value]) => ({
+        key: `expenseBreakdownYear-${key}`,
+        title: cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        value: Number(value) || 0,
+      }))
+    : [];
 
-  const yearlyExpenseCards = apiData?.expense_breakdown_year ? Object.entries(apiData.expense_breakdown_year)
-    .map(([key, value]) => ({
-      key: `expenseBreakdownYear-${key}`,
-      title: cardNameMap[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-      value: Number(value) || 0,
-      currency: isMonetary(key) ? '₦ ' : undefined
-    })) : [];
+  const monthlyExpenseCards = apiData?.expense_breakdown_month
+    ? Object.entries(apiData.expense_breakdown_month).map(([key, value]) => ({
+        key: `expenseBreakdownMonth-${key}`,
+        title: cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        value: Number(value) || 0,
+      }))
+    : [];
 
-  const monthlyExpenseCards = apiData?.expense_breakdown_month ? Object.entries(apiData.expense_breakdown_month)
-    .map(([key, value]) => ({
-      key: `expenseBreakdownMonth-${key}`,
-      title: cardNameMap[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-      value: Number(value) || 0,
-      currency: isMonetary(key) ? '₦ ' : undefined
-    })) : [];
+  const keyMetricsCards = apiData?.key_metrics
+    ? Object.entries(apiData.key_metrics).map(([key, value]) => ({
+        key: `keyMetrics-${key}`,
+        title: cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        value: Number(value) || 0,
+      }))
+    : [];
 
-  // Combine for show more/less logic
-  // Number of columns in the grid (should match lg:grid-cols-6)
-  const numCols = 6;
-  const numRowsDefault = 2;
-  const defaultVisibleCount = numCols * numRowsDefault;
+  const customerMetricsCards = apiData?.customers
+    ? Object.entries(apiData.customers)
+        .filter(([key]) => key !== "owing_customers") // Exclude owing_customers list
+        .map(([key, value]) => ({
+          key: `customers-${key}`,
+          title: cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+          value: Number(value) || 0,
+        }))
+    : [];
 
-  // Helper to render a group with heading, with optional slice
-  const renderCardGroup = (heading: string, cards: any[], start: number, end: number) => {
-    const groupCards = cards.slice(start, end);
-    return groupCards.length ? (
-      <div className="mb-2">
-        <h4 className="text-xs font-semibold text-gray-500 pl-1 uppercase tracking-wide">{heading}</h4>
-        <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {groupCards.map(card => (
-            <DashboardCard key={card.key} title={card.title} value={card.value} currency={card.currency} />
+  const additionalMetricsCards = apiData?.additional_metrics
+    ? Object.entries(apiData.additional_metrics).map(([key, value]) => ({
+        key: `additionalMetrics-${key}`,
+        title: cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        value: Number(value) || 0,
+      }))
+    : [];
+
+  // Group cards into two groups for collapsible sections
+  const breakdownMetricsCards = [...yearlyBreakdownCards, ...monthlyBreakdownCards];
+  const expenseAndKeyMetricsCards = [
+    ...yearlyExpenseCards,
+    ...monthlyExpenseCards,
+    ...keyMetricsCards,
+    ...customerMetricsCards,
+    ...additionalMetricsCards,
+  ];
+
+  const handleSectionClick = (section: typeof openSection) => {
+    setOpenSection(section);
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="animate-pulse space-y-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-24 bg-gray-200 rounded"></div>
           ))}
         </div>
       </div>
-    ) : null;
-  };
-
-  // Helper to get visible cards per group for the first N cards
-  function getVisibleGroupSlices(groups: any[][], max: number) {
-    let remaining = max;
-    const slices = [];
-    for (const group of groups) {
-      if (remaining <= 0) {
-        slices.push([0, 0]);
-        continue;
-      }
-      const take = Math.min(group.length, remaining);
-      slices.push([0, take]);
-      remaining -= take;
-    }
-    return slices;
+    );
   }
 
-  const groups = [yearlyBreakdownCards, monthlyBreakdownCards, yearlyExpenseCards, monthlyExpenseCards, keyMetricsCards,];
-  const groupNames = ['Yearly Breakdown', 'Monthly Breakdown', 'Yearly Expenses', 'Monthly Expenses','Key Metrics'];
-  const groupSlices = showAllCards ? groups.map(g => [0, g.length]) : getVisibleGroupSlices(groups, defaultVisibleCount);
+  if (error) return <div className="text-red-500">{error}</div>;
 
   // Chart data
   const incomeData = apiData?.monthly_income_trend || [];
@@ -196,32 +223,65 @@ const ProjectManagerDashboard = () => {
   const profitData = apiData?.monthly_profit_trend || [];
 
   return (
-    <div className="w-full sm:w-11/12 mx-auto mt-3 sm:mt-6 pl-1 mb-20 pt-2">
-      <div className="mb-8 sm:mb-16">
-        {/* Grouped card sections, only first 2 rows by default */}
-        {groups.map((group, i) => renderCardGroup(groupNames[i], group, groupSlices[i][0], groupSlices[i][1]))}
-        {groups.flat().length > defaultVisibleCount && (
-          <div className="flex justify-center mb-4">
-            <button
-              className="flex items-center justify-center w-10 h-10 bg-blue-400 text-white rounded-full shadow-lg hover:bg-blue-400 transition-transform duration-200 focus:outline-none"
-              onClick={() => setShowAllCards(v => !v)}
-              title={showAllCards ? 'Show Less' : 'Show More'}
-              aria-label={showAllCards ? 'Show Less' : 'Show More'}
-            >
-              <svg
-                className={`w-6 h-6 transform transition-transform duration-300 ${showAllCards ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-              </div>
-        )}
+    <div className="relative z-10 sm:p-3 lg:p-4 w-full min-w-0 mb-20 md:mb-2">
+      {/* Collapsible Section Headers Row */}
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:flex gap-2 mb-3 px-0 py-1 w-full min-w-0">
+        <button
+          className={`w-full flex-1 flex-shrink min-w-0 flex items-center justify-between px-2 py-6 rounded-lg shadow bg-blue-50/60 hover:bg-blue-100 transition font-semibold text-blue-700 text-[11px] sm:text-xs ${
+            openSection === "breakdownMetrics" ? "ring-2 ring-blue-400" : ""
+          }`}
+          onClick={() => handleSectionClick("breakdownMetrics")}
+        >
+          <span className="truncate text-left flex-1">Breakdown Metrics</span>
+          <span className="flex items-center justify-end">
+            {openSection === "breakdownMetrics" ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
+          </span>
+        </button>
+        <button
+          className={`w-full flex-1 flex-shrink min-w-0 flex items-center justify-between px-2 py-6 rounded-lg shadow bg-teal-50/60 hover:bg-teal-100 transition font-semibold text-teal-700 text-[11px] sm:text-xs ${
+            openSection === "expenseAndKeyMetrics" ? "ring-2 ring-teal-400" : ""
+          }`}
+          onClick={() => handleSectionClick("expenseAndKeyMetrics")}
+        >
+          <span className="truncate text-left flex-1">Expense & Key Metrics</span>
+          <span className="flex items-center justify-end">
+            {openSection === "expenseAndKeyMetrics" ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
+          </span>
+        </button>
+      </div>
 
+      {/* Collapsible Section Content */}
+      {openSection === "breakdownMetrics" && (
+        <section className="mb-6 sm:mb-8 bg-blue-50/60 rounded-2xl shadow p-1 sm:p-4 lg:p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
+            {breakdownMetricsCards.map((card) => (
+              <ProjectDashboardCard
+                key={card.key}
+                label={card.title}
+                value={card.value}
+                isMonetary={isMonetary(card.key.split("-")[1])}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {openSection === "expenseAndKeyMetrics" && (
+        <section className="mb-6 sm:mb-8 bg-teal-50/60 rounded-2xl shadow p-1 sm:p-4 lg:p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
+            {expenseAndKeyMetricsCards.map((card) => (
+              <ProjectDashboardCard
+                key={card.key}
+                label={card.title}
+                value={card.value}
+                isMonetary={isMonetary(card.key.split("-")[1])}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <div className="p-2 sm:p-4">
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4 bg-gray-50">
           {/* Income Chart */}
           <div className="bg-white rounded-lg shadow-md border border-gray-200">
@@ -238,7 +298,7 @@ const ProjectManagerDashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                   <YAxis tickFormatter={formatNairaCompact} tick={{ fontSize: 12 }} width={80} />
-                  <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{fill: 'rgba(240, 240, 240, 0.5)'}} />
+                  <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{ fill: "rgba(240, 240, 240, 0.5)" }} />
                   <Bar dataKey="total_income" fill="url(#incomeGradient)" name="Total Income" barSize={20} />
                 </BarChart>
               </ResponsiveContainer>
@@ -260,7 +320,7 @@ const ProjectManagerDashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                   <YAxis tickFormatter={formatNairaCompact} tick={{ fontSize: 12 }} width={80} />
-                  <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{fill: 'rgba(240, 240, 240, 0.5)'}} />
+                  <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{ fill: "rgba(240, 240, 240, 0.5)" }} />
                   <Bar dataKey="total_expenses" fill="url(#expenseGradient)" name="Total Expenses" barSize={20} />
                 </BarChart>
               </ResponsiveContainer>
@@ -276,12 +336,8 @@ const ProjectManagerDashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                   <YAxis tickFormatter={formatNairaCompact} tick={{ fontSize: 12 }} width={80} />
-                  <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{fill: 'rgba(240, 240, 240, 0.5)'}} />
-                  <Bar 
-                    dataKey="profit" 
-                    fill="#4CAF50"
-                    barSize={40}
-                  />
+                  <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{ fill: "rgba(240, 240, 240, 0.5)" }} />
+                  <Bar dataKey="profit" fill="#4CAF50" barSize={40} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

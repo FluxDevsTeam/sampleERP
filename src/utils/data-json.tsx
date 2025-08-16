@@ -428,42 +428,6 @@ export const FactoryManagerSidebarLink: SidebarProps[] = [
   },
   {
     id: nanoid(),
-    text: "Workers",
-    href: "/factory-manager/workers",
-    icon: <FontAwesomeIcon icon={faUsers} className="text-lg" />,
-  },
-  {
-    id: nanoid(),
-    text: "Income",
-    href: "/factory-manager/income",
-    icon: <FontAwesomeIcon icon={faMoneyBillTrendUp} className="text-lg" />,
-  },
-  {
-    id: nanoid(),
-    text: "Assets",
-    href: "/factory-manager/assets",
-    icon: <FontAwesomeIcon icon={faBuilding} className="text-lg" />,
-  },
-  {
-    id: nanoid(),
-    text: "Customers",
-    href: "/factory-manager/customers",
-    icon: <FontAwesomeIcon icon={faHandshake} className="text-lg" />,
-  },
-  {
-    id: nanoid(),
-    text: "Expenses",
-    href: "/factory-manager/expenses",
-    icon: <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-lg" />,
-  },
-  {
-    id: nanoid(),
-    text: "Income",
-    href: "/factory-manager/income",
-    icon: <FontAwesomeIcon icon={faMoneyBillTrendUp} className="text-lg" />,
-  },
-  {
-    id: nanoid(),
     text: "Projects",
     href: "/factory-manager/projects",
     icon: <FontAwesomeIcon icon={faClipboardCheck} className="text-lg" />,
@@ -476,68 +440,100 @@ export const FactoryManagerSidebarLink: SidebarProps[] = [
   },
   {
     id: nanoid(),
-    text: "Store",
-    isDropdown: true,
-    icon: <FontAwesomeIcon icon={faWarehouse} className="text-lg" />,
-    dropdownItems: [
-      {
-        id: nanoid(),
-        text: "Dashboard",
-        href: "/factory-manager/store/dashboard",
-        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
-      },
-      {
-        id: nanoid(),
-        text: "Raw Materials",
-        href: "/factory-manager/store/raw-materials",
-        icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
-      },
-      {
-        id: nanoid(),
-        text: "Removed Items",
-        href: "/factory-manager/store/removed",
-        icon: <FontAwesomeIcon icon={faMinusCircle} className="text-lg" />,
-      },
-      {
-        id: nanoid(),
-        text: "Add Raw Material",
-        href: "/factory-manager/store/record-rm-added",
-        icon: <FontAwesomeIcon icon={faPlusMinus} className="text-lg" />,
-      },
-    ],
+    text: "Income",
+    href: "/factory-manager/income",
+    icon: <FontAwesomeIcon icon={faMoneyBillTrendUp} className="text-lg" />,
   },
   {
     id: nanoid(),
-    text: "Shop",
-    isDropdown: true,
-    icon: <FontAwesomeIcon icon={faStore} className="text-lg" />,
-    dropdownItems: [
-      {
-        id: nanoid(),
-        text: "Dashboard",
-        href: "/factory-manager/shop/dashboard",
-        icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
-      },
-      {
-        id: nanoid(),
-        text: "Inventory",
-        href: "/factory-manager/shop/inventory",
-        icon: <FontAwesomeIcon icon={faBoxOpen} className="text-lg" />,
-      },
-      {
-        id: nanoid(),
-        text: "Sold Items",
-        href: "/factory-manager/shop/sold",
-        icon: <FontAwesomeIcon icon={faCashRegister} className="text-lg" />,
-      },
-      {
-        id: nanoid(),
-        text: "Add Stock",
-        href: "/factory-manager/shop/stock",
-        icon: <FontAwesomeIcon icon={faPlusCircle} className="text-lg" />,
-      },
-    ],
+    text: "Expenses",
+    href: "/factory-manager/expenses",
+    icon: <FontAwesomeIcon icon={faFileInvoiceDollar} className="text-lg" />,
   },
+  {
+    id: nanoid(),
+    text: "Customers",
+    href: "/factory-manager/customers",
+    icon: <FontAwesomeIcon icon={faHandshake} className="text-lg" />,
+  },
+  {
+    id: nanoid(),
+    text: "Workers",
+    href: "/factory-manager/workers",
+    icon: <FontAwesomeIcon icon={faUsers} className="text-lg" />,
+  },
+  {
+    id: nanoid(),
+    text: "Assets",
+    href: "/factory-manager/assets",
+    icon: <FontAwesomeIcon icon={faBuilding} className="text-lg" />,
+  },
+
+
+  // {
+  //   id: nanoid(),
+  //   text: "Store",
+  //   isDropdown: true,
+  //   icon: <FontAwesomeIcon icon={faWarehouse} className="text-lg" />,
+  //   dropdownItems: [
+  //     {
+  //       id: nanoid(),
+  //       text: "Dashboard",
+  //       href: "/factory-manager/store/dashboard",
+  //       icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+  //     },
+  //     {
+  //       id: nanoid(),
+  //       text: "Raw Materials",
+  //       href: "/factory-manager/store/raw-materials",
+  //       icon: <FontAwesomeIcon icon={faBoxes} className="text-lg" />,
+  //     },
+  //     {
+  //       id: nanoid(),
+  //       text: "Removed Items",
+  //       href: "/factory-manager/store/removed",
+  //       icon: <FontAwesomeIcon icon={faMinusCircle} className="text-lg" />,
+  //     },
+  //     {
+  //       id: nanoid(),
+  //       text: "Add Raw Material",
+  //       href: "/factory-manager/store/record-rm-added",
+  //       icon: <FontAwesomeIcon icon={faPlusMinus} className="text-lg" />,
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: nanoid(),
+  //   text: "Shop",
+  //   isDropdown: true,
+    // icon: <FontAwesomeIcon icon={faStore} className="text-lg" />,
+    // dropdownItems: [
+    //   {
+    //     id: nanoid(),
+    //     text: "Dashboard",
+    //     href: "/factory-manager/shop/dashboard",
+    //     icon: <FontAwesomeIcon icon={faTachometerAlt} className="text-lg" />,
+    //   },
+    //   {
+    //     id: nanoid(),
+    //     text: "Inventory",
+    //     href: "/factory-manager/shop/inventory",
+    //     icon: <FontAwesomeIcon icon={faBoxOpen} className="text-lg" />,
+    //   },
+    //   {
+    //     id: nanoid(),
+    //     text: "Sold Items",
+    //     href: "/factory-manager/shop/sold",
+    //     icon: <FontAwesomeIcon icon={faCashRegister} className="text-lg" />,
+    //   },
+    //   {
+    //     id: nanoid(),
+    //     text: "Add Stock",
+    //     href: "/factory-manager/shop/stock",
+    //     icon: <FontAwesomeIcon icon={faPlusCircle} className="text-lg" />,
+    //   },
+    // ],
+  // },
 ];
 
 export const storeKeeperSidebarLink: SidebarProps[] = [

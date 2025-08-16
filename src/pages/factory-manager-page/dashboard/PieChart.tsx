@@ -3,6 +3,19 @@ import React from "react";
 
 const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#ff0000"];
 
+const formatNumber = (num: number) => {
+  if (num >= 1000000000) {
+    return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+  }
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  }
+  return num.toString();
+};
+
 const PieChartComponent = ({ data }: { data: { name: string; value: number }[] }) => {
   // Show top 5, group the rest as 'Others'
   let pieData = data || [];
@@ -63,7 +76,8 @@ const PieChartComponent = ({ data }: { data: { name: string; value: number }[] }
         fill="#fff"
         dominantBaseline="central"
       >
-        {`${Math.round(percent * 100)}%`}
+        <tspan x={x} y={y - (window.innerWidth < 640 ? 6 : 8)}>{`${Math.round(percent * 100)}%`}</tspan>
+        <tspan x={x} y={y + (window.innerWidth < 640 ? 6 : 8)}>{`${formatNumber(value)}`}</tspan>
       </text>
     );
   };

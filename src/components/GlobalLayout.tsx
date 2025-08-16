@@ -28,7 +28,7 @@ const GlobalLayout = ({ children, data }: NavBarProps) => {
           />
         )}
         <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} data={data} />
-        <div className="flex-1 w-full overflow-auto bg-gray-50 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="flex-1 w-full overflow-auto bg-gray-50 px-2 sm:px-6 lg:px-8 py-4 sm:py-6">
           {children}
         </div>
       </div>

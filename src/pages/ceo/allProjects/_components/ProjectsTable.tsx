@@ -584,16 +584,16 @@ const ProjectsTable = () => {
             <table className="w-full lg:min-w-[1100px] bg-white shadow-md rounded-lg text-xs sm:text-sm">
               <thead>
                 <tr className="bg-blue-400 text-white">
-                  <th className="py-4 px-2 text-center font-bold">Project Name</th>
-                  <th className="py-4 px-2 text-center font-bold">Status</th>
-                  <th className="py-4 px-2 text-center font-bold hidden sm:table-cell">Progress</th>
-                  <th className="py-4 px-2 text-center font-bold hidden lg:table-cell">Start Date</th>
-                  <th className="py-4 px-2 text-center font-bold hidden lg:table-cell">Deadline</th>
-                  <th className="py-4 px-2 text-center font-bold hidden lg:table-cell">Date Delivered</th>
-                  <th className="py-4 px-2 text-center font-bold hidden sm:table-cell">Timeframe</th>
-                  <th className="py-4 px-2 text-center font-bold">Time Remaining</th>
-                  <th className="py-4 px-2 text-center font-bold hidden sm:table-cell">Tasks</th>
-                  <th className="py-4 px-2 text-center font-bold">Details</th>
+                  <th className="py-2 md:py-4 text-center font-bold">Project Name</th>
+                  <th className="py-2 md:py-4 text-center font-bold">Status</th>
+                  <th className="py-2 md:py-4 text-center font-bold hidden sm:table-cell">Progress</th>
+                  <th className="py-2 md:py-4 text-center font-bold hidden lg:table-cell">Start Date</th>
+                  <th className="py-2 md:py-4 text-center font-bold hidden lg:table-cell">Deadline</th>
+                  <th className="py-2 md:py-4 text-center font-bold hidden lg:table-cell">Date Delivered</th>
+                  <th className="py-2 md:py-4 text-center font-bold hidden sm:table-cell">Timeframe</th>
+                  <th className="py-2 md:py-4 text-center font-bold">Time Rem.</th>
+                  <th className="py-2 md:py-4 text-center font-bold hidden sm:table-cell">Tasks</th>
+                  <th className="py-2 md:py-4 text-center font-bold">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -604,20 +604,20 @@ const ProjectsTable = () => {
                     key={project.id}
                     className="cursor-pointer hover:bg-gray-50"
                   >
-                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 w-2/5 sm:w-auto">
+                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 w-auto sm:w-auto">
                         {project.name}
                       </td>
-                    <td className="py-2 md:py-5 px-0 sm:px-4 border-b border-gray-200 text-sm md:text-sm text-center text-gray-700 w-2/5 md:w-auto">
+                    <td className="py-2 md:py-5 px-0 sm:px-4 border-b border-gray-200 text-sm md:text-sm text-center text-gray-700 w-auto md:w-auto">
                         <span
                         className={`px-2 max-sm:px-1 inline-flex text-[11px] py-1 sm:text-xs leading-5 font-semibold rounded ${
                             project.status === "in progress"
-                              ? "bg-yellow-100 text-yellow-800"
+                              ? " text-yellow-600"
                               : project.status === "completed"
-                              ? "bg-green-100 text-green-800"
+                              ? " text-green-600"
                               : project.status === "delivered"
-                              ? "bg-green-400 text-white"
+                              ? " text-green-700"
                               : project.status === "cancelled"
-                              ? "bg-red-100 text-red-800"
+                              ? " text-red-600"
                               : ""
                           }`}
                         >
@@ -647,7 +647,7 @@ const ProjectsTable = () => {
                     <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 hidden sm:table-cell">
                       {project.timeframe || "-"}
                     </td>
-                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 w-2/5 sm:w-auto">
+                    <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center text-gray-700 w-auto sm:w-auto">
                       <span className={timeRemainingInfo.color}>{timeRemainingInfo.text}</span>
                       </td>
                     <td className="py-3 sm:py-5 px-2 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-center hidden sm:table-cell">

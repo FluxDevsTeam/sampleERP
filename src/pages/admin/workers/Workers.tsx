@@ -98,7 +98,7 @@ const Workers = () => {
   if (error) return <p>Error loading workers: {error.message}</p>;
 
   return (
-    <div className="wrapper w-full mx-auto mb-20 md:mb-2 pl-1 pt-0">
+    <div className="wrapper w-full mx-auto mb-20 md:mb-2 pt-0">
       {/* Analysis Sections Container */}
       <div
         className={`grid grid-cols-1 md:grid-cols-2 gap-4 mb-2 ${
@@ -107,7 +107,7 @@ const Workers = () => {
       >
         {/* Salary Analysis Section */}
         <div>
-          <h2 style={{ fontSize: "clamp(12.5px, 3vw, 24px)" }} className="font-medium py-0 mt-0 ">
+          <h2 className="font-medium text-blue-400 text-lg py-0 mt-0 ">
             Salary Analysis
           </h2>
           <div className="grid grid-cols-2 gap-4">
@@ -119,7 +119,7 @@ const Workers = () => {
         </div>
         {/* Contractor Analysis Section */}
         <div>
-          <h2 style={{ fontSize: "clamp(12.5px, 3vw, 24px)" }} className="font-medium py-0 mt-0 ">
+          <h2 className="font-medium text-lg text-blue-400 py-0 mt-0 ">
             Contractor Analysis
           </h2>
           <div className="grid grid-cols-2 gap-4">

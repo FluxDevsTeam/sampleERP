@@ -1,20 +1,38 @@
 import React from "react";
 
 interface DashboardCardProps {
-  title: string;
-  value: number;
-  currency?: string;
+  label: string;
+  value: number | string;
 }
 
-const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, currency }) => {
-  // Format the value with thousand separators, handling null or undefined values
-  const formattedValue = (value ?? 0).toLocaleString();
+const NO_NAIRA_LABELS = [
+  "Deprecated Assets",
+  "Active Assets",
+  "All Customers",
+  "Active Customers",
+  "Owing Customers",
+  "Total Workers",
+  "Active Workers",
+  "Total Contractors",
+  "Active Contractors",
+  "Inventory Items",
+  "Raw Materials Count",
+  "Sales Count",
+  "Project Count",
+];
+
+const DashboardCard: React.FC<DashboardCardProps> = ({ label, value }) => {
+  const isNumber = typeof value === "number";
+  const isPercent = typeof value === "string" && value.trim().endsWith("%");
+  const showNaira = isNumber && !NO_NAIRA_LABELS.includes(label);
+
   return (
-    <div className="relative flex flex-col justify-between rounded-lg border border-gray-200 bg-white p-4 shadow-md transition-all duration-300 hover:shadow-lg sm:p-6">
-      <p className="mb-2 text-sm font-medium text-gray-500 sm:text-base">{title}</p>
-      <h2 className="text-xl font-bold text-blue-600 sm:text-2xl">
-        {currency}{formattedValue}
-      </h2>
+    <div className="p-1 sm:p-2 border rounded-lg shadow-md flex flex-col items-center justify-center min-h-[74px] sm:min-h-[100px]">
+      <div className="text-xs sm:text-sm lg:text-base font-medium text-center mb-1 leading-tight">{label}</div>
+      <div className="text-sm sm:text-base font-semibold text-blue-400 text-center">
+        {showNaira ? "₦" : ""}
+        {isNumber ? value.toLocaleString("en-NG") : value}
+      </div>
     </div>
   );
 };

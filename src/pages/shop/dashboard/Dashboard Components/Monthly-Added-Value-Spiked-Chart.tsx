@@ -184,7 +184,7 @@ const MonthlyAddedValueSpikedChart = () => {
       <h1 style={{ fontSize: "clamp(16.5px, 3vw, 23px)" }}>
         Monthly Added Value
       </h1>
-      <ResponsiveContainer width="100%" height={340}>
+      <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} className="bg-white" margin={{ left: 0, right: 14, top: 10, bottom: 9 }}>
           <defs>
             <linearGradient id="addedValueGradient" x1="0" y1="0" x2="0" y2="1">
@@ -194,7 +194,7 @@ const MonthlyAddedValueSpikedChart = () => {
           </defs>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
-          <YAxis tickFormatter={formatNairaCompact} width={60} />
+          <YAxis tickFormatter={formatNairaCompact} width={64} />
           <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
           <Bar
             dataKey="value"

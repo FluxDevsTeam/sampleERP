@@ -177,7 +177,7 @@ const FactoryManagerCustomers = () => {
           }}
           className={`border rounded-lg p-2 sm:p-4 shadow-md flex flex-col items-center justify-center cursor-pointer ${filter === "all" ? "ring-2 ring-blue-400 bg-blue-50" : ""}`}
         >
-          <p className="font-bold text-[11px] sm:text-[14px] text-[#767676] mb-1 sm:mb-2">Total Customers</p>
+          <p className="font-bold text-center text-[11px] sm:text-[18px] text-[#767676] sm:mb-0">Total Customers</p>
           <p className="text-[#0178A3] text-[20px] sm:text-[36px] font-bold">{totalCustomers}</p>
         </article>
         <article
@@ -187,7 +187,7 @@ const FactoryManagerCustomers = () => {
           }}
           className={`border rounded-lg p-2 sm:p-4 shadow-md flex flex-col items-center justify-center cursor-pointer ${filter === "active" ? "ring-2 ring-blue-400 bg-blue-50" : ""}`}
         >
-          <p className="font-bold text-[11px] sm:text-[14px] text-[#767676] mb-1 sm:mb-2">Active Customers</p>
+          <p className="font-bold text-[11px] text-center sm:text-[18px] text-[#767676] sm:mb-0">Active Customers</p>
           <p className="text-[#0178A3] text-[20px] sm:text-[36px] font-bold">{activeCustomers}</p>
         </article>
         <article
@@ -197,13 +197,13 @@ const FactoryManagerCustomers = () => {
           }}
           className={`border rounded-lg p-2 sm:p-4 shadow-md flex flex-col items-center justify-center cursor-pointer ${filter === "owing" ? "ring-2 ring-blue-400 bg-blue-50" : ""}`}
         >
-          <p className="font-bold text-[11px] sm:text-[14px] text-[#767676] mb-1 sm:mb-2">Owing Customers</p>
+          <p className="font-bold text-[11px] sm:text-[18px] text-center text-[#767676] sm:mb-0">Owing Customers</p>
           <p className="text-[#0178A3] text-[20px] sm:text-[36px] font-bold">{owingCustomers}</p>
         </article>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4 items-center">
-        <button onClick={() => setShowModal(true)} className="flex items-center gap-2 px-3 py-1.5 rounded text-xs sm:text-sm w-full sm:w-auto justify-center border border-blue-400 text-blue-400 bg-transparent hover:bg-blue-50 transition-colors">
+        <button onClick={() => setShowModal(true)} className="flex items-center gap-2 px-3 py-1.5  rounded text-xs sm:text-sm w-full sm:w-auto justify-center border border-blue-400 text-blue-400 bg-transparent hover:bg-blue-50 transition-colors">
           <span className="font-extrabold text-lg sm:text-2xl">+</span>
           <span className="text-xs sm:text-sm">Create Customer</span>
         </button>

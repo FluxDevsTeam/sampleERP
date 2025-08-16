@@ -1,3 +1,6 @@
+import {
+  CustomTooltip
+} from "../../components/CustomChartComponents";
 import { useQuery } from "@tanstack/react-query";
 import {
   BarChart,
@@ -283,12 +286,12 @@ const AccountantDashboard = () => {
 
   return (
     <GlobalLayout data={sidebar}>
-      <div className="min-h-screen h-screen w-full flex flex-col">
+      <div className="min-h-screen h-screen w-full flex flex-col mb-20">
         <div className="flex-1 overflow-auto">
-          <div className="p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6 mb-20">
+          <div className="sm:p-4 md:p-6 space-y-4 sm:space-y-6 mb-20">
             {/* Card grid for all data */}
             <div className="mb-10">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
                 {visibleCards.map(card => (
                   <AccountantDashboardCard key={card.key} title={card.title} value={card.value} currency={card.currency} />
                 ))}
@@ -370,17 +373,18 @@ const AccountantDashboard = () => {
               <div className="bg-white rounded-lg shadow p-2 sm:p-4 mb-4 w-full overflow-x-auto">
                 <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">Top Categories</h2>
                 <ResponsiveContainer width="100%" height={300} className="sm:h-[300px]">
-                  <BarChart data={topCategories} barSize={20} className="sm:barSize-[30px]">
+                  <BarChart data={topCategories} margin={{ top: 5, right: 10, left: 0, bottom: 5 }} barGap={5}>
                     <defs>
                       <linearGradient id="topCategoriesGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#ffc658" stopOpacity={0.9} />
-                        <stop offset="100%" stopColor="#ff7300" stopOpacity={0.9} />
+                        <stop offset="0%" stopColor="#4A90E2" stopOpacity={0.9} />
+                        <stop offset="100%" stopColor="#50E3C2" stopOpacity={0.9} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} angle={-20} textAnchor="end" height={60} />
-                    <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} />
-                    <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
-                    <Bar dataKey="total" fill="url(#topCategoriesGradient)" label={{ position: "top", formatter: formatNairaCompact }} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} angle={-26} textAnchor="end" height={60} tickFormatter={(value) => (value.length > 16 ? `${value.substring(0, 16)}..` : value)}/>
+                    <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} width={64} />
+                    <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{ fill: "rgba(240, 240, 240, 0.5)" }} />
+                    <Bar dataKey="total" fill="url(#topCategoriesGradient)" name="Total" barSize={20} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -388,20 +392,19 @@ const AccountantDashboard = () => {
             {/* Single Bar Chart for Monthly Expense Trend */}
             <div className="bg-white rounded-lg shadow p-2 sm:p-4 w-full overflow-x-auto">
               <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4 ml-4">Monthly Expense Trend</h2>
-              <ResponsiveContainer width="100%" height={400} className="sm:h-[300px]">
-                <BarChart data={monthlyExpenseTrend} margin={{ top: 10, right: 10, left: 0, bottom: 30 }}>
+              <ResponsiveContainer width="100%" height={300} className="sm:h-[300px]">
+                <BarChart data={monthlyExpenseTrend} margin={{ top: 5, right: 10, left: 0, bottom: 5 }} barGap={5}>
                   <defs>
                     <linearGradient id="monthlyExpenseGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#ffc658" stopOpacity={0.9} />
-                      <stop offset="100%" stopColor="#ff7300" stopOpacity={0.9} />
+                      <stop offset="0%" stopColor="#F44336" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="#F5A623" stopOpacity={0.9} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} interval={isMobile ? 2 : isTablet ? 1 : 0} angle={-20} textAnchor="end" height={60} />
-                  <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} />
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
-                  <Legend wrapperStyle={{ fontSize: '12px' }} />
-                  <Bar dataKey="total_expenses" fill="url(#monthlyExpenseGradient)" name="Total Expenses" barSize={42} label={{ position: "top", formatter: formatNairaCompact }} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }}  />
+                  <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} width={64} />
+                  <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{ fill: "rgba(240, 240, 240, 0.5)" }} />
+                  <Bar dataKey="total_expenses" fill="url(#monthlyExpenseGradient)" name="Total Expenses" barSize={20} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

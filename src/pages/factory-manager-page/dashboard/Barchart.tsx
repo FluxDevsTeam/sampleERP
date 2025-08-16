@@ -82,7 +82,7 @@ const BarChartComponent = () => {
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis tickFormatter={formatNairaCompact} tick={{ fontSize: 12 }} width={80} />
+              <YAxis tickFormatter={formatNairaCompact} tick={{ fontSize: 12 }} width={64} />
               <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{fill: 'rgba(240, 240, 240, 0.5)'}} />
               {/* <Legend iconType="circle" iconSize={10} /> */}
               <Bar dataKey="TotalIncome" fill="url(#incomeGradient)" name="Total Income" barSize={20} />
@@ -104,7 +104,7 @@ const BarChartComponent = () => {
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis tickFormatter={formatNairaCompact} tick={{ fontSize: 12 }} width={80} />
+              <YAxis tickFormatter={formatNairaCompact} tick={{ fontSize: 12 }} width={64} />
               <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{fill: 'rgba(240, 240, 240, 0.5)'}} />
               {/* <Legend iconType="circle" iconSize={10} /> */}
               <Bar dataKey="TotalExpenses" fill="url(#expenseGradient)" name="Total Expenses" barSize={20} />
@@ -120,7 +120,7 @@ const BarChartComponent = () => {
             <BarChart data={profitData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }} barGap={5}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis tickFormatter={formatNairaCompact} tick={{ fontSize: 12 }} width={80} />
+              <YAxis tickFormatter={formatNairaCompact} tick={{ fontSize: 12 }} width={64} />
               <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{fill: 'rgba(240, 240, 240, 0.5)'}} />
               {/* <Legend iconType="circle" iconSize={10} /> */}
               <Bar 
