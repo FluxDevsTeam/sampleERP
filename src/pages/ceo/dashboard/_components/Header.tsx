@@ -179,7 +179,7 @@ const Header = () => {
   if (!data) return <p className="p-4 sm:p-6">No dashboard data available</p>;
 
   return (
-    <div className="relative z-10 p-2 sm:p-3 lg:p-4 w-full min-w-0">
+    <div className="relative z-10 sm:p-3 lg:p-4 w-full min-w-0">
       {/* Collapsible Section Headers Row */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:flex gap-2 mb-3 px-0 py-1 w-full min-w-0">
         <button 
@@ -252,7 +252,7 @@ const Header = () => {
         </section>
       )}
       {openSection === 'income' && (
-        <section className="mb-6 sm:mb-8 bg-green-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
+        <section className="mb-6 sm:mb-8 bg-green-50/60 rounded-2xl shadow p-1 sm:p-4 lg:p-6">
           <div className="mb-4 sm:mb-6">
             <h4 className="font-semibold text-green-700 mb-2 text-sm sm:text-base">Monthly Income Breakdown</h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
@@ -278,7 +278,7 @@ const Header = () => {
         </section>
       )}
       {openSection === 'expense' && (
-        <section className="mb-6 sm:mb-8 bg-teal-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
+        <section className="mb-6 sm:mb-8 bg-teal-50/60 rounded-2xl shadow p-1 sm:p-4 lg:p-6">
           <div className="mb-4 sm:mb-6">
             <h4 className="font-semibold text-teal-700 mb-2 text-sm sm:text-base">Monthly Expense Breakdown</h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
@@ -306,7 +306,7 @@ const Header = () => {
         </section>
       )}
       {openSection === 'asset' && (
-        <section className="mb-6 sm:mb-8 bg-purple-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
+        <section className="mb-6 sm:mb-8 bg-purple-50/60 rounded-2xl shadow p-1 sm:p-4 lg:p-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
             <DataCard label="Active Assets" value={data.asset_analysis.active_assets} />
             <DataCard label="Deprecated Assets" value={data.asset_analysis.deprecated_assets} />
@@ -318,7 +318,7 @@ const Header = () => {
         </section>
       )}
       {openSection === 'customer' && (
-        <section className="mb-6 sm:mb-8 bg-yellow-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
+        <section className="mb-6 sm:mb-8 bg-yellow-50/60 rounded-2xl shadow p-1 sm:p-4 lg:p-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
             <DataCard label="All Customers" value={data.customers.all_customers_count} />
             <DataCard label="Active Customers" value={data.customers.active_customers_count} />
@@ -331,7 +331,7 @@ const Header = () => {
         </section>
       )}
       {openSection === 'additional' && (
-        <section className="mb-6 sm:mb-8 bg-gray-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
+        <section className="mb-6 sm:mb-8 bg-gray-50/60 rounded-2xl shadow p-1sm:p-4 lg:p-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
             <DataCard label="Inventory Items" value={data.additional_metrics.inventory_items} />
             <DataCard label="Raw Materials Count" value={data.additional_metrics.raw_materials_types} />

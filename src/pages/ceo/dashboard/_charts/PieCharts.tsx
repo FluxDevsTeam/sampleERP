@@ -87,10 +87,10 @@ const formatValue = (value: number): string => {
 
 const getPieRadii = () => {
   if (typeof window !== 'undefined') {
-    if (window.innerWidth < 640) return { outer: 78, inner: 35, cx: '50%' };
-    if (window.innerWidth < 1024) return { outer: 100, inner: 40, cx: '50%' };
+    if (window.innerWidth < 640) return { outer: 70, inner: 25, cx: '50%' };
+    if (window.innerWidth < 1024) return { outer: 110, inner: 35, cx: '50%' };
   }
-  return { outer: 110, inner: 30, cx: '50%' };
+  return { outer: 80, inner: 30, cx: '50%' };
 };
 
 // Custom Legend content to wrap text and add left padding
@@ -230,12 +230,12 @@ const PieCharts = () => {
     percent,
   }: CustomLabelProps) => {
     const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.6;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     // Only show label for segments that are large enough (more than 5%)
-    return percent > 0.05 ? (
+    return percent > 0.04 ? (
       <text
         x={x}
         y={y}

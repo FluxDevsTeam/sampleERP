@@ -4,15 +4,15 @@ import AreaCharts from "./_charts/AreaCharts"
 import Header from "./_components/Header"
 const CEODashboard = () => {
   return (
-    <div className="bg-white p-2 mb-20 sm:p-2 min-h-screen">
+    <div className="bg-white mb-20 sm:p-2 min-h-screen">
       <Header />
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mb-8">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mb-2">
         {/* Add CEO dashboard cards here if any */}
       </div>
-      <div className="w-full min-h-[220px] sm:min-h-[350px] bg-white rounded-lg shadow p-2 sm:p-4 overflow-x-auto mb-4">
+      <div className="w-full min-h-[220px] sm:min-h-[350px] bg-white rounded-lg shadow sm:p-4 overflow-x-auto mb-4">
         <PieCharts />
       </div>
-      <div className="w-full min-h-[220px] sm:min-h-[350px] bg-white rounded-lg shadow p-2 sm:p-4 overflow-x-auto">
+      <div className="w-full min-h-[220px] sm:min-h-[350px] bg-white rounded-lg shadow sm:p-4 overflow-x-auto">
         <AreaCharts />
       </div>
     </div>
