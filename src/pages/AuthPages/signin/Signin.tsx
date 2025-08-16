@@ -1,5 +1,5 @@
 // Signin.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Logo } from "../../../assets";
 import Button from "../../../components/Button";
@@ -10,13 +10,77 @@ import FormHeader from "../signup/_components/FormHeader";
 import { useAuth } from "../AuthContext";
 import { toast } from "sonner";
 
+declare global {
+  interface Window {
+    deferredPrompt: any;
+  }
+}
+
 const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showInstallButton, setShowInstallButton] = useState(false);
+  const [isAppInstalled, setIsAppInstalled] = useState(
+      window.matchMedia('(display-mode: standalone)').matches
+    );
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      window.deferredPrompt = e;
+      setShowInstallButton(true);
+      // Do NOT set isAppInstalled to false here, as the app might already be installed
+      // and the prompt is just an option to re-install or update.
+    };
+
+    const handleAppInstalled = () => {
+      setIsAppInstalled(true);
+      setShowInstallButton(false);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    // Check if the app is already installed on mount
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setIsAppInstalled(true);
+      setShowInstallButton(false);
+    } else {
+      setIsAppInstalled(false);
+      setShowInstallButton(true);
+    }
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (window.deferredPrompt) {
+      window.deferredPrompt.prompt();
+      const { outcome } = await window.deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      if (outcome === 'accepted') {
+        console.log('User accepted the A2HS prompt');
+        setIsAppInstalled(true); // App is now installed
+      } else {
+        console.log('User dismissed the A2HS prompt');
+      }
+      window.deferredPrompt = null;
+      setShowInstallButton(false);
+    }
+  };
+
+  const handleOpenAppClick = () => {
+    console.log('Opening installed app...');
+    // Redirect to the root of the application to open the installed PWA
+    window.location.href = '/';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,12 +192,40 @@ const Signin = () => {
             >
               {loading ? "Logging in..." : "Login"}
             </Button>
-
           </div>
         </form>
       </section>
-    </AuthLayout>
-  );
-};
+      {showInstallButton && !isAppInstalled && !window.matchMedia('(display-mode: standalone)').matches && (
+         <button
+           onClick={handleInstallClick}
+           className="fixed top-4 right-4 bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 animate-bounce flex items-center"
+           title="Install App"
+         >
+           <svg
+             xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             viewBox="0 0 24 24"
+             strokeWidth="1.5"
+             stroke="currentColor"
+             className="w-6 h-6"
+           >
+             <path
+               strokeLinecap="round"
+               strokeLinejoin="round"
+               d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+             />
+           </svg>
+           <span className="ml-2">Download App</span>
+         </button>
+       )}
+
+       {isAppInstalled && !window.matchMedia('(display-mode: standalone)').matches && (
+         <div className="fixed bottom-4 right-4 bg-green-500 text-white p-3 rounded-lg shadow-lg flex items-center space-x-2">
+           <span>App already installed on your device and ready for use.</span>
+         </div>
+       )}
+     </AuthLayout>
+   );
+ };
 
 export default Signin;
