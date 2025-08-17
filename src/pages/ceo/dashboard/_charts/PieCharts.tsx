@@ -62,7 +62,7 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-4 rounded-lg shadow-md border border-gray-100">
-        <p className="font-medium text-gray-900">{payload[0].name}</p>
+        <p className="font-medium text-blue-300">{payload[0].name}</p>
         <p className="text-lg font-bold text-blue-600">
           ₦{payload[0].value.toLocaleString()}
         </p>

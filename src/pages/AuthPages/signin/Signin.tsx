@@ -21,38 +21,24 @@ const Signin = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showInstallButton, setShowInstallButton] = useState(false);
-  const [isAppInstalled, setIsAppInstalled] = useState(
-      window.matchMedia('(display-mode: standalone)').matches
-    );
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      window.deferredPrompt = e;
-      setShowInstallButton(true);
-      // Do NOT set isAppInstalled to false here, as the app might already be installed
-      // and the prompt is just an option to re-install or update.
+      setDeferredPrompt(e);
     };
 
     const handleAppInstalled = () => {
-      setIsAppInstalled(true);
-      setShowInstallButton(false);
+      setDeferredPrompt(null); // Clear prompt after installation
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
-    // Check if the app is already installed on mount
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsAppInstalled(true);
-      setShowInstallButton(false);
-    } else {
-      setIsAppInstalled(false);
-      setShowInstallButton(true);
-    }
+    // No initial state setting for deferredPrompt here, it will be set by the event listener if available.
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -67,12 +53,11 @@ const Signin = () => {
       console.log(`User response to the install prompt: ${outcome}`);
       if (outcome === 'accepted') {
         console.log('User accepted the A2HS prompt');
-        setIsAppInstalled(true); // App is now installed
+
       } else {
         console.log('User dismissed the A2HS prompt');
       }
-      window.deferredPrompt = null;
-      setShowInstallButton(false);
+      setDeferredPrompt(null);
     }
   };
 
@@ -195,7 +180,7 @@ const Signin = () => {
           </div>
         </form>
       </section>
-      {showInstallButton && !isAppInstalled && !window.matchMedia('(display-mode: standalone)').matches && (
+      {!window.matchMedia('(display-mode: standalone)').matches && (
          <button
            onClick={handleInstallClick}
            className="fixed top-4 right-4 bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 animate-bounce flex items-center"
@@ -219,7 +204,7 @@ const Signin = () => {
          </button>
        )}
 
-       {isAppInstalled && !window.matchMedia('(display-mode: standalone)').matches && (
+       {!deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches && (
          <div className="fixed bottom-4 right-4 bg-green-500 text-white p-3 rounded-lg shadow-lg flex items-center space-x-2">
            <span>App already installed on your device and ready for use.</span>
          </div>
