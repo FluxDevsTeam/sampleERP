@@ -1,9 +1,7 @@
-// Signin.tsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Logo } from "../../../assets";
 import Button from "../../../components/Button";
-import { ChromeIcon } from "../../../utils/SvgIcons";
 import FormInput from "../_components/FormInput";
 import AuthLayout from "../AuthLayout";
 import FormHeader from "../signup/_components/FormHeader";
@@ -28,43 +26,24 @@ const Signin = () => {
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
+      setDeferredPrompt(e); // Store the prompt event
     };
 
-    const handleAppInstalled = () => {
-      setDeferredPrompt(null); // Clear prompt after installation
-    };
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
-
-    // No initial state setting for deferredPrompt here, it will be set by the event listener if available.
-
+    // Cleanup event listener
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
     };
   }, []);
 
   const handleInstallClick = async () => {
-    if (window.deferredPrompt) {
-      window.deferredPrompt.prompt();
-      const { outcome } = await window.deferredPrompt.userChoice;
+    if (deferredPrompt) {
+      deferredPrompt.prompt(); // Show the install prompt
+      const { outcome } = await deferredPrompt.userChoice;
       console.log(`User response to the install prompt: ${outcome}`);
-      if (outcome === 'accepted') {
-        console.log('User accepted the A2HS prompt');
-
-      } else {
-        console.log('User dismissed the A2HS prompt');
-      }
-      setDeferredPrompt(null);
+      setDeferredPrompt(null); // Clear the prompt after user choice
     }
-  };
-
-  const handleOpenAppClick = () => {
-    console.log('Opening installed app...');
-    // Redirect to the root of the application to open the installed PWA
-    window.location.href = '/';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,7 +51,6 @@ const Signin = () => {
     setError("");
     setLoading(true);
 
-    // Basic validation
     if (!email || !password) {
       setError("Please fill in all fields");
       setLoading(false);
@@ -81,21 +59,17 @@ const Signin = () => {
 
     try {
       const result = await login(email, password);
-      
       if (result.success) {
-          toast.success("Login successful!");
-          // Store the role from the API response
-          if (result.role) {
-            localStorage.setItem("user_role", result.role);
-          } else {
-            // Fallback if role is not directly in result, though it should be now
-            const roleFromStorage = localStorage.getItem("user_role");
-            if (!roleFromStorage) {
-              console.warn("User role not found in login result or localStorage.");
-            }
+        toast.success("Login successful!");
+        if (result.role) {
+          localStorage.setItem("user_role", result.role);
+        } else {
+          const roleFromStorage = localStorage.getItem("user_role");
+          if (!roleFromStorage) {
+            console.warn("User role not found in login result or localStorage.");
           }
-          // Redirect based on role
-          const role = result.role || localStorage.getItem("user_role");
+        }
+        const role = result.role || localStorage.getItem("user_role");
         switch (role) {
           case "ceo":
             navigate("/ceo/dashboard");
@@ -133,6 +107,9 @@ const Signin = () => {
     }
   };
 
+  // Check if the app is running in standalone mode
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+
   return (
     <AuthLayout>
       <section className="w-full h-fit overflow-auto px-3 sm:px-4 py-4 max-sm:py-10 max-sm:px-8 max-sm:mb-32 sm:py-6 space-y-3 sm:space-y-4 bg-green-900 shadow-xl rounded-xl sm:rounded-2xl">
@@ -169,10 +146,10 @@ const Signin = () => {
             />
           </div>
 
-          <div className="flex flex-col items-center w-full space-y-3  sm:space-y-4">
+          <div className="flex flex-col items-center w-full space-y-3 sm:space-y-4">
             <Button
               type="submit"
-              className="bg-blue-400 text-white w-full max-w-[250px] sm:max-w-[278px] font-semibold text-xs sm:text-sm py-2  m-6 sm:py-2"
+              className="bg-blue-400 text-white w-full max-w-[250px] sm:max-w-[278px] font-semibold text-xs sm:text-sm py-2 m-6 sm:py-2"
               disabled={loading}
             >
               {loading ? "Logging in..." : "Login"}
@@ -180,37 +157,20 @@ const Signin = () => {
           </div>
         </form>
       </section>
-      {!window.matchMedia('(display-mode: standalone)').matches && (
-         <button
-           onClick={handleInstallClick}
-           className="fixed top-4 right-4 bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 animate-bounce flex items-center"
-           title="Install App"
-         >
-           <svg
-             xmlns="http://www.w3.org/2000/svg"
-             fill="none"
-             viewBox="0 0 24 24"
-             strokeWidth="1.5"
-             stroke="currentColor"
-             className="w-6 h-6"
-           >
-             <path
-               strokeLinecap="round"
-               strokeLinejoin="round"
-               d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-             />
-           </svg>
-           <span className="ml-2">Download App</span>
-         </button>
-       )}
 
-       {!deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches && (
-         <div className="fixed bottom-4 right-4 bg-green-500 text-white p-3 rounded-lg shadow-lg flex items-center space-x-2">
-           <span>App already installed on your device and ready for use.</span>
-         </div>
-       )}
-     </AuthLayout>
-   );
- };
+      {!isStandalone && deferredPrompt && (
+        <div className="fixed top-4 right-4">
+          <button
+            onClick={handleInstallClick}
+            className="bg-blue-400 text-white p-3 rounded-full shadow-lg hover:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 animate-bounce flex items-center"
+            title="Install App"
+          >
+            Download App
+          </button>
+        </div>
+      )}
+    </AuthLayout>
+  );
+};
 
 export default Signin;
