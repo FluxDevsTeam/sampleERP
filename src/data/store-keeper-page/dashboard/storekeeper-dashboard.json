@@ -1,0 +1,50 @@
+{
+  "dashboardData": {
+    "total_raw_materials": 120,
+    "total_value": 15000000,
+    "added_amount_this_year": 9000000,
+    "removed_amount_year": 7800000,
+    "added_amount_this_month": 800000,
+    "removed_cost_month": 670000
+  },
+  "rawMaterialsCategories": [
+    { "id": 1, "name": "Components", "materials_count": 50, "total_materials_value": 2500000 },
+    { "id": 2, "name": "Materials", "materials_count": 30, "total_materials_value": 1800000 },
+    { "id": 3, "name": "Supplies", "materials_count": 35, "total_materials_value": 1200000 },
+    { "id": 4, "name": "Parts", "materials_count": 25, "total_materials_value": 900000 },
+    { "id": 5, "name": "Tools", "materials_count": 20, "total_materials_value": 750000 },
+    { "id": 6, "name": "Consumables", "materials_count": 15, "total_materials_value": 600000 },
+    { "id": 7, "name": "Equipment", "materials_count": 22, "total_materials_value": 550000 },
+    { "id": 8, "name": "Packaging", "materials_count": 18, "total_materials_value": 500000 },
+    { "id": 9, "name": "Fasteners", "materials_count": 12, "total_materials_value": 400000 },
+    { "id": 10, "name": "Adhesives", "materials_count": 10, "total_materials_value": 350000 }
+  ],
+  "addedAmountMonthly": [
+    { "month": "Jan", "total": 700000 },
+    { "month": "Feb", "total": 750000 },
+    { "month": "Mar", "total": 820000 },
+    { "month": "Apr", "total": 710000 },
+    { "month": "May", "total": 780000 },
+    { "month": "Jun", "total": 850000 },
+    { "month": "Jul", "total": 830000 },
+    { "month": "Aug", "total": 870000 },
+    { "month": "Sep", "total": 720000 },
+    { "month": "Oct", "total": 690000 },
+    { "month": "Nov", "total": 760000 },
+    { "month": "Dec", "total": 800000 }
+  ],
+  "removedAmountMonthly": [
+    { "month": "Jan", "total": 580000 },
+    { "month": "Feb", "total": 640000 },
+    { "month": "Mar", "total": 720000 },
+    { "month": "Apr", "total": 600000 },
+    { "month": "May", "total": 670000 },
+    { "month": "Jun", "total": 740000 },
+    { "month": "Jul", "total": 710000 },
+    { "month": "Aug", "total": 770000 },
+    { "month": "Sep", "total": 620000 },
+    { "month": "Oct", "total": 590000 },
+    { "month": "Nov", "total": 660000 },
+    { "month": "Dec", "total": 700000 }
+  ]
+}

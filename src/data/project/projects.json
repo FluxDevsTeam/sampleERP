@@ -1,0 +1,95 @@
+[
+  {
+    "id": "1",
+    "name": "Website Redesign",
+    "invoice_image": null,
+    "status": "in progress",
+    "start_date": "2024-05-15",
+    "deadline": "2024-06-30",
+    "date_delivered": null,
+    "is_delivered": false,
+    "archived": false,
+    "customer_detail": {
+      "id": 1,
+      "name": "Adebayo Jubreel"
+    },
+    "selling_price": "500000",
+    "logistics": "0",
+    "service_charge": "0",
+    "note": "Initial mockups approved. Waiting on content.",
+    "all_items": [
+      {
+        "item": "Design Mockups",
+        "price": "200000",
+        "quantity": "1"
+      },
+      {
+        "item": "Frontend Development",
+        "price": "300000",
+        "quantity": "1"
+      }
+    ],
+    "tasks": [
+      {
+        "title": "Design Homepage",
+        "checked": true,
+        "subtasks": [
+          {
+            "title": "Create wireframe",
+            "checked": true
+          },
+          {
+            "title": "Finalize color palette",
+            "checked": true
+          }
+        ]
+      },
+      {
+        "title": "Develop Blog Section",
+        "checked": false,
+        "subtasks": [
+          {
+            "title": "Set up database schema",
+            "checked": false
+          },
+          {
+            "title": "Build UI components",
+            "checked": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "Branding Package",
+    "invoice_image": null,
+    "status": "delivered",
+    "start_date": "2024-04-01",
+    "deadline": "2024-04-15",
+    "date_delivered": "2024-04-15",
+    "is_delivered": true,
+    "archived": false,
+    "customer_detail": {
+      "id": 2,
+      "name": "Julius Caesar"
+    },
+    "selling_price": "250000",
+    "logistics": "5000",
+    "service_charge": "0",
+    "note": "Final files sent to client.",
+    "all_items": [
+      {
+        "item": "Logo Design",
+        "price": "150000",
+        "quantity": "1"
+      },
+      {
+        "item": "Brand Guidelines",
+        "price": "100000",
+        "quantity": "1"
+      }
+    ],
+    "tasks": []
+  }
+]

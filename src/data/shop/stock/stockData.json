@@ -1,0 +1,518 @@
+{
+  "monthly_added_stock_count": 1250,
+  "yearly_added_stock_count": 15000,
+  "monthly_added_total_cost_price": 12500000,
+  "yearly_added_total_cost_price": 150000000,
+  "daily_data": [
+    {
+      "date": "2025-08-05",
+      "daily_added_cost_total": 4200000,
+      "entries": [
+        {
+          "id": 10,
+          "name": "Wireless Earbuds",
+          "quantity": "600",
+          "cost_price": "5000",
+          "date": "2025-08-05",
+          "inventory_item": {
+            "id": 110,
+            "name": "Wireless Earbuds",
+            "image": "/images/wireless-earbuds.jpg",
+            "dimensions": "One Size",
+            "inventory_category": {
+              "id": 4,
+              "name": "Electronics"
+            }
+          }
+        },
+        {
+          "id": 11,
+          "name": "Yoga Pants",
+          "quantity": "400",
+          "cost_price": "3000",
+          "date": "2025-08-05",
+          "inventory_item": {
+            "id": 111,
+            "name": "Yoga Pants",
+            "image": "/images/yoga-pants.jpg",
+            "dimensions": "M",
+            "inventory_category": {
+              "id": 1,
+              "name": "Clothing"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-08-04",
+      "daily_added_cost_total": 2800000,
+      "entries": [
+        {
+          "id": 8,
+          "name": "Backpack",
+          "quantity": "350",
+          "cost_price": "4000",
+          "date": "2025-08-04",
+          "inventory_item": {
+            "id": 108,
+            "name": "Backpack",
+            "image": "/images/backpack.jpg",
+            "dimensions": "30L",
+            "inventory_category": {
+              "id": 2,
+              "name": "Accessories"
+            }
+          }
+        },
+        {
+          "id": 9,
+          "name": "Running Shoes",
+          "quantity": "280",
+          "cost_price": "5000",
+          "date": "2025-08-04",
+          "inventory_item": {
+            "id": 109,
+            "name": "Running Shoes",
+            "image": "/images/running-shoes.jpg",
+            "dimensions": "Size 9",
+            "inventory_category": {
+              "id": 3,
+              "name": "Footwear"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-08-03",
+      "daily_added_cost_total": 7500000,
+      "entries": [
+        {
+          "id": 6,
+          "name": "Designer Jeans",
+          "quantity": "500",
+          "cost_price": "3500",
+          "date": "2025-08-03",
+          "inventory_item": {
+            "id": 106,
+            "name": "Designer Jeans",
+            "image": "/images/designer-jeans.jpg",
+            "dimensions": "32",
+            "inventory_category": {
+              "id": 1,
+              "name": "Clothing"
+            }
+          }
+        },
+        {
+          "id": 7,
+          "name": "Laptop Pro",
+          "quantity": "100",
+          "cost_price": "50000",
+          "date": "2025-08-03",
+          "inventory_item": {
+            "id": 107,
+            "name": "Laptop Pro",
+            "image": "/images/laptop-pro.jpg",
+            "dimensions": "15.6 inch",
+            "inventory_category": {
+              "id": 4,
+              "name": "Electronics"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-08-02",
+      "daily_added_cost_total": 3500000,
+      "entries": [
+        {
+          "id": 4,
+          "name": "Black Shoes",
+          "quantity": "750",
+          "cost_price": "2000",
+          "date": "2025-08-02",
+          "inventory_item": {
+            "id": 103,
+            "name": "Black Shoes",
+            "image": "/images/black-shoes.jpg",
+            "dimensions": "Size 10",
+            "inventory_category": {
+              "id": 3,
+              "name": "Footwear"
+            }
+          }
+        },
+        {
+          "id": 5,
+          "name": "Smart Watch",
+          "quantity": "300",
+          "cost_price": "8000",
+          "date": "2025-08-02",
+          "inventory_item": {
+            "id": 105,
+            "name": "Smart Watch",
+            "image": "/images/smart-watch.jpg",
+            "dimensions": "One Size",
+            "inventory_category": {
+              "id": 4,
+              "name": "Electronics"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-08-01",
+      "daily_added_cost_total": 1500000,
+      "entries": [
+        {
+          "id": 1,
+          "name": "Blue T-Shirt",
+          "quantity": "1000",
+          "cost_price": "1500",
+          "date": "2025-08-01",
+          "inventory_item": {
+            "id": 101,
+            "name": "Blue T-Shirt",
+            "image": "/images/blue-tshirt.jpg",
+            "dimensions": "M",
+            "inventory_category": {
+              "id": 1,
+              "name": "Clothing"
+            }
+          }
+        },
+        {
+          "id": 2,
+          "name": "Red Cap",
+          "quantity": "500",
+          "cost_price": "1000",
+          "date": "2025-08-01",
+          "inventory_item": {
+            "id": 102,
+            "name": "Red Cap",
+            "image": "/images/red-cap.jpg",
+            "dimensions": "One Size",
+            "inventory_category": {
+              "id": 2,
+              "name": "Accessories"
+            }
+          }
+        },
+        {
+          "id": 3,
+          "name": "Leather Jacket",
+          "quantity": "200",
+          "cost_price": "5000",
+          "date": "2025-08-01",
+          "inventory_item": {
+            "id": 104,
+            "name": "Leather Jacket",
+            "image": "/images/leather-jacket.jpg",
+            "dimensions": "L",
+            "inventory_category": {
+              "id": 1,
+              "name": "Clothing"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-07-30",
+      "daily_added_cost_total": 5200000,
+      "entries": [
+        {
+          "id": 12,
+          "name": "Gaming Console",
+          "quantity": "80",
+          "cost_price": "50000",
+          "date": "2025-07-30",
+          "inventory_item": {
+            "id": 112,
+            "name": "Gaming Console",
+            "image": "/images/gaming-console.jpg",
+            "dimensions": "Standard",
+            "inventory_category": {
+              "id": 4,
+              "name": "Electronics"
+            }
+          }
+        },
+        {
+          "id": 13,
+          "name": "Sunglasses",
+          "quantity": "200",
+          "cost_price": "6000",
+          "date": "2025-07-30",
+          "inventory_item": {
+            "id": 113,
+            "name": "Sunglasses",
+            "image": "/images/sunglasses.jpg",
+            "dimensions": "One Size",
+            "inventory_category": {
+              "id": 2,
+              "name": "Accessories"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-07-15",
+      "daily_added_cost_total": 3100000,
+      "entries": [
+        {
+          "id": 14,
+          "name": "Hoodie",
+          "quantity": "400",
+          "cost_price": "3500",
+          "date": "2025-07-15",
+          "inventory_item": {
+            "id": 114,
+            "name": "Hoodie",
+            "image": "/images/hoodie.jpg",
+            "dimensions": "L",
+            "inventory_category": {
+              "id": 1,
+              "name": "Clothing"
+            }
+          }
+        },
+        {
+          "id": 15,
+          "name": "Sandals",
+          "quantity": "500",
+          "cost_price": "3400",
+          "date": "2025-07-15",
+          "inventory_item": {
+            "id": 115,
+            "name": "Sandals",
+            "image": "/images/sandals.jpg",
+            "dimensions": "Size 8",
+            "inventory_category": {
+              "id": 3,
+              "name": "Footwear"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-06-20",
+      "daily_added_cost_total": 6800000,
+      "entries": [
+        {
+          "id": 16,
+          "name": "4K TV",
+          "quantity": "50",
+          "cost_price": "120000",
+          "date": "2025-06-20",
+          "inventory_item": {
+            "id": 116,
+            "name": "4K TV",
+            "image": "/images/4k-tv.jpg",
+            "dimensions": "55 inch",
+            "inventory_category": {
+              "id": 4,
+              "name": "Electronics"
+            }
+          }
+        },
+        {
+          "id": 17,
+          "name": "Denim Jacket",
+          "quantity": "300",
+          "cost_price": "4000",
+          "date": "2025-06-20",
+          "inventory_item": {
+            "id": 117,
+            "name": "Denim Jacket",
+            "image": "/images/denim-jacket.jpg",
+            "dimensions": "M",
+            "inventory_category": {
+              "id": 1,
+              "name": "Clothing"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-06-10",
+      "daily_added_cost_total": 1850000,
+      "entries": [
+        {
+          "id": 18,
+          "name": "Baseball Cap",
+          "quantity": "700",
+          "cost_price": "1500",
+          "date": "2025-06-10",
+          "inventory_item": {
+            "id": 118,
+            "name": "Baseball Cap",
+            "image": "/images/baseball-cap.jpg",
+            "dimensions": "One Size",
+            "inventory_category": {
+              "id": 2,
+              "name": "Accessories"
+            }
+          }
+        },
+        {
+          "id": 19,
+          "name": "Sneakers",
+          "quantity": "200",
+          "cost_price": "4000",
+          "date": "2025-06-10",
+          "inventory_item": {
+            "id": 119,
+            "name": "Sneakers",
+            "image": "/images/sneakers.jpg",
+            "dimensions": "Size 9",
+            "inventory_category": {
+              "id": 3,
+              "name": "Footwear"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "inventory_items": [
+    {
+      "id": 101,
+      "name": "Blue T-Shirt",
+      "quantity": 1000,
+      "cost_price": 1500
+    },
+    {
+      "id": 102,
+      "name": "Red Cap",
+      "quantity": 500,
+      "cost_price": 1000
+    },
+    {
+      "id": 103,
+      "name": "Black Shoes",
+      "quantity": 750,
+      "cost_price": 2000
+    },
+    {
+      "id": 104,
+      "name": "Leather Jacket",
+      "quantity": 200,
+      "cost_price": 5000
+    },
+    {
+      "id": 105,
+      "name": "Smart Watch",
+      "quantity": 300,
+      "cost_price": 8000
+    },
+    {
+      "id": 106,
+      "name": "Designer Jeans",
+      "quantity": 500,
+      "cost_price": 3500
+    },
+    {
+      "id": 107,
+      "name": "Laptop Pro",
+      "quantity": 100,
+      "cost_price": 50000
+    },
+    {
+      "id": 108,
+      "name": "Backpack",
+      "quantity": 350,
+      "cost_price": 4000
+    },
+    {
+      "id": 109,
+      "name": "Running Shoes",
+      "quantity": 280,
+      "cost_price": 5000
+    },
+    {
+      "id": 110,
+      "name": "Wireless Earbuds",
+      "quantity": 600,
+      "cost_price": 5000
+    },
+    {
+      "id": 111,
+      "name": "Yoga Pants",
+      "quantity": 400,
+      "cost_price": 3000
+    },
+    {
+      "id": 112,
+      "name": "Gaming Console",
+      "quantity": 80,
+      "cost_price": 50000
+    },
+    {
+      "id": 113,
+      "name": "Sunglasses",
+      "quantity": 200,
+      "cost_price": 6000
+    },
+    {
+      "id": 114,
+      "name": "Hoodie",
+      "quantity": 400,
+      "cost_price": 3500
+    },
+    {
+      "id": 115,
+      "name": "Sandals",
+      "quantity": 500,
+      "cost_price": 3400
+    },
+    {
+      "id": 116,
+      "name": "4K TV",
+      "quantity": 50,
+      "cost_price": 120000
+    },
+    {
+      "id": 117,
+      "name": "Denim Jacket",
+      "quantity": 300,
+      "cost_price": 4000
+    },
+    {
+      "id": 118,
+      "name": "Baseball Cap",
+      "quantity": 700,
+      "cost_price": 1500
+    },
+    {
+      "id": 119,
+      "name": "Sneakers",
+      "quantity": 200,
+      "cost_price": 4000
+    }
+  ],
+  "monthly_summary": [
+    {
+      "month": "August 2025",
+      "stock_added": 1250,
+      "total_cost": 12500000
+    },
+    {
+      "month": "July 2025",
+      "stock_added": 980,
+      "total_cost": 8300000
+    },
+    {
+      "month": "June 2025",
+      "stock_added": 1150,
+      "total_cost": 8650000
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "daily_data": [
+    {
+      "date": "2025-08-15",
+      "entries": [
+        {
+          "id": 1,
+          "quantity": "2",
+          "date": "2025-08-15",
+          "sold_to": { "id": 1, "name": "John Doe" },
+          "item_sold": {
+            "id": 1,
+            "name": "Laptop Pro",
+            "dimensions": "35x25x2 cm",
+            "inventory_category": { "id": 1, "name": "Electronics" }
+          },
+          "linked_project": null,
+          "name": "Laptop Pro",
+          "logistics": "1500",
+          "cost_price": "500000",
+          "selling_price": "650000",
+          "total_price": 1300000,
+          "profit": 300000
+        }
+      ],
+      "daily_total": 1300000
+    },
+    {
+      "date": "2025-08-12",
+      "entries": [
+        {
+          "id": 2,
+          "quantity": "5",
+          "date": "2025-08-12",
+          "sold_to": { "id": 2, "name": "Jane Smith" },
+          "item_sold": {
+            "id": 4,
+            "name": "Wireless Earbuds",
+            "dimensions": "6x4x3 cm",
+            "inventory_category": { "id": 1, "name": "Electronics" }
+          },
+          "linked_project": null,
+          "name": "Wireless Earbuds",
+          "logistics": "800",
+          "cost_price": "25000",
+          "selling_price": "40000",
+          "total_price": 200000,
+          "profit": 75000
+        }
+      ],
+      "daily_total": 200000
+    },
+    {
+      "date": "2025-08-05",
+      "entries": [
+        {
+          "id": 3,
+          "quantity": "1",
+          "date": "2025-08-05",
+          "sold_to": { "id": 3, "name": "Mike Johnson" },
+          "item_sold": {
+            "id": 6,
+            "name": "Office Chair",
+            "dimensions": "60x60x110 cm",
+            "inventory_category": { "id": 3, "name": "Furniture" }
+          },
+          "linked_project": { "id": 1, "name": "Office Setup" },
+          "name": "Office Chair",
+          "logistics": "3000",
+          "cost_price": "75000",
+          "selling_price": "120000",
+          "total_price": 120000,
+          "profit": 45000
+        }
+      ],
+      "daily_total": 120000
+    },
+
+    {
+      "date": "2025-07-28",
+      "entries": [
+        {
+          "id": 4,
+          "quantity": "3",
+          "date": "2025-07-28",
+          "sold_to": { "id": 4, "name": "Sarah Williams" },
+          "item_sold": {
+            "id": 5,
+            "name": "Denim Jeans",
+            "dimensions": "80x30x2 cm",
+            "inventory_category": { "id": 2, "name": "Clothing" }
+          },
+          "linked_project": null,
+          "name": "Denim Jeans",
+          "logistics": "500",
+          "cost_price": "8000",
+          "selling_price": "15000",
+          "total_price": 45000,
+          "profit": 21000
+        }
+      ],
+      "daily_total": 45000
+    },
+    {
+      "date": "2025-07-20",
+      "entries": [
+        {
+          "id": 5,
+          "quantity": "2",
+          "date": "2025-07-20",
+          "sold_to": { "id": 1, "name": "John Doe" },
+          "item_sold": {
+            "id": 1,
+            "name": "Laptop Pro",
+            "dimensions": "35x25x2 cm",
+            "inventory_category": { "id": 1, "name": "Electronics" }
+          },
+          "linked_project": null,
+          "name": "Laptop Pro",
+          "logistics": "1500",
+          "cost_price": "500000",
+          "selling_price": "650000",
+          "total_price": 1300000,
+          "profit": 300000
+        }
+      ],
+      "daily_total": 1300000
+    },
+    {
+      "date": "2025-07-10",
+      "entries": [
+        {
+          "id": 6,
+          "quantity": "1",
+          "date": "2025-07-10",
+          "sold_to": { "id": 5, "name": "David Brown" },
+          "item_sold": {
+            "id": 3,
+            "name": "Wooden Table",
+            "dimensions": "180x90x75 cm",
+            "inventory_category": { "id": 3, "name": "Furniture" }
+          },
+          "linked_project": { "id": 2, "name": "Hotel Renovation" },
+          "name": "Wooden Table",
+          "logistics": "5000",
+          "cost_price": "200000",
+          "selling_price": "300000",
+          "total_price": 300000,
+          "profit": 100000
+        }
+      ],
+      "daily_total": 300000
+    },
+
+    {
+      "date": "2025-06-25",
+      "entries": [
+        {
+          "id": 7,
+          "quantity": "4",
+          "date": "2025-06-25",
+          "sold_to": { "id": 2, "name": "Jane Smith" },
+          "item_sold": {
+            "id": 4,
+            "name": "Wireless Earbuds",
+            "dimensions": "6x4x3 cm",
+            "inventory_category": { "id": 1, "name": "Electronics" }
+          },
+          "linked_project": null,
+          "name": "Wireless Earbuds",
+          "logistics": "800",
+          "cost_price": "25000",
+          "selling_price": "40000",
+          "total_price": 160000,
+          "profit": 60000
+        }
+      ],
+      "daily_total": 160000
+    }
+  ],
+  "monthly_total": 3270000,
+  "this_month_non_project_sales": 1500000,
+  "this_month_profit": 420000,
+  "this_month_project_sales": 120000,
+  "this_month_sales": 1620000,
+  "this_month_sales_count": 3,
+  "this_year_sold_count": 19,
+  "this_year_sales": 3475000,
+  "items": [
+    { "id": 1, "name": "Laptop Pro", "stock": 46, "selling_price": 650000 },
+    { "id": 2, "name": "Designer Jacket", "stock": 100, "selling_price": 25000 },
+    { "id": 3, "name": "Wooden Table", "stock": 18, "selling_price": 300000 },
+    { "id": 4, "name": "Wireless Earbuds", "stock": 109, "selling_price": 40000 },
+    { "id": 5, "name": "Denim Jeans", "stock": 97, "selling_price": 15000 },
+    { "id": 6, "name": "Office Chair", "stock": 33, "selling_price": 120000 }
+  ],
+  "customers": [
+    { "id": 1, "name": "John Doe" },
+    { "id": 2, "name": "Jane Smith" },
+    { "id": 3, "name": "Mike Johnson" },
+    { "id": 4, "name": "Sarah Williams" },
+    { "id": 5, "name": "David Brown" }
+  ],
+  "projects": [
+    { "id": 1, "name": "Office Setup" },
+    { "id": 2, "name": "Hotel Renovation" }
+  ]
+}

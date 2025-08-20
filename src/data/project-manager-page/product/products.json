@@ -1,0 +1,352 @@
+{
+  "count": 125,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 1,
+      "name": "Wooden Toy Car",
+      "linked_project": {
+        "id": 101,
+        "name": "Children's Toys Collection"
+      },
+      "selling_price": "2500.00",
+      "quantity": 50,
+      "progress": 75,
+      "colour": "Red",
+      "design": "Classic Sports Car",
+      "dimensions": "15x8x6",
+      "overhead_cost": "500.00",
+      "overhead_cost_base_at_creation": "450.00",
+      "production_note": "High-quality wooden toy with smooth edges",
+      "images": "/images/products/toy-car.jpg",
+      "tasks": "[{\"title\": \"Cut wood pieces\", \"checked\": true, \"subtasks\": [{\"title\": \"Measure dimensions\", \"checked\": true}, {\"title\": \"Cut main body\", \"checked\": true}]}, {\"title\": \"Assemble parts\", \"checked\": true, \"subtasks\": [{\"title\": \"Attach wheels\", \"checked\": true}, {\"title\": \"Install axle\", \"checked\": true}]}, {\"title\": \"Paint and finish\", \"checked\": false, \"subtasks\": [{\"title\": \"Apply primer\", \"checked\": true}, {\"title\": \"Apply color\", \"checked\": false}]}]",
+      "calculations": {
+        "total_raw_material_cost": 1200,
+        "total_production_cost": 800,
+        "total_overhead_cost": 500,
+        "quantity": 50,
+        "profit": 1000,
+        "profit_per_item": 20
+      },
+      "raw_materials": [
+        {
+          "name": "Pine Wood",
+          "quantity": "10",
+          "price": "800",
+          "date": "2023-10-15"
+        },
+        {
+          "name": "Paint",
+          "quantity": "5",
+          "price": "400",
+          "date": "2023-10-20"
+        }
+      ],
+      "expensis": [
+        {
+          "name": "Packaging",
+          "amount": "200",
+          "quantity": "50",
+          "date": "2023-10-25"
+        }
+      ],
+      "salary_workers": [
+        {
+          "id": 1,
+          "linked_salary_worker": {
+            "first_name": "John",
+            "last_name": "Doe"
+          },
+          "date": "2023-10-15"
+        }
+      ],
+      "contractors": [
+        {
+          "id": 1,
+          "linked_contractor": {
+            "first_name": "Mike",
+            "last_name": "Smith"
+          },
+          "cost": "1200",
+          "date": "2023-10-10"
+        }
+      ],
+      "quotation": [
+        {
+          "id": 1,
+          "department": "Woodworking",
+          "salary_worker": [
+            {"name": "John Doe"},
+            {"name": "Jane Smith"}
+          ],
+          "contractor": [
+            {"name": "Mike Smith"}
+          ],
+          "quotation": [
+            {"name": "Pine Wood", "quantity": "10 boards"},
+            {"name": "Paint", "quantity": "5 cans"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Product A",
+      "linked_project": {
+        "id": 102,
+        "name": "General Collection"
+      },
+      "selling_price": "1500.00",
+      "quantity": 30,
+      "progress": 60,
+      "colour": "Blue",
+      "design": "Standard Model",
+      "dimensions": "10x5x4",
+      "overhead_cost": "300.00",
+      "overhead_cost_base_at_creation": "280.00",
+      "production_note": "Durable and lightweight product",
+      "images": "/images/products/product-a.jpg",
+      "tasks": "[{\"title\": \"Prepare base\", \"checked\": true, \"subtasks\": [{\"title\": \"Measure base\", \"checked\": true}, {\"title\": \"Cut base\", \"checked\": true}]}, {\"title\": \"Assemble parts\", \"checked\": false, \"subtasks\": [{\"title\": \"Join pieces\", \"checked\": true}, {\"title\": \"Secure joints\", \"checked\": false}]}]",
+      "calculations": {
+        "total_raw_material_cost": 600,
+        "total_production_cost": 400,
+        "total_overhead_cost": 300,
+        "quantity": 30,
+        "profit": 200,
+        "profit_per_item": 7
+      },
+      "raw_materials": [
+        {
+          "name": "Material X",
+          "quantity": "8",
+          "price": "400",
+          "date": "2023-10-18"
+        },
+        {
+          "name": "Material Y",
+          "quantity": "3",
+          "price": "200",
+          "date": "2023-10-19"
+        }
+      ],
+      "expensis": [
+        {
+          "name": "Transport",
+          "amount": "150",
+          "quantity": "1",
+          "date": "2023-10-22"
+        }
+      ],
+      "salary_workers": [
+        {
+          "id": 2,
+          "linked_salary_worker": {
+            "first_name": "Alice",
+            "last_name": "Brown"
+          },
+          "date": "2023-10-16"
+        }
+      ],
+      "contractors": [
+        {
+          "id": 2,
+          "linked_contractor": {
+            "first_name": "Chris",
+            "last_name": "Johnson"
+          },
+          "cost": "800",
+          "date": "2023-10-12"
+        }
+      ],
+      "quotation": [
+        {
+          "id": 2,
+          "department": "Assembly",
+          "salary_worker": [
+            {"name": "Alice Brown"}
+          ],
+          "contractor": [
+            {"name": "Chris Johnson"}
+          ],
+          "quotation": [
+            {"name": "Material X", "quantity": "8 units"},
+            {"name": "Material Y", "quantity": "3 units"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Item B",
+      "linked_project": {
+        "id": 103,
+        "name": "General Collection"
+      },
+      "selling_price": "1800.00",
+      "quantity": 40,
+      "progress": 50,
+      "colour": "Green",
+      "design": "Basic Design",
+      "dimensions": "12x6x5",
+      "overhead_cost": "350.00",
+      "overhead_cost_base_at_creation": "320.00",
+      "production_note": "Simple structure, easy to produce",
+      "images": "/images/products/item-b.jpg",
+      "tasks": "[{\"title\": \"Initial setup\", \"checked\": true, \"subtasks\": [{\"title\": \"Mark dimensions\", \"checked\": true}, {\"title\": \"Prepare tools\", \"checked\": true}]}, {\"title\": \"Final assembly\", \"checked\": false, \"subtasks\": [{\"title\": \"Fit components\", \"checked\": true}, {\"title\": \"Apply finish\", \"checked\": false}]}]",
+      "calculations": {
+        "total_raw_material_cost": 700,
+        "total_production_cost": 500,
+        "total_overhead_cost": 350,
+        "quantity": 40,
+        "profit": 250,
+        "profit_per_item": 6
+      },
+      "raw_materials": [
+        {
+          "name": "Material A",
+          "quantity": "12",
+          "price": "450",
+          "date": "2023-10-14"
+        },
+        {
+          "name": "Material B",
+          "quantity": "4",
+          "price": "250",
+          "date": "2023-10-17"
+        }
+      ],
+      "expensis": [
+        {
+          "name": "Storage",
+          "amount": "180",
+          "quantity": "1",
+          "date": "2023-10-23"
+        }
+      ],
+      "salary_workers": [
+        {
+          "id": 3,
+          "linked_salary_worker": {
+            "first_name": "David",
+            "last_name": "Miller"
+          },
+          "date": "2023-10-17"
+        }
+      ],
+      "contractors": [
+        {
+          "id": 3,
+          "linked_contractor": {
+            "first_name": "Sophia",
+            "last_name": "Wilson"
+          },
+          "cost": "950",
+          "date": "2023-10-13"
+        }
+      ],
+      "quotation": [
+        {
+          "id": 3,
+          "department": "Production",
+          "salary_worker": [
+            {"name": "David Miller"}
+          ],
+          "contractor": [
+            {"name": "Sophia Wilson"}
+          ],
+          "quotation": [
+            {"name": "Material A", "quantity": "12 units"},
+            {"name": "Material B", "quantity": "4 units"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Sample Package C",
+      "linked_project": {
+        "id": 104,
+        "name": "General Collection"
+      },
+      "selling_price": "2200.00",
+      "quantity": 25,
+      "progress": 80,
+      "colour": "Black",
+      "design": "Compact Model",
+      "dimensions": "8x5x3",
+      "overhead_cost": "400.00",
+      "overhead_cost_base_at_creation": "380.00",
+      "production_note": "Compact design, optimized for space",
+      "images": "/images/products/package-c.jpg",
+      "tasks": "[{\"title\": \"Prepare components\", \"checked\": true, \"subtasks\": [{\"title\": \"Check parts\", \"checked\": true}, {\"title\": \"Sort parts\", \"checked\": true}]}, {\"title\": \"Final touch\", \"checked\": false, \"subtasks\": [{\"title\": \"Polish\", \"checked\": false}]}]",
+      "calculations": {
+        "total_raw_material_cost": 900,
+        "total_production_cost": 600,
+        "total_overhead_cost": 400,
+        "quantity": 25,
+        "profit": 300,
+        "profit_per_item": 12
+      },
+      "raw_materials": [
+        {
+          "name": "Material C",
+          "quantity": "15",
+          "price": "600",
+          "date": "2023-10-16"
+        },
+        {
+          "name": "Material D",
+          "quantity": "3",
+          "price": "300",
+          "date": "2023-10-19"
+        }
+      ],
+      "expensis": [
+        {
+          "name": "Labeling",
+          "amount": "120",
+          "quantity": "1",
+          "date": "2023-10-24"
+        }
+      ],
+      "salary_workers": [
+        {
+          "id": 4,
+          "linked_salary_worker": {
+            "first_name": "Emma",
+            "last_name": "Davis"
+          },
+          "date": "2023-10-18"
+        }
+      ],
+      "contractors": [
+        {
+          "id": 4,
+          "linked_contractor": {
+            "first_name": "Liam",
+            "last_name": "Garcia"
+          },
+          "cost": "1100",
+          "date": "2023-10-14"
+        }
+      ],
+      "quotation": [
+        {
+          "id": 4,
+          "department": "Packaging",
+          "salary_worker": [
+            {"name": "Emma Davis"}
+          ],
+          "contractor": [
+            {"name": "Liam Garcia"}
+          ],
+          "quotation": [
+            {"name": "Material C", "quantity": "15 units"},
+            {"name": "Material D", "quantity": "3 units"}
+          ]
+        }
+      ]
+    }
+  ]
+}
