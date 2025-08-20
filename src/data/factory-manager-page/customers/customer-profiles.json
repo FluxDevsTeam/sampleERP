@@ -1,0 +1,512 @@
+{
+    "1": {
+      "total_projects_count": 3,
+      "active_projects_count": 2,
+      "total_projects_cost": 1500000,
+      "total_shop_items_count": 5,
+      "total_shop_items_cost": 250000,
+      "customer_details": {
+        "id": 1,
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "phone_number": "08012345678",
+        "address": "123 Main St, Lagos",
+        "created_at": "2024-01-15T10:00:00Z",
+        "project": [
+          {
+            "id": 101,
+            "name": "Office Renovation",
+            "paid": 1000000,
+            "balance": "500000"
+          },
+          {
+            "id": 102,
+            "name": "Shop Fitout",
+            "paid": 400000,
+            "balance": "100000"
+          },
+          {
+            "id": 103,
+            "name": "Warehouse Expansion",
+            "paid": 0,
+            "balance": "600000"
+          }
+        ],
+        "shop_item": [
+          {
+            "id": 201,
+            "name": "Chair",
+            "quantity": "10",
+            "cost_price": "5000",
+            "selling_price": "7000",
+            "total_price": 70000
+          },
+          {
+            "id": 202,
+            "name": "Table",
+            "quantity": "5",
+            "cost_price": "10000",
+            "selling_price": "15000",
+            "total_price": 75000
+          },
+          {
+            "id": 203,
+            "name": "Desk",
+            "quantity": "3",
+            "cost_price": "15000",
+            "selling_price": "20000",
+            "total_price": 60000
+          },
+          {
+            "id": 204,
+            "name": "Shelf",
+            "quantity": "2",
+            "cost_price": "8000",
+            "selling_price": "12000",
+            "total_price": 24000
+          },
+          {
+            "id": 205,
+            "name": "Cabinet",
+            "quantity": "1",
+            "cost_price": "20000",
+            "selling_price": "30000",
+            "total_price": 30000
+          }
+        ]
+      }
+    },
+    "2": {
+      "total_projects_count": 2,
+      "active_projects_count": 1,
+      "total_projects_cost": 800000,
+      "total_shop_items_count": 3,
+      "total_shop_items_cost": 150000,
+      "customer_details": {
+        "id": 2,
+        "name": "Jane Smith",
+        "email": "jane.smith@example.com",
+        "phone_number": "08098765432",
+        "address": "456 Broad St, Abuja",
+        "created_at": "2024-02-20T12:00:00Z",
+        "project": [
+          {
+            "id": 104,
+            "name": "Home Renovation",
+            "paid": 600000,
+            "balance": "200000"
+          },
+          {
+            "id": 105,
+            "name": "Store Setup",
+            "paid": 0,
+            "balance": "300000"
+          }
+        ],
+        "shop_item": [
+          {
+            "id": 206,
+            "name": "Sofa",
+            "quantity": "2",
+            "cost_price": "25000",
+            "selling_price": "35000",
+            "total_price": 70000
+          },
+          {
+            "id": 207,
+            "name": "Lamp",
+            "quantity": "5",
+            "cost_price": "4000",
+            "selling_price": "6000",
+            "total_price": 30000
+          },
+          {
+            "id": 208,
+            "name": "Rug",
+            "quantity": "3",
+            "cost_price": "10000",
+            "selling_price": "15000",
+            "total_price": 45000
+          }
+        ]
+      }
+    },
+    "3": {
+      "total_projects_count": 1,
+      "active_projects_count": 1,
+      "total_projects_cost": 500000,
+      "total_shop_items_count": 2,
+      "total_shop_items_cost": 100000,
+      "customer_details": {
+        "id": 3,
+        "name": "Michael Brown",
+        "email": "",
+        "phone_number": "08011122233",
+        "address": "789 High St, Port Harcourt",
+        "created_at": "2024-03-10T09:00:00Z",
+        "project": [
+          {
+            "id": 106,
+            "name": "Office Setup",
+            "paid": 300000,
+            "balance": "200000"
+          }
+        ],
+        "shop_item": [
+          {
+            "id": 209,
+            "name": "Monitor",
+            "quantity": "2",
+            "cost_price": "20000",
+            "selling_price": "30000",
+            "total_price": 60000
+          },
+          {
+            "id": 210,
+            "name": "Keyboard",
+            "quantity": "4",
+            "cost_price": "5000",
+            "selling_price": "10000",
+            "total_price": 40000
+          }
+        ]
+      }
+    },
+    "4": {
+      "total_projects_count": 2,
+      "active_projects_count": 1,
+      "total_projects_cost": 900000,
+      "total_shop_items_count": 4,
+      "total_shop_items_cost": 180000,
+      "customer_details": {
+        "id": 4,
+        "name": "Sarah Johnson",
+        "email": "sarah.j@example.com",
+        "phone_number": "08044455566",
+        "address": "101 Low St, Kano",
+        "created_at": "2024-04-05T14:00:00Z",
+        "project": [
+          {
+            "id": 107,
+            "name": "Boutique Interior",
+            "paid": 600000,
+            "balance": "300000"
+          },
+          {
+            "id": 108,
+            "name": "Office Partitioning",
+            "paid": 0,
+            "balance": "400000"
+          }
+        ],
+        "shop_item": [
+          {
+            "id": 211,
+            "name": "Chair",
+            "quantity": "6",
+            "cost_price": "5000",
+            "selling_price": "7000",
+            "total_price": 42000
+          },
+          {
+            "id": 212,
+            "name": "Desk",
+            "quantity": "2",
+            "cost_price": "15000",
+            "selling_price": "20000",
+            "total_price": 40000
+          },
+          {
+            "id": 213,
+            "name": "Lamp",
+            "quantity": "4",
+            "cost_price": "4000",
+            "selling_price": "6000",
+            "total_price": 24000
+          },
+          {
+            "id": 214,
+            "name": "Cabinet",
+            "quantity": "2",
+            "cost_price": "20000",
+            "selling_price": "30000",
+            "total_price": 60000
+          }
+        ]
+      }
+    },
+    "5": {
+      "total_projects_count": 1,
+      "active_projects_count": 1,
+      "total_projects_cost": 600000,
+      "total_shop_items_count": 3,
+      "total_shop_items_cost": 120000,
+      "customer_details": {
+        "id": 5,
+        "name": "David Lee",
+        "email": "david.lee@example.com",
+        "phone_number": "08077788899",
+        "address": "202 Middle St, Ibadan",
+        "created_at": "2024-05-12T11:00:00Z",
+        "project": [
+          {
+            "id": 109,
+            "name": "Restaurant Setup",
+            "paid": 400000,
+            "balance": "200000"
+          }
+        ],
+        "shop_item": [
+          {
+            "id": 215,
+            "name": "Table",
+            "quantity": "4",
+            "cost_price": "10000",
+            "selling_price": "15000",
+            "total_price": 60000
+          },
+          {
+            "id": 216,
+            "name": "Chair",
+            "quantity": "8",
+            "cost_price": "5000",
+            "selling_price": "7000",
+            "total_price": 56000
+          },
+          {
+            "id": 217,
+            "name": "Shelf",
+            "quantity": "1",
+            "cost_price": "8000",
+            "selling_price": "12000",
+            "total_price": 12000
+          }
+        ]
+      }
+    },
+    "6": {
+      "total_projects_count": 1,
+      "active_projects_count": 0,
+      "total_projects_cost": 400000,
+      "total_shop_items_count": 2,
+      "total_shop_items_cost": 80000,
+      "customer_details": {
+        "id": 6,
+        "name": "Emma Wilson",
+        "email": "",
+        "phone_number": "08022233344",
+        "address": "303 Oak St, Enugu",
+        "created_at": "2024-06-18T13:00:00Z",
+        "project": [
+          {
+            "id": 110,
+            "name": "Cafe Interior",
+            "paid": 400000,
+            "balance": "0"
+          }
+        ],
+        "shop_item": [
+          {
+            "id": 218,
+            "name": "Stool",
+            "quantity": "5",
+            "cost_price": "4000",
+            "selling_price": "6000",
+            "total_price": 30000
+          },
+          {
+            "id": 219,
+            "name": "Counter",
+            "quantity": "1",
+            "cost_price": "30000",
+            "selling_price": "50000",
+            "total_price": 50000
+          }
+        ]
+      }
+    },
+    "7": {
+      "total_projects_count": 2,
+      "active_projects_count": 1,
+      "total_projects_cost": 1100000,
+      "total_shop_items_count": 3,
+      "total_shop_items_cost": 140000,
+      "customer_details": {
+        "id": 7,
+        "name": "James Taylor",
+        "email": "james.t@example.com",
+        "phone_number": "08055566677",
+        "address": "404 Pine St, Kaduna",
+        "created_at": "2024-07-22T15:00:00Z",
+        "project": [
+          {
+            "id": 111,
+            "name": "Clinic Design",
+            "paid": 700000,
+            "balance": "200000"
+          },
+          {
+            "id": 112,
+            "name": "Shop Renovation",
+            "paid": 200000,
+            "balance": "200000"
+          }
+        ],
+        "shop_item": [
+          {
+            "id": 220,
+            "name": "Bed",
+            "quantity": "2",
+            "cost_price": "20000",
+            "selling_price": "30000",
+            "total_price": 60000
+          },
+          {
+            "id": 221,
+            "name": "Cabinet",
+            "quantity": "1",
+            "cost_price": "20000",
+            "selling_price": "30000",
+            "total_price": 30000
+          },
+          {
+            "id": 222,
+            "name": "Lamp",
+            "quantity": "5",
+            "cost_price": "4000",
+            "selling_price": "6000",
+            "total_price": 30000
+          }
+        ]
+      }
+    },
+    "8": {
+      "total_projects_count": 1,
+      "active_projects_count": 1,
+      "total_projects_cost": 750000,
+      "total_shop_items_count": 2,
+      "total_shop_items_cost": 90000,
+      "customer_details": {
+        "id": 8,
+        "name": "Olivia Davis",
+        "email": "olivia.d@example.com",
+        "phone_number": "08088899900",
+        "address": "505 Cedar St, Jos",
+        "created_at": "2024-08-01T10:00:00Z",
+        "project": [
+          {
+            "id": 113,
+            "name": "Fashion Store Setup",
+            "paid": 400000,
+            "balance": "350000"
+          }
+        ],
+        "shop_item": [
+          {
+            "id": 223,
+            "name": "Mirror",
+            "quantity": "3",
+            "cost_price": "5000",
+            "selling_price": "8000",
+            "total_price": 24000
+          },
+          {
+            "id": 224,
+            "name": "Rack",
+            "quantity": "5",
+            "cost_price": "10000",
+            "selling_price": "13000",
+            "total_price": 65000
+          }
+        ]
+      }
+    },
+    "9": {
+      "total_projects_count": 1,
+      "active_projects_count": 0,
+      "total_projects_cost": 550000,
+      "total_shop_items_count": 1,
+      "total_shop_items_cost": 40000,
+      "customer_details": {
+        "id": 9,
+        "name": "William Clark",
+        "email": "",
+        "phone_number": "08033344455",
+        "address": "606 Elm St, Benin",
+        "created_at": "2024-09-10T12:00:00Z",
+        "project": [
+          {
+            "id": 114,
+            "name": "Warehouse Setup",
+            "paid": 550000,
+            "balance": "0"
+          }
+        ],
+        "shop_item": [
+          {
+            "id": 225,
+            "name": "Forklift",
+            "quantity": "1",
+            "cost_price": "30000",
+            "selling_price": "40000",
+            "total_price": 40000
+          }
+        ]
+      }
+    },
+    "10": {
+      "total_projects_count": 2,
+      "active_projects_count": 1,
+      "total_projects_cost": 950000,
+      "total_shop_items_count": 3,
+      "total_shop_items_cost": 150000,
+      "customer_details": {
+        "id": 10,
+        "name": "Sophia Martinez",
+        "email": "sophia.m@example.com",
+        "phone_number": "08066677788",
+        "address": "707 Maple St, Owerri",
+        "created_at": "2024-10-15T14:00:00Z",
+        "project": [
+          {
+            "id": 115,
+            "name": "Beauty Salon Setup",
+            "paid": 500000,
+            "balance": "200000"
+          },
+          {
+            "id": 116,
+            "name": "Office Upgrade",
+            "paid": 150000,
+            "balance": "100000"
+          }
+        ],
+        "shop_item": [
+          {
+            "id": 226,
+            "name": "Sofa",
+            "quantity": "1",
+            "cost_price": "25000",
+            "selling_price": "35000",
+            "total_price": 35000
+          },
+          {
+            "id": 227,
+            "name": "Chair",
+            "quantity": "6",
+            "cost_price": "5000",
+            "selling_price": "7000",
+            "total_price": 42000
+          },
+          {
+            "id": 228,
+            "name": "Desk",
+            "quantity": "2",
+            "cost_price": "15000",
+            "selling_price": "20000",
+            "total_price": 40000
+          }
+        ]
+      }
+    }
+  }

@@ -1,0 +1,231 @@
+{
+  "count": 20,
+  "next": null,
+  "previous": null,
+  "results": {
+    "total_stock_value": 15000000,
+    "total_store_count": 20,
+    "items": [
+      {
+        "id": 1,
+        "name": "Steel Bolts",
+        "store_category": { "id": 9, "name": "Fasteners" },
+        "quantity": 500,
+        "unit": "pieces",
+        "price": 200,
+        "description": "High-strength steel bolts for assembly",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 2,
+        "name": "Aluminum Sheets",
+        "store_category": { "id": 2, "name": "Materials" },
+        "quantity": 100,
+        "unit": "sheets",
+        "price": 5000,
+        "description": "Lightweight aluminum sheets for construction",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 3,
+        "name": "Screws",
+        "store_category": { "id": 9, "name": "Fasteners" },
+        "quantity": 1000,
+        "unit": "pieces",
+        "price": 50,
+        "description": "Standard screws for general use",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 4,
+        "name": "Welding Rods",
+        "store_category": { "id": 6, "name": "Consumables" },
+        "quantity": 200,
+        "unit": "rods",
+        "price": 300,
+        "description": "Electrodes for arc welding",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 5,
+        "name": "Drill Bits",
+        "store_category": { "id": 5, "name": "Tools" },
+        "quantity": 50,
+        "unit": "pieces",
+        "price": 1000,
+        "description": "High-speed steel drill bits",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 6,
+        "name": "Plastic Wrap",
+        "store_category": { "id": 8, "name": "Packaging" },
+        "quantity": 300,
+        "unit": "rolls",
+        "price": 800,
+        "description": "Industrial-grade plastic wrap for packaging",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 7,
+        "name": "Hydraulic Fluid",
+        "store_category": { "id": 10, "name": "Adhesives" },
+        "quantity": 25,
+        "unit": "liters",
+        "price": 2000,
+        "description": "High-performance hydraulic fluid",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 8,
+        "name": "Safety Gloves",
+        "store_category": { "id": 3, "name": "Supplies" },
+        "quantity": 150,
+        "unit": "pairs",
+        "price": 400,
+        "description": "Durable safety gloves for handling",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 9,
+        "name": "Steel Rods",
+        "store_category": { "id": 2, "name": "Materials" },
+        "quantity": 80,
+        "unit": "pieces",
+        "price": 3000,
+        "description": "Reinforced steel rods for construction",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 10,
+        "name": "Cutting Blades",
+        "store_category": { "id": 5, "name": "Tools" },
+        "quantity": 60,
+        "unit": "pieces",
+        "price": 1200,
+        "description": "Precision cutting blades for machinery",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 11,
+        "name": "Cardboard Boxes",
+        "store_category": { "id": 8, "name": "Packaging" },
+        "quantity": 200,
+        "unit": "boxes",
+        "price": 150,
+        "description": "Standard cardboard boxes for shipping",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 12,
+        "name": "Nuts",
+        "store_category": { "id": 9, "name": "Fasteners" },
+        "quantity": 800,
+        "unit": "pieces",
+        "price": 60,
+        "description": "Assorted nuts for assembly",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 13,
+        "name": "Lubricant Oil",
+        "store_category": { "id": 10, "name": "Adhesives" },
+        "quantity": 30,
+        "unit": "liters",
+        "price": 1500,
+        "description": "Industrial lubricant oil",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 14,
+        "name": "Wrench Set",
+        "store_category": { "id": 5, "name": "Tools" },
+        "quantity": 40,
+        "unit": "sets",
+        "price": 2500,
+        "description": "Complete wrench set for maintenance",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 15,
+        "name": "Protective Tape",
+        "store_category": { "id": 8, "name": "Packaging" },
+        "quantity": 250,
+        "unit": "rolls",
+        "price": 300,
+        "description": "Adhesive tape for secure packaging",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 16,
+        "name": "Copper Wire",
+        "store_category": { "id": 2, "name": "Materials" },
+        "quantity": 100,
+        "unit": "meters",
+        "price": 600,
+        "description": "High-conductivity copper wire",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 17,
+        "name": "Safety Helmets",
+        "store_category": { "id": 3, "name": "Supplies" },
+        "quantity": 60,
+        "unit": "pieces",
+        "price": 800,
+        "description": "Standard safety helmets for workers",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 18,
+        "name": "Welding Masks",
+        "store_category": { "id": 6, "name": "Consumables" },
+        "quantity": 20,
+        "unit": "pieces",
+        "price": 1500,
+        "description": "Protective welding masks",
+        "image": null,
+        "archived": false
+      },
+      {
+        "id": 19,
+        "name": "Steel Plates",
+        "store_category": { "id": 2, "name": "Materials" },
+        "quantity": 50,
+        "unit": "plates",
+        "price": 4000,
+        "description": "Heavy-duty steel plates for construction",
+        "image": null,
+        "archived": true
+      },
+      {
+        "id": 20,
+        "name": "Screwdrivers",
+        "store_category": { "id": 5, "name": "Tools" },
+        "quantity": 0,
+        "unit": "sets",
+        "price": 500,
+        "description": "Multi-type screwdriver set",
+        "image": null,
+        "archived": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "breakdown_year": {
+    "projects_count_year": 120,
+    "total_projects_income_year": 120000000,
+    "no_shop_projects_year": 70000000,
+    "project_shop_income_year": 50000000,
+    "project_expenses_year": 80000000,
+    "profit_year": 40000000,
+    "percentage_projects": "58.33%",
+    "percentage_shop": "41.67%"
+  },
+  "breakdown_month": {
+    "projects_count_month": 11,
+    "total_projects_income_month": 10800000,
+    "no_shop_projects_month": 6300000,
+    "project_shop_income_month": 4500000,
+    "project_expenses_month": 7100000,
+    "profit_month": 3700000,
+    "percentage_projects": "58.33%",
+    "percentage_shop": "41.67%"
+  },
+  "expense_breakdown_year": {
+    "contractors": 20000000,
+    "raw_materials": 30000000,
+    "overhead": 15000000,
+    "factory_expenses": 10000000,
+    "other_production_expensis": 5000000,
+    "yearly_sold_cost_price": 25000000,
+    "total_project_expenses_year": 80000000,
+    "overhead_cost": 15000000
+  },
+  "expense_breakdown_month": {
+    "contractors": 1950000,
+    "raw_materials": 2800000,
+    "overhead": 1250000,
+    "factory_expenses": 750000,
+    "other_production_expensis": 350000,
+    "monthly_sold_cost_price": 2200000,
+    "total_project_expenses_month": 7100000
+  },
+  "key_metrics": {
+    "active_employees": 50,
+    "total_projects_completed": 100,
+    "average_project_duration_days": 30,
+    "customer_satisfaction_rate": "85%",
+    "on_time_delivery_rate": "90%"
+  },
+  "customers": {
+    "all_customers_count": 200,
+    "active_customers_count": 150,
+    "owing_customers_count": 20,
+    "owing_customers": [
+      { "id": 1, "name": "John Doe", "amount_owed": 500000 },
+      { "id": 2, "name": "Jane Smith", "amount_owed": 300000 }
+    ]
+  },
+  "additional_metrics": {
+    "total_revenue": 150000000,
+    "net_profit_margin": "26.67%",
+    "employee_productivity_rate": "80%",
+    "inventory_turnover": 5.5,
+    "average_contract_value": 1250000,
+    "customer_retention_rate": "75%",
+    "project_success_rate": "88%",
+    "cost_per_project": 666667,
+    "revenue_per_employee": 3000000,
+    "monthly_growth_rate": "5%",
+    "client_referral_rate": "30%",
+    "operational_efficiency": "82%",
+    "budget_adherence_rate": "87%"
+  },
+"monthly_income_trend": [
+  { "month": "Sep 2024", "total_income": 6400000 },
+  { "month": "Oct 2024", "total_income": 7100000 },
+  { "month": "Nov 2024", "total_income": 7550000 },
+  { "month": "Dec 2024", "total_income": 6900000 },
+  { "month": "Jan 2025", "total_income": 7700000 },
+  { "month": "Feb 2025", "total_income": 8200000 },
+  { "month": "Mar 2025", "total_income": 7800000 },
+  { "month": "Apr 2025", "total_income": 8500000 },
+  { "month": "May 2025", "total_income": 9000000 },
+  { "month": "Jun 2025", "total_income": 8700000 },
+  { "month": "Jul 2025", "total_income": 9400000 },
+  { "month": "Aug 2025", "total_income": 8900000 }
+],
+"monthly_expense_trend": [
+  { "month": "Sep 2024", "total_expenses": 4600000 },
+  { "month": "Oct 2024", "total_expenses": 5200000 },
+  { "month": "Nov 2024", "total_expenses": 5500000 },
+  { "month": "Dec 2024", "total_expenses": 4800000 },
+  { "month": "Jan 2025", "total_expenses": 5300000 },
+  { "month": "Feb 2025", "total_expenses": 5700000 },
+  { "month": "Mar 2025", "total_expenses": 6000000 },
+  { "month": "Apr 2025", "total_expenses": 5600000 },
+  { "month": "May 2025", "total_expenses": 6300000 },
+  { "month": "Jun 2025", "total_expenses": 5900000 },
+  { "month": "Jul 2025", "total_expenses": 6500000 },
+  { "month": "Aug 2025", "total_expenses": 6100000 }
+],
+"monthly_profit_trend": [
+  { "month": "Sep 2024", "profit": 1800000 },
+  { "month": "Oct 2024", "profit": 1900000 },
+  { "month": "Nov 2024", "profit": 2050000 },
+  { "month": "Dec 2024", "profit": 2100000 },
+  { "month": "Jan 2025", "profit": 2400000 },
+  { "month": "Feb 2025", "profit": 2500000 },
+  { "month": "Mar 2025", "profit": 1800000 },
+  { "month": "Apr 2025", "profit": 2900000 },
+  { "month": "May 2025", "profit": 2700000 },
+  { "month": "Jun 2025", "profit": 2800000 },
+  { "month": "Jul 2025", "profit": 2900000 },
+  { "month": "Aug 2025", "profit": 2800000 }
+  ]
+}

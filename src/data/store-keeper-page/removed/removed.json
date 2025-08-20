@@ -1,0 +1,135 @@
+{
+  "this_month_removed_count": 15,
+  "this_month_removed": 225000,
+  "daily_data": [
+    {
+      "date": "2025-08-15",
+      "entries": [
+        {
+          "id": 1,
+          "name": "Steel Bolts",
+          "raw_material": { "id": 1, "name": "Steel Bolts", "unit": "pieces" },
+          "quantity": "50",
+          "price": "200",
+          "product_its_used": { "id": 1, "name": "Widget A" },
+          "date": "2025-08-15"
+        },
+        {
+          "id": 2,
+          "name": "Aluminum Sheets",
+          "raw_material": { "id": 2, "name": "Aluminum Sheets", "unit": "sheets" },
+          "quantity": "10",
+          "price": "5000",
+          "product_its_used": { "id": 2, "name": "Widget B" },
+          "date": "2025-08-15"
+        }
+      ],
+      "daily_total": 60000
+    },
+    {
+      "date": "2025-07-20",
+      "entries": [
+        {
+          "id": 3,
+          "name": "Screws",
+          "raw_material": { "id": 3, "name": "Screws", "unit": "pieces" },
+          "quantity": "100",
+          "price": "50",
+          "product_its_used": { "id": 3, "name": "Gadget C" },
+          "date": "2025-07-20"
+        }
+      ],
+      "daily_total": 5000
+    },
+    {
+      "date": "2025-06-10",
+      "entries": [
+        {
+          "id": 4,
+          "name": "Steel Bolts",
+          "raw_material": { "id": 1, "name": "Steel Bolts", "unit": "pieces" },
+          "quantity": "75",
+          "price": "200",
+          "product_its_used": { "id": 1, "name": "Widget A" },
+          "date": "2025-06-10"
+        }
+      ],
+      "daily_total": 15000
+    },
+    {
+      "date": "2025-05-05",
+      "entries": [
+        {
+          "id": 5,
+          "name": "Aluminum Sheets",
+          "raw_material": { "id": 2, "name": "Aluminum Sheets", "unit": "sheets" },
+          "quantity": "5",
+          "price": "5000",
+          "product_its_used": { "id": 2, "name": "Widget B" },
+          "date": "2025-05-05"
+        }
+      ],
+      "daily_total": 25000
+    },
+    {
+      "date": "2025-04-15",
+      "entries": [
+        {
+          "id": 6,
+          "name": "Screws",
+          "raw_material": { "id": 3, "name": "Screws", "unit": "pieces" },
+          "quantity": "150",
+          "price": "50",
+          "product_its_used": { "id": 3, "name": "Gadget C" },
+          "date": "2025-04-15"
+        }
+      ],
+      "daily_total": 7500
+    },
+    {
+      "date": "2025-03-20",
+      "entries": [
+        {
+          "id": 7,
+          "name": "Steel Bolts",
+          "raw_material": { "id": 1, "name": "Steel Bolts", "unit": "pieces" },
+          "quantity": "60",
+          "price": "200",
+          "product_its_used": { "id": 1, "name": "Widget A" },
+          "date": "2025-03-20"
+        }
+      ],
+      "daily_total": 12000
+    },
+    {
+      "date": "2025-02-10",
+      "entries": [
+        {
+          "id": 8,
+          "name": "Aluminum Sheets",
+          "raw_material": { "id": 2, "name": "Aluminum Sheets", "unit": "sheets" },
+          "quantity": "8",
+          "price": "5000",
+          "product_its_used": { "id": 2, "name": "Widget B" },
+          "date": "2025-02-10"
+        }
+      ],
+      "daily_total": 40000
+    },
+    {
+      "date": "2025-01-05",
+      "entries": [
+        {
+          "id": 9,
+          "name": "Screws",
+          "raw_material": { "id": 3, "name": "Screws", "unit": "pieces" },
+          "quantity": "200",
+          "price": "50",
+          "product_its_used": { "id": 3, "name": "Gadget C" },
+          "date": "2025-01-05"
+        }
+      ],
+      "daily_total": 10000
+    }
+  ]
+}

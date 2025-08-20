@@ -1,0 +1,89 @@
+{
+  "financial_health": {
+    "active_assets": 120,
+    "deprecated_assets": 15,
+    "sales_count_this_month": 150,
+    "total_project_sales_this_month": 5000000,
+    "total_non_project_sales_this_month": 3000000,
+    "total_shop_items_sold_this_month": 200,
+    "total_shop_profit_this_month": 1500000,
+    "project_count_this_month": 10,
+    "total_project_amount_this_month": 6000000,
+    "total_income_this_month": 8000000,
+    "total_expenses_month": 4500000,
+    "profit_month": 3500000
+  },
+  "yearly_data": {
+    "total_income_year": 96000000,
+    "total_expenses_year": 54000000,
+    "profit_year": 42000000
+  },
+  "customers": {
+    "all_customers_count": 500,
+    "active_customers_count": 300,
+    "owing_customers_count": 50
+  },
+  "workers": {
+    "salary_workers_count": 20,
+    "active_salary_workers_count": 18,
+    "total_salary_workers_monthly_pay": 2000000,
+    "all_contractors_count": 15,
+    "all_active_contractors_count": 12
+  },
+  "paid": {
+    "monthly_total_paid": 3000000,
+    "weekly_total_paid": 750000,
+    "total_paid": 36000000,
+    "total_contractors_monthly_pay": 1200000,
+    "total_contractors_weekly_pay": 300000
+  },
+  "expense_category_breakdown": [
+    { "category": "Materials", "total": 2000000 },
+    { "category": "Labor", "total": 1500000 },
+    { "category": "Equipment", "total": 1200000 },
+    { "category": "Utilities", "total": 1000000 },
+    { "category": "Others", "total": 1400000 }
+  ],
+ "monthly_income_trend": [
+    { "month": "Jan 2025", "total_income": 7200000, "type_breakdown": { "project": 4200000, "shop": 3000000 } },
+    { "month": "Feb 2025", "total_income": 8500000, "type_breakdown": { "project": 5500000, "shop": 3000000 } },
+    { "month": "Mar 2025", "total_income": 7600000, "type_breakdown": { "project": 4600000, "shop": 3000000 } },
+    { "month": "Apr 2025", "total_income": 9100000, "type_breakdown": { "project": 6100000, "shop": 3000000 } },
+    { "month": "May 2025", "total_income": 7800000, "type_breakdown": { "project": 4800000, "shop": 3000000 } },
+    { "month": "Jun 2025", "total_income": 9600000, "type_breakdown": { "project": 6600000, "shop": 3000000 } },
+    { "month": "Jul 2025", "total_income": 8300000, "type_breakdown": { "project": 5300000, "shop": 3000000 } },
+    { "month": "Aug 2025", "total_income": 10500000, "type_breakdown": { "project": 7500000, "shop": 3000000 } },
+    { "month": "Sep 2025", "total_income": 8800000, "type_breakdown": { "project": 5800000, "shop": 3000000 } },
+    { "month": "Oct 2025", "total_income": 9900000, "type_breakdown": { "project": 6900000, "shop": 3000000 } },
+    { "month": "Nov 2025", "total_income": 8700000, "type_breakdown": { "project": 5700000, "shop": 3000000 } },
+    { "month": "Dec 2025", "total_income": 11000000, "type_breakdown": { "project": 8000000, "shop": 3000000 } }
+  ],
+  "monthly_expense_trend": [
+    { "month": "Jan 2025", "total_expenses": 4200000, "type_breakdown": { "project": 2200000, "shop": 1500000, "others": 500000 } },
+    { "month": "Feb 2025", "total_expenses": 5000000, "type_breakdown": { "project": 2600000, "shop": 1900000, "others": 500000 } },
+    { "month": "Mar 2025", "total_expenses": 4600000, "type_breakdown": { "project": 2400000, "shop": 1700000, "others": 500000 } },
+    { "month": "Apr 2025", "total_expenses": 5600000, "type_breakdown": { "project": 3000000, "shop": 2100000, "others": 500000 } },
+    { "month": "May 2025", "total_expenses": 4800000, "type_breakdown": { "project": 2500000, "shop": 1800000, "others": 500000 } },
+    { "month": "Jun 2025", "total_expenses": 5900000, "type_breakdown": { "project": 3100000, "shop": 2300000, "others": 500000 } },
+    { "month": "Jul 2025", "total_expenses": 5200000, "type_breakdown": { "project": 2700000, "shop": 2000000, "others": 500000 } },
+    { "month": "Aug 2025", "total_expenses": 6400000, "type_breakdown": { "project": 3400000, "shop": 2500000, "others": 500000 } },
+    { "month": "Sep 2025", "total_expenses": 5000000, "type_breakdown": { "project": 2600000, "shop": 1900000, "others": 500000 } },
+    { "month": "Oct 2025", "total_expenses": 6100000, "type_breakdown": { "project": 3100000, "shop": 2500000, "others": 500000 } },
+    { "month": "Nov 2025", "total_expenses": 4900000, "type_breakdown": { "project": 2500000, "shop": 1900000, "others": 500000 } },
+    { "month": "Dec 2025", "total_expenses": 6600000, "type_breakdown": { "project": 3600000, "shop": 2500000, "others": 500000 } }
+  ],
+  "monthly_profit_trend": [
+    { "month": "Jan 2025", "profit": 3000000 },
+    { "month": "Feb 2025", "profit": 3500000 },
+    { "month": "Mar 2025", "profit": 3000000 },
+    { "month": "Apr 2025", "profit": 3500000 },
+    { "month": "May 2025", "profit": 3000000 },
+    { "month": "Jun 2025", "profit": 3700000 },
+    { "month": "Jul 2025", "profit": 3100000 },
+    { "month": "Aug 2025", "profit": 4100000 },
+    { "month": "Sep 2025", "profit": 3800000 },
+    { "month": "Oct 2025", "profit": 3800000 },
+    { "month": "Nov 2025", "profit": 3800000 },
+    { "month": "Dec 2025", "profit": 4400000 }
+  ]
+}
