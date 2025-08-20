@@ -1,0 +1,17 @@
+{
+  "count": 10,
+  "next": null,
+  "previous": null,
+  "results": [
+    { "id": 1, "name": "Components" },
+    { "id": 2, "name": "Materials" },
+    { "id": 3, "name": "Supplies" },
+    { "id": 4, "name": "Parts" },
+    { "id": 5, "name": "Tools" },
+    { "id": 6, "name": "Consumables" },
+    { "id": 7, "name": "Equipment" },
+    { "id": 8, "name": "Packaging" },
+    { "id": 9, "name": "Fasteners" },
+    { "id": 10, "name": "Adhesives" }
+  ]
+}

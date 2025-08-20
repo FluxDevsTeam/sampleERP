@@ -1,0 +1,72 @@
+{
+  "total_shop_value": 15000000,
+  "total_cost_value": 10000000,
+  "total_profit_potential": 5000000,
+  "yearly_added_value": 3000000,
+  "total_added_this_month": 250000,
+  "total_sold_this_month": 400000,
+  "total_profit_this_month": 150000,
+  "yearly_profit": 2000000,
+  "amount_sold_monthly": [
+    { "month": "Jan", "total": 300000 },
+    { "month": "Feb", "total": 320000 },
+    { "month": "Mar", "total": 350000 },
+    { "month": "Apr", "total": 280000 },
+    { "month": "May", "total": 310000 },
+    { "month": "Jun", "total": 330000 },
+    { "month": "Jul", "total": 360000 },
+    { "month": "Aug", "total": 400000 },
+    { "month": "Sep", "total": 380000 },
+    { "month": "Oct", "total": 390000 },
+    { "month": "Nov", "total": 370000 },
+    { "month": "Dec", "total": 410000 }
+  ],
+  "monthly_added_value": [
+    { "month": "Jan", "total": 200000 },
+    { "month": "Feb", "total": 210000 },
+    { "month": "Mar", "total": 220000 },
+    { "month": "Apr", "total": 190000 },
+    { "month": "May", "total": 200000 },
+    { "month": "Jun", "total": 230000 },
+    { "month": "Jul", "total": 240000 },
+    { "month": "Aug", "total": 250000 },
+    { "month": "Sep", "total": 260000 },
+    { "month": "Oct", "total": 270000 },
+    { "month": "Nov", "total": 280000 },
+    { "month": "Dec", "total": 290000 }
+  ],
+  "monthly_profit": [
+    { "month": "January", "total": 100000 },
+    { "month": "February", "total": 110000 },
+    { "month": "March", "total": 120000 },
+    { "month": "April", "total": 90000 },
+    { "month": "May", "total": 100000 },
+    { "month": "June", "total": 130000 },
+    { "month": "July", "total": 140000 },
+    { "month": "August", "total": 150000 },
+    { "month": "September", "total": 160000 },
+    { "month": "October", "total": 170000 },
+    { "month": "November", "total": 180000 },
+    { "month": "December", "total": 190000 }
+  ],
+  "shop_category_data": [
+    {
+      "category": "Electronics",
+      "total_cost_value": 5000000,
+      "total_profit": 1500000,
+      "total_stock_value": 7000000
+    },
+    {
+      "category": "Clothing",
+      "total_cost_value": 3000000,
+      "total_profit": 1000000,
+      "total_stock_value": 4000000
+    },
+    {
+      "category": "Furniture",
+      "total_cost_value": 2000000,
+      "total_profit": 500000,
+      "total_stock_value": 3000000
+    }
+  ]
+}

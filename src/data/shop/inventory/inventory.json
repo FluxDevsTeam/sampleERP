@@ -1,0 +1,165 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "Laptop Pro",
+      "inventory_category": { "id": 1, "name": "Electronics" },
+      "stock": 50,
+      "description": "High-performance laptop with 16GB RAM",
+      "dimensions": "35x25x2 cm",
+      "cost_price": 500000,
+      "selling_price": 650000,
+      "image": null,
+      "profit_per_item": 150000,
+      "total_price": 32500000
+    },
+    {
+      "id": 2,
+      "name": "Designer Jacket",
+      "inventory_category": { "id": 2, "name": "Clothing" },
+      "stock": 100,
+      "description": "Premium leather jacket",
+      "dimensions": "60x40x5 cm",
+      "cost_price": 15000,
+      "selling_price": 25000,
+      "image": null,
+      "profit_per_item": 10000,
+      "total_price": 2500000
+    },
+    {
+      "id": 3,
+      "name": "Wooden Table",
+      "inventory_category": { "id": 3, "name": "Furniture" },
+      "stock": 20,
+      "description": "Solid oak dining table",
+      "dimensions": "180x90x75 cm",
+      "cost_price": 200000,
+      "selling_price": 300000,
+      "image": null,
+      "profit_per_item": 100000,
+      "total_price": 6000000
+    },
+    {
+      "id": 4,
+      "name": "Wireless Earbuds",
+      "inventory_category": { "id": 1, "name": "Electronics" },
+      "stock": 120,
+      "description": "Noise-cancelling Bluetooth earbuds",
+      "dimensions": "6x4x3 cm",
+      "cost_price": 25000,
+      "selling_price": 40000,
+      "image": null,
+      "profit_per_item": 15000,
+      "total_price": 4800000
+    },
+    {
+      "id": 5,
+      "name": "Denim Jeans",
+      "inventory_category": { "id": 2, "name": "Clothing" },
+      "stock": 85,
+      "description": "Slim-fit premium denim",
+      "dimensions": "80x30x2 cm",
+      "cost_price": 8000,
+      "selling_price": 15000,
+      "image": null,
+      "profit_per_item": 7000,
+      "total_price": 1275000
+    },
+    {
+      "id": 6,
+      "name": "Office Chair",
+      "inventory_category": { "id": 3, "name": "Furniture" },
+      "stock": 35,
+      "description": "Ergonomic executive chair",
+      "dimensions": "60x60x110 cm",
+      "cost_price": 75000,
+      "selling_price": 120000,
+      "image": null,
+      "profit_per_item": 45000,
+      "total_price": 4200000
+    },
+    {
+      "id": 7,
+      "name": "Smart Watch",
+      "inventory_category": { "id": 1, "name": "Electronics" },
+      "stock": 65,
+      "description": "Fitness tracking smartwatch",
+      "dimensions": "4x4x1 cm",
+      "cost_price": 60000,
+      "selling_price": 90000,
+      "image": null,
+      "profit_per_item": 30000,
+      "total_price": 5850000
+    },
+    {
+      "id": 8,
+      "name": "Silk Scarf",
+      "inventory_category": { "id": 2, "name": "Clothing" },
+      "stock": 50,
+      "description": "100% pure silk designer scarf",
+      "dimensions": "180x30x1 cm",
+      "cost_price": 5000,
+      "selling_price": 12000,
+      "image": null,
+      "profit_per_item": 7000,
+      "total_price": 600000
+    },
+    {
+      "id": 9,
+      "name": "Bookshelf",
+      "inventory_category": { "id": 3, "name": "Furniture" },
+      "stock": 15,
+      "description": "5-tier wooden bookshelf",
+      "dimensions": "80x30x180 cm",
+      "cost_price": 90000,
+      "selling_price": 150000,
+      "image": null,
+      "profit_per_item": 60000,
+      "total_price": 2250000
+    },
+    {
+      "id": 10,
+      "name": "Tablet",
+      "inventory_category": { "id": 1, "name": "Electronics" },
+      "stock": 40,
+      "description": "10-inch Android tablet",
+      "dimensions": "25x17x1 cm",
+      "cost_price": 80000,
+      "selling_price": 120000,
+      "image": null,
+      "profit_per_item": 40000,
+      "total_price": 4800000
+    }
+  ],
+  "categories": [
+    { "id": 1, "name": "Electronics" },
+    { "id": 2, "name": "Clothing" },
+    { "id": 3, "name": "Furniture" }
+  ],
+  "metrics": {
+    "total_cost_value": 15805000,
+    "total_profit": 6185000,
+    "total_stock_count": 580,
+    "total_stock_value": 21990000,
+    "category_breakdown": [
+      {
+        "category_id": 1,
+        "category_name": "Electronics",
+        "item_count": 4,
+        "total_value": 47950000
+      },
+      {
+        "category_id": 2,
+        "category_name": "Clothing",
+        "item_count": 3,
+        "total_value": 4375000
+      },
+      {
+        "category_id": 3,
+        "category_name": "Furniture",
+        "item_count": 3,
+        "total_value": 12450000
+      }
+    ]
+  }
+}

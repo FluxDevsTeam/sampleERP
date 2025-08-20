@@ -1,0 +1,202 @@
+{
+  "yearly_added_material_count": 215,
+  "yearly_added_total_cost": 3250000,
+  "monthly_added_material_count": 18,
+  "monthly_added_total_cost": 270000,
+  "daily_data": [
+    {
+      "date": "2025-08-15",
+      "entries": [
+        {
+          "id": 1,
+          "material": { "id": 1, "name": "Steel Bolts", "unit": "pieces" },
+          "quantity": "100",
+          "cost_price": "200",
+          "date": "2025-08-15"
+        },
+        {
+          "id": 2,
+          "material": { "id": 2, "name": "Aluminum Sheets", "unit": "sheets" },
+          "quantity": "20",
+          "cost_price": "5000",
+          "date": "2025-08-15"
+        }
+      ],
+      "daily_added_cost_total": 102000
+    },
+    {
+      "date": "2025-08-14",
+      "entries": [
+        {
+          "id": 3,
+          "material": { "id": 3, "name": "Screws", "unit": "pieces" },
+          "quantity": "200",
+          "cost_price": "50",
+          "date": "2025-08-14"
+        },
+        {
+          "id": 4,
+          "material": { "id": 4, "name": "PVC Pipes", "unit": "meters" },
+          "quantity": "15",
+          "cost_price": "1200",
+          "date": "2025-08-14"
+        }
+      ],
+      "daily_added_cost_total": 22000
+    },
+    {
+      "date": "2025-07-28",
+      "entries": [
+        {
+          "id": 5,
+          "material": { "id": 5, "name": "Electrical Wires", "unit": "rolls" },
+          "quantity": "5",
+          "cost_price": "8000",
+          "date": "2025-07-28"
+        }
+      ],
+      "daily_added_cost_total": 40000
+    },
+    {
+      "date": "2025-07-15",
+      "entries": [
+        {
+          "id": 6,
+          "material": { "id": 6, "name": "Paint Cans", "unit": "gallons" },
+          "quantity": "10",
+          "cost_price": "3500",
+          "date": "2025-07-15"
+        },
+        {
+          "id": 7,
+          "material": { "id": 7, "name": "Nails", "unit": "kg" },
+          "quantity": "5",
+          "cost_price": "1500",
+          "date": "2025-07-15"
+        }
+      ],
+      "daily_added_cost_total": 42500
+    },
+    {
+      "date": "2025-06-22",
+      "entries": [
+        {
+          "id": 8,
+          "material": { "id": 8, "name": "Plywood", "unit": "sheets" },
+          "quantity": "8",
+          "cost_price": "6500",
+          "date": "2025-06-22"
+        }
+      ],
+      "daily_added_cost_total": 52000
+    },
+    {
+      "date": "2025-06-10",
+      "entries": [
+        {
+          "id": 9,
+          "material": { "id": 9, "name": "Concrete Mix", "unit": "bags" },
+          "quantity": "30",
+          "cost_price": "1800",
+          "date": "2025-06-10"
+        }
+      ],
+      "daily_added_cost_total": 54000
+    },
+    {
+      "date": "2025-05-18",
+      "entries": [
+        {
+          "id": 10,
+          "material": { "id": 10, "name": "Roofing Tiles", "unit": "pieces" },
+          "quantity": "150",
+          "cost_price": "450",
+          "date": "2025-05-18"
+        }
+      ],
+      "daily_added_cost_total": 67500
+    },
+    {
+      "date": "2025-05-05",
+      "entries": [
+        {
+          "id": 11,
+          "material": { "id": 11, "name": "Insulation Foam", "unit": "panels" },
+          "quantity": "12",
+          "cost_price": "3200",
+          "date": "2025-05-05"
+        }
+      ],
+      "daily_added_cost_total": 38400
+    },
+    {
+      "date": "2025-04-30",
+      "entries": [
+        {
+          "id": 12,
+          "material": { "id": 12, "name": "Ceramic Tiles", "unit": "boxes" },
+          "quantity": "25",
+          "cost_price": "2800",
+          "date": "2025-04-30"
+        }
+      ],
+      "daily_added_cost_total": 70000
+    },
+    {
+      "date": "2025-04-15",
+      "entries": [
+        {
+          "id": 13,
+          "material": { "id": 13, "name": "Copper Pipes", "unit": "meters" },
+          "quantity": "8",
+          "cost_price": "4500",
+          "date": "2025-04-15"
+        }
+      ],
+      "daily_added_cost_total": 36000
+    }
+  ],
+  "monthly_totals": [
+    {
+      "month": "January",
+      "total": 185000,
+      "material_count": 12
+    },
+    {
+      "month": "February",
+      "total": 210000,
+      "material_count": 15
+    },
+    {
+      "month": "March",
+      "total": 245000,
+      "material_count": 18
+    },
+    {
+      "month": "April",
+      "total": 106000,
+      "material_count": 8
+    },
+    {
+      "month": "May",
+      "total": 105900,
+      "material_count": 7
+    },
+    {
+      "month": "June",
+      "total": 106000,
+      "material_count": 9
+    },
+    {
+      "month": "July",
+      "total": 82500,
+      "material_count": 6
+    },
+    {
+      "month": "August",
+      "total": 124000,
+      "material_count": 12
+    }
+  ],
+  "yearly_total": 3250000
+}
