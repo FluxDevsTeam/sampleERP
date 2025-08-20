@@ -1,0 +1,136 @@
+{
+  "monthly_income_trend": [
+    { "month": "Sep 2024", "total_income": 4800000 },
+    { "month": "Oct 2024", "total_income": 5500000 },
+    { "month": "Nov 2024", "total_income": 4200000 },
+    { "month": "Dec 2024", "total_income": 6500000 },
+    { "month": "Jan 2025", "total_income": 5000000 },
+    { "month": "Feb 2025", "total_income": 5700000 },
+    { "month": "Mar 2025", "total_income": 4900000 },
+    { "month": "Apr 2025", "total_income": 6300000 },
+    { "month": "May 2025", "total_income": 5800000 },
+    { "month": "Jun 2025", "total_income": 5400000 },
+    { "month": "Jul 2025", "total_income": 6700000 },
+    { "month": "Aug 2025", "total_income": 6000000 }
+  ],
+  "monthly_expense_trend": [
+    { "month": "Sep 2024", "total_expenses": 2800000 },
+    { "month": "Oct 2024", "total_expenses": 3400000 },
+    { "month": "Nov 2024", "total_expenses": 2600000 },
+    { "month": "Dec 2024", "total_expenses": 3800000 },
+    { "month": "Jan 2025", "total_expenses": 3100000 },
+    { "month": "Feb 2025", "total_expenses": 3600000 },
+    { "month": "Mar 2025", "total_expenses": 2900000 },
+    { "month": "Apr 2025", "total_expenses": 3700000 },
+    { "month": "May 2025", "total_expenses": 3300000 },
+    { "month": "Jun 2025", "total_expenses": 3000000 },
+    { "month": "Jul 2025", "total_expenses": 3900000 },
+    { "month": "Aug 2025", "total_expenses": 3500000 }
+  ],
+  "monthly_profit_trend": [
+    { "month": "Sep 2024", "profit": 2000000 },
+    { "month": "Oct 2024", "profit": 2100000 },
+    { "month": "Nov 2024", "profit": 1600000 },
+    { "month": "Dec 2024", "profit": 2700000 },
+    { "month": "Jan 2025", "profit": 1900000 },
+    { "month": "Feb 2025", "profit": 2100000 },
+    { "month": "Mar 2025", "profit": 2000000 },
+    { "month": "Apr 2025", "profit": 2600000 },
+    { "month": "May 2025", "profit": 2500000 },
+    { "month": "Jun 2025", "profit": 2400000 },
+    { "month": "Jul 2025", "profit": 2800000 },
+    { "month": "Aug 2025", "profit": 2500000 }
+  ],
+  "categorical_data_year": {
+    "expense_categories": [
+      { "name": "Salaries", "value": 12000000 },
+      { "name": "Contractors", "value": 8000000 },
+      { "name": "Raw Materials", "value": 10000000 },
+      { "name": "Assets", "value": 5000000 },
+      { "name": "Factory Expenses", "value": 6000000 },
+      { "name": "Other Production", "value": 3000000 },
+      { "name": "Miscellaneous", "value": 2000000 }
+    ]
+  },
+  "categorical_data_month": {
+    "expense_categories": [
+      { "name": "Salaries", "value": 1000000 },
+      { "name": "Contractors", "value": 600000 },
+      { "name": "Raw Materials", "value": 800000 },
+      { "name": "Assets", "value": 400000 },
+      { "name": "Factory Expenses", "value": 500000 },
+      { "name": "Other Production", "value": 250000 },
+      { "name": "Miscellaneous", "value": 150000 }
+    ]
+  },
+  "income_breakdown_year": {
+    "projects": 40000000,
+    "no_shop_projects": 15000000,
+    "shop_sales": 25000000,
+    "non_project_shop_sales": 10000000,
+    "percentage_projects": 61.54,
+    "percentage_shop": 38.46
+  },
+  "income_breakdown_month": {
+    "projects": 3500000,
+    "no_shop_projects": 1200000,
+    "shop_sales": 2300000,
+    "non_project_shop_sales": 800000,
+    "percentage_projects": 60.34,
+    "percentage_shop": 39.66
+  },
+  "expense_breakdown_year": {
+    "salaries": 12000000,
+    "contractors": 8000000,
+    "raw_materials": 10000000,
+    "assets": 5000000,
+    "factory_expenses": 6000000,
+    "other_production_expensis": 3000000,
+    "monthly_sold_cost_price": 2000000
+  },
+  "expense_breakdown_month": {
+    "salaries": 1000000,
+    "contractors": 600000,
+    "raw_materials": 800000,
+    "assets": 400000,
+    "factory_expenses": 500000,
+    "other_production_expensis": 250000,
+    "monthly_sold_cost_price": 150000
+  },
+  "asset_analysis": {
+    "active_assets": 50,
+    "deprecated_assets": 10
+  },
+  "customers": {
+    "all_customers_count": 10,
+    "active_customers_count": 8,
+    "owing_customers_count": 3,
+    "owing_customers": [
+      { "id": 1, "name": "John Doe", "amount_owed": 500000 },
+      { "id": 2, "name": "Jane Smith", "amount_owed": 300000 },
+      { "id": 3, "name": "Michael Brown", "amount_owed": 200000 }
+    ]
+  },
+  "additional_metrics": {
+    "total_salary_workers": 30,
+    "active_salary_workers": 25,
+    "total_contractors": 15,
+    "active_contractors": 12,
+    "inventory_items": 1000,
+    "raw_materials_types": 50
+  },
+  "key_metrics": {
+    "overhead_cost": 5000000,
+    "suggested_overhead_cost": 4500000,
+    "total_income_year": 65000000,
+    "total_expenses_year": 40000000,
+    "total_profit_year": 25000000,
+    "total_income_month": 6500000,
+    "total_expenses_month": 3700000,
+    "profit_month": 2800000,
+    "current_assets_value": 20000000,
+    "inventory_value": 15000000,
+    "total_store_value": 35000000
+  },
+  "overhead_cost_base": "5000000"
+}

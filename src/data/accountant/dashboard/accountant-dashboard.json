@@ -1,0 +1,58 @@
+{
+  "financial_health": {
+    "total_expenses": 20000000,
+    "total_income": 35000000,
+    "total_profit": 15000000,
+    "total_assets": 60000000,
+    "total_shop_value": 25000000,
+    "yearly_total_paid": 18000000,
+    "active_salary_workers_count": 55,
+    "all_active_contractors_count": 22
+  },
+  "workers": {
+    "salary_workers_count": 65,
+    "contractors_count": 28,
+    "active_salary_workers_count": 55,
+    "all_active_contractors_count": 22,
+    "total_salary_workers_monthly_pay": 6000000,
+    "total_contractors_monthly_pay": 3500000,
+    "total_contractors_weekly_pay": 875000
+  },
+  "paid": {
+    "salary": 5000000,
+    "contractors": 2500000,
+    "total_paid": 7500000,
+    "weekly_total_paid": 1875000,
+    "total_contractors_weekly_pay": 875000
+  },
+  "expense_category_breakdown": [
+    { "category": "Salaries", "percentage": 38 },
+    { "category": "Raw Materials", "percentage": 28 },
+    { "category": "Utilities", "percentage": 12 },
+    { "category": "Marketing", "percentage": 10 },
+    { "category": "Maintenance", "percentage": 7 },
+    { "category": "Others", "percentage": 5 }
+  ],
+  "monthly_expense_trend": [
+    { "month": "Jan", "total_expenses": 1500000 },
+    { "month": "Feb", "total_expenses": 1750000 },
+    { "month": "Mar", "total_expenses": 1400000 },
+    { "month": "Apr", "total_expenses": 1800000 },
+    { "month": "May", "total_expenses": 1650000 },
+    { "month": "Jun", "total_expenses": 1900000 },
+    { "month": "Jul", "total_expenses": 1600000 },
+    { "month": "Aug", "total_expenses": 2000000 },
+    { "month": "Sep", "total_expenses": 1700000 },
+    { "month": "Oct", "total_expenses": 2100000 },
+    { "month": "Nov", "total_expenses": 1850000 },
+    { "month": "Dec", "total_expenses": 2200000 }
+  ],
+  "top_categories": [
+    { "name": "Salaries", "total": 7600000 },
+    { "name": "Raw Materials", "total": 5600000 },
+    { "name": "Utilities", "total": 2400000 },
+    { "name": "Marketing", "total": 2000000 },
+    { "name": "Maintenance", "total": 1400000 }
+  ],
+  "current_month_product_total": 3500000
+}

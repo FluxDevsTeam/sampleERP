@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "name": "Alice Johnson",
+    "company": "BuildIt Co.",
+    "contract_value": 120000,
+    "is_still_active": true
+  },
+  {
+    "id": "2",
+    "name": "Bob Williams",
+    "company": "CodeCrafters",
+    "contract_value": 90000,
+    "is_still_active": true
+  }
+]

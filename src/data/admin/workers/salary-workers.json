@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "name": "John Doe",
+    "position": "Software Engineer",
+    "salary": 75000,
+    "is_still_active": true
+  },
+  {
+    "id": "2",
+    "name": "Jane Smith",
+    "position": "Project Manager",
+    "salary": 85000,
+    "is_still_active": true
+  }
+]
