@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "name": "Custom Wooden Table",
+    "description": "Handcrafted table from oak wood.",
+    "price": 500,
+    "status": "available"
+  },
+  {
+    "id": "2",
+    "name": "Ergonomic Office Chair",
+    "description": "Comfortable chair with adjustable settings.",
+    "price": 250,
+    "status": "available"
+  }
+]

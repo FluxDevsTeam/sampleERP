@@ -1,0 +1,91 @@
+{
+  "results": {
+    "all_customers_count": 10,
+    "active_customers": 8,
+    "owing_customers": 3,
+    "all_customers": [
+      {
+        "id": 1,
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "phone_number": "08012345678",
+        "address": "123 Main St, Lagos",
+        "created_at": "2024-01-15T10:00:00Z"
+      },
+      {
+        "id": 2,
+        "name": "Jane Smith",
+        "email": "jane.smith@example.com",
+        "phone_number": "08098765432",
+        "address": "456 Broad St, Abuja",
+        "created_at": "2024-02-20T12:00:00Z"
+      },
+      {
+        "id": 3,
+        "name": "Michael Brown",
+        "email": "",
+        "phone_number": "08011122233",
+        "address": "789 High St, Port Harcourt",
+        "created_at": "2024-03-10T09:00:00Z"
+      },
+      {
+        "id": 4,
+        "name": "Sarah Johnson",
+        "email": "sarah.j@example.com",
+        "phone_number": "08044455566",
+        "address": "101 Low St, Kano",
+        "created_at": "2024-04-05T14:00:00Z"
+      },
+      {
+        "id": 5,
+        "name": "David Lee",
+        "email": "david.lee@example.com",
+        "phone_number": "08077788899",
+        "address": "202 Middle St, Ibadan",
+        "created_at": "2024-05-12T11:00:00Z"
+      },
+      {
+        "id": 6,
+        "name": "Emma Wilson",
+        "email": "",
+        "phone_number": "08022233344",
+        "address": "303 Oak St, Enugu",
+        "created_at": "2024-06-18T13:00:00Z"
+      },
+      {
+        "id": 7,
+        "name": "James Taylor",
+        "email": "james.t@example.com",
+        "phone_number": "08055566677",
+        "address": "404 Pine St, Kaduna",
+        "created_at": "2024-07-22T15:00:00Z"
+      },
+      {
+        "id": 8,
+        "name": "Olivia Davis",
+        "email": "olivia.d@example.com",
+        "phone_number": "08088899900",
+        "address": "505 Cedar St, Jos",
+        "created_at": "2024-08-01T10:00:00Z"
+      },
+      {
+        "id": 9,
+        "name": "William Clark",
+        "email": "",
+        "phone_number": "08033344455",
+        "address": "606 Elm St, Benin",
+        "created_at": "2024-09-10T12:00:00Z"
+      },
+      {
+        "id": 10,
+        "name": "Sophia Martinez",
+        "email": "sophia.m@example.com",
+        "phone_number": "08066677788",
+        "address": "707 Maple St, Owerri",
+        "created_at": "2024-10-15T14:00:00Z"
+      }
+    ]
+  },
+  "next": null,
+  "previous": null
+}

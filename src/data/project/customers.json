@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "Adebayo Jubreel",
+    "email": "adebayo.j@example.com",
+    "phone_number": "123-456-7890",
+    "address": "123 Tech Lane"
+  },
+  {
+    "id": 2,
+    "name": "Julius Caesar",
+    "email": "j.caesar@example.com",
+    "phone_number": "987-654-3210",
+    "address": "45 Roman Road"
+  },
+  {
+    "id": 3,
+    "name": "Martha Ayodele",
+    "email": "martha.a@example.com",
+    "phone_number": "555-123-4567",
+    "address": "789 King's Street"
+  },
+  {
+    "id": 4,
+    "name": "Smith Wigglesworth",
+    "email": "smith.w@example.com",
+    "phone_number": "111-222-3333",
+    "address": "10 Revival Drive"
+  }
+]
