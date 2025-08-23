@@ -1,0 +1,50 @@
+[
+    {
+      "id": "client-payments",
+      "name": "Client Payments"
+    },
+    {
+      "id": "sales",
+      "name": "Sales"
+    },
+    {
+      "id": "consulting",
+      "name": "Consulting"
+    },
+    {
+      "id": "subscriptions",
+      "name": "Subscriptions"
+    },
+    {
+      "id": "royalties",
+      "name": "Royalties"
+    },
+    {
+      "id": "grants",
+      "name": "Grants"
+    },
+    {
+      "id": "donations",
+      "name": "Donations"
+    },
+    {
+      "id": "investments",
+      "name": "Investments"
+    },
+    {
+      "id": "advertising",
+      "name": "Advertising"
+    },
+    {
+      "id": "sponsorships",
+      "name": "Sponsorships"
+    },
+    {
+      "id": "events",
+      "name": "Events"
+    },
+    {
+      "id": "merchandise",
+      "name": "Merchandise"
+    }
+  ]

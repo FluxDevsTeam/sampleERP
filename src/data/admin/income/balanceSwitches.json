@@ -1,0 +1,112 @@
+{
+    "count": 15,
+    "next": null,
+    "previous": null,
+    "results": [
+      {
+        "id": 1,
+        "from_method": "CASH",
+        "to_method": "BANK",
+        "amount": "100000",
+        "switch_date": "2025-08-20"
+      },
+      {
+        "id": 2,
+        "from_method": "BANK",
+        "to_method": "CASH",
+        "amount": "50000",
+        "switch_date": "2025-08-19"
+      },
+      {
+        "id": 3,
+        "from_method": "CASH",
+        "to_method": "DEBT",
+        "amount": "25000",
+        "switch_date": "2025-08-18"
+      },
+      {
+        "id": 4,
+        "from_method": "BANK",
+        "to_method": "CASH",
+        "amount": "75000",
+        "switch_date": "2025-08-17"
+      },
+      {
+        "id": 5,
+        "from_method": "CASH",
+        "to_method": "BANK",
+        "amount": "120000",
+        "switch_date": "2025-08-16"
+      },
+      {
+        "id": 6,
+        "from_method": "DEBT",
+        "to_method": "BANK",
+        "amount": "30000",
+        "switch_date": "2025-08-15"
+      },
+      {
+        "id": 7,
+        "from_method": "BANK",
+        "to_method": "CASH",
+        "amount": "80000",
+        "switch_date": "2025-08-14"
+      },
+      {
+        "id": 8,
+        "from_method": "CASH",
+        "to_method": "DEBT",
+        "amount": "20000",
+        "switch_date": "2025-08-13"
+      },
+      {
+        "id": 9,
+        "from_method": "BANK",
+        "to_method": "CASH",
+        "amount": "60000",
+        "switch_date": "2025-08-12"
+      },
+      {
+        "id": 10,
+        "from_method": "CASH",
+        "to_method": "BANK",
+        "amount": "150000",
+        "switch_date": "2025-08-11"
+      },
+      {
+        "id": 11,
+        "from_method": "DEBT",
+        "to_method": "CASH",
+        "amount": "40000",
+        "switch_date": "2025-08-10"
+      },
+      {
+        "id": 12,
+        "from_method": "BANK",
+        "to_method": "DEBT",
+        "amount": "35000",
+        "switch_date": "2025-08-09"
+      },
+      {
+        "id": 13,
+        "from_method": "CASH",
+        "to_method": "BANK",
+        "amount": "90000",
+        "switch_date": "2025-08-08"
+      },
+      {
+        "id": 14,
+        "from_method": "BANK",
+        "to_method": "CASH",
+        "amount": "70000",
+        "switch_date": "2025-08-07"
+      },
+      {
+        "id": 15,
+        "from_method": "CASH",
+        "to_method": "DEBT",
+        "amount": "25000",
+        "switch_date": "2025-08-06"
+      }
+    ]
+  }

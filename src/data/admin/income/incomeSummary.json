@@ -1,0 +1,416 @@
+{
+    "monthly_total": 3500000,
+    "current_month_cash_total": 1400000,
+    "current_month_bank_total": 2100000,
+    "cash_at_hand": 500000,
+    "money_in_bank": 3000000,
+    "debt": 100000,
+    "daily_data": [
+      {
+        "date": "2025-08-20",
+        "entries": [
+          {
+            "id": 1,
+            "name": "Client Payment - Project X",
+            "category": "client-payments",
+            "amount": "500000",
+            "cash": true,
+            "date": "2025-08-20"
+          },
+          {
+            "id": 2,
+            "name": "Online Sales - Q3",
+            "category": "sales",
+            "amount": "200000",
+            "cash": false,
+            "date": "2025-08-20"
+          }
+        ],
+        "daily_total": 700000
+      },
+      {
+        "date": "2025-08-19",
+        "entries": [
+          {
+            "id": 3,
+            "name": "Consulting Fee - Strategy Session",
+            "category": "consulting",
+            "amount": "300000",
+            "cash": true,
+            "date": "2025-08-19"
+          },
+          {
+            "id": 4,
+            "name": "Client Payment - Project Y",
+            "category": "client-payments",
+            "amount": "400000",
+            "cash": false,
+            "date": "2025-08-19"
+          }
+        ],
+        "daily_total": 700000
+      },
+      {
+        "date": "2025-08-18",
+        "entries": [
+          {
+            "id": 5,
+            "name": "Retail Sales",
+            "category": "sales",
+            "amount": "150000",
+            "cash": true,
+            "date": "2025-08-18"
+          }
+        ],
+        "daily_total": 150000
+      },
+      {
+        "date": "2025-08-17",
+        "entries": [
+          {
+            "id": 6,
+            "name": "Freelance Work",
+            "category": "consulting",
+            "amount": "250000",
+            "cash": false,
+            "date": "2025-08-17"
+          },
+          {
+            "id": 7,
+            "name": "Client Payment - Invoice 102",
+            "category": "client-payments",
+            "amount": "300000",
+            "cash": true,
+            "date": "2025-08-17"
+          }
+        ],
+        "daily_total": 550000
+      },
+      {
+        "date": "2025-08-16",
+        "entries": [
+          {
+            "id": 8,
+            "name": "Online Sales - Campaign",
+            "category": "sales",
+            "amount": "100000",
+            "cash": false,
+            "date": "2025-08-16"
+          }
+        ],
+        "daily_total": 100000
+      },
+      {
+        "date": "2025-08-15",
+        "entries": [
+          {
+            "id": 9,
+            "name": "Consulting - Workshop",
+            "category": "consulting",
+            "amount": "200000",
+            "cash": true,
+            "date": "2025-08-15"
+          },
+          {
+            "id": 10,
+            "name": "Client Payment - Invoice 103",
+            "category": "client-payments",
+            "amount": "350000",
+            "cash": false,
+            "date": "2025-08-15"
+          }
+        ],
+        "daily_total": 550000
+      },
+      {
+        "date": "2025-08-14",
+        "entries": [
+          {
+            "id": 11,
+            "name": "Retail Sales - Store",
+            "category": "sales",
+            "amount": "120000",
+            "cash": true,
+            "date": "2025-08-14"
+          }
+        ],
+        "daily_total": 120000
+      },
+      {
+        "date": "2025-08-13",
+        "entries": [
+          {
+            "id": 12,
+            "name": "Client Payment - Project Z",
+            "category": "client-payments",
+            "amount": "400000",
+            "cash": false,
+            "date": "2025-08-13"
+          }
+        ],
+        "daily_total": 400000
+      },
+      {
+        "date": "2025-08-12",
+        "entries": [
+          {
+            "id": 13,
+            "name": "Consulting - Advisory",
+            "category": "consulting",
+            "amount": "180000",
+            "cash": true,
+            "date": "2025-08-12"
+          },
+          {
+            "id": 14,
+            "name": "Online Sales - Promo",
+            "category": "sales",
+            "amount": "90000",
+            "cash": false,
+            "date": "2025-08-12"
+          }
+        ],
+        "daily_total": 270000
+      },
+      {
+        "date": "2025-08-11",
+        "entries": [
+          {
+            "id": 15,
+            "name": "Client Payment - Invoice 104",
+            "category": "client-payments",
+            "amount": "250000",
+            "cash": true,
+            "date": "2025-08-11"
+          }
+        ],
+        "daily_total": 250000
+      },
+      {
+        "date": "2025-08-10",
+        "entries": [
+          {
+            "id": 16,
+            "name": "Retail Sales - Weekend",
+            "category": "sales",
+            "amount": "110000",
+            "cash": true,
+            "date": "2025-08-10"
+          }
+        ],
+        "daily_total": 110000
+      },
+      {
+        "date": "2025-08-09",
+        "entries": [
+          {
+            "id": 17,
+            "name": "Consulting - Training",
+            "category": "consulting",
+            "amount": "220000",
+            "cash": false,
+            "date": "2025-08-09"
+          }
+        ],
+        "daily_total": 220000
+      },
+      {
+        "date": "2025-08-08",
+        "entries": [
+          {
+            "id": 18,
+            "name": "Client Payment - Invoice 105",
+            "category": "client-payments",
+            "amount": "300000",
+            "cash": true,
+            "date": "2025-08-08"
+          }
+        ],
+        "daily_total": 300000
+      },
+      {
+        "date": "2025-08-07",
+        "entries": [
+          {
+            "id": 19,
+            "name": "Online Sales - Flash Sale",
+            "category": "sales",
+            "amount": "80000",
+            "cash": false,
+            "date": "2025-08-07"
+          }
+        ],
+        "daily_total": 80000
+      },
+      {
+        "date": "2025-08-06",
+        "entries": [
+          {
+            "id": 20,
+            "name": "Consulting - Audit",
+            "category": "consulting",
+            "amount": "190000",
+            "cash": true,
+            "date": "2025-08-06"
+          }
+        ],
+        "daily_total": 190000
+      }, 
+      {
+        "date": "2025-07-28",
+        "entries": [
+          {
+            "id": 21,
+            "name": "Client Payment - Contract Renewal",
+            "category": "client-payments",
+            "amount": "450000",
+            "cash": false,
+            "date": "2025-07-28"
+          }
+        ],
+        "daily_total": 450000
+      },
+      {
+        "date": "2025-07-20",
+        "entries": [
+          {
+            "id": 22,
+            "name": "Retail Sales - Mid Month",
+            "category": "sales",
+            "amount": "130000",
+            "cash": true,
+            "date": "2025-07-20"
+          },
+          {
+            "id": 23,
+            "name": "Consulting - Business Plan",
+            "category": "consulting",
+            "amount": "170000",
+            "cash": false,
+            "date": "2025-07-20"
+          }
+        ],
+        "daily_total": 300000
+      },
+      {
+        "date": "2025-07-10",
+        "entries": [
+          {
+            "id": 24,
+            "name": "Online Sales - Seasonal Campaign",
+            "category": "sales",
+            "amount": "250000",
+            "cash": false,
+            "date": "2025-07-10"
+          }
+        ],
+        "daily_total": 250000
+      },
+      {
+        "date": "2025-07-02",
+        "entries": [
+          {
+            "id": 25,
+            "name": "Client Payment - Invoice 095",
+            "category": "client-payments",
+            "amount": "600000",
+            "cash": true,
+            "date": "2025-07-02"
+          }
+        ],
+        "daily_total": 600000
+      },
+      {
+        "date": "2025-06-25",
+        "entries": [
+          {
+            "id": 26,
+            "name": "Consulting - Market Research",
+            "category": "consulting",
+            "amount": "220000",
+            "cash": true,
+            "date": "2025-06-25"
+          }
+        ],
+        "daily_total": 220000
+      },
+      {
+        "date": "2025-06-18",
+        "entries": [
+          {
+            "id": 27,
+            "name": "Retail Sales - Store Promo",
+            "category": "sales",
+            "amount": "160000",
+            "cash": true,
+            "date": "2025-06-18"
+          },
+          {
+            "id": 28,
+            "name": "Client Payment - Project Alpha",
+            "category": "client-payments",
+            "amount": "280000",
+            "cash": false,
+            "date": "2025-06-18"
+          }
+        ],
+        "daily_total": 440000
+      },
+      {
+        "date": "2025-06-09",
+        "entries": [
+          {
+            "id": 29,
+            "name": "Online Sales - June Campaign",
+            "category": "sales",
+            "amount": "95000",
+            "cash": false,
+            "date": "2025-06-09"
+          }
+        ],
+        "daily_total": 95000
+      },
+      {
+        "date": "2025-05-27",
+        "entries": [
+          {
+            "id": 30,
+            "name": "Client Payment - Annual Contract",
+            "category": "client-payments",
+            "amount": "750000",
+            "cash": true,
+            "date": "2025-05-27"
+          }
+        ],
+        "daily_total": 750000
+      },
+      {
+        "date": "2025-05-14",
+        "entries": [
+          {
+            "id": 31,
+            "name": "Consulting - Training Workshop",
+            "category": "consulting",
+            "amount": "210000",
+            "cash": false,
+            "date": "2025-05-14"
+          }
+        ],
+        "daily_total": 210000
+      },
+      {
+        "date": "2025-05-05",
+        "entries": [
+          {
+            "id": 32,
+            "name": "Retail Sales - May Week 1",
+            "category": "sales",
+            "amount": "120000",
+            "cash": true,
+            "date": "2025-05-05"
+          }
+        ],
+        "daily_total": 120000
+      }
+    ]
+  }

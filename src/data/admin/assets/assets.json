@@ -1,0 +1,197 @@
+{
+    "count": 20,
+    "next": null,
+    "previous": null,
+    "results": {
+      "assets": [
+        {
+          "id": 1,
+          "name": "Industrial Forklift",
+          "value": 15000000,
+          "expected_lifespan": "10 years",
+          "is_still_available": true,
+          "date_added": "2025-08-15",
+          "note": "Used for warehouse operations"
+        },
+        {
+          "id": 2,
+          "name": "Office Furniture Set",
+          "value": 2500000,
+          "expected_lifespan": "8 years",
+          "is_still_available": true,
+          "date_added": "2025-08-10",
+          "note": "Includes desks and chairs for new office"
+        },
+        {
+          "id": 3,
+          "name": "CNC Machine",
+          "value": 30000000,
+          "expected_lifespan": "15 years",
+          "is_still_available": true,
+          "date_added": "2025-07-20",
+          "note": "For precision manufacturing"
+        },
+        {
+          "id": 4,
+          "name": "Company Van",
+          "value": 12000000,
+          "expected_lifespan": "7 years",
+          "is_still_available": true,
+          "date_added": "2025-07-10",
+          "note": "Delivery vehicle"
+        },
+        {
+          "id": 5,
+          "name": "Server Rack",
+          "value": 5000000,
+          "expected_lifespan": "5 years",
+          "is_still_available": true,
+          "date_added": "2025-06-25",
+          "note": "Data center upgrade"
+        },
+        {
+          "id": 6,
+          "name": "Laptop Fleet",
+          "value": 7500000,
+          "expected_lifespan": "4 years",
+          "is_still_available": true,
+          "date_added": "2025-06-15",
+          "note": "For remote employees"
+        },
+        {
+          "id": 7,
+          "name": "HVAC System",
+          "value": 8000000,
+          "expected_lifespan": "12 years",
+          "is_still_available": true,
+          "date_added": "2025-05-30",
+          "note": "Installed in main office"
+        },
+        {
+          "id": 8,
+          "name": "Packaging Machine",
+          "value": 20000000,
+          "expected_lifespan": "10 years",
+          "is_still_available": true,
+          "date_added": "2025-05-15",
+          "note": "For production line"
+        },
+        {
+          "id": 9,
+          "name": "Security Cameras",
+          "value": 1500000,
+          "expected_lifespan": "6 years",
+          "is_still_available": true,
+          "date_added": "2025-04-20",
+          "note": "Facility surveillance"
+        },
+        {
+          "id": 10,
+          "name": "Conference Room AV System",
+          "value": 3000000,
+          "expected_lifespan": "5 years",
+          "is_still_available": true,
+          "date_added": "2025-04-10",
+          "note": "For presentations"
+        },
+        {
+          "id": 11,
+          "name": "Backup Generator",
+          "value": 10000000,
+          "expected_lifespan": "15 years",
+          "is_still_available": true,
+          "date_added": "2025-03-25",
+          "note": "Emergency power supply"
+        },
+        {
+          "id": 12,
+          "name": "Warehouse Shelving",
+          "value": 4000000,
+          "expected_lifespan": "20 years",
+          "is_still_available": true,
+          "date_added": "2025-03-15",
+          "note": "Heavy-duty storage"
+        },
+        {
+          "id": 13,
+          "name": "Laser Printer",
+          "value": 500000,
+          "expected_lifespan": "5 years",
+          "is_still_available": true,
+          "date_added": "2025-02-28",
+          "note": "High-volume printing"
+        },
+        {
+          "id": 14,
+          "name": "Delivery Truck",
+          "value": 18000000,
+          "expected_lifespan": "8 years",
+          "is_still_available": true,
+          "date_added": "2025-02-15",
+          "note": "Regional deliveries"
+        },
+        {
+          "id": 15,
+          "name": "Industrial Oven",
+          "value": 25000000,
+          "expected_lifespan": "12 years",
+          "is_still_available": true,
+          "date_added": "2025-01-30",
+          "note": "For food processing"
+        },
+        {
+          "id": 16,
+          "name": "Workstation PCs",
+          "value": 6000000,
+          "expected_lifespan": "4 years",
+          "is_still_available": true,
+          "date_added": "2025-01-15",
+          "note": "For design team"
+        },
+        {
+          "id": 17,
+          "name": "Forklift (Old)",
+          "value": 5000000,
+          "expected_lifespan": "8 years",
+          "is_still_available": false,
+          "date_added": "2024-12-20",
+          "end_date": "2025-08-01",
+          "note": "Replaced due to maintenance costs"
+        },
+        {
+          "id": 18,
+          "name": "Office Copier",
+          "value": 1200000,
+          "expected_lifespan": "5 years",
+          "is_still_available": false,
+          "date_added": "2024-11-15",
+          "end_date": "2025-07-30",
+          "note": "Outdated model"
+        },
+        {
+          "id": 19,
+          "name": "Old Server",
+          "value": 3000000,
+          "expected_lifespan": "5 years",
+          "is_still_available": false,
+          "date_added": "2024-10-10",
+          "end_date": "2025-06-15",
+          "note": "Decommissioned"
+        },
+        {
+          "id": 20,
+          "name": "Retired Van",
+          "value": 4000000,
+          "expected_lifespan": "7 years",
+          "is_still_available": false,
+          "date_added": "2024-09-05",
+          "end_date": "2025-05-20",
+          "note": "High mileage, sold"
+        }
+      ],
+      "total_assets_count": 20,
+      "good_assets_count": 16,
+      "good_assets_value": 162500000,
+      "depreciated_assets_count": 4
+    }
+  }
