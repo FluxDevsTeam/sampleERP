@@ -1,0 +1,764 @@
+{
+  "all_time_projects_count": 6,
+  "all_projects_count": 6,
+  "completed_projects_count": 2,
+  "ongoing_projects_count": 4,
+  "average_progress": 42,
+  "all_projects": [
+    {
+      "id": 1,
+      "name": "Website Redesign",
+      "invoice_image": null,
+      "status": "in progress",
+      "start_date": "2025-01-15",
+      "deadline": "2025-03-15",
+      "timeframe": 60,
+      "date_delivered": null,
+      "is_delivered": false,
+      "archived": false,
+      "total": "50000",
+      "customer_detail": {
+        "id": 1,
+        "name": "John Doe"
+      },
+      "selling_price": "50000",
+      "logistics": "2000",
+      "service_charge": "1000",
+      "note": "Redesign client's e-commerce website",
+      "all_items": [
+        {
+          "item": "UI/UX Design",
+          "price": "20000",
+          "quantity": "1",
+          "budget": "15000"
+        },
+        {
+          "item": "Backend Development",
+          "price": "25000",
+          "quantity": "1",
+          "budget": "20000"
+        }
+      ],
+      "products": {
+        "progress": 50,
+        "total_product_selling_price": 10000,
+        "total_production_cost": 8000,
+        "total_artisan_cost": 2000,
+        "total_overhead_cost": 1000,
+        "total_raw_material_cost": 5000,
+        "total_grand_total": 8000,
+        "total_profit": 2000,
+        "products": [
+          {
+            "id": 1,
+            "name": "Website UI Kit",
+            "selling_price": "10000",
+            "progress": 50
+          }
+        ]
+      },
+      "sold_items": {
+        "total_cost_price_sold_items": 5000,
+        "total_selling_price_sold_items": 7000,
+        "sold_items": [
+          {
+            "id": 1,
+            "name": "API License",
+            "quantity": "1",
+            "cost_price": "5000",
+            "selling_price": "7000",
+            "total_price": 7000
+          }
+        ]
+      },
+      "expenses": {
+        "total_expenses": 3000,
+        "expenses": [
+          {
+            "name": "Server Hosting",
+            "amount": "3000"
+          }
+        ]
+      },
+      "other_productions": {
+        "total_cost": 2000,
+        "total_budget": 2500,
+        "other_productions": [
+          {
+            "id": 1,
+            "name": "Third-Party Integration",
+            "cost": "2000",
+            "budget": "2500"
+          }
+        ]
+      },
+      "calculations": {
+        "total_raw_material_cost": 5000,
+        "total_artisan_cost": 2000,
+        "total_overhead_cost": 1000,
+        "total_products_cost": 8000,
+        "total_product_selling_price": 10000,
+        "product_profit": 2000,
+        "total_cost_price_sold_items": 5000,
+        "total_selling_price_sold_items": 7000,
+        "shop_items_profit": 2000,
+        "money_left_for_expensis": 42000,
+        "money_left_for_expensis_with_logistics_and_service_charge": 39000,
+        "total_other_productions_budget": 2500,
+        "total_other_productions_cost": 2000,
+        "total_expensis": 3000,
+        "total_money_spent": 10000,
+        "total_paid": 0,
+        "final_profit": 39000
+      },
+      "tasks": [
+        {
+          "title": "Design Homepage",
+          "checked": false,
+          "subtasks": [
+            {
+              "title": "Create Wireframe",
+              "checked": true
+            },
+            {
+              "title": "Design Mockup",
+              "checked": false
+            }
+          ]
+        },
+        {
+          "title": "Setup Database",
+          "checked": false,
+          "subtasks": []
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Mobile App Development",
+      "invoice_image": "blob:http://localhost:3000/abc123",
+      "status": "completed",
+      "start_date": "2025-02-01",
+      "deadline": "2025-04-01",
+      "timeframe": 60,
+      "date_delivered": "2025-03-30",
+      "is_delivered": true,
+      "archived": false,
+      "total": "75000",
+      "customer_detail": {
+        "id": 2,
+        "name": "Jane Smith"
+      },
+      "selling_price": "75000",
+      "logistics": "3000",
+      "service_charge": "1500",
+      "note": "Develop a cross-platform mobile app",
+      "all_items": [
+        {
+          "item": "Frontend Development",
+          "price": "30000",
+          "quantity": "1",
+          "budget": "25000"
+        },
+        {
+          "item": "API Integration",
+          "price": "40000",
+          "quantity": "1",
+          "budget": "35000"
+        }
+      ],
+      "products": {
+        "progress": 100,
+        "total_product_selling_price": 20000,
+        "total_production_cost": 15000,
+        "total_artisan_cost": 5000,
+        "total_overhead_cost": 2000,
+        "total_raw_material_cost": 8000,
+        "total_grand_total": 15000,
+        "total_profit": 5000,
+        "products": [
+          {
+            "id": 2,
+            "name": "Mobile App UI",
+            "selling_price": "20000",
+            "progress": 100
+          }
+        ]
+      },
+      "sold_items": {
+        "total_cost_price_sold_items": 10000,
+        "total_selling_price_sold_items": 15000,
+        "sold_items": [
+          {
+            "id": 2,
+            "name": "Database Subscription",
+            "quantity": "1",
+            "cost_price": "10000",
+            "selling_price": "15000",
+            "total_price": 15000
+          }
+        ]
+      },
+      "expenses": {
+        "total_expenses": 5000,
+        "expenses": [
+          {
+            "name": "Cloud Services",
+            "amount": "5000"
+          }
+        ]
+      },
+      "other_productions": {
+        "total_cost": 3000,
+        "total_budget": 3500,
+        "other_productions": [
+          {
+            "id": 2,
+            "name": "Authentication Module",
+            "cost": "3000",
+            "budget": "3500"
+          }
+        ]
+      },
+      "calculations": {
+        "total_raw_material_cost": 8000,
+        "total_artisan_cost": 5000,
+        "total_overhead_cost": 2000,
+        "total_products_cost": 15000,
+        "total_product_selling_price": 20000,
+        "product_profit": 5000,
+        "total_cost_price_sold_items": 10000,
+        "total_selling_price_sold_items": 15000,
+        "shop_items_profit": 5000,
+        "money_left_for_expensis": 60000,
+        "money_left_for_expensis_with_logistics_and_service_charge": 55500,
+        "total_other_productions_budget": 3500,
+        "total_other_productions_cost": 3000,
+        "total_expensis": 5000,
+        "total_money_spent": 18000,
+        "total_paid": 0,
+        "final_profit": 55500
+      },
+      "tasks": [
+        {
+          "title": "Develop Login Screen",
+          "checked": true,
+          "subtasks": [
+            {
+              "title": "UI Design",
+              "checked": true
+            },
+            {
+              "title": "Authentication Logic",
+              "checked": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Marketing Campaign",
+      "invoice_image": null,
+      "status": "in progress",
+      "start_date": "2025-03-10",
+      "deadline": "2025-05-10",
+      "timeframe": 61,
+      "date_delivered": null,
+      "is_delivered": false,
+      "archived": false,
+      "total": "30000",
+      "customer_detail": {
+        "id": 3,
+        "name": "Acme Corp"
+      },
+      "selling_price": "30000",
+      "logistics": "1000",
+      "service_charge": "500",
+      "note": "Social media marketing campaign",
+      "all_items": [
+        {
+          "item": "Content Creation",
+          "price": "15000",
+          "quantity": "1",
+          "budget": "12000"
+        }
+      ],
+      "products": {
+        "progress": 25,
+        "total_product_selling_price": 5000,
+        "total_production_cost": 4000,
+        "total_artisan_cost": 1000,
+        "total_overhead_cost": 500,
+        "total_raw_material_cost": 2500,
+        "total_grand_total": 4000,
+        "total_profit": 1000,
+        "products": [
+          {
+            "id": 3,
+            "name": "Ad Campaign",
+            "selling_price": "5000",
+            "progress": 25
+          }
+        ]
+      },
+      "sold_items": {
+        "total_cost_price_sold_items": 2000,
+        "total_selling_price_sold_items": 3000,
+        "sold_items": [
+          {
+            "id": 3,
+            "name": "Social Media Ads",
+            "quantity": "1",
+            "cost_price": "2000",
+            "selling_price": "3000",
+            "total_price": 3000
+          }
+        ]
+      },
+      "expenses": {
+        "total_expenses": 1000,
+        "expenses": [
+          {
+            "name": "Ad Placement",
+            "amount": "1000"
+          }
+        ]
+      },
+      "other_productions": {
+        "total_cost": 1000,
+        "total_budget": 1500,
+        "other_productions": [
+          {
+            "id": 3,
+            "name": "Content Distribution",
+            "cost": "1000",
+            "budget": "1500"
+          }
+        ]
+      },
+      "calculations": {
+        "total_raw_material_cost": 2500,
+        "total_artisan_cost": 1000,
+        "total_overhead_cost": 500,
+        "total_products_cost": 4000,
+        "total_product_selling_price": 5000,
+        "product_profit": 1000,
+        "total_cost_price_sold_items": 2000,
+        "total_selling_price_sold_items": 3000,
+        "shop_items_profit": 1000,
+        "money_left_for_expensis": 26000,
+        "money_left_for_expensis_with_logistics_and_service_charge": 24500,
+        "total_other_productions_budget": 1500,
+        "total_other_productions_cost": 1000,
+        "total_expensis": 1000,
+        "total_money_spent": 5000,
+        "total_paid": 0,
+        "final_profit": 24500
+      },
+      "tasks": []
+    },
+    {
+      "id": 4,
+      "name": "Office Renovation",
+      "invoice_image": null,
+      "status": "in progress",
+      "start_date": "2025-02-20",
+      "deadline": "2025-05-20",
+      "timeframe": 89,
+      "date_delivered": null,
+      "is_delivered": false,
+      "archived": false,
+      "total": "120000",
+      "customer_detail": {
+        "id": 4,
+        "name": "Robert Johnson"
+      },
+      "selling_price": "120000",
+      "logistics": "5000",
+      "service_charge": "2500",
+      "note": "Complete office renovation including furniture",
+      "all_items": [
+        {
+          "item": "Interior Design",
+          "price": "40000",
+          "quantity": "1",
+          "budget": "35000"
+        },
+        {
+          "item": "Construction Work",
+          "price": "60000",
+          "quantity": "1",
+          "budget": "55000"
+        },
+        {
+          "item": "Furniture",
+          "price": "20000",
+          "quantity": "1",
+          "budget": "18000"
+        }
+      ],
+      "products": {
+        "progress": 40,
+        "total_product_selling_price": 30000,
+        "total_production_cost": 22000,
+        "total_artisan_cost": 8000,
+        "total_overhead_cost": 3000,
+        "total_raw_material_cost": 11000,
+        "total_grand_total": 22000,
+        "total_profit": 8000,
+        "products": [
+          {
+            "id": 4,
+            "name": "Office Furniture Set",
+            "selling_price": "30000",
+            "progress": 40
+          }
+        ]
+      },
+      "sold_items": {
+        "total_cost_price_sold_items": 15000,
+        "total_selling_price_sold_items": 22000,
+        "sold_items": [
+          {
+            "id": 4,
+            "name": "Design Consultation",
+            "quantity": "1",
+            "cost_price": "15000",
+            "selling_price": "22000",
+            "total_price": 22000
+          }
+        ]
+      },
+      "expenses": {
+        "total_expenses": 8000,
+        "expenses": [
+          {
+            "name": "Building Materials",
+            "amount": "5000"
+          },
+          {
+            "name": "Permit Fees",
+            "amount": "3000"
+          }
+        ]
+      },
+      "other_productions": {
+        "total_cost": 4000,
+        "total_budget": 5000,
+        "other_productions": [
+          {
+            "id": 4,
+            "name": "Lighting Installation",
+            "cost": "4000",
+            "budget": "5000"
+          }
+        ]
+      },
+      "calculations": {
+        "total_raw_material_cost": 11000,
+        "total_artisan_cost": 8000,
+        "total_overhead_cost": 3000,
+        "total_products_cost": 22000,
+        "total_product_selling_price": 30000,
+        "product_profit": 8000,
+        "total_cost_price_sold_items": 15000,
+        "total_selling_price_sold_items": 22000,
+        "shop_items_profit": 7000,
+        "money_left_for_expensis": 98000,
+        "money_left_for_expensis_with_logistics_and_service_charge": 90500,
+        "total_other_productions_budget": 5000,
+        "total_other_productions_cost": 4000,
+        "total_expensis": 8000,
+        "total_money_spent": 30000,
+        "total_paid": 0,
+        "final_profit": 90500
+      },
+      "tasks": [
+        {
+          "title": "Design Layout",
+          "checked": true,
+          "subtasks": [
+            {
+              "title": "Space Planning",
+              "checked": true
+            },
+            {
+              "title": "Color Scheme Selection",
+              "checked": true
+            }
+          ]
+        },
+        {
+          "title": "Order Materials",
+          "checked": false,
+          "subtasks": []
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Product Manufacturing",
+      "invoice_image": "blob:http://localhost:3000/def456",
+      "status": "completed",
+      "start_date": "2025-01-10",
+      "deadline": "2025-03-10",
+      "timeframe": 59,
+      "date_delivered": "2025-03-05",
+      "is_delivered": true,
+      "archived": false,
+      "total": "85000",
+      "customer_detail": {
+        "id": 5,
+        "name": "Sarah Williams"
+      },
+      "selling_price": "85000",
+      "logistics": "4000",
+      "service_charge": "2000",
+      "note": "Manufacture 500 units of product X",
+      "all_items": [
+        {
+          "item": "Raw Materials",
+          "price": "35000",
+          "quantity": "1",
+          "budget": "30000"
+        },
+        {
+          "item": "Production Labor",
+          "price": "40000",
+          "quantity": "1",
+          "budget": "35000"
+        }
+      ],
+      "products": {
+        "progress": 100,
+        "total_product_selling_price": 60000,
+        "total_production_cost": 45000,
+        "total_artisan_cost": 15000,
+        "total_overhead_cost": 5000,
+        "total_raw_material_cost": 25000,
+        "total_grand_total": 45000,
+        "total_profit": 15000,
+        "products": [
+          {
+            "id": 5,
+            "name": "Product X Units",
+            "selling_price": "60000",
+            "progress": 100
+          }
+        ]
+      },
+      "sold_items": {
+        "total_cost_price_sold_items": 20000,
+        "total_selling_price_sold_items": 30000,
+        "sold_items": [
+          {
+            "id": 5,
+            "name": "Packaging Materials",
+            "quantity": "1",
+            "cost_price": "20000",
+            "selling_price": "30000",
+            "total_price": 30000
+          }
+        ]
+      },
+      "expenses": {
+        "total_expenses": 6000,
+        "expenses": [
+          {
+            "name": "Equipment Maintenance",
+            "amount": "4000"
+          },
+          {
+            "name": "Quality Testing",
+            "amount": "2000"
+          }
+        ]
+      },
+      "other_productions": {
+        "total_cost": 3000,
+        "total_budget": 4000,
+        "other_productions": [
+          {
+            "id": 5,
+            "name": "Custom Tooling",
+            "cost": "3000",
+            "budget": "4000"
+          }
+        ]
+      },
+      "calculations": {
+        "total_raw_material_cost": 25000,
+        "total_artisan_cost": 15000,
+        "total_overhead_cost": 5000,
+        "total_products_cost": 45000,
+        "total_product_selling_price": 60000,
+        "product_profit": 15000,
+        "total_cost_price_sold_items": 20000,
+        "total_selling_price_sold_items": 30000,
+        "shop_items_profit": 10000,
+        "money_left_for_expensis": 79000,
+        "money_left_for_expensis_with_logistics_and_service_charge": 73000,
+        "total_other_productions_budget": 4000,
+        "total_other_productions_cost": 3000,
+        "total_expensis": 6000,
+        "total_money_spent": 51000,
+        "total_paid": 0,
+        "final_profit": 73000
+      },
+      "tasks": [
+        {
+          "title": "Source Materials",
+          "checked": true,
+          "subtasks": [
+            {
+              "title": "Find Suppliers",
+              "checked": true
+            },
+            {
+              "title": "Place Orders",
+              "checked": true
+            }
+          ]
+        },
+        {
+          "title": "Quality Control",
+          "checked": true,
+          "subtasks": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Event Planning",
+      "invoice_image": null,
+      "status": "in progress",
+      "start_date": "2025-03-01",
+      "deadline": "2025-05-15",
+      "timeframe": 75,
+      "date_delivered": null,
+      "is_delivered": false,
+      "archived": false,
+      "total": "60000",
+      "customer_detail": {
+        "id": 6,
+        "name": "Michael Brown"
+      },
+      "selling_price": "60000",
+      "logistics": "3000",
+      "service_charge": "1500",
+      "note": "Corporate anniversary event planning",
+      "all_items": [
+        {
+          "item": "Venue Decoration",
+          "price": "20000",
+          "quantity": "1",
+          "budget": "18000"
+        },
+        {
+          "item": "Catering Services",
+          "price": "30000",
+          "quantity": "1",
+          "budget": "25000"
+        }
+      ],
+      "products": {
+        "progress": 30,
+        "total_product_selling_price": 15000,
+        "total_production_cost": 10000,
+        "total_artisan_cost": 4000,
+        "total_overhead_cost": 1000,
+        "total_raw_material_cost": 5000,
+        "total_grand_total": 10000,
+        "total_profit": 5000,
+        "products": [
+          {
+            "id": 6,
+            "name": "Event Package",
+            "selling_price": "15000",
+            "progress": 30
+          }
+        ]
+      },
+      "sold_items": {
+        "total_cost_price_sold_items": 8000,
+        "total_selling_price_sold_items": 12000,
+        "sold_items": [
+          {
+            "id": 6,
+            "name": "Entertainment Booking",
+            "quantity": "1",
+            "cost_price": "8000",
+            "selling_price": "12000",
+            "total_price": 12000
+          }
+        ]
+      },
+      "expenses": {
+        "total_expenses": 4000,
+        "expenses": [
+          {
+            "name": "Venue Deposit",
+            "amount": "3000"
+          },
+          {
+            "name": "Marketing Materials",
+            "amount": "1000"
+          }
+        ]
+      },
+      "other_productions": {
+        "total_cost": 2000,
+        "total_budget": 2500,
+        "other_productions": [
+          {
+            "id": 6,
+            "name": "Audio-Visual Setup",
+            "cost": "2000",
+            "budget": "2500"
+          }
+        ]
+      },
+      "calculations": {
+        "total_raw_material_cost": 5000,
+        "total_artisan_cost": 4000,
+        "total_overhead_cost": 1000,
+        "total_products_cost": 10000,
+        "total_product_selling_price": 15000,
+        "product_profit": 5000,
+        "total_cost_price_sold_items": 8000,
+        "total_selling_price_sold_items": 12000,
+        "shop_items_profit": 4000,
+        "money_left_for_expensis": 50000,
+        "money_left_for_expensis_with_logistics_and_service_charge": 45500,
+        "total_other_productions_budget": 2500,
+        "total_other_productions_cost": 2000,
+        "total_expensis": 4000,
+        "total_money_spent": 14000,
+        "total_paid": 0,
+        "final_profit": 45500
+      },
+      "tasks": [
+        {
+          "title": "Book Venue",
+          "checked": true,
+          "subtasks": [
+            {
+              "title": "Research Options",
+              "checked": true
+            },
+            {
+              "title": "Finalize Contract",
+              "checked": false
+            }
+          ]
+        },
+        {
+          "title": "Plan Menu",
+          "checked": false,
+          "subtasks": []
+        }
+      ]
+    }
+  ]
+}
