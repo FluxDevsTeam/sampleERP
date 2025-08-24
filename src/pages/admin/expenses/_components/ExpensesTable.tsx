@@ -1,6 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
 import EditExpenseModal from "./EditExpenseModal";
@@ -24,12 +22,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronDown,
-  faChevronUp,
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import AddExpenseModal from "./AddExpenseModal";
+import expensesData from "@/data/admin/expenses/expenses.json";
 
 interface ExpenseCategory {
   id: number;
@@ -62,9 +57,9 @@ interface Entry {
   description: string;
   linked_project: LinkedProject | null;
   sold_item: SoldItem | null;
-  linked_product: LinkedProduct | null; // Add linked_product to Entry interface
+  linked_product: LinkedProduct | null;
   amount: string;
-  quantity: string | null; // Quantity can be null
+  quantity: string | null;
   payment_method?: string;
   date: string;
 }
@@ -81,11 +76,10 @@ interface ExpensesData {
   daily_total: number;
   monthly_project_expenses_total: number;
   monthly_shop_expenses_total: number;
-  current_month_product_total: number; // Add current_month_product_total
+  current_month_product_total: number;
   daily_data: DailyData[];
 }
 
-// Transform Entry to Expense interface for EditExpenseModal
 interface Expense {
   id: number;
   name: string;
@@ -107,66 +101,52 @@ interface Expense {
   product?: {
     id: number;
     name: string;
-  }; // Add product to Expense interface
-  date?: string; // Add date to Expense interface
-  payment_method?: string; // Add payment method to Expense interface
+  };
+  date?: string;
+  payment_method?: string;
 }
 
 interface ExpensesTableProps {
   isTableModalOpen: boolean;
 }
 
-const fetchExpenses = async (year: number | '', month: number | '', day: number | ''): Promise<ExpensesData> => {
-  const accessToken = localStorage.getItem("accessToken");
-  const params = new URLSearchParams();
+// Utility function to convert Entry to Expense
+const entryToExpense = (entry: Entry): Expense => ({
+  id: entry.id,
+  name: entry.name,
+  description: entry.description,
+  amount: Number(entry.amount) || 0,
+  quantity: Number(entry.quantity) || 0,
+  category: entry.expense_category,
+  project: entry.linked_project,
+  shop: entry.sold_item,
+  product: entry.linked_product,
+  date: entry.date,
+  payment_method: entry.payment_method,
+});
 
-  if (year) {
-    params.append("year", String(year));
-  }
-  if (month) {
-    params.append("month", String(month));
-  }
-  if (day) {
-    params.append("day", String(day));
-  }
-
-  const { data } = await axios.get<ExpensesData>(
-    `https://backend.kidsdesigncompany.com/api/expense/?${params.toString()}`,
-    {
-      headers: {
-        Authorization: `JWT ${accessToken}`,
-      },
-    }
-  );
-  return data;
-};
-
-const ExpensesTable: React.FC<ExpensesTableProps> = ({
-  isTableModalOpen,
-}) => {
-  const [year, setYear] = useState<number | ''>( '');
-  const [month, setMonth] = useState<number | ''>( '');
-  const [day, setDay] = useState<number | ''>( '');
-
-  const { data, isLoading, error } = useQuery<ExpensesData>({
-    queryKey: ["expenses", year, month, day],
-    queryFn: () => fetchExpenses(year, month, day),
-  });
+const ExpensesTable: React.FC<ExpensesTableProps> = ({ isTableModalOpen }) => {
+  const [year, setYear] = useState<number | "">("");
+  const [month, setMonth] = useState<number | "">("");
+  const [day, setDay] = useState<number | "">("");
+  const [data, setData] = useState<ExpensesData>(expensesData);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isMonthOpen, setIsMonthOpen] = useState(false);
+  const [isDayOpen, setIsDayOpen] = useState(false);
 
   const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>(() => {
     const initialCollapsedState: { [key: string]: boolean } = {};
-    if (data?.daily_data && data.daily_data.length > 0) {
-      data.daily_data.forEach((day, index) => {
-        initialCollapsedState[day.date] = index !== 0;
-      });
-    }
+    expensesData.daily_data.forEach((day, index) => {
+      initialCollapsedState[day.date] = index !== 0;
+    });
     return initialCollapsedState;
   });
-  const queryClient = useQueryClient();
+
   const currentUserRole = localStorage.getItem("user_role");
   const isceo = currentUserRole === "ceo";
 
-  // Modal states
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -175,17 +155,10 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
 
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-  // Dropdown visibility states
-  const [isYearOpen, setIsYearOpen] = useState(false);
-  const [isMonthOpen, setIsMonthOpen] = useState(false);
-  const [isDayOpen, setIsDayOpen] = useState(false);
-
-  // Refs for click-outside detection
   const yearRef = useRef<HTMLDivElement>(null);
   const monthRef = useRef<HTMLDivElement>(null);
   const dayRef = useRef<HTMLDivElement>(null);
 
-  // Effect for handling click outside dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (yearRef.current && !yearRef.current.contains(event.target as Node)) {
@@ -198,31 +171,37 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
         setIsDayOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-  // Ensure only the first day's table is open, others are collapsed
   useEffect(() => {
-    if (data?.daily_data && data.daily_data.length > 0) {
-      const initialCollapsedState: { [key: string]: boolean } = {};
-      data.daily_data.forEach((day, index) => {
-        initialCollapsedState[day.date] = index !== 0;
-      });
-      setCollapsed(initialCollapsedState);
+    if (year || month || day) {
+      const filteredData: ExpensesData = {
+        ...expensesData,
+        daily_data: expensesData.daily_data.filter((dayData) => {
+          const date = new Date(dayData.date);
+          const yearMatch = year ? date.getFullYear() === Number(year) : true;
+          const monthMatch = month ? date.getMonth() + 1 === Number(month) : true;
+          const dayMatch = day ? date.getDate() === Number(day) : true;
+          return yearMatch && monthMatch && dayMatch;
+        }),
+      };
+      setData(filteredData);
+    } else {
+      setData(expensesData);
     }
-  }, [data?.daily_data]);
+  }, [year, month, day]);
 
-  // Helper to format numbers with Naira sign
   const formatNumber = (number: number | string | undefined | null) => {
     if (number === undefined || number === null || number === "") {
       return "0";
     }
     const num = typeof number === "string" ? parseFloat(number) : number;
     if (isNaN(num)) {
-      return "0"; // Return "0" for NaN values
+      return "0";
     }
     return num.toLocaleString("en-NG");
   };
@@ -235,72 +214,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
     });
   };
 
-  // Delete mutation
-  const deleteExpenseMutation = useMutation({
-    mutationFn: async (entryId: number) => {
-      const accessToken = localStorage.getItem("accessToken");
-      await axios.delete(
-        `https://backend.kidsdesigncompany.com/api/expense/${entryId}/`,
-        {
-          headers: {
-            Authorization: `JWT ${accessToken}`,
-          },
-        }
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["expenses"] });
-      setIsDeleteDialogOpen(false);
-      setIsViewModalOpen(false);
-      setSelectedEntry(null);
-      toast.success("Expense deleted successfully!");
-    },
-    onError: (error) => {
-      console.error("Delete error:", error);
-      toast.error("Failed to delete expense. Please try again.");
-    },
-  });
-
-  // Transform Entry to Expense format for EditExpenseModal
-  const entryToExpense = (entry: Entry): Expense => {
-    return {
-      id: entry.id,
-      name: entry.name,
-      description: entry.description,
-      amount: parseFloat(entry.amount) || 0,
-      quantity: entry.quantity ? parseFloat(entry.quantity) : undefined, // Set to undefined if null
-      category: entry.expense_category
-        ? {
-            id: entry.expense_category.id,
-            name: entry.expense_category.name,
-          }
-        : undefined,
-      project: entry.linked_project
-        ? {
-            id: entry.linked_project.id,
-            name: entry.linked_project.name,
-          }
-        : undefined,
-      shop: entry.sold_item
-        ? {
-            id: entry.sold_item.id,
-            name: entry.sold_item.name || "Shop Item",
-          }
-        : undefined,
-      product: entry.linked_product // Map linked_product to product
-        ? {
-            id: entry.linked_product.id,
-            name: entry.linked_product.name,
-          }
-        : undefined,
-      date: entry.date, // Map date to expense.date
-      payment_method: entry.payment_method || undefined, // Map payment method
-    };
-  };
-
-  // Event handlers
   const handleRowClick = (entry: Entry) => {
-    console.log("Entry object in handleRowClick:", entry); // Add this line
     setSelectedEntry(entry);
     setIsViewModalOpen(true);
   };
@@ -317,16 +231,16 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
   };
 
   const confirmDelete = () => {
-    if (selectedEntry?.id) {
-      deleteExpenseMutation.mutate(selectedEntry.id);
-    }
+    toast.error("Delete functionality is disabled in static mode.");
+    setIsDeleteDialogOpen(false);
+    setIsViewModalOpen(false);
+    setSelectedEntry(null);
   };
 
   const handleEditSuccess = () => {
-    queryClient.invalidateQueries({ queryKey: ["expenses"] });
+    toast.error("Edit functionality is disabled in static mode.");
     setIsEditModalOpen(false);
     setSelectedEntry(null);
-    toast.success("Expense updated successfully!");
   };
 
   const toggleCollapse = (date: string) => {
@@ -341,29 +255,42 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
   };
 
   if (isLoading) return <SkeletonLoader />;
-  if (error)
-    return <p className="text-red-600">Error: {(error as Error).message}</p>;
+  if (error) return <p className="text-red-600">Error: {error}</p>;
 
   return (
-    <div className={`relative ${!data?.daily_data?.length ? 'min-h-[300px]' : ''}`}>
+    <div className={`relative ${!data?.daily_data?.length ? "min-h-[300px]" : ""}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 sm:gap-0">
         <div className="flex flex-row flex-wrap items-center gap-2 w-full mb-4 justify-end ml-auto">
-          {/* Year Dropdown */}
           <div className="relative w-14 sm:w-20" ref={yearRef}>
             <button
               onClick={() => setIsYearOpen(!isYearOpen)}
               className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm"
             >
-              <span>{year || 'Year'}</span>
+              <span>{year || "Year"}</span>
               <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} className="text-xs" />
             </button>
             {isYearOpen && (
               <ul className="absolute z-[9999] w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto shadow-lg">
-                <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Year</li>
+                <li
+                  onClick={() => {
+                    setYear("");
+                    setIsYearOpen(false);
+                  }}
+                  className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
+                >
+                  Year
+                </li>
                 {[...Array(10)].map((_, i) => {
                   const y = new Date().getFullYear() - i;
                   return (
-                    <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">
+                    <li
+                      key={i}
+                      onClick={() => {
+                        setYear(y);
+                        setIsYearOpen(false);
+                      }}
+                      className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
+                    >
                       {y}
                     </li>
                   );
@@ -371,88 +298,133 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
               </ul>
             )}
           </div>
-          {/* Month Dropdown */}
           <div className="relative w-20 sm:w-20" ref={monthRef}>
             <button
               onClick={() => setIsMonthOpen(!isMonthOpen)}
               className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm"
             >
-              <span>{month ? months[Number(month) - 1] : 'Month'}</span>
+              <span>{month ? months[Number(month) - 1] : "Month"}</span>
               <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} className="text-xs" />
             </button>
             {isMonthOpen && (
               <ul className="absolute z-[9999] w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto shadow-lg">
-                <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Month</li>
+                <li
+                  onClick={() => {
+                    setMonth("");
+                    setIsMonthOpen(false);
+                  }}
+                  className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
+                >
+                  Month
+                </li>
                 {months.map((m, i) => (
-                  <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">
+                  <li
+                    key={i}
+                    onClick={() => {
+                      setMonth(i + 1);
+                      setIsMonthOpen(false);
+                    }}
+                    className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
+                  >
                     {m}
                   </li>
                 ))}
               </ul>
             )}
           </div>
-          {/* Day Dropdown */}
           <div className="relative w-12 sm:w-20" ref={dayRef}>
             <button
               onClick={() => setIsDayOpen(!isDayOpen)}
               className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm"
             >
-              <span>{day || 'Day'}</span>
+              <span>{day || "Day"}</span>
               <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} className="text-xs" />
             </button>
             {isDayOpen && (
               <ul className="absolute z-[9999] w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto shadow-lg">
-                <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Day</li>
+                <li
+                  onClick={() => {
+                    setDay("");
+                    setIsDayOpen(false);
+                  }}
+                  className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
+                >
+                  Day
+                </li>
                 {[...Array(31)].map((_, i) => (
-                  <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">
+                  <li
+                    key={i}
+                    onClick={() => {
+                      setDay(i + 1);
+                      setIsDayOpen(false);
+                    }}
+                    className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
+                  >
                     {i + 1}
                   </li>
                 ))}
               </ul>
             )}
           </div>
-          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["expenses"] })} disabled={isLoading} className="px-2 py-1 border border-blue-400 text-blue-400 bg-transparent rounded hover:bg-blue-50 transition-colors text-xs w-12 sm:w-auto">Filter</Button>
-          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["expenses"] }); }} disabled={isLoading} className="px-1 md:px-2 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-xs w-12 sm:w-auto">Clear</Button>
+          <Button
+            onClick={() => {}}
+            disabled={isLoading}
+            className="px-2 py-1 border border-blue-400 text-blue-400 bg-transparent rounded hover:bg-blue-50 transition-colors text-xs w-12 sm:w-auto"
+          >
+            Filter
+          </Button>
+          <Button
+            onClick={() => {
+              setYear("");
+              setMonth("");
+              setDay("");
+            }}
+            disabled={isLoading}
+            className="px-1 md:px-2 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-xs w-12 sm:w-auto"
+          >
+            Clear
+          </Button>
         </div>
       </div>
-      <div className={`overflow-x-auto pb-8 ${isTableModalOpen || isViewModalOpen || isEditModalOpen || isDeleteDialogOpen || isAddModalOpen ? 'blur-md' : ''}`}>
+      <div
+        className={`overflow-x-auto pb-8 ${
+          isTableModalOpen || isViewModalOpen || isEditModalOpen || isDeleteDialogOpen || isAddModalOpen ? "blur-md" : ""
+        }`}
+      >
         {(!data?.daily_data || data.daily_data.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10 m-2">
             <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
-              {/* SVG icon for receipt, styled to match assets table */}
-              <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg
+                className="w-8 h-8 text-blue-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
                 <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
                 <path d="M9 21V7M15 21V7M3 7h18" stroke="currentColor" strokeWidth="2" />
               </svg>
             </div>
             <h2 className="text-lg font-semibold text-gray-800 mb-1">No expenses found</h2>
-            <p className="text-gray-500 mb-6 text-center max-w-xs">All your expense records will show up here. Add a new expense to get started.</p>
+            <p className="text-gray-500 mb-6 text-center max-w-xs">
+              All your expense records will show up here. Add a new expense to get started.
+            </p>
+            <Button onClick={() => setIsAddModalOpen(true)}>Add Expense</Button>
           </div>
         ) : (
           data.daily_data.map((day) => (
-            <div
-              key={day.date}
-              className="bg-white shadow-md rounded-lg overflow-auto mb-6"
-            >
+            <div key={day.date} className="bg-white shadow-md overflow-auto mb-6">
               <div
                 className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-300 hover:text-blue-20 w-full"
                 onClick={() => toggleCollapse(day.date)}
               >
                 <div className="flex items-center space-x-2">
-                  <FontAwesomeIcon
-                    icon={collapsed[day.date] ? faChevronDown : faChevronUp}
-                  />
-                  <h3
-                    className="text-lg font-semibold"
-                    style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
-                  >
+                  <FontAwesomeIcon icon={collapsed[day.date] ? faChevronDown : faChevronUp} />
+                  <h3 className="text-lg font-semibold" style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}>
                     {formatDate(day.date)}
                   </h3>
                 </div>
-                <p
-                  className="font-bold"
-                  style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}
-                >
+                <p className="font-bold" style={{ fontSize: "clamp(13.5px, 3vw, 15px)" }}>
                   Total: ₦{formatNumber(day.daily_total)}
                 </p>
               </div>
@@ -462,16 +434,36 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
                   <table className="min-w-full">
                     <thead className="bg-gray-800">
                       <tr>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">Date</th>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Name</th>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell">Category</th>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Payment</th>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Project</th>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Shop Item</th>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">Product</th> {/* Add Product column */}
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Amount</th>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">Qty</th>
-                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">Details</th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">
+                          Date
+                        </th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">
+                          Name
+                        </th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell">
+                          Category
+                        </th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">
+                          Payment
+                        </th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">
+                          Project
+                        </th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">
+                          Shop Item
+                        </th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden lg:table-cell">
+                          Product
+                        </th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">
+                          Amount
+                        </th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell">
+                          Qty
+                        </th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400">
+                          Details
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -484,15 +476,33 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
                       ) : (
                         day.entries.map((entry) => (
                           <tr key={entry.id} className="hover:bg-gray-50">
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{new Date(entry.date).toLocaleDateString()}</td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium">{entry.name}</td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">{entry.expense_category?.name || "N/A"}</td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.payment_method || '-'}</td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.linked_project?.name || "N/A"}</td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.sold_item?.name || "N/A"}</td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">{entry.linked_product?.name || "N/A"}</td> {/* Display Product */}
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium">₦ {formatNumber(entry.amount)}</td>
-                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{entry.quantity || "-"}</td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">
+                              {new Date(entry.date).toLocaleDateString()}
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium">
+                              {entry.name}
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">
+                              {entry.expense_category?.name || "N/A"}
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">
+                              {entry.payment_method || "-"}
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">
+                              {entry.linked_project?.name || "N/A"}
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">
+                              {entry.sold_item?.name || "N/A"}
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">
+                              {entry.linked_product?.name || "N/A"}
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium">
+                              ₦ {formatNumber(entry.amount)}
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">
+                              {entry.quantity || "-"}
+                            </td>
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
                               <button
                                 onClick={() => handleRowClick(entry)}
@@ -513,7 +523,6 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
         )}
       </div>
 
-      {/* View Expense Modal */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
         <DialogContent className="w-[95vw] max-w-md mx-auto p-4 sm:p-6">
           <DialogHeader>
@@ -541,14 +550,14 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Payment Method</span>
-                <span className="text-base font-bold text-black">{selectedEntry.payment_method || '-'}</span>
+                <span className="text-base font-bold text-black">{selectedEntry.payment_method || "-"}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Linked Project</span>
                 <span className="text-base font-bold text-black">{selectedEntry.linked_project?.name || "N/A"}</span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-black uppercase">Linked Product</span> {/* Add Linked Product display */}
+                <span className="text-xs font-semibold text-black uppercase">Linked Product</span>
                 <span className="text-base font-bold text-black">{selectedEntry.linked_product?.name || "N/A"}</span>
               </div>
               <div className="flex flex-col gap-1">
@@ -557,7 +566,9 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Date</span>
-                <span className="text-base font-bold text-black">{new Date(selectedEntry.date || '').toLocaleDateString()}</span>
+                <span className="text-base font-bold text-black">
+                  {new Date(selectedEntry.date || "").toLocaleDateString()}
+                </span>
               </div>
             </div>
           )}
@@ -567,22 +578,21 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
               <Button variant="outline" onClick={() => setIsViewModalOpen(false)} className="w-full text-sm">
                 Close
               </Button>
-              {isceo && (
                 <Button variant="outline" onClick={handleEdit} className="w-full text-sm">
                   Edit
                 </Button>
-              )}
-              {isceo && (
-                <Button variant="destructive" onClick={handleDelete} disabled={deleteExpenseMutation.isPending} className="w-full text-sm">
+                <Button
+                  variant="destructive"
+                  onClick={handleDelete}
+                  className="w-full text-sm"
+                >
                   Delete
                 </Button>
-              )}
             </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Edit Expense Modal */}
       {selectedEntry && isEditModalOpen && (
         <EditExpenseModal
           expense={entryToExpense(selectedEntry)}
@@ -592,7 +602,6 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
         />
       )}
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent className="w-[95vw] max-w-md mx-auto p-4 sm:p-6">
           <AlertDialogHeader>
@@ -608,10 +617,7 @@ const ExpensesTable: React.FC<ExpensesTableProps> = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      <AddExpenseModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-      />
+      <AddExpenseModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onSuccess={() => setIsAddModalOpen(false)} />
     </div>
   );
 };

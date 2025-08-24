@@ -1,3 +1,4 @@
+// src/pages/admin/assets/_components/AssetsData.tsx
 interface AssetsDataProps {
   info: string;
   digits: number;
@@ -6,7 +7,7 @@ interface AssetsDataProps {
 }
 
 const AssetsData = (AssetsData: AssetsDataProps) => {
-  const formattedDigits = (AssetsData.digits ?? 0).toLocaleString('en-NG');
+  const formattedDigits = (AssetsData.digits ?? 0).toLocaleString("en-NG");
 
   return (
     <div className="p-2 sm:p-4 border rounded-lg shadow-md flex flex-col items-center justify-center py-4">

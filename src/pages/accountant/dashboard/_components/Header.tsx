@@ -1,13 +1,16 @@
 import { MdArrowOutward } from "react-icons/md";
 import { useQuery } from "@tanstack/react-query";
-import { DashboardHeaders } from "../_api/apiService";
 import Frame180 from "../../../../assets/images/Frame180.png";
+import accountantDashboardData from "@/data/accountant/dashboard/accountant-dashboard.json";
 
 const Header = () => {
-  
   const { data, isLoading, error } = useQuery({
     queryKey: ["Header"],
-    queryFn: DashboardHeaders,
+    queryFn: async () => {
+      // Load from local storage if available, else use JSON
+      const storedData = localStorage.getItem("accountantDashboardData");
+      return storedData ? JSON.parse(storedData) : accountantDashboardData;
+    },
   });
 
   if (isLoading) return <p>Loading...</p>;

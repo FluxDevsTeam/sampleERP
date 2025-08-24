@@ -1,18 +1,14 @@
+// src/pages/admin/assets/Assets.tsx
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { AssetsData, AssetSummary } from "./_api/apiService";
 import AssetsDataTable from "./_components/AssetsTable";
 import AssetsDataCard from "./_components/AssetsData";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import AddAssetModal from "./_components/AddAssetsModal";
-// import Header from "./_components/AssetsHeader"
-// import AssetsTable from "./_components/AssetsTable"
 
 const Assets = () => {
-  document.title = "Assets - KDC Admin";
+  document.title = "Assets - Admin";
   const tableHeaders = ["Asset", "Value", "Lifespan", "Status", "Details"];
   const [totalAssetsCount, setTotalAssetsCount] = useState(0);
   const [goodAssetsCount, setGoodAssetsCount] = useState(0);
@@ -25,20 +21,26 @@ const Assets = () => {
   const [showDeprecated, setShowDeprecated] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
-
-  const { data, isLoading, error } = useQuery<AssetSummary, Error>({
-    queryKey: ["assetsData", searchQuery, showAvailable, showDeprecated],
-    queryFn: () => AssetsData({ search: searchQuery, is_still_available: getAvailabilityFilter() }),
-  });
+  const [data, setData] = useState<AssetSummary | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (data) {
-      setTotalAssetsCount(data.results.total_assets_count);
-      setGoodAssetsCount(data.results.good_assets_count);
-      setGoodAssetsValue(data.results.good_assets_value);
-      setDepreciatedAssetsCount(data.results.depreciated_assets_count);
-    }
-  }, [data]);
+    setIsLoading(true);
+    AssetsData({ search: searchQuery, is_still_available: getAvailabilityFilter(), show_deprecated: showDeprecated })
+      .then((result) => {
+        setData(result);
+        setTotalAssetsCount(result.results.total_assets_count);
+        setGoodAssetsCount(result.results.good_assets_count);
+        setGoodAssetsValue(result.results.good_assets_value);
+        setDepreciatedAssetsCount(result.results.depreciated_assets_count);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setIsLoading(false);
+      });
+  }, [searchQuery, showAvailable, showDeprecated]);
 
   const handleSearch = () => {
     setSearchQuery(searchInput);
@@ -58,15 +60,14 @@ const Assets = () => {
     if (showDeprecated && !showAvailable) {
       return false;
     }
-    return undefined; // Neither selected, or both selected (ambiguous, so show all)
+    return undefined;
   };
 
   if (isLoading) return <p>Loading assets data...</p>;
-  if (error) return <p>Error loading assets: {error.message}</p>;
+  if (error) return <p>Error loading assets: {error}</p>;
 
   return (
     <div className="wrapper w-full mb-20 md:mb-2 mx-auto md:pt-4">
-      {/* Asset Summary Cards */}
       <div
         className={`grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mb-4 sm:mb-6 ${
           isAddModalOpen || isTableModalOpen ? "blur-md" : ""
@@ -74,14 +75,15 @@ const Assets = () => {
       >
         <AssetsDataCard info="Total Assets Count" digits={totalAssetsCount} />
         <AssetsDataCard info="Good Assets Count" digits={goodAssetsCount} />
-        <AssetsDataCard info="deprecated Assets Count" digits={depreciatedAssetsCount} />
+        <AssetsDataCard info="Deprecated Assets Count" digits={depreciatedAssetsCount} />
         <AssetsDataCard info="Good Assets Value" digits={goodAssetsValue} currency="₦ " />
       </div>
 
-      {/* Asset Items Heading and Add Button Row */}
-      <div className={`flex flex-row items-center justify-between gap-2 ${
-        isAddModalOpen || isTableModalOpen ? "blur-md" : ""
-      }`}>
+      <div
+        className={`flex flex-row items-center justify-between gap-2 ${
+          isAddModalOpen || isTableModalOpen ? "blur-md" : ""
+        }`}
+      >
         <h1
           style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
           className="font-semibold md:py-3 mt-2"
@@ -97,8 +99,11 @@ const Assets = () => {
         </button>
       </div>
 
-      {/* Search, Clear, Filters Row - always one line, right aligned, no wrap */}
-      <div className={`w-full flex flex-row flex-nowrap justify-end items-center gap-2 mb-5 overflow-x-auto ${isAddModalOpen || isTableModalOpen ? "blur-md" : ""}`}>
+      <div
+        className={`w-full flex flex-row flex-nowrap justify-end items-center gap-2 mb-5 overflow-x-auto ${
+          isAddModalOpen || isTableModalOpen ? "blur-md" : ""
+        }`}
+      >
         <input
           type="text"
           placeholder="Search for assets by name..."
@@ -167,7 +172,7 @@ const Assets = () => {
                       if (!showDeprecated) setShowAvailable(false);
                     }}
                   />
-                  <span>Show Depreciated</span>
+                  <span>Show Deprecated</span>
                 </label>
               </div>
             </div>
@@ -180,19 +185,20 @@ const Assets = () => {
           isAddModalOpen || isTableModalOpen ? "blur-md" : ""
         }`}
       >
-        
         <AssetsDataTable
           headers={tableHeaders}
           searchQuery={searchQuery}
           showAvailable={showAvailable}
           showDeprecated={showDeprecated}
           isTableModalOpen={isTableModalOpen}
+          setIsTableModalOpen={setIsTableModalOpen}
         />
       </div>
 
       <AddAssetModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
+        onSuccess={() => setIsAddModalOpen(false)}
       />
     </div>
   );

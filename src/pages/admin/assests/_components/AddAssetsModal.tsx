@@ -1,20 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useCreateAsset, type AssetData } from "../_api/apiService";
+// src/pages/admin/assets/_components/AddAssetModal.tsx
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { useAuth } from "../../../AuthPages/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+interface AssetData {
+  name: string;
+  value: number;
+  expected_lifespan: string;
+  is_still_available: boolean;
+  date_added?: string;
+  note?: string;
+}
 
 interface AddAssetModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess: () => void;
 }
 
 const initialFormData: AssetData & { date_added?: string; note?: string } = {
@@ -22,18 +27,14 @@ const initialFormData: AssetData & { date_added?: string; note?: string } = {
   value: 0,
   expected_lifespan: "",
   is_still_available: true,
-  date_added: new Date().toISOString().split('T')[0],
+  date_added: new Date().toISOString().split("T")[0],
   note: "",
 };
 
-const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
-  const queryClient = useQueryClient();
-  const { mutate, isPending } = useCreateAsset();
-  const { userRole } = useAuth();
-
+const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState<AssetData & { date_added?: string; note?: string }>(initialFormData);
+  const userRole = localStorage.getItem("user_role") || "employee";
 
-  // Reset form when modal opens/closes
   useEffect(() => {
     if (!isOpen) {
       setFormData(initialFormData);
@@ -41,31 +42,21 @@ const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
   }, [isOpen]);
 
   useEffect(() => {
-    if (userRole !== 'ceo') {
-      setFormData(prev => ({ ...prev, date_added: undefined }));
-    }
+      setFormData((prev) => ({ ...prev, date_added: undefined }));
   }, [userRole]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : type === "number" ? (value === "" ? 0 : Number(value)) : value,
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutate(formData, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["assets"] });
-        toast.success("Asset added successfully!");
-        onClose(); 
-      },
-      onError: () => {
-        toast.error("Failed to add asset. Please try again.");
-      },
-    });
+    toast.error("Add asset functionality is disabled in static mode.");
+    onSuccess();
   };
 
   return (
@@ -78,23 +69,23 @@ const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
-              <Input 
-                id="name" 
-                name="name" 
-                value={formData.name} 
-                onChange={handleChange} 
-                required 
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="value">Value</Label>
-              <Input 
-                id="value" 
-                name="value" 
-                type="number" 
-                value={formData.value || ""} 
-                onChange={handleChange} 
-                required 
+              <Label htmlFor="value">Value (NGN)</Label>
+              <Input
+                id="value"
+                name="value"
+                type="number"
+                value={formData.value || ""}
+                onChange={handleChange}
+                required
               />
             </div>
             <div className="space-y-2">
@@ -107,7 +98,6 @@ const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
                 required
               />
             </div>
-            {userRole === 'ceo' && (
               <div className="space-y-2">
                 <Label htmlFor="date_added">Date Added</Label>
                 <Input
@@ -119,7 +109,6 @@ const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
                   required
                 />
               </div>
-            )}
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -146,9 +135,7 @@ const AddAssetModal: React.FC<AddAssetModalProps> = ({ isOpen, onClose }) => {
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving..." : "Save Asset"}
-            </Button>
+            <Button type="submit">Save Asset</Button>
           </CardFooter>
         </form>
       </DialogContent>
