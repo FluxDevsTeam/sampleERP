@@ -1,16 +1,16 @@
-[
-  {
-    "id": "1",
-    "name": "Alice Johnson",
-    "company": "BuildIt Co.",
-    "contract_value": 120000,
-    "is_still_active": true
-  },
-  {
-    "id": "2",
-    "name": "Bob Williams",
-    "company": "CodeCrafters",
-    "contract_value": 90000,
-    "is_still_active": true
+{
+  "results": {
+    "contractor": [
+      {"id": 1, "first_name": "Alice", "last_name": "Smith", "email": "alice.smith@example.com", "phone_number": "5551234567", "address": "789 Market St", "craft_specialty": "Plumber", "years_of_experience": 8, "contract_value": 10000, "contract_type": "Monthly", "is_still_active": true, "date_joined": "2023-03-15", "date_left": null, "guarantor_name": "Bob Smith", "guarantor_phone_number": "5559876543", "guarantor_address": "321 Elm St", "image": null, "agreement_form_image": null, "created_at": "2023-03-15T00:00:00Z", "updated_at": "2023-03-15T00:00:00Z"},
+      {"id": 2, "first_name": "Bob", "last_name": "Johnson", "email": "bob.johnson@example.com", "phone_number": "5552345678", "address": "234 Market St", "craft_specialty": "Electrician", "years_of_experience": 6, "contract_value": 9000, "contract_type": "Weekly", "is_still_active": false, "date_joined": "2023-04-15", "date_left": null, "guarantor_name": "Alice Johnson", "guarantor_phone_number": "5558765432", "guarantor_address": "654 Elm St", "image": null, "agreement_form_image": null, "created_at": "2023-04-15T00:00:00Z", "updated_at": "2023-04-15T00:00:00Z"},
+      {"id": 3, "first_name": "Carol", "last_name": "Williams", "email": "carol.williams@example.com", "phone_number": "5553456789", "address": "345 Market St", "craft_specialty": "Carpenter", "years_of_experience": 7, "contract_value": 9500, "contract_type": "Monthly", "is_still_active": true, "date_joined": "2023-05-15", "date_left": null, "guarantor_name": "Dave Williams", "guarantor_phone_number": "5557654321", "guarantor_address": "987 Elm St", "image": null, "agreement_form_image": null, "created_at": "2023-05-15T00:00:00Z", "updated_at": "2023-05-15T00:00:00Z"},
+      {"id": 4, "first_name": "Dave", "last_name": "Miller", "email": "dave.miller@example.com", "phone_number": "5554567890", "address": "456 Market St", "craft_specialty": "Welder", "years_of_experience": 5, "contract_value": 9200, "contract_type": "Weekly", "is_still_active": true, "date_joined": "2023-06-15", "date_left": null, "guarantor_name": "Carol Miller", "guarantor_phone_number": "5556543210", "guarantor_address": "321 Elm St", "image": null, "agreement_form_image": null, "created_at": "2023-06-15T00:00:00Z", "updated_at": "2023-06-15T00:00:00Z"},
+      {"id": 5, "first_name": "Eve", "last_name": "Davis", "email": "eve.davis@example.com", "phone_number": "5555678901", "address": "567 Market St", "craft_specialty": "Painter", "years_of_experience": 4, "contract_value": 8800, "contract_type": "Monthly", "is_still_active": false, "date_joined": "2023-07-15", "date_left": null, "guarantor_name": "Frank Davis", "guarantor_phone_number": "5555432109", "guarantor_address": "654 Elm St", "image": null, "agreement_form_image": null, "created_at": "2023-07-15T00:00:00Z", "updated_at": "2023-07-15T00:00:00Z"},
+      {"id": 6, "first_name": "Frank", "last_name": "Garcia", "email": "frank.garcia@example.com", "phone_number": "5556789012", "address": "678 Market St", "craft_specialty": "Mechanic", "years_of_experience": 8, "contract_value": 9700, "contract_type": "Weekly", "is_still_active": true, "date_joined": "2023-08-15", "date_left": null, "guarantor_name": "Eve Garcia", "guarantor_phone_number": "5554321098", "guarantor_address": "987 Elm St", "image": null, "agreement_form_image": null, "created_at": "2023-08-15T00:00:00Z", "updated_at": "2023-08-15T00:00:00Z"},
+      {"id": 7, "first_name": "Grace", "last_name": "Martinez", "email": "grace.martinez@example.com", "phone_number": "5557890123", "address": "789 Market St", "craft_specialty": "Technician", "years_of_experience": 6, "contract_value": 9300, "contract_type": "Monthly", "is_still_active": true, "date_joined": "2023-09-15", "date_left": null, "guarantor_name": "Frank Martinez", "guarantor_phone_number": "5553210987", "guarantor_address": "321 Elm St", "image": null, "agreement_form_image": null, "created_at": "2023-09-15T00:00:00Z", "updated_at": "2023-09-15T00:00:00Z"},
+      {"id": 8, "first_name": "Henry", "last_name": "Lopez", "email": "henry.lopez@example.com", "phone_number": "5558901234", "address": "890 Market St", "craft_specialty": "Supervisor", "years_of_experience": 7, "contract_value": 9900, "contract_type": "Weekly", "is_still_active": true, "date_joined": "2023-10-15", "date_left": null, "guarantor_name": "Grace Lopez", "guarantor_phone_number": "5552109876", "guarantor_address": "654 Elm St", "image": null, "agreement_form_image": null, "created_at": "2023-10-15T00:00:00Z", "updated_at": "2023-10-15T00:00:00Z"},
+      {"id": 9, "first_name": "Ivy", "last_name": "Gonzalez", "email": "ivy.gonzalez@example.com", "phone_number": "5559012345", "address": "901 Market St", "craft_specialty": "Accountant", "years_of_experience": 9, "contract_value": 10000, "contract_type": "Monthly", "is_still_active": true, "date_joined": "2023-11-15", "date_left": null, "guarantor_name": "Henry Gonzalez", "guarantor_phone_number": "5551098765", "guarantor_address": "987 Elm St", "image": null, "agreement_form_image": null, "created_at": "2023-11-15T00:00:00Z", "updated_at": "2023-11-15T00:00:00Z"},
+      {"id": 10, "first_name": "Jack", "last_name": "Wilson", "email": "jack.wilson@example.com", "phone_number": "5550123456", "address": "012 Market St", "craft_specialty": "Driver", "years_of_experience": 2, "contract_value": 8500, "contract_type": "Weekly", "is_still_active": true, "date_joined": "2023-12-15", "date_left": null, "guarantor_name": "Ivy Wilson", "guarantor_phone_number": "5550987654", "guarantor_address": "321 Elm St", "image": null, "agreement_form_image": null, "created_at": "2023-12-15T00:00:00Z", "updated_at": "2023-12-15T00:00:00Z"}
+    ]
   }
-]
+}

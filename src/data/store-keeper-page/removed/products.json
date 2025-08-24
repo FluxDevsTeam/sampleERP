@@ -1,0 +1,28 @@
+{
+    "count": 3,
+    "next": null,
+    "previous": null,
+    "results": [
+      {
+        "id": 1,
+        "name": "Widget A",
+        "selling_price": "1000",
+        "progress": 100,
+        "raw_material": { "id": 1, "name": "Steel Bolts", "unit": "pieces" }
+      },
+      {
+        "id": 2,
+        "name": "Widget B",
+        "selling_price": "2000",
+        "progress": 80,
+        "raw_material": { "id": 2, "name": "Aluminum Sheets", "unit": "sheets" }
+      },
+      {
+        "id": 3,
+        "name": "Gadget C",
+        "selling_price": "1500",
+        "progress": 90,
+        "raw_material": { "id": 3, "name": "Screws", "unit": "pieces" }
+      }
+    ]
+  }

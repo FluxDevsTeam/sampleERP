@@ -1,0 +1,668 @@
+{
+  "monthly_total": 1250000,
+  "salary_paid_this_month": 750000,
+  "contractors_paid_this_month": 500000,
+  "yearly_total": 15000000,
+  "daily_data": [
+    {
+      "date": "2025-08-10",
+      "daily_total": 220000,
+      "entries": [
+        {
+          "id": 15,
+          "amount": "90000",
+          "date": "2025-08-10",
+          "salary_detail": {
+            "id": 11,
+            "first_name": "Adeola",
+            "last_name": "Balogun",
+            "email": "adeola.balogun@example.com",
+            "phone_number": "+2348019876543",
+            "address": "45 Ikoyi Crescent, Lagos",
+            "craft_specialty": "Masonry",
+            "years_of_experience": 6,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2023-09-12",
+            "date_left": null,
+            "guarantor_name": "Kunle Ade",
+            "guarantor_phone_number": "+2348081234567",
+            "guarantor_address": "12 Ibadan Street, Ibadan",
+            "created_at": "2023-09-12T10:00:00Z",
+            "updated_at": null,
+            "salary": "95000",
+            "is_still_active": true
+          },
+          "contractor_detail": null
+        },
+        {
+          "id": 16,
+          "amount": "130000",
+          "date": "2025-08-10",
+          "salary_detail": null,
+          "contractor_detail": {
+            "id": 12,
+            "first_name": "Yakubu",
+            "last_name": "Abdullahi",
+            "email": "yakubu.abdullahi@example.com",
+            "phone_number": "+2348023459876",
+            "address": "77 Zaria Road, Kaduna",
+            "craft_specialty": "Roofing",
+            "years_of_experience": 10,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2022-03-15",
+            "date_left": null,
+            "guarantor_name": "Musa Bello",
+            "guarantor_phone_number": "+2348093456781",
+            "guarantor_address": "34 Bauchi Street, Bauchi",
+            "created_at": "2022-03-15T09:00:00Z",
+            "updated_at": null,
+            "contract_value": "160000",
+            "is_still_active": true
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-08-09",
+      "daily_total": 195000,
+      "entries": [
+        {
+          "id": 13,
+          "amount": "75000",
+          "date": "2025-08-09",
+          "salary_detail": {
+            "id": 10,
+            "first_name": "Zainab",
+            "last_name": "Usman",
+            "email": "zainab.usman@example.com",
+            "phone_number": "+2348014567893",
+            "address": "56 Ilorin Road, Ilorin",
+            "craft_specialty": "Welding",
+            "years_of_experience": 5,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2024-05-11",
+            "date_left": null,
+            "guarantor_name": "Mariam Adamu",
+            "guarantor_phone_number": "+2348092223344",
+            "guarantor_address": "88 Lokoja Lane, Lokoja",
+            "created_at": "2024-05-11T10:00:00Z",
+            "updated_at": null,
+            "salary": "88000",
+            "is_still_active": true
+          },
+          "contractor_detail": null
+        },
+        {
+          "id": 14,
+          "amount": "120000",
+          "date": "2025-08-09",
+          "salary_detail": null,
+          "contractor_detail": {
+            "id": 11,
+            "first_name": "Samuel",
+            "last_name": "Okafor",
+            "email": "samuel.okafor@example.com",
+            "phone_number": "+2348039876543",
+            "address": "90 Awka Street, Anambra",
+            "craft_specialty": "Electrical",
+            "years_of_experience": 8,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2021-08-20",
+            "date_left": null,
+            "guarantor_name": "Chioma Nwosu",
+            "guarantor_phone_number": "+2348024567890",
+            "guarantor_address": "22 Nsukka Road, Enugu",
+            "created_at": "2021-08-20T11:00:00Z",
+            "updated_at": null,
+            "contract_value": "140000",
+            "is_still_active": true
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-08-08",
+      "daily_total": 185000,
+      "entries": [
+        {
+          "id": 11,
+          "amount": "65000",
+          "date": "2025-08-08",
+          "salary_detail": {
+            "id": 9,
+            "first_name": "Bola",
+            "last_name": "Adeyemi",
+            "email": "bola.adeyemi@example.com",
+            "phone_number": "+2348091239876",
+            "address": "12 Ikeja Road, Lagos",
+            "craft_specialty": "Painting",
+            "years_of_experience": 4,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2023-08-01",
+            "date_left": null,
+            "guarantor_name": "Kolade Ojo",
+            "guarantor_phone_number": "+2348076543333",
+            "guarantor_address": "55 Mushin Road, Lagos",
+            "created_at": "2023-08-01T09:00:00Z",
+            "updated_at": null,
+            "salary": "85000",
+            "is_still_active": true
+          },
+          "contractor_detail": null
+        },
+        {
+          "id": 12,
+          "amount": "120000",
+          "date": "2025-08-08",
+          "salary_detail": null,
+          "contractor_detail": {
+            "id": 10,
+            "first_name": "Hassan",
+            "last_name": "Lawal",
+            "email": "hassan.lawal@example.com",
+            "phone_number": "+2348043219876",
+            "address": "34 Kano Street, Kano",
+            "craft_specialty": "Carpentry",
+            "years_of_experrence": 7,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2021-04-10",
+            "date_left": null,
+            "guarantor_name": "Abdul Rahman",
+            "guarantor_phone_number": "+2348023452222",
+            "guarantor_address": "77 Maiduguri Road, Maiduguri",
+            "created_at": "2021-04-10T08:00:00Z",
+            "updated_at": null,
+            "contract_value": "135000",
+            "is_still_active": true
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-08-07",
+      "daily_total": 200000,
+      "entries": [
+        {
+          "id": 17,
+          "amount": "85000",
+          "date": "2025-08-07",
+          "salary_detail": {
+            "id": 12,
+            "first_name": "Ngozi",
+            "last_name": "Ike",
+            "email": "ngozi.ike@example.com",
+            "phone_number": "+2348017654321",
+            "address": "56 Aba Street, Aba",
+            "craft_specialty": "Plumbing",
+            "years_of_experience": 6,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2024-01-05",
+            "date_left": null,
+            "guarantor_name": "Chidera Obi",
+            "guarantor_phone_number": "+2348091234561",
+            "guarantor_address": "98 Owerri Road, Owerri",
+            "created_at": "2024-01-05T10:00:00Z",
+            "updated_at": null,
+            "salary": "92000",
+            "is_still_active": true
+          },
+          "contractor_detail": null
+        },
+        {
+          "id": 18,
+          "amount": "115000",
+          "date": "2025-08-07",
+          "salary_detail": null,
+          "contractor_detail": {
+            "id": 13,
+            "first_name": "Abiola",
+            "last_name": "Sanni",
+            "email": "abiola.sanni@example.com",
+            "phone_number": "+2348023456789",
+            "address": "45 Ogbomoso Street, Oyo",
+            "craft_specialty": "Tiling",
+            "years_of_experience": 9,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2020-07-15",
+            "date_left": null,
+            "guarantor_name": "Micheal Ojo",
+            "guarantor_phone_number": "+2348087654311",
+            "guarantor_address": "101 Ekiti Road, Ado-Ekiti",
+            "created_at": "2020-07-15T09:00:00Z",
+            "updated_at": null,
+            "contract_value": "145000",
+            "is_still_active": true
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-08-06",
+      "daily_total": 205000,
+      "entries": [
+        {
+          "id": 19,
+          "amount": "95000",
+          "date": "2025-08-06",
+          "salary_detail": {
+            "id": 13,
+            "first_name": "Halima",
+            "last_name": "Garba",
+            "email": "halima.garba@example.com",
+            "phone_number": "+2348034567891",
+            "address": "65 Gombe Road, Gombe",
+            "craft_specialty": "Electrical",
+            "years_of_experience": 5,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2022-12-12",
+            "date_left": null,
+            "guarantor_name": "Suleiman Ibrahim",
+            "guarantor_phone_number": "+2348076543221",
+            "guarantor_address": "90 Lafia Road, Nasarawa",
+            "created_at": "2022-12-12T08:00:00Z",
+            "updated_at": null,
+            "salary": "100000",
+            "is_still_active": true
+          },
+          "contractor_detail": null
+        },
+        {
+          "id": 20,
+          "amount": "110000",
+          "date": "2025-08-06",
+          "salary_detail": null,
+          "contractor_detail": {
+            "id": 14,
+            "first_name": "Bashir",
+            "last_name": "Danladi",
+            "email": "bashir.danladi@example.com",
+            "phone_number": "+2348098765431",
+            "address": "23 Jalingo Road, Taraba",
+            "craft_specialty": "Masonry",
+            "years_of_experience": 12,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2019-09-01",
+            "date_left": null,
+            "guarantor_name": "Adamu Isa",
+            "guarantor_phone_number": "+2348012345555",
+            "guarantor_address": "33 Dutse Road, Jigawa",
+            "created_at": "2019-09-01T09:00:00Z",
+            "updated_at": null,
+            "contract_value": "155000",
+            "is_still_active": true
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-07-15",
+      "daily_total": 180000,
+      "entries": [
+        {
+          "id": 21,
+          "amount": "80000",
+          "date": "2025-07-15",
+          "salary_detail": {
+            "id": 14,
+            "first_name": "Chinedu",
+            "last_name": "Okoro",
+            "email": "chinedu.okoro@example.com",
+            "phone_number": "+2348029876543",
+            "address": "78 Onitsha Street, Anambra",
+            "craft_specialty": "Carpentry",
+            "years_of_experience": 7,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2023-02-14",
+            "date_left": null,
+            "guarantor_name": "Emeka Nwankwo",
+            "guarantor_phone_number": "+2348098765432",
+            "guarantor_address": "45 Nnewi Road, Anambra",
+            "created_at": "2023-02-14T10:00:00Z",
+            "updated_at": null,
+            "salary": "90000",
+            "is_still_active": true
+          },
+          "contractor_detail": null
+        },
+        {
+          "id": 22,
+          "amount": "100000",
+          "date": "2025-07-15",
+          "salary_detail": null,
+          "contractor_detail": {
+            "id": 15,
+            "first_name": "Fatima",
+            "last_name": "Mohammed",
+            "email": "fatima.mohammed@example.com",
+            "phone_number": "+2348039876543",
+            "address": "34 Sokoto Road, Sokoto",
+            "craft_specialty": "Painting",
+            "years_of_experience": 6,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2022-05-20",
+            "date_left": null,
+            "guarantor_name": "Aisha Bello",
+            "guarantor_phone_number": "+2348076543210",
+            "guarantor_address": "12 Gusau Street, Zamfara",
+            "created_at": "2022-05-20T09:00:00Z",
+            "updated_at": null,
+            "contract_value": "120000",
+            "is_still_active": true
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-07-10",
+      "daily_total": 210000,
+      "entries": [
+        {
+          "id": 23,
+          "amount": "95000",
+          "date": "2025-07-10",
+          "salary_detail": {
+            "id": 15,
+            "first_name": "Tunde",
+            "last_name": "Ogunleye",
+            "email": "tunde.ogunleye@example.com",
+            "phone_number": "+2348045678901",
+            "address": "23 Abeokuta Road, Ogun",
+            "craft_specialty": "Plumbing",
+            "years_of_experience": 8,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2021-11-05",
+            "date_left": null,
+            "guarantor_name": "Femi Adebayo",
+            "guarantor_phone_number": "+2348091234567",
+            "guarantor_address": "67 Ijebu-Ode Street, Ogun",
+            "created_at": "2021-11-05T08:00:00Z",
+            "updated_at": null,
+            "salary": "105000",
+            "is_still_active": true
+          },
+          "contractor_detail": null
+        },
+        {
+          "id": 24,
+          "amount": "115000",
+          "date": "2025-07-10",
+          "salary_detail": null,
+          "contractor_detail": {
+            "id": 16,
+            "first_name": "Grace",
+            "last_name": "Eze",
+            "email": "grace.eze@example.com",
+            "phone_number": "+2348056789012",
+            "address": "89 Umuahia Road, Abia",
+            "craft_specialty": "Electrical",
+            "years_of_experience": 9,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2020-03-12",
+            "date_left": null,
+            "guarantor_name": "John Okoro",
+            "guarantor_phone_number": "+2348087654321",
+            "guarantor_address": "34 Abakaliki Street, Ebonyi",
+            "created_at": "2020-03-12T10:00:00Z",
+            "updated_at": null,
+            "contract_value": "140000",
+            "is_still_active": true
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-06-20",
+      "daily_total": 195000,
+      "entries": [
+        {
+          "id": 25,
+          "amount": "85000",
+          "date": "2025-06-20",
+          "salary_detail": {
+            "id": 16,
+            "first_name": "Aminu",
+            "last_name": "Suleiman",
+            "email": "aminu.suleiman@example.com",
+            "phone_number": "+2348067890123",
+            "address": "56 Katsina Road, Katsina",
+            "craft_specialty": "Masonry",
+            "years_of_experience": 10,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2019-08-15",
+            "date_left": null,
+            "guarantor_name": "Ibrahim Musa",
+            "guarantor_phone_number": "+2348076543219",
+            "guarantor_address": "78 Daura Street, Katsina",
+            "created_at": "2019-08-15T09:00:00Z",
+            "updated_at": null,
+            "salary": "95000",
+            "is_still_active": true
+          },
+          "contractor_detail": null
+        },
+        {
+          "id": 26,
+          "amount": "110000",
+          "date": "2025-06-20",
+          "salary_detail": null,
+          "contractor_detail": {
+            "id": 17,
+            "first_name": "Patience",
+            "last_name": "Udo",
+            "email": "patience.udo@example.com",
+            "phone_number": "+2348078901234",
+            "address": "12 Calabar Road, Cross River",
+            "craft_specialty": "Welding",
+            "years_of_experience": 11,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2018-06-10",
+            "date_left": null,
+            "guarantor_name": "Blessing Etim",
+            "guarantor_phone_number": "+2348098765432",
+            "guarantor_address": "45 Uyo Street, Akwa Ibom",
+            "created_at": "2018-06-10T08:00:00Z",
+            "updated_at": null,
+            "contract_value": "135000",
+            "is_still_active": true
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-06-15",
+      "daily_total": 175000,
+      "entries": [
+        {
+          "id": 27,
+          "amount": "75000",
+          "date": "2025-06-15",
+          "salary_detail": {
+            "id": 17,
+            "first_name": "Ruth",
+            "last_name": "Adeyemo",
+            "email": "ruth.adeyemo@example.com",
+            "phone_number": "+2348089012345",
+            "address": "34 Ibadan Road, Oyo",
+            "craft_specialty": "Painting",
+            "years_of_experience": 5,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2023-01-20",
+            "date_left": null,
+            "guarantor_name": "Esther Oladele",
+            "guarantor_phone_number": "+2348091234568",
+            "guarantor_address": "67 Oyo Street, Oyo",
+            "created_at": "2023-01-20T10:00:00Z",
+            "updated_at": null,
+            "salary": "85000",
+            "is_still_active": true
+          },
+          "contractor_detail": null
+        },
+        {
+          "id": 28,
+          "amount": "100000",
+          "date": "2025-06-15",
+          "salary_detail": null,
+          "contractor_detail": {
+            "id": 18,
+            "first_name": "Sunday",
+            "last_name": "Ojo",
+            "email": "sunday.ojo@example.com",
+            "phone_number": "+2348090123456",
+            "address": "89 Akure Road, Ondo",
+            "craft_specialty": "Carpentry",
+            "years_of_experience": 8,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2021-07-25",
+            "date_left": null,
+            "guarantor_name": "Monday Adekunle",
+            "guarantor_phone_number": "+2348087654329",
+            "guarantor_address": "23 Ado-Ekiti Street, Ekiti",
+            "created_at": "2021-07-25T09:00:00Z",
+            "updated_at": null,
+            "contract_value": "125000",
+            "is_still_active": true
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-05-25",
+      "daily_total": 190000,
+      "entries": [
+        {
+          "id": 29,
+          "amount": "90000",
+          "date": "2025-05-25",
+          "salary_detail": {
+            "id": 18,
+            "first_name": "Musa",
+            "last_name": "Abubakar",
+            "email": "musa.abubakar@example.com",
+            "phone_number": "+2348101234567",
+            "address": "12 Minna Road, Niger",
+            "craft_specialty": "Electrical",
+            "years_of_experience": 7,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2022-04-18",
+            "date_left": null,
+            "guarantor_name": "Ahmed Sani",
+            "guarantor_phone_number": "+2348098765433",
+            "guarantor_address": "45 Bida Street, Niger",
+            "created_at": "2022-04-18T08:00:00Z",
+            "updated_at": null,
+            "salary": "100000",
+            "is_still_active": true
+          },
+          "contractor_detail": null
+        },
+        {
+          "id": 30,
+          "amount": "100000",
+          "date": "2025-05-25",
+          "salary_detail": null,
+          "contractor_detail": {
+            "id": 19,
+            "first_name": "Mercy",
+            "last_name": "Johnson",
+            "email": "mercy.johnson@example.com",
+            "phone_number": "+2348112345678",
+            "address": "78 Port Harcourt Road, Rivers",
+            "craft_specialty": "Plumbing",
+            "years_of_experience": 6,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2022-09-30",
+            "date_left": null,
+            "guarantor_name": "Peace Thompson",
+            "guarantor_phone_number": "+2348076543218",
+            "guarantor_address": "34 Bonny Street, Rivers",
+            "created_at": "2022-09-30T10:00:00Z",
+            "updated_at": null,
+            "contract_value": "120000",
+            "is_still_active": true
+          }
+        }
+      ]
+    },
+    {
+      "date": "2025-05-20",
+      "daily_total": 205000,
+      "entries": [
+        {
+          "id": 31,
+          "amount": "95000",
+          "date": "2025-05-20",
+          "salary_detail": {
+            "id": 19,
+            "first_name": "James",
+            "last_name": "Okafor",
+            "email": "james.okafor@example.com",
+            "phone_number": "+2348123456789",
+            "address": "23 Enugu Road, Enugu",
+            "craft_specialty": "Masonry",
+            "years_of_experience": 9,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2020-12-05",
+            "date_left": null,
+            "guarantor_name": "Peter Nnamani",
+            "guarantor_phone_number": "+2348098765434",
+            "guarantor_address": "56 Nsukka Street, Enugu",
+            "created_at": "2020-12-05T09:00:00Z",
+            "updated_at": null,
+            "salary": "110000",
+            "is_still_active": true
+          },
+          "contractor_detail": null
+        },
+        {
+          "id": 32,
+          "amount": "110000",
+          "date": "2025-05-20",
+          "salary_detail": null,
+          "contractor_detail": {
+            "id": 20,
+            "first_name": "Hauwa",
+            "last_name": "Yusuf",
+            "email": "hauwa.yusuf@example.com",
+            "phone_number": "+2348134567890",
+            "address": "89 Yola Road, Adamawa",
+            "craft_specialty": "Tiling",
+            "years_of_experience": 10,
+            "image": null,
+            "agreement_form_image": null,
+            "date_joined": "2019-05-22",
+            "date_left": null,
+            "guarantor_name": "Aisha Mohammed",
+            "guarantor_phone_number": "+2348087654328",
+            "guarantor_address": "12 Mubi Street, Adamawa",
+            "created_at": "2019-05-22T08:00:00Z",
+            "updated_at": null,
+            "contract_value": "140000",
+            "is_still_active": true
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "all_projects": [
+    { "id": 1, "name": "Main Showroom" },
+    { "id": 2, "name": "Outdoor Kiosk" }
+  ],
+  "results": [
+    { "id": 1, "name": "Main Showroom" },
+    { "id": 2, "name": "Outdoor Kiosk" }
+  ],
+  "count": 2,
+  "next": null,
+  "previous": null
+}

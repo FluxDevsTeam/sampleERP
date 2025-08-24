@@ -1,0 +1,7 @@
+{
+  "workers": [
+    { "id": 101, "first_name": "Grace", "last_name": "Lee" },
+    { "id": 102, "first_name": "Henry", "last_name": "Nguyen" },
+    { "id": 103, "first_name": "Ivy", "last_name": "Khan" }
+  ]
+}
