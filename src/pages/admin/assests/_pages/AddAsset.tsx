@@ -1,52 +1,41 @@
-import React, { useState } from "react"
-import { useQueryClient } from "@tanstack/react-query"
-import { useNavigate } from "react-router-dom"
-import { useCreateAsset, type AssetData } from "../_api/apiService"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
+// src/pages/admin/assets/_components/AddAsset.tsx
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+
+interface AssetData {
+  name: string;
+  value: number;
+  expected_lifespan: string;
+  is_still_available: boolean;
+}
 
 const AddAsset = () => {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const { mutate, isPending } = useCreateAsset()
-
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<AssetData>({
     name: "",
     value: 0,
     expected_lifespan: "",
     is_still_available: true,
-  })
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }))
-  }
+      [name]: type === "checkbox" ? checked : type === "number" ? (value === "" ? 0 : Number(value)) : value,
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    mutate(formData, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["assets"], refetchType: "active" })
-        toast.success("Asset added successfully!")
-        navigate("/admin/assets")
-      },
-      onError: () => {
-        toast.error("Failed to add asset. Please try again.")
-      },
-    })
-  }
+    e.preventDefault();
+    toast.error("Add asset functionality is disabled in static mode.");
+    navigate("/admin/assets");
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -68,12 +57,12 @@ const AddAsset = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="value">Value</Label>
+              <Label htmlFor="value">Value (NGN)</Label>
               <Input
                 id="value"
                 name="value"
                 type="number"
-                value={formData.value}
+                value={formData.value || ""}
                 onChange={handleChange}
                 required
               />
@@ -110,14 +99,12 @@ const AddAsset = () => {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving..." : "Save Asset"}
-            </Button>
+            <Button type="submit">Save Asset</Button>
           </CardFooter>
         </form>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default AddAsset
+export default AddAsset;

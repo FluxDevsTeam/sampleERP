@@ -1,7 +1,7 @@
+// src/pages/admin/assets/_components/CreateAsset.tsx
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const CreateAsset = () => {
   const [name, setName] = useState("");
@@ -9,20 +9,11 @@ const CreateAsset = () => {
   const [lifespan, setLifespan] = useState("");
   const [available, setAvailable] = useState(true);
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newAsset = {
-      name,
-      value,
-      expected_lifespan: lifespan,
-      is_still_available: available,
-    };
-
-    await axios.post("https://backend.kidsdesigncompany.com/api/assets/crud", newAsset);
-    queryClient.invalidateQueries(["assets"]); // Refresh assets data
-    navigate("/admin/dashboard/assets");
+    toast.error("Add asset functionality is disabled in static mode.");
+    navigate("/admin/assets");
   };
 
   return (
@@ -38,7 +29,7 @@ const CreateAsset = () => {
         />
         <input
           type="number"
-          placeholder="Value"
+          placeholder="Value (NGN)"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           className="block w-full p-2 border rounded"
@@ -55,6 +46,7 @@ const CreateAsset = () => {
             type="checkbox"
             checked={available}
             onChange={() => setAvailable(!available)}
+            className="h-4 w-4"
           />
           <span className="ml-2">Available</span>
         </label>

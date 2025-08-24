@@ -14,24 +14,18 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import axios from "axios";
 import Header from "./_components/Header";
 import SkeletonLoader from "./_components/SkeletonLoader";
 import AdminDashboardCard from "./AdminDashboardCard";
 import React from "react";
 import { CustomTooltip } from "../../../components/CustomChartComponents";
+import adminDashboardData from "@/data/admin/dashboard/admin-dashboard.json";
+import { useState, useEffect } from "react";
 
 const fetchFinancialData = async () => {
-  const accessToken = localStorage.getItem("accessToken");
-  const { data } = await axios.get(
-    "https://backend.kidsdesigncompany.com/api/admin-dashboard/",
-    {
-      headers: {
-        Authorization: `JWT ${accessToken}`,
-      },
-    }
-  );
-  return data;
+  // Load from local storage if available, else use JSON
+  const storedData = localStorage.getItem("adminDashboardData");
+  return storedData ? JSON.parse(storedData) : adminDashboardData;
 };
 
 // Helper to determine if a key is monetary
@@ -58,7 +52,6 @@ const cardNameMap: Record<string, string> = {
   sales_count: "Sales Count",
   "total_salary_workers_monthly_pay": "Fixed Monthly Salary",
   "total_contractors_monthly_pay": "Monthly Contractors Pay",
-  "total_contractors_weekly_pay": "Weekly Contractors Pay",
   "total_paid": "Monthly Salary Pay",
   // ...add more as needed
 };
@@ -68,15 +61,7 @@ const cardOrder = [
   "Total Expenses",
   "Monthly Salary Pay",
   "Monthly Contractors Pay",
-  "Total Income",
-  "Total Profit",
-  "Total Assets",
-  "Total Shop Value",
-
-  "Yearly Total Paid",
-  "Salary Paid",
-  "Contractors Paid",
-  "Sales Count",
+  "Monthly Total Paid",
 ];
 
 const AdminDashboard = () => {
@@ -132,11 +117,28 @@ const AdminDashboard = () => {
       }))
     : [];
 
+  // Create Monthly Total Paid card as sum of Monthly Salary Pay and Monthly Contractors Pay
+  const monthlySalaryPay = data?.paid?.total_paid || 0;
+  const monthlyContractorsPay = data?.workers?.total_contractors_monthly_pay || 0;
+  const monthlyTotalPaidCard = {
+    key: "custom-monthly-total-paid",
+    title: "Monthly Total Paid",
+    value: Number(monthlySalaryPay) + Number(monthlyContractorsPay),
+    currency: "₦ ",
+  };
+
+  // Filter to show only the specified four cards
   const allCards = [
     ...financialHealthCards,
     ...workersCards,
     ...paidCards,
-  ].sort((a, b) => {
+    monthlyTotalPaidCard,
+  ].filter(card => [
+    "Total Expenses",
+    "Monthly Salary Pay",
+    "Monthly Contractors Pay",
+    "Monthly Total Paid"
+  ].includes(card.title)).sort((a, b) => {
     const aIdx = cardOrder.indexOf(a.title);
     const bIdx = cardOrder.indexOf(b.title);
     if (aIdx === -1 && bIdx === -1) return 0;
@@ -376,7 +378,7 @@ const AdminDashboard = () => {
               <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} angle={-26} textAnchor="end" height={60} tickFormatter={(value) => (value.length > 16 ? `${value.substring(0, 16)}..` : value)}/>
               <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} width={64} />
               <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{ fill: "rgba(240, 240, 240, 0.5)" }} />
-              <Bar dataKey="total" fill="url(#topCategoriesGradient)" name="Total" barSize={20} />
+              <Bar dataKey="total" fill="url(#topCategoriesGradient)" name="Total" barSize={40} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -397,7 +399,7 @@ const AdminDashboard = () => {
             <XAxis dataKey="month" tick={{ fontSize: 12 }}/>
             <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} width={64} />
             <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{ fill: "rgba(240, 240, 240, 0.5)" }} />
-            <Bar dataKey="total_expenses" fill="url(#monthlyExpenseGradient)" name="Total Expenses" barSize={20} />
+            <Bar dataKey="total_expenses" fill="url(#monthlyExpenseGradient)" name="Total Expenses" barSize={40} />
           </BarChart>
         </ResponsiveContainer>
       </div>

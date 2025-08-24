@@ -1,35 +1,31 @@
-import { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
-import { Asset } from "../_api/apiService"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
+// src/pages/admin/assets/_components/EditAsset.tsx
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import SkeletonLoader from "../_components/SkeletonLoader"
-import { 
-  Card,
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card"
-import { AlertCircle } from "lucide-react"
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import SkeletonLoader from "../_components/SkeletonLoader";
+import assetsData from "@/data/admin/assets/assets.json";
+
+interface Asset {
+  id: number;
+  name: string;
+  value: number;
+  expected_lifespan: string;
+  is_still_available: boolean;
+  date_added?: string;
+  end_date?: string;
+  note?: string;
+}
 
 const EditAsset = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-
-  // Asset form state
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     value: "",
@@ -37,100 +33,64 @@ const EditAsset = () => {
     is_still_available: true,
     date_added: "",
     end_date: "",
-  })
+    note: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Loading and error states
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formError, setFormError] = useState("")
-
-  // Fetch asset data
-  const { data: asset, isLoading, error } = useQuery<Asset>({
-    queryKey: ["asset", id],
-    queryFn: async () => {
-      const response = await axios.get(`https://backend.kidsdesigncompany.com/api/assets/${id}/`)
-      return response.data
-    },
-    enabled: !!id,
-  })
-
-  // Update form when asset data is loaded
   useEffect(() => {
+    const asset = assetsData.results.assets.find((a) => a.id === Number(id));
     if (asset) {
       setFormData({
         name: asset.name || "",
         value: asset.value?.toString() || "",
         expected_lifespan: asset.expected_lifespan || "",
         is_still_available: asset.is_still_available || false,
-        date_added: asset.date_added ? asset.date_added : "",
-        end_date: asset.end_date ? asset.end_date : "",
-      })
+        date_added: asset.date_added || "",
+        end_date: asset.end_date || "",
+        note: asset.note || "",
+      });
+    } else {
+      setError("Asset not found");
     }
-  }, [asset])
+    setIsLoading(false);
+  }, [id]);
 
-  // Update asset mutation
-  const updateAssetMutation = useMutation({
-    mutationFn: async (updatedAsset: Partial<Asset>) => {
-      return axios.put(`https://backend.kidsdesigncompany.com/api/assets/${id}/`, updatedAsset)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["assets"] })
-      queryClient.invalidateQueries({ queryKey: ["asset", id] })
-      navigate("/admin/assets")
-      toast.success("Assets updated successfully!");
-    },
-    onError: (error) => {
-      setFormError("Failed to update asset. Please try again.")
-       toast.error("Failed to update asset. Please try again.");
-      console.error("Update error:", error)
-      setIsSubmitting(false)
-    }
-  })
-
-  // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
-    })
-  }
+    });
+  };
 
-  // Handle checkbox change
   const handleCheckboxChange = (checked: boolean) => {
     setFormData({
       ...formData,
       is_still_available: checked,
-    })
-  }
+    });
+  };
 
-  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setFormError("")
+    e.preventDefault();
+    setIsSubmitting(true);
+    setFormError("");
 
-    // Validate form
     if (!formData.name || !formData.value || !formData.expected_lifespan || !formData.date_added) {
-      setFormError("Please fill out all required fields")
-      setIsSubmitting(false)
-      return
+      setFormError("Please fill out all required fields");
+      setIsSubmitting(false);
+      return;
     }
 
-    // Prepare data for submission
-    const assetData = {
-      name: formData.name,
-      value: parseFloat(formData.value),
-      expected_lifespan: formData.expected_lifespan,
-      is_still_available: formData.is_still_available,
-      date_added: formData.date_added,
-      end_date: formData.end_date || undefined,
-    }
+    toast.error("Update asset functionality is disabled in static mode.");
+    setIsSubmitting(false);
+    navigate("/admin/assets");
+  };
 
-    updateAssetMutation.mutate(assetData)
-  }
-
-  if (isLoading) return <p className="p-4"><SkeletonLoader/> </p>
-  if (error) return <p className="p-4">Error: {(error as Error).message}</p>
+  if (isLoading) return <div className="p-4"><SkeletonLoader /></div>;
+  if (error) return <p className="p-4">Error: {error}</p>;
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
@@ -139,7 +99,6 @@ const EditAsset = () => {
           <CardTitle>Edit Asset</CardTitle>
           <CardDescription>Update the details for the selected asset.</CardDescription>
         </CardHeader>
-        
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {formError && (
@@ -149,7 +108,6 @@ const EditAsset = () => {
                 <AlertDescription>{formError}</AlertDescription>
               </Alert>
             )}
-            
             <div className="space-y-2">
               <Label htmlFor="name">Asset Name</Label>
               <Input
@@ -161,7 +119,6 @@ const EditAsset = () => {
                 required
               />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="value">Asset Value (NGN)</Label>
               <Input
@@ -176,7 +133,6 @@ const EditAsset = () => {
                 required
               />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="expected_lifespan">Expected Lifespan</Label>
               <Input
@@ -188,7 +144,6 @@ const EditAsset = () => {
                 required
               />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="date_added">Date Added</Label>
               <Input
@@ -200,7 +155,6 @@ const EditAsset = () => {
                 required
               />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="end_date">End Date (optional)</Label>
               <Input
@@ -211,7 +165,6 @@ const EditAsset = () => {
                 onChange={handleChange}
               />
             </div>
-            
             <div className="flex items-center space-x-2 pt-2">
               <Checkbox
                 id="is_still_available"
@@ -220,8 +173,17 @@ const EditAsset = () => {
               />
               <Label htmlFor="is_still_available">Asset is still available</Label>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="note">Note (optional)</Label>
+              <Input
+                id="note"
+                name="note"
+                value={formData.note}
+                onChange={handleChange}
+                placeholder="Enter a note (optional)"
+              />
+            </div>
           </CardContent>
-          
           <CardFooter className="flex justify-between">
             <Button
               type="button"
@@ -230,17 +192,14 @@ const EditAsset = () => {
             >
               Cancel
             </Button>
-            <Button 
-              type="submit"
-              disabled={isSubmitting || updateAssetMutation.isPending}
-            >
-              {isSubmitting || updateAssetMutation.isPending ? "Saving..." : "Save Changes"}
+            <Button type="submit" disabled={isSubmitting}>
+              Save Changes
             </Button>
           </CardFooter>
         </form>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default EditAsset
+export default EditAsset;

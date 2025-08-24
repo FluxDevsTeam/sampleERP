@@ -1,20 +1,22 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+// src/pages/admin/assets/_components/AssetsTableSimple.tsx
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import assetsData from "@/data/admin/assets/assets.json";
 
-const fetchAssets = async () => {
-  const { data } = await axios.get("https://backend.kidsdesigncompany.com/api/assets/");
-  return data;
-};
+interface Asset {
+  id: number;
+  name: string;
+  value: number;
+  expected_lifespan: string;
+  is_still_available: boolean;
+}
 
 const AssetsTable = () => {
-  const { data: assets, isLoading, isError } = useQuery({
-    queryKey: ["assets"],
-    queryFn: fetchAssets,
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (isLoading) return <p>Loading assets...</p>;
-  if (isError) return <p>Error fetching assets.</p>;
+  if (error) return <p>Error fetching assets: {error}</p>;
 
   return (
     <div className="p-6">
@@ -38,10 +40,10 @@ const AssetsTable = () => {
           </tr>
         </thead>
         <tbody>
-          {assets?.results?.assets?.map((asset: any, index: number) => (
-            <tr key={index} className="border">
+          {assetsData.results.assets.map((asset: Asset) => (
+            <tr key={asset.id} className="border">
               <td className="border p-2">{asset.name}</td>
-              <td className="border p-2">${asset.value}</td>
+              <td className="border p-2">₦ {asset.value.toLocaleString("en-NG")}</td>
               <td className="border p-2">{asset.expected_lifespan}</td>
               <td className="border p-2">
                 {asset.is_still_available ? "✅ Yes" : "❌ No"}

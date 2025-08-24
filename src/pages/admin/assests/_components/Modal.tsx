@@ -1,65 +1,84 @@
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
-import EditAssetModal from "./EditAssetModal"
+// src/pages/admin/assets/_components/Modal.tsx
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import EditAssetModal from "./EditAssetModal";
 
 interface Asset {
-  id: number
-  name: string
-  value: number
-  expected_lifespan: string
-  is_still_available: boolean
-  date_added?: string
-  end_date?: string
-  note?: string
+  id: number;
+  name: string;
+  value: number;
+  expected_lifespan: string;
+  is_still_available: boolean;
+  date_added?: string;
+  end_date?: string;
+  note?: string;
 }
 
 interface ModalsProps {
-  selectedAsset: Asset | null
-  isModalOpen: boolean
-  setIsModalOpen: (open: boolean) => void
-  isDeleteDialogOpen: boolean
-  setIsDeleteDialogOpen: (open: boolean) => void
-  handleDelete: () => void
-  confirmDelete: () => void
-  isCEO: boolean
-  isDeleting?: boolean
+  selectedAsset: Asset | null;
+  isModalOpen: boolean;
+  setIsModalOpen: (open: boolean) => void;
+  isDeleteDialogOpen: boolean;
+  setIsDeleteDialogOpen: (open: boolean) => void;
+  handleDelete: () => void;
+  confirmDelete: () => void;
+  isCEO: boolean;
+  isDeleting?: boolean;
+  onModalStateChange?: (isOpen: boolean) => void;
 }
 
-const Modals = ({ 
-  selectedAsset, 
-  isModalOpen, 
-  setIsModalOpen, 
-  isDeleteDialogOpen, 
-  setIsDeleteDialogOpen, 
-  handleDelete, 
-  confirmDelete, 
-  isCEO, 
-  isDeleting 
+const Modals = ({
+  selectedAsset,
+  isModalOpen,
+  setIsModalOpen,
+  isDeleteDialogOpen,
+  setIsDeleteDialogOpen,
+  handleDelete,
+  confirmDelete,
+  isCEO,
+  onModalStateChange,
 }: ModalsProps) => {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
- const handleEditClick = () => {
-    setIsModalOpen(false) // Close the details modal
-    setIsEditModalOpen(true) // Open the edit modal
-  }
+  // Notify parent component about modal state changes
+  useEffect(() => {
+    if (onModalStateChange) {
+      onModalStateChange(isModalOpen);
+    }
+  }, [isModalOpen, onModalStateChange]);
+
+  const handleEditClick = () => {
+    setIsModalOpen(false);
+    setIsEditModalOpen(true);
+  };
 
   const handleEditModalClose = () => {
-    setIsEditModalOpen(false)
-    // Don't reopen details modal here
-  }
+    setIsEditModalOpen(false);
+  };
+
+  const handleClose = () => {
+    setIsClosing(true);
+    // Small delay to allow any animations to complete
+    setTimeout(() => {
+      setIsModalOpen(false);
+      setIsClosing(false);
+    }, 150);
+  };
 
   return (
     <>
-      {/* Asset Details Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Dialog open={isModalOpen} onOpenChange={(open) => {
+        if (!open) handleClose();
+        else setIsModalOpen(true);
+      }}>
         <DialogContent className="w-[95vw] max-w-md mx-auto p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-lg sm:text-xl">Asset Details</DialogTitle>
             <DialogDescription className="text-sm">View details for the selected asset.</DialogDescription>
           </DialogHeader>
-
           {selectedAsset && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow">
               <div className="flex flex-col gap-1">
@@ -68,7 +87,7 @@ const Modals = ({
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Value</span>
-                <span className="text-base font-bold text-black">₦ {selectedAsset.value?.toLocaleString("en-NG")}</span>
+                <span className="text-base font-bold text-black">₦ {selectedAsset.value.toLocaleString("en-NG")}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Expected Lifespan</span>
@@ -92,37 +111,29 @@ const Modals = ({
               </div>
             </div>
           )}
-
           <DialogFooter>
             <div className="flex flex-row justify-around items-center w-full gap-2">
-              <Button variant="outline" onClick={() => setIsModalOpen(false)} className="w-full text-sm">
+              <Button variant="outline" onClick={handleClose} className="w-full text-sm">
                 Close
               </Button>
-              {isCEO && (
                 <Button variant="outline" onClick={handleEditClick} className="w-full text-sm">
                   Edit
                 </Button>
-              )}
-              {isCEO && (
-                <Button variant="destructive" onClick={handleDelete} disabled={isDeleting} className="w-full text-sm">
+                <Button variant="destructive" onClick={handleDelete} className="w-full text-sm">
                   Delete
                 </Button>
-              )}
             </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Edit Asset Modal */}
       {selectedAsset && (
-        <EditAssetModal 
+        <EditAssetModal
           asset={selectedAsset}
           isOpen={isEditModalOpen}
           onClose={handleEditModalClose}
+          onSuccess={() => setIsEditModalOpen(false)}
         />
       )}
-
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -138,7 +149,7 @@ const Modals = ({
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
-}
+  );
+};
 
-export default Modals
+export default Modals;
