@@ -2,12 +2,18 @@ import { MdArrowOutward } from "react-icons/md";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardHeaders } from "../_api/apiService";
 import Frame180 from "../../../../assets/images/Frame180.png";
+import adminDashboardData from "@/data/admin/dashboard/admin-dashboard.json";
+import { useState, useEffect } from "react";
 
 const Header = () => {
   
   const { data, isLoading, error } = useQuery({
     queryKey: ["Header"],
-    queryFn: DashboardHeaders,
+    queryFn: async () => {
+      // Load from local storage if available, else use JSON
+      const storedData = localStorage.getItem("adminDashboardData");
+      return storedData ? JSON.parse(storedData) : adminDashboardData;
+    },
   });
 
   if (isLoading) return <p>Loading...</p>;

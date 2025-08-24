@@ -37,7 +37,7 @@ const NavBar = ({ toggleSidebar, isSidebarOpen, title }: NavBarProps) => {
   const displayTitle = title || (isMobile ? formattedRole : `Welcome, ${formattedRole}`);
   
   return (
-    <nav className="h-[60px] sm:h-[70px] lg:h-[77px] bg-white border-b border-gray-200 flex items-center px-3 sm:px-4 lg:px-6 w-full shadow-sm z-50">
+    <nav className="h-[60px] sm:h-[70px] lg:h-[77px] bg-white border-b border-gray-200 flex items-center pr-3 sm:pr-4 pl-2 lg:pr-6 w-full shadow-sm z-50">
       <div className="flex justify-between items-center w-full">
         <div className="flex items-center gap-2 sm:gap-4 min-w-[180px] sm:min-w-[220px]">
           {/* Logo with built-in collapse functionality */}

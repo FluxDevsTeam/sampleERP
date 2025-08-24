@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { updateSalaryWorker, getSalaryWorkerDetails } from "@/utils/jsonDataService";
 
 const EditSalaryWorker = () => {
   const { id } = useParams<{ id: string }>();
@@ -45,17 +45,7 @@ const EditSalaryWorker = () => {
   useEffect(() => {
     const fetchSalaryWorker = async () => {
       try {
-        const accessToken = localStorage.getItem("accessToken");
-        const response = await axios.get(`https://backend.kidsdesigncompany.com/api/salary-workers/${id}/`, {
-          headers: {
-            Authorization: `JWT ${accessToken}`,
-          },
-        });
-        const normalized = {
-          ...response.data,
-          date_joined: response.data.date_joined ? response.data.date_joined.slice(0, 10) : "",
-          date_left: response.data.date_left ? response.data.date_left.slice(0, 10) : "",
-        };
+        const normalized = await getSalaryWorkerDetails(id);
         setFormData(normalized);
         setOriginalData(normalized);
       } catch (error) {
@@ -99,27 +89,13 @@ const EditSalaryWorker = () => {
     e.preventDefault();
     setIsPending(true);
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      const data = new FormData();
-      // Only append changed fields
-      Object.entries(formData).forEach(([key, value]) => {
-        if (originalData && value !== originalData[key]) {
-          data.append(key, value as string);
-        }
-      });
-      if (image) data.append("image", image);
-      if (agreementFormImage) data.append("agreement_form_image", agreementFormImage);
-      await axios.patch(`https://backend.kidsdesigncompany.com/api/salary-workers/${id}/`, data, {
-        headers: { 
-          "Content-Type": "multipart/form-data",
-          Authorization: `JWT ${accessToken}`,
-        },
-      });
+      await updateSalaryWorker(id, formData, image, agreementFormImage);
       queryClient.invalidateQueries({ queryKey: ["salary-workers"], refetchType: "active" });
       toast.success("Salary worker updated successfully!");
       navigate("/admin/workers");
     } catch (error) {
       toast.error("Failed to update salary worker. Please try again.");
+      console.error("Update error:", error);
     } finally {
       setIsPending(false);
     }

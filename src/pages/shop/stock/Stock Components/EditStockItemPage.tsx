@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ThreeDots } from "react-loader-spinner";
 import Modal from "../../Modal";
-
+import stockData from "../../../../data/shop/stock/stockData.json";
 
 const EditStockItemPage: React.FC = () => {
   const { id } = useParams();
@@ -33,40 +33,38 @@ const EditStockItemPage: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchSoldItem = async () => {
+    const fetchStockItem = () => {
       try {
-        const response = await fetch(
-          `https://backend.kidsdesigncompany.com/api/add-stock/${id}/`,{
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,}
-          }
-        );
-        const data = await response.json();
-        console.log('Fetched stock item:', data);
+        const stockItem = stockData.daily_data
+          .flatMap(day => day.entries)
+          .find(entry => entry.id === Number(id));
+        
+        if (!stockItem) {
+          throw new Error("Stock item not found");
+        }
+
         setFormData({
-          quantity: data.quantity || "",
-          date: data.date ? data.date.slice(0, 10) : "",
+          quantity: stockItem.quantity || "",
+          date: stockItem.date ? stockItem.date.slice(0, 10) : "",
         });
-        setOriginalQuantity(Number(data.quantity) || 0);
-        // Use inventory_item directly for itemDetails
-        if (data.inventory_item) {
+        setOriginalQuantity(Number(stockItem.quantity) || 0);
+
+        const inventoryItem = stockData.inventory_items.find(item => item.id === stockItem.inventory_item.id);
+        if (inventoryItem) {
           setItemDetails({
-            quantity: Number(data.inventory_item.quantity) || 0,
-            price: Number(data.inventory_item.cost_price || data.cost_price) || 0,
-        });
+            quantity: Number(inventoryItem.quantity) || 0,
+            price: Number(inventoryItem.cost_price) || 0,
+          });
         }
       } catch (error) {
         setError("Failed to load stock data");
-        console.error("Error fetching stocks item:", error);
+        console.error("Error fetching stock item:", error);
       } finally {
         setInitialDataLoading(false);
       }
     };
-    if (id) fetchSoldItem();
+    if (id) fetchStockItem();
   }, [id]);
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,23 +76,8 @@ const EditStockItemPage: React.FC = () => {
         date: formData.date,
       };
 
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/add-stock/${id}/`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to update stock");
-      }
-
+      // Simulate update (log to console)
+      console.log("Updating stock item:", requestBody);
       setModalConfig({
         isOpen: true,
         title: "Success",

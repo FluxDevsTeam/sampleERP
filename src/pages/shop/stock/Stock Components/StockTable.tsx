@@ -11,6 +11,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../Modal";
+import stockData from "../../../../data/shop/stock/stockData.json";
 
 interface InventoryCategory {
   id: number;
@@ -25,7 +26,6 @@ interface StockEntry {
     name: string;
     image: string;
     dimensions: string;
-
     inventory_category: InventoryCategory;
   };
   name: string;
@@ -38,10 +38,6 @@ interface DailyData {
   daily_added_cost_total: number;
 }
 
-interface ApiResponse {
-  daily_data: DailyData[];
-}
-
 interface SelectedStock {
   id: number;
   name: string;
@@ -51,14 +47,12 @@ const StockTable: React.FC = () => {
   document.title = "Stock Items - KDC Admin";
 
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [stockData, setStockData] = useState<DailyData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [stockDataState, setStockData] = useState<DailyData[]>(stockData.daily_data);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [openDates, setOpenDates] = useState<{ [key: string]: boolean }>({});
   const [showModal, setShowModal] = useState(false);
-  const [selectedStock, setSelectedStock] = useState<SelectedStock | null>(
-    null
-  );
+  const [selectedStock, setSelectedStock] = useState<SelectedStock | null>(null);
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     title: "",
@@ -102,10 +96,23 @@ const StockTable: React.FC = () => {
     };
   }, []);
 
-
   const handleFilter = () => {
     setFilterLoading(true);
-    fetchItems(year, month, day);
+    let filteredData = stockData.daily_data;
+    
+    if (year) {
+      filteredData = filteredData.filter(day => day.date.startsWith(year.toString()));
+    }
+    if (month) {
+      const monthStr = month.toString().padStart(2, '0');
+      filteredData = filteredData.filter(day => day.date.includes(`-${monthStr}-`));
+    }
+    if (day) {
+      const dayStr = day.toString().padStart(2, '0');
+      filteredData = filteredData.filter(day => day.date.endsWith(`-${dayStr}`));
+    }
+    
+    setStockData(filteredData);
     setFilterLoading(false);
   };
 
@@ -114,7 +121,7 @@ const StockTable: React.FC = () => {
     setYear("");
     setMonth("");
     setDay("");
-    fetchItems();
+    setStockData(stockData.daily_data);
     setFilterLoading(false);
   };
 
@@ -126,61 +133,21 @@ const StockTable: React.FC = () => {
     if (isNaN(num)) {
       return String(number);
     }
-    // If the number is a float but has no decimal part, show as integer
     if (Number.isFinite(num) && Math.floor(num) === num) {
       return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
     }
-    // If the number is a float with .00, show as integer
     if (Number.isFinite(num) && Number(num) % 1 === 0) {
       return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
     }
-    // Otherwise, show as is (with up to 2 decimals)
     return num.toLocaleString("en-US", { maximumFractionDigits: 2 });
   };
 
   useEffect(() => {
     const role = localStorage.getItem("user_role");
     setUserRole(role);
-  }, []);
-
-  const fetchItems = async (filterYear?: number | string, filterMonth?: number | string, filterDay?: number | string) => {
-    try {
-      setLoading(true);
-      let url = "https://backend.kidsdesigncompany.com/api/add-stock/?";
-      if (filterYear) url += `year=${filterYear}&`;
-      if (filterMonth) url += `month=${filterMonth}&`;
-      if (filterDay) url += `day=${filterDay}`;
-
-      const response = await fetch(
-        url,{
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-
-      const data: ApiResponse = await response.json();
-      console.log(data);
-
-      setStockData(data.daily_data);
-      if (data.daily_data && data.daily_data.length > 0) {
-        setOpenDates({ [data.daily_data[0].date]: true });
-      }
-    } catch (error) {
-      console.error("Error fetching stock items:", error);
-    } finally {
-      setLoading(false);
+    if (stockData.daily_data.length > 0) {
+      setOpenDates({ [stockData.daily_data[0].date]: true });
     }
-  };
-
-  useEffect(() => {
-    fetchItems();
   }, []);
 
   const toggleDate = (date: string) => {
@@ -201,34 +168,20 @@ const StockTable: React.FC = () => {
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === "success") {
-      fetchItems();
       setShowModal(false);
     }
   };
 
   const handleDelete = async (stockId: number) => {
     try {
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/add-stock/${stockId}/`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        setModalConfig({
-          isOpen: true,
-          title: "Success",
-          message: "Stock record deleted successfully",
-          type: "success",
-        });
-      } else {
-        throw new Error("Failed to delete stock record");
-      }
+      // Simulate delete (log to console)
+      console.log("Deleting stock item:", stockId);
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Stock record deleted successfully",
+        type: "success",
+      });
     } catch (error) {
       console.error("Error deleting stock record:", error);
       setModalConfig({
@@ -256,12 +209,11 @@ const StockTable: React.FC = () => {
   const handleViewDetails = (entry: StockEntry) => {
     setSelectedItem(entry);
     setShowDetailsModal(true);
-    setShowImage(false); // Reset image visibility when opening modal
+    setShowImage(false);
   };
 
   return (
     <div className="">
-      {/* Heading and Add Stock button in the same row */}
       <div className="flex flex-row justify-between items-center mb-2 sm:mb-4 gap-3 sm:gap-0">
         <h1
           style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
@@ -277,10 +229,8 @@ const StockTable: React.FC = () => {
           Add Stock
         </button>
       </div>
-      {/* Filter controls below and right-aligned */}
       <div className="flex w-full justify-end mb-4">
         <div className="flex flex-wrap items-center gap-2">
-          {/* Year Dropdown */}
           <div className="relative w-20 sm:w-24 max-sm:w-14" ref={yearRef}>
             <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{year || 'Year'}</span>
@@ -296,7 +246,6 @@ const StockTable: React.FC = () => {
               </ul>
             )}
           </div>
-          {/* Month Dropdown */}
           <div className="relative w-24 sm:w-32" ref={monthRef}>
             <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{month ? months[Number(month) - 1] : 'Month'}</span>
@@ -311,7 +260,6 @@ const StockTable: React.FC = () => {
               </ul>
             )}
           </div>
-          {/* Day Dropdown */}
           <div className="relative w-20 sm:w-24 max-sm:w-14" ref={dayRef}>
             <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{day || 'Day'}</span>
@@ -367,7 +315,7 @@ const StockTable: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-6 ">
-            {stockData.map((dayData) => (
+            {stockDataState.map((dayData) => (
               <div
                 key={dayData.date}
                 className="bg-white shadow-md rounded-lg overflow-auto"
@@ -389,33 +337,23 @@ const StockTable: React.FC = () => {
 
                 {openDates[dayData.date] && (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
+                    <table className="min-w-full bg-white shadow-md overflow-hidden text-xs sm:text-sm">
                       <thead>
                         <tr className="bg-blue-400 text-white">
-                          {/* Name column: always visible */}
                           <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Name</th>
-                          {/* Quantity: always visible on mobile, already hidden on mobile in original, so make visible */}
                           <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Quantity</th>
-                          {/* Date: hidden on mobile, visible on desktop */}
                           <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Date</th>
-                          {/* Category: hidden on mobile, visible on desktop */}
                           <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Category</th>
-                          {/* Actions: always visible */}
                           <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {dayData.entries.map((entry, index) => (
                           <tr key={entry.id ?? index} className="hover:bg-gray-50">
-                            {/* Name: always visible */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{entry.name}</td>
-                            {/* Quantity: always visible */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{formatNumber(entry.quantity)}</td>
-                            {/* Date: hidden on mobile, visible on desktop */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{formatDate(entry.date)}</td>
-                            {/* Category: hidden on mobile, visible on desktop */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell">{entry.inventory_item && entry.inventory_item.inventory_category ? entry.inventory_item.inventory_category.name : 'N/A'}</td>
-                            {/* Actions: always visible */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-blue-400">
                               <button
                                 className="px-2 sm:px-3 py-1 text-blue-400 border-2 border-blue-400 rounded text-xs sm:text-sm"
@@ -433,10 +371,9 @@ const StockTable: React.FC = () => {
               </div>
             ))}
 
-            {stockData.length === 0 ? (
+            {stockDataState.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
                 <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-50 mb-4">
-                  {/* Box icon */}
                   <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
                     <path d="M16 3v4M8 3v4M3 7h18" stroke="currentColor" strokeWidth="2" />
@@ -447,7 +384,6 @@ const StockTable: React.FC = () => {
               </div>
             ) : (
               <div className="flex justify-between items-center mt-4">
-                {/* delete and edit options modal */}
                 {showModal && selectedStock && (
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-sm">
@@ -457,7 +393,6 @@ const StockTable: React.FC = () => {
                             {selectedStock.name}
                           </span>
                         </h3>
-
                         <FontAwesomeIcon
                           icon={faXmark}
                           size="2x"
@@ -551,24 +486,23 @@ const StockTable: React.FC = () => {
                           <>
                             <div className="font-semibold text-black">Image:</div>
                             <div>
-                          <button
-                            onClick={() => setShowImage(!showImage)}
+                              <button
+                                onClick={() => setShowImage(!showImage)}
                                 className="mb-2 px-3 py-1.5 text-blue-500 border border-blue-500 rounded hover:bg-blue-50 text-xs sm:text-sm"
-                          >
-                            {showImage ? "Hide Image" : "View Image"}
-                          </button>
-                          {showImage && (
-                            <img
-                              src={selectedItem.inventory_item.image}
-                              alt={selectedItem.name}
-                              className="w-full h-32 sm:h-48 object-cover rounded-lg mt-2"
-                            />
-                          )}
-                        </div>
+                              >
+                                {showImage ? "Hide Image" : "View Image"}
+                              </button>
+                              {showImage && (
+                                <img
+                                  src={selectedItem.inventory_item.image}
+                                  alt={selectedItem.name}
+                                  className="w-full h-32 sm:h-48 object-cover rounded-lg mt-2"
+                                />
+                              )}
+                            </div>
                           </>
                         )}
                       </div>
-                      {userRole === 'ceo' && (
                         <div className="mt-6 flex flex-row gap-2">
                           <button
                             onClick={() => navigate(`/shop/edit-stock-item/${selectedItem.id}`)}
@@ -585,7 +519,6 @@ const StockTable: React.FC = () => {
                             Delete Item
                           </button>
                         </div>
-                      )}
                     </div>
                   </div>
                 )}

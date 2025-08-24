@@ -20,10 +20,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
 import EditProjectModal from "./EditProjectModal";
-import relativeTime from 'dayjs/plugin/relativeTime';
-import dayjs from 'dayjs';
-import axios from 'axios';
-import AllItemsManager from './AllItemsManager';
+import relativeTime from "dayjs/plugin/relativeTime";
+import dayjs from "dayjs";
+import AllItemsManager from "./AllItemsManager";
+import projectsData from "@/data/ceo/project/projects.json";
 
 dayjs.extend(relativeTime);
 
@@ -136,6 +136,12 @@ interface ProjectModalsProps {
   handleViewTasks: (project: Project) => void;
 }
 
+const saveProjectsToJson = async (updatedProjects: Project[]) => {
+  // Placeholder for saving to JSON file (e.g., using localStorage for client-side)
+  localStorage.setItem("projects", JSON.stringify(updatedProjects));
+  return updatedProjects;
+};
+
 const ProjectModals: React.FC<ProjectModalsProps> = ({
   isModalOpen,
   setIsModalOpen,
@@ -149,8 +155,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   const navigate = useNavigate();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
-  const userRole =
-    typeof window !== "undefined" ? localStorage.getItem("user_role") : null;
+  const userRole = typeof window !== "undefined" ? localStorage.getItem("user_role") : null;
   const [isEditStatusModalOpen, setIsEditStatusModalOpen] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [newStatus, setNewStatus] = useState(selectedProject?.status || "");
@@ -199,29 +204,27 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   const handleStatusSave = async () => {
     setStatusLoading(true);
     try {
-      const token = localStorage.getItem('accessToken');
       let statusToSend = newStatus;
-      // Only allow valid statuses
-      if (statusToSend === 'in_progress' || statusToSend === 'pending') statusToSend = 'in progress';
-      if (statusToSend !== 'in progress' && statusToSend !== 'completed' && statusToSend !== 'delivered') statusToSend = 'in progress';
+      if (statusToSend === "in_progress" || statusToSend === "pending") statusToSend = "in progress";
+      if (statusToSend !== "in progress" && statusToSend !== "completed" && statusToSend !== "delivered") statusToSend = "in progress";
       const payload: Record<string, any> = { status: statusToSend };
-      if (statusToSend === 'delivered') {
-        payload['is_delivered'] = true;
-        payload['date_delivered'] = dayjs().format('YYYY-MM-DD');
+      if (statusToSend === "delivered") {
+        payload["is_delivered"] = true;
+        payload["date_delivered"] = dayjs().format("YYYY-MM-DD");
       } else {
-        payload['is_delivered'] = false;
-        payload['date_delivered'] = null;
+        payload["is_delivered"] = false;
+        payload["date_delivered"] = null;
       }
-      console.log('PATCH payload to backend:', payload);
-      await axios.patch(
-        `https://backend.kidsdesigncompany.com/api/project/${selectedProject.id}/`,
-        payload,
-        { headers: { Authorization: `JWT ${token}` } }
+      console.log("Updated project payload:", payload);
+
+      const updatedProjects = projectsData.all_projects.map((project) =>
+        project.id === selectedProject.id ? { ...project, ...payload } : project
       );
+      await saveProjectsToJson(updatedProjects);
       setIsEditStatusModalOpen(false);
       window.location.reload(); // Or refetch project data if you have a query
     } catch (err) {
-      alert('Failed to update status');
+      alert("Failed to update status");
     } finally {
       setStatusLoading(false);
     }
@@ -230,18 +233,18 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   // Calculate totals from frontend
   const totalProductsSellingPrice =
     selectedProject.products?.products?.reduce(
-      (acc, product) => acc + parseFloat(product.selling_price || '0'),
+      (acc, product) => acc + parseFloat(product.selling_price || "0"),
       0
     ) || 0;
 
   const totalSoldItemsCost =
     selectedProject.sold_items?.sold_items?.reduce(
-      (acc, item) => acc + parseFloat(item.cost_price || '0'),
+      (acc, item) => acc + parseFloat(item.cost_price || "0"),
       0
     ) || 0;
   const totalSoldItemsSelling =
     selectedProject.sold_items?.sold_items?.reduce(
-      (acc, item) => acc + parseFloat(item.selling_price || '0'),
+      (acc, item) => acc + parseFloat(item.selling_price || "0"),
       0
     ) || 0;
 
@@ -253,18 +256,18 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
 
   const totalExpensesAmount =
     selectedProject.expenses?.expenses?.reduce(
-      (acc, expense) => acc + parseFloat(expense.amount || '0'),
+      (acc, expense) => acc + parseFloat(expense.amount || "0"),
       0
     ) || 0;
 
   const totalOtherProductionsBudget =
     selectedProject.other_productions?.other_productions?.reduce(
-      (acc, production) => acc + parseFloat(production.budget || '0'),
+      (acc, production) => acc + parseFloat(production.budget || "0"),
       0
     ) || 0;
   const totalOtherProductionsCost =
     selectedProject.other_productions?.other_productions?.reduce(
-      (acc, production) => acc + parseFloat(production.cost || '0'),
+      (acc, production) => acc + parseFloat(production.cost || "0"),
       0
     ) || 0;
 
@@ -274,18 +277,16 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
 
   // Calculate total for All Items
   const allItemsTotal = Array.isArray(selectedProject.all_items)
-    ? selectedProject.all_items.reduce((acc, item) => acc + (parseFloat(item.price || '0') * (parseInt(item.quantity || '1', 10) || 1)), 0)
+    ? selectedProject.all_items.reduce(
+        (acc, item) => acc + parseFloat(item.price || "0") * (parseInt(item.quantity || "1", 10) || 1),
+        0
+      )
     : 0;
 
   // --- Time Remaining and Timeframe logic to match ProjectsTable.tsx ---
   const getTimeRemainingInfo = (project: any) => {
     const { deadline, status, date_delivered, is_delivered } = project;
-    if (
-      status === "delivered" ||
-      status === "cancelled" ||
-      date_delivered ||
-      is_delivered
-    ) {
+    if (status === "delivered" || status === "cancelled" || date_delivered || is_delivered) {
       return { text: "-", color: "" };
     }
     if (!deadline) {
@@ -315,34 +316,30 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
   const handleTaskCompletionToggle = async (taskIdx: number, subIdx?: number) => {
     if (!selectedProject) return;
     const updatedTasks = [...localTasks];
-    if (typeof subIdx === 'number') {
+    if (typeof subIdx === "number") {
       if (updatedTasks[taskIdx].subtasks && updatedTasks[taskIdx].subtasks![subIdx]) {
         updatedTasks[taskIdx].subtasks![subIdx].checked = !updatedTasks[taskIdx].subtasks![subIdx].checked;
-        // After toggling, check if all subtasks are checked
-        const allChecked = updatedTasks[taskIdx].subtasks!.every(sub => sub.checked);
+        const allChecked = updatedTasks[taskIdx].subtasks!.every((sub) => sub.checked);
         updatedTasks[taskIdx].checked = allChecked;
       }
     } else {
       updatedTasks[taskIdx].checked = !updatedTasks[taskIdx].checked;
-      // If toggling the main task, also toggle all subtasks to match
       if (updatedTasks[taskIdx].subtasks && Array.isArray(updatedTasks[taskIdx].subtasks)) {
-        updatedTasks[taskIdx].subtasks = updatedTasks[taskIdx].subtasks!.map(sub => ({
+        updatedTasks[taskIdx].subtasks = updatedTasks[taskIdx].subtasks!.map((sub) => ({
           ...sub,
-          checked: updatedTasks[taskIdx].checked
+          checked: updatedTasks[taskIdx].checked,
         }));
       }
     }
     setLocalTasks(updatedTasks); // Update local state for immediate UI feedback
-    // Send PATCH to backend
+    // Update JSON data
     try {
-      const token = localStorage.getItem('accessToken');
-      await axios.patch(
-        `https://backend.kidsdesigncompany.com/api/project/${selectedProject.id}/`,
-        { tasks: JSON.stringify(updatedTasks) },
-        { headers: { Authorization: `JWT ${token}` } }
+      const updatedProjects = projectsData.all_projects.map((project) =>
+        project.id === selectedProject.id ? { ...project, tasks: updatedTasks } : project
       );
+      await saveProjectsToJson(updatedProjects);
     } catch (err) {
-      alert('Failed to update task completion');
+      alert("Failed to update task completion");
     }
   };
 
@@ -364,36 +361,33 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
 
   // Shorter display names for financials
   const financialsDisplayNames: Record<string, string> = {
-    total_raw_material_cost: 'Total Raw Materials',
-    total_artisan_cost: 'Artisan Cost',
-    total_overhead_cost: 'Overhead',
-    total_products_cost: 'Products Cost',
-    total_product_selling_price: 'Products Revenue',
-    product_profit: 'Product Profit',
-    total_cost_price_sold_items: 'Sold Cost',
-    total_selling_price_sold_items: 'Sold Revenue',
-    shop_items_profit: 'Shop Profit',
-    money_left_for_expensis: 'Net After Expenses',
-    money_left_for_expensis_with_logistics_and_service_charge: 'Net After All',
-    total_other_productions_budget: 'Other Prod. Budget',
-    total_other_productions_cost: 'Other Prod. Cost',
-    total_expensis: 'Expenses',
-    total_money_spent: 'Total Spent',
-    total_paid: 'Total Paid',
-    final_profit: 'Final Profit',
+    total_raw_material_cost: "Total Raw Materials",
+    total_artisan_cost: "Artisan Cost",
+    total_overhead_cost: "Overhead",
+    total_products_cost: "Products Cost",
+    total_product_selling_price: "Products Revenue",
+    product_profit: "Product Profit",
+    total_cost_price_sold_items: "Sold Cost",
+    total_selling_price_sold_items: "Sold Revenue",
+    shop_items_profit: "Shop Profit",
+    money_left_for_expensis: "Net After Expenses",
+    money_left_for_expensis_with_logistics_and_service_charge: "Net After All",
+    total_other_productions_budget: "Other Prod. Budget",
+    total_other_productions_cost: "Other Prod. Cost",
+    total_expensis: "Expenses",
+    total_money_spent: "Total Spent",
+    total_paid: "Total Paid",
+    final_profit: "Final Profit",
   };
 
   return (
     <>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="w-90% max-sm:mt-7 max-sm:max-w-[54vh] max-sm:min-w-[54vh] min-w-[80vh]  lg:min-w-[165vh] p-1 sm:p-6 md:p-10 overflow-y-auto max-h-[98vh]">
+        <DialogContent className="w-90% max-sm:mt-7 max-sm:max-w-[54vh] max-sm:min-w-[54vh] min-w-[80vh] lg:min-w-[165vh] p-1 sm:p-6 md:p-10 overflow-y-auto max-h-[98vh]">
           <DialogHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start gap-4 px-2 mr-8">
               <div>
-            <DialogTitle className="text-lg md:text-xl pt-2">Project Details</DialogTitle>
-            {/* <DialogDescription className="text-sm sm:text-base">
-              View details for the selected project.
-            </DialogDescription> */}
+                <DialogTitle className="text-lg md:text-xl pt-2">Project Details</DialogTitle>
               </div>
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
                 <Button
@@ -420,8 +414,6 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                 >
                   Edit Status
                 </Button>
-                {/* Only CEO can see Full Edit and Delete buttons */}
-                {userRole === "ceo" && (
                   <>
                     <Button
                       variant="outline"
@@ -438,10 +430,6 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                       Delete
                     </Button>
                   </>
-                )}
-                {/* <Button variant="outline" onClick={() => navigate('/ceo/allProjects')} className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2">
-                  Close
-                </Button> */}
               </div>
             </div>
           </DialogHeader>
@@ -450,100 +438,98 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
             <div className="space-y-4 sm:space-y-6 max-sm:mb-10">
               {/* Project Info Section */}
               <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
-                <h3 className="text-base sm:text-lg font-semibold text-black-400 mb-3 sm:mb-4">
-                  Project Info
-                </h3>
+                <h3 className="text-base sm:text-lg font-semibold text-black-400 mb-3 sm:mb-4">Project Info</h3>
                 <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-7 gap-3 sm:gap-4 w-full">
-                  {/* Project Name Card */}
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Project Name</span>
                     <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.name}</p>
-                </div>
-                  {/* Customer Card */}
+                  </div>
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Customer</span>
                     <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.customer_detail?.name}</p>
-                </div>
-                  {/* Status Card */}
+                  </div>
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Status</span>
                     <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.status}</p>
-                </div>
-                  {/* Start Date Card */}
+                  </div>
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Start Date</span>
-                    <p className="text-[11px] sm:text-sm text-black mt-1">{dayjs(selectedProject.start_date).format("MMM D, YYYY")}</p>
-                </div>
-                  {/* Deadline Card */}
+                    <p className="text-[11px] sm:text-sm text-black mt-1">
+                      {dayjs(selectedProject.start_date).format("MMM D, YYYY")}
+                    </p>
+                  </div>
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Deadline</span>
-                    <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.deadline ? dayjs(selectedProject.deadline).format("MMM D, YYYY") : "-"}</p>
-                </div>
-                  {/* Date Delivered Card */}
+                    <p className="text-[11px] sm:text-sm text-black mt-1">
+                      {selectedProject.deadline ? dayjs(selectedProject.deadline).format("MMM D, YYYY") : "-"}
+                    </p>
+                  </div>
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Date Delivered</span>
-                    <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.date_delivered ? dayjs(selectedProject.date_delivered).format("MMM D, YYYY") : "-"}</p>
-                </div>
-                  {/* Time Remaining Card */}
+                    <p className="text-[11px] sm:text-sm text-black mt-1">
+                      {selectedProject.date_delivered ? dayjs(selectedProject.date_delivered).format("MMM D, YYYY") : "-"}
+                    </p>
+                  </div>
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Time Remaining</span>
                     <p className={`text-[11px] sm:text-sm mt-1 ${timeRemainingInfo.color}`}>{timeRemainingInfo.text}</p>
-                </div>
-                  {/* Timeframe Card */}
+                  </div>
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Timeframe</span>
                     <p className="text-[11px] sm:text-sm text-black mt-1">{timeframeDisplay}</p>
-                </div>
-                  {/* Selling Price Card */}
+                  </div>
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Selling Price</span>
-                    <p className="text-[11px] sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.selling_price || '0'))}</p>
-                </div>
-                  {/* Logistics Card */}
+                    <p className="text-[11px] sm:text-sm text-black mt-1">
+                      ₦{formatNumber(parseFloat(selectedProject.selling_price || "0"))}
+                    </p>
+                  </div>
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Logistics</span>
-                    <p className="text-[11px] sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.logistics || '0'))}</p>
-                </div>
-                  {/* Service Charge Card */}
+                    <p className="text-[11px] sm:text-sm text-black mt-1">
+                      ₦{formatNumber(parseFloat(selectedProject.logistics || "0"))}
+                    </p>
+                  </div>
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Service Charge</span>
-                    <p className="text-[11px] sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.service_charge || '0'))}</p>
-                </div>
-                  {/* Total Card */}
+                    <p className="text-[11px] sm:text-sm text-black mt-1">
+                      ₦{formatNumber(parseFloat(selectedProject.service_charge || "0"))}
+                    </p>
+                  </div>
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Total</span>
-                    <p className="text-[11px] sm:text-sm text-black mt-1">₦{formatNumber(parseFloat(selectedProject.total || '0'))}</p>
-                </div>
-                
-                  {/* Archived Card */}
+                    <p className="text-[11px] sm:text-sm text-black mt-1">
+                      ₦{formatNumber(parseFloat(selectedProject.total || "0"))}
+                    </p>
+                  </div>
                   <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                     <span className="text-xs text-blue-600 font-medium">Archived</span>
-                    <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.archived ? 'Yes' : 'No'}</p>
+                    <p className="text-[11px] sm:text-sm text-black mt-1">{selectedProject.archived ? "Yes" : "No"}</p>
                   </div>
-                  {/* Invoice Image Card */}
-                {selectedProject.invoice_image && (
+                  {selectedProject.invoice_image && (
                     <div className="bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                       <span className="text-xs text-blue-600 font-medium">Invoice</span>
-                      <Button variant="link" className="p-0 h-auto text-xs sm:text-sm text-blue-500 block mt-1" onClick={() => setShowImageModal(true)}>
+                      <Button
+                        variant="link"
+                        className="p-0 h-auto text-xs sm:text-sm text-blue-500 block mt-1"
+                        onClick={() => setShowImageModal(true)}
+                      >
                         View Invoice
                       </Button>
-                  </div>
-                )}
-                  {/* Note Card */}
-                {selectedProject.note && (
+                    </div>
+                  )}
+                  {selectedProject.note && (
                     <div className="col-span-2 max-sm:col-span-3 lg:col-span-7 bg-white p-2 sm:p-3 rounded-lg shadow-sm border border-gray-200">
                       <span className="text-xs text-blue-600 font-medium">Note</span>
                       <p className="text-[11px] sm:text-sm text-black whitespace-pre-wrap mt-1">{selectedProject.note}</p>
-                  </div>
-                )}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Calculations Section */}
               <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
-                <h3 className="text-base sm:text-lg font-semibold text-black-400 mb-3 sm:mb-4">
-                  Financials
-                </h3>
+                <h3 className="text-base sm:text-lg font-semibold text-black-400 mb-3 sm:mb-4">Financials</h3>
                 {(() => {
                   const entries = Object.entries(selectedProject.calculations);
                   const mainItems = entries.slice(0, -2);
@@ -590,10 +576,8 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                 {/* All Items Table */}
                 <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
                   <div className="flex justify-between items-center mb-2">
-                    <h4 className="text-sm sm:text-md font-semibold text-gray-700">
-                      All Items
-                    </h4>
-                    <button 
+                    <h4 className="text-sm sm:text-md font-semibold text-gray-700">All Items</h4>
+                    <button
                       onClick={() => {
                         setIsModalOpen(false);
                         setTimeout(() => setShowAllItemsManager(true), 300);
@@ -618,14 +602,16 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                           selectedProject.all_items.map((item: any, idx: number) => (
                             <tr key={idx} className="border-b border-gray-200">
                               <td className="p-1 sm:p-2 text-left">{item.item}</td>
-                              <td className="p-1 sm:p-2 text-left">₦{formatNumber(parseFloat(item.budget || '0'))}</td>
-                              <td className="p-1 sm:p-2 text-left">₦{formatNumber(parseFloat(item.price || '0'))}</td>
+                              <td className="p-1 sm:p-2 text-left">₦{formatNumber(parseFloat(item.budget || "0"))}</td>
+                              <td className="p-1 sm:p-2 text-left">₦{formatNumber(parseFloat(item.price || "0"))}</td>
                               <td className="p-1 sm:p-2 text-left">{item.quantity || 1}</td>
                             </tr>
                           ))
                         ) : (
                           <tr>
-                            <td colSpan={4} className="p-2 text-center text-gray-500">No items found</td>
+                            <td colSpan={4} className="p-2 text-center text-gray-500">
+                              No items found
+                            </td>
                           </tr>
                         )}
                       </tbody>
@@ -635,14 +621,17 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                           <td className="p-1 sm:p-2 text-left">
                             ₦{formatNumber(
                               Array.isArray(selectedProject.all_items)
-                                ? selectedProject.all_items.reduce((sum, item) => sum + (parseFloat(item.budget || '0')), 0)
+                                ? selectedProject.all_items.reduce((sum, item) => sum + parseFloat(item.budget || "0"), 0)
                                 : 0
                             )}
                           </td>
                           <td className="p-1 sm:p-2 text-left">
                             ₦{formatNumber(
                               Array.isArray(selectedProject.all_items)
-                                ? selectedProject.all_items.reduce((sum, item) => sum + (parseFloat(item.price || '0') * (parseInt(item.quantity) || 1)), 0)
+                                ? selectedProject.all_items.reduce(
+                                    (sum, item) => sum + parseFloat(item.price || "0") * (parseInt(item.quantity) || 1),
+                                    0
+                                  )
                                 : 0
                             )}
                           </td>
@@ -656,11 +645,9 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                     </table>
                   </div>
                 </div>
-                                {/* Products Table */}
+                {/* Products Table */}
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                  <h4 className="text-md font-semibold text-gray-700 mb-2">
-                    Products
-                  </h4>
+                  <h4 className="text-md font-semibold text-gray-700 mb-2">Products</h4>
                   <div className="overflow-x-auto">
                     <table className="min-w-full text-sm">
                       <thead className="bg-blue-400 text-white">
@@ -673,34 +660,29 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                       <tbody>
                         {selectedProject.products?.products?.length > 0 ? (
                           selectedProject.products.products.map((product) => (
-                            <tr
-                              key={product.id}
-                              className="border-b border-gray-200"
-                            >
+                            <tr key={product.id} className="border-b border-gray-200">
                               <td className="p-2 text-left">{product.name}</td>
-                              <td className="p-2 text-left">
-                                ₦{formatNumber(parseFloat(product.selling_price))}
-                            </td>
+                              <td className="p-2 text-left">₦{formatNumber(parseFloat(product.selling_price))}</td>
                               <td className="p-2 text-left">{product.progress}</td>
                             </tr>
                           ))
                         ) : (
                           <tr>
-                            <td className="p-2 text-left" colSpan={3}>No data found</td>
+                            <td className="p-2 text-left" colSpan={3}>
+                              No data found
+                            </td>
                           </tr>
                         )}
                       </tbody>
                       <tfoot className="bg-gray-100">
                         <tr className="font-semibold">
                           <td className="p-2 text-left">Total</td>
-                          <td className="p-2 text-left">
-                            ₦{formatNumber(totalProductsSellingPrice)}
-                          </td>
+                          <td className="p-2 text-left">₦{formatNumber(totalProductsSellingPrice)}</td>
                           <td className="p-2 text-left">
                             {(() => {
                               const products = selectedProject.products?.products || [];
                               if (!products.length) return 0;
-                              const sum = products.reduce((acc, p) => acc + (typeof p.progress === 'number' ? p.progress : 0), 0);
+                              const sum = products.reduce((acc, p) => acc + (typeof p.progress === "number" ? p.progress : 0), 0);
                               return Math.round(sum / products.length);
                             })()}
                           </td>
@@ -712,58 +694,45 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
 
                 {/* Sold Items Table */}
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <h4 className="text-md font-semibold text-gray-700 mb-2">
-                      Sold Items
-                    </h4>
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full text-sm">
-                        <thead className="bg-blue-400 text-white">
-                          <tr>
-                            <th className="p-2 text-left">Name</th>
-                            <th className="p-2 text-left">Quantity</th>
-                            <th className="p-2 text-left">Cost Price</th>
-                            <th className="p-2 text-left">Selling Price</th>
-                            <th className="p-2 text-left">Total Price</th>
+                  <h4 className="text-md font-semibold text-gray-700 mb-2">Sold Items</h4>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead className="bg-blue-400 text-white">
+                        <tr>
+                          <th className="p-2 text-left">Name</th>
+                          <th className="p-2 text-left">Quantity</th>
+                          <th className="p-2 text-left">Cost Price</th>
+                          <th className="p-2 text-left">Selling Price</th>
+                          <th className="p-2 text-left">Total Price</th>
                         </tr>
                       </thead>
                       <tbody>
-                          {selectedProject.sold_items.sold_items.map(
-                            (item) => (
-                              <tr
-                                key={item.id}
-                                className="border-b border-gray-200"
-                              >
-                                <td className="p-2 text-left">{item.name}</td>
-                                <td className="p-2 text-left">{item.quantity}</td>
-                                <td className="p-2 text-left">
-                                  ₦{formatNumber(parseFloat(item.cost_price))}
-                                </td>
-                                <td className="p-2 text-left">
-                                  ₦{formatNumber(parseFloat(item.selling_price))}
-                              </td>
-                                <td className="p-2 text-left">
-                                  ₦{formatNumber(item.total_price)}
-                              </td>
-                            </tr>
-                          )
-                        )}
-                      </tbody>
-                        <tfoot className="bg-gray-100 ">
-                          <tr className="font-semibold">
-                            <td className="p-2 text-left">Total</td>
-                            <td className="p-2 text-left"></td>
-                            <td className="p-2 text-left">₦{formatNumber(totalSoldItemsCost)}</td>
-                            <td className="p-2 text-left">₦{formatNumber(totalSoldItemsSelling)}</td>
-                            <td className="p-2  text-left">₦{formatNumber(totalSoldItemsTotalPrice)}</td>
+                        {selectedProject.sold_items.sold_items.map((item) => (
+                          <tr key={item.id} className="border-b border-gray-200">
+                            <td className="p-2 text-left">{item.name}</td>
+                            <td className="p-2 text-left">{item.quantity}</td>
+                            <td className="p-2 text-left">₦{formatNumber(parseFloat(item.cost_price))}</td>
+                            <td className="p-2 text-left">₦{formatNumber(parseFloat(item.selling_price))}</td>
+                            <td className="p-2 text-left">₦{formatNumber(item.total_price)}</td>
                           </tr>
-                        </tfoot>
+                        ))}
+                      </tbody>
+                      <tfoot className="bg-gray-100">
+                        <tr className="font-semibold">
+                          <td className="p-2 text-left">Total</td>
+                          <td className="p-2 text-left"></td>
+                          <td className="p-2 text-left">₦{formatNumber(totalSoldItemsCost)}</td>
+                          <td className="p-2 text-left">₦{formatNumber(totalSoldItemsSelling)}</td>
+                          <td className="p-2 text-left">₦{formatNumber(totalSoldItemsTotalPrice)}</td>
+                        </tr>
+                      </tfoot>
                     </table>
-                    </div>
-                    </div>
+                  </div>
+                </div>
 
                 {/* Tasks Table */}
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                  <div className="flex  md:flex-row md:items-center md:justify-between mb-2 gap-2">
+                  <div className="flex md:flex-row md:items-center md:justify-between mb-2 gap-2">
                     <h4 className="text-md font-semibold text-gray-700">Tasks</h4>
                     <div className="flex-1 flex flex-col items-center justify-center">
                       <div className="flex items-center gap-2">
@@ -774,7 +743,7 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                         <div className="bg-blue-400 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => {
                         if (selectedProject) {
                           setIsModalOpen(false);
@@ -797,34 +766,46 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
                       </thead>
                       <tbody>
                         {Array.isArray(localTasks) && localTasks.length > 0 ? (
-                          localTasks.map((task, idx) => (
+                          localTasks.map((task, idx) =>
                             task ? (
                               <React.Fragment key={idx}>
                                 <tr className="border-b border-gray-200">
                                   <td className="p-2 text-left font-medium">{task?.title}</td>
                                   <td className="p-2 text-left">
-                                    <input type="checkbox" checked={task?.checked} onChange={() => task && handleTaskCompletionToggle(idx)} />
-                            </td>
+                                    <input
+                                      type="checkbox"
+                                      checked={task?.checked}
+                                      onChange={() => task && handleTaskCompletionToggle(idx)}
+                                    />
+                                  </td>
                                 </tr>
-                                {Array.isArray(task.subtasks) ? task.subtasks.map((sub, subIdx) => (
-                                  sub ? (
-                                    <tr key={subIdx} className="border-b border-gray-100">
-                                      <td className="p-2 pl-8 text-left text-gray-700 flex items-center gap-2">
-                                        <span className="inline-block w-2 h-2 rounded-full bg-blue-400"></span>
-                                        <span>{sub.title}</span>
-                            </td>
-                                      <td className="p-2 text-left">
-                                        <input type="checkbox" checked={sub.checked} onChange={() => sub && handleTaskCompletionToggle(idx, subIdx)} />
-                            </td>
-                                    </tr>
-                                  ) : null
-                                )) : null}
+                                {Array.isArray(task.subtasks)
+                                  ? task.subtasks.map((sub, subIdx) =>
+                                      sub ? (
+                                        <tr key={subIdx} className="border-b border-gray-100">
+                                          <td className="p-2 pl-8 text-left text-gray-700 flex items-center gap-2">
+                                            <span className="inline-block w-2 h-2 rounded-full bg-blue-400"></span>
+                                            <span>{sub.title}</span>
+                                          </td>
+                                          <td className="p-2 text-left">
+                                            <input
+                                              type="checkbox"
+                                              checked={sub.checked}
+                                              onChange={() => sub && handleTaskCompletionToggle(idx, subIdx)}
+                                            />
+                                          </td>
+                                        </tr>
+                                      ) : null
+                                    )
+                                  : null}
                               </React.Fragment>
                             ) : null
-                          ))
+                          )
                         ) : (
                           <tr>
-                            <td className="p-2 text-left" colSpan={2}>No tasks found</td>
+                            <td className="p-2 text-left" colSpan={2}>
+                              No tasks found
+                            </td>
                           </tr>
                         )}
                       </tbody>
@@ -834,236 +815,157 @@ const ProjectModals: React.FC<ProjectModalsProps> = ({
 
                 {/* Expenses Table */}
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <h4 className="text-md font-semibold text-gray-700 mb-2">
-                      Expenses
-                    </h4>
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full text-sm">
-                        <thead className="bg-blue-400 text-white">
-                          <tr>
-                            <th className="p-2 text-left">Name</th>
-                            <th className="p-2 text-left">Amount</th>
+                  <h4 className="text-md font-semibold text-gray-700 mb-2">Expenses</h4>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead className="bg-blue-400 text-white">
+                        <tr>
+                          <th className="p-2 text-left">Name</th>
+                          <th className="p-2 text-left">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedProject.expenses.expenses.map((expense, index) => (
+                          <tr key={index} className="border-b border-gray-200">
+                            <td className="p-2 text-left">{expense.name}</td>
+                            <td className="p-2 text-left">₦{formatNumber(parseFloat(expense.amount))}</td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {selectedProject.expenses.expenses.map(
-                            (expense, index) => (
-                              <tr
-                                key={index}
-                                className="border-b border-gray-200"
-                              >
-                                <td className="p-2 text-left">{expense.name}</td>
-                                <td className="p-2 text-left">
-                                  ₦{formatNumber(parseFloat(expense.amount))}
-                                </td>
-                              </tr>
-                            )
-                          )}
-                        </tbody>
-                        <tfoot className="bg-gray-100">
-                          <tr className="font-semibold">
-                            <td className="p-2 text-left">Total</td>
-                            <td className="p-2 text-left">₦{formatNumber(totalExpensesAmount)}</td>
-                          </tr>
-                        </tfoot>
-                      </table>
-                    </div>
-                    </div>
+                        ))}
+                      </tbody>
+                      <tfoot className="bg-gray-100">
+                        <tr className="font-semibold">
+                          <td className="p-2 text-left">Total</td>
+                          <td className="p-2 text-left">₦{formatNumber(totalExpensesAmount)}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
 
                 {/* Other Productions Table */}
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-md font-semibold text-gray-700">
-                      Other Productions
-                    </h4>
-                      <button
-                        onClick={handleViewOtherProductionRecords}
-                        className="px-3 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500 transition-colors"
-                        disabled={!selectedProject}
-                      >
-                        + View
-                      </button>
-                    </div>
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full text-sm">
-                        <thead className="bg-blue-400 text-white">
-                          <tr>
-                            <th className="p-2 text-left">Name</th>
-                            <th className="p-2 text-left">Budget</th>
-                            <th className="p-2 text-left">Cost</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {selectedProject.other_productions.other_productions.map(
-                            (production) => (
-                              <tr
-                                key={production.id}
-                                className="border-b border-gray-200"
-                              >
-                                <td className="p-2 text-left">
-                                  {production.name}
-                                </td>
-                                <td className="p-2 text-left">
-                                  {production.budget ? `₦${formatNumber(parseFloat(production.budget))}` : '-'}
-                                </td>
-                                <td className="p-2 text-left">
-                                  {production.cost ? `₦${formatNumber(parseFloat(production.cost))}` : '-'}
-                                </td>
-                              </tr>
-                            )
-                          )}
-                        </tbody>
-                        <tfoot className="bg-gray-100">
-                          <tr className="font-semibold">
-                            <td className="p-2 text-left">Total</td>
-                            <td className="p-2 text-left">₦{formatNumber(totalOtherProductionsBudget)}</td>
-                            <td className="p-2 text-left">₦{formatNumber(totalOtherProductionsCost)}</td>
-                          </tr>
-                        </tfoot>
-                      </table>
-                    </div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-md font-semibold text-gray-700">Other Productions</h4>
+                    <button
+                      onClick={handleViewOtherProductionRecords}
+                      className="px-3 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500 transition-colors"
+                      disabled={!selectedProject}
+                    >
+                      + View
+                    </button>
                   </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead className="bg-blue-400 text-white">
+                        <tr>
+                          <th className="p-2 text-left">Name</th>
+                          <th className="p-2 text-left">Budget</th>
+                          <th className="p-2 text-left">Cost</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedProject.other_productions.other_productions.map((production) => (
+                          <tr key={production.id} className="border-b border-gray-200">
+                            <td className="p-2 text-left">{production.name}</td>
+                            <td className="p-2 text-left">₦{formatNumber(parseFloat(production.budget || "0"))}</td>
+                            <td className="p-2 text-left">₦{formatNumber(parseFloat(production.cost || "0"))}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot className="bg-gray-100">
+                        <tr className="font-semibold">
+                          <td className="p-2 text-left">Total</td>
+                          <td className="p-2 text-left">₦{formatNumber(totalOtherProductionsBudget)}</td>
+                          <td className="p-2 text-left">₦{formatNumber(totalOtherProductionsCost)}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
               </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
 
-      {selectedProject && (
-        <EditProjectModal
-          open={isEditModalOpen}
-          onOpenChange={setIsEditModalOpen}
-          projectId={selectedProject.id.toString()}
-          onSuccess={handleEditSuccess}
-        />
-      )}
+      {/* Edit Status Modal */}
+      <Dialog open={isEditStatusModalOpen} onOpenChange={setIsEditStatusModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Project Status</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="status" className="col-span-1 text-right">
+                Status
+              </label>
+              <select
+                id="status"
+                className="col-span-3 border rounded p-2"
+                value={newStatus}
+                onChange={(e) => setNewStatus(e.target.value)}
+              >
+                <option value="in progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="delivered">Delivered</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditStatusModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleStatusSave} disabled={statusLoading}>
+              {statusLoading ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {selectedProject && selectedProject.invoice_image && (
-        <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Invoice Image</DialogTitle>
-            </DialogHeader>
-            <img
-              src={selectedProject.invoice_image}
-              alt="Invoice"
-              className="max-w-full h-auto rounded-lg"
-            />
-          </DialogContent>
-        </Dialog>
-      )}
-
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              project and all its related data.
+              This action cannot be undone. This will permanently delete the project.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>
-              Confirm
-            </AlertDialogAction>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Edit Status Modal */}
-      <Dialog open={isEditStatusModalOpen} onOpenChange={setIsEditStatusModalOpen}>
-        <DialogContent>
+      {/* Invoice Image Modal */}
+      <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
+        <DialogContent className="sm:max-w-[80vw] sm:max-h-[80vh]">
           <DialogHeader>
-            <DialogTitle>Edit Project Status</DialogTitle>
+            <DialogTitle>Invoice Image</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">Status</label>
-            <select
-              className="w-full border rounded p-2"
-              value={newStatus}
-              onChange={e => setNewStatus(e.target.value)}
-            >
-              <option value="in progress">In Progress</option>
-              <option value="completed">Completed</option>
-              <option value="delivered">Delivered</option>
-              {/* Add more statuses as needed */}
-            </select>
-            <Button onClick={handleStatusSave} disabled={statusLoading}>
-              {statusLoading ? 'Saving...' : 'Save'}
-            </Button>
+          <div className="flex justify-center items-center">
+            <img
+              src={selectedProject?.invoice_image || ""}
+              alt="Invoice"
+              className="max-w-full max-h-[70vh] object-contain"
+            />
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Add Item Modal */}
-      <Dialog open={isAddItemModalOpen} onOpenChange={setIsAddItemModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Item</DialogTitle>
-            <DialogDescription>
-              Add a new item to the project.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Item Name</label>
-              <input type="text" className="w-full border rounded p-2" placeholder="Enter item name" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Price</label>
-              <input type="number" className="w-full border rounded p-2" placeholder="Enter price" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Quantity</label>
-              <input type="number" className="w-full border rounded p-2" placeholder="Enter quantity" />
-            </div>
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setIsAddItemModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={() => setIsAddItemModalOpen(false)}>
-                Add Item
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Edit Project Modal */}
+      <EditProjectModal
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        projectId={String(selectedProject.id)} // Pass projectId as string
+        onSuccess={handleEditSuccess}
+      />
 
-      {/* Add Task Modal */}
-      <Dialog open={isAddTaskModalOpen} onOpenChange={setIsAddTaskModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Task</DialogTitle>
-            <DialogDescription>
-              Add a new task to the project.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Task Title</label>
-              <input type="text" className="w-full border rounded p-2" placeholder="Enter task title" />
-            </div>
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setIsAddTaskModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={() => setIsAddTaskModalOpen(false)}>
-                Add Task
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
+      {/* All Items Manager Modal */}
       {showAllItemsManager && selectedProject && (
         <AllItemsManager
           project={selectedProject}
-          onUpdate={(updatedItems) => {
-            selectedProject.all_items = updatedItems as any;
-          }}
           onClose={() => {
             setShowAllItemsManager(false);
             setIsModalOpen(true);

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -20,6 +19,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  getContractorRecords,
+  deleteContractorRecord,
+} from "@/utils/jsonDataService";
 
 interface ContractorRecord {
   id: number;
@@ -60,17 +63,9 @@ const ContractorRecords = () => {
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const [totalPages, setTotalPages] = useState(1);
 
+  // Fetch records from local JSON
   const fetchRecords = async () => {
-    const token = localStorage.getItem("accessToken");
-    const response = await axios.get(
-      `https://backend.kidsdesigncompany.com/api/contractors/${id}/record/?page=${currentPage}`,
-      {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      }
-    );
-    return response.data;
+    return await getContractorRecords(id!, currentPage);
   };
 
   const {
@@ -90,17 +85,10 @@ const ContractorRecords = () => {
     }
   }, [recordsData]);
 
+  // Delete record mutation using local JSON
   const deleteRecordMutation = useMutation({
     mutationFn: async (recordId: number) => {
-      const token = localStorage.getItem("accessToken");
-      await axios.delete(
-        `https://backend.kidsdesigncompany.com/api/contractors/${id}/record/${recordId}/`,
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
-        }
-      );
+      await deleteContractorRecord(id!, recordId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contractor-records", id, currentPage] });
@@ -162,7 +150,7 @@ const ContractorRecords = () => {
           records.map((record: ContractorRecord) => (
             <Card
               key={record.id}
-              className="mb-4 mb-4 shadow-md hover:shadow-lg transition-shadow duration-200"
+              className="mb-4 shadow-md hover:shadow-lg transition-shadow duration-200"
             >
               <CardContent className="p-4 space-y-5">
                 <p className="text-sm text-gray-500">
@@ -173,7 +161,6 @@ const ContractorRecords = () => {
                 <p className="text-sm text-gray-500">Date: {record.date}</p>
               </CardContent>
               <CardFooter className="flex justify-end gap-2">
-                {isCEO && (
                   <>
                     <Button
                       variant="outline"
@@ -189,7 +176,6 @@ const ContractorRecords = () => {
                       Delete
                     </Button>
                   </>
-                )}
               </CardFooter>
             </Card>
           ))

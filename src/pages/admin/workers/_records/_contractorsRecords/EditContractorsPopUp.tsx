@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { updateContractorRecord } from "@/utils/jsonDataService";
 
 interface EditRecordPopupProps {
   isOpen: boolean;
@@ -35,17 +35,7 @@ const EditRecordPopup: React.FC<EditRecordPopupProps> = ({
 
   const editRecordMutation = useMutation({
     mutationFn: async (updatedData: { report: string }) => {
-      const token = localStorage.getItem("accessToken");
-      const response = await axios.put(
-        `https://backend.kidsdesigncompany.com/api/contractors/${contractorId}/record/${record.id}/`,
-        updatedData,
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
-        }
-      );
-      return response.data;
+      await updateContractorRecord(contractorId, record.id, updatedData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
@@ -23,7 +20,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import SearchablePaginatedDropdown from "../../../shop/sold/Sold Components/SearchablePaginatedDropdown";
+import projectsData from "@/data/ceo/project/projects.json";
+import customersData from "@/data/ceo/project/customers.json";
 
 interface Customer {
   id: number;
@@ -33,34 +31,25 @@ interface Customer {
   address: string;
 }
 
-interface CustomerApiResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: {
-    all_customers_count: number;
-    active_customers: number;
-    all_customers: Customer[];
-  };
-}
-
 interface AddProjectModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }
 
+const saveProjectsToJson = async (updatedProjects: any) => {
+  localStorage.setItem("projects", JSON.stringify(updatedProjects));
+  return updatedProjects;
+};
+
 const AddProjectModal: React.FC<AddProjectModalProps> = ({
   open,
   onOpenChange,
   onSuccess,
 }) => {
-  const queryClient = useQueryClient();
   const [isPending, setIsPending] = useState(false);
   const [formError, setFormError] = useState("");
-  const [errorDetails, setErrorDetails] = useState<Record<string, string[]>>(
-    {}
-  );
+  const [errorDetails, setErrorDetails] = useState<Record<string, string[]>>({});
   const [invoiceImage, setInvoiceImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -81,33 +70,14 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
   });
 
   useEffect(() => {
-    const fetchCustomers = async () => {
-      setIsLoadingCustomers(true);
-      try {
-        const token = localStorage.getItem("accessToken");
-        const response = await axios.get<CustomerApiResponse>(
-          "https://backend.kidsdesigncompany.com/api/customer/",
-          {
-            headers: {
-              Authorization: `JWT ${token}`,
-            },
-          }
-        );
-        if (response.data?.results?.all_customers) {
-          setCustomers(response.data.results.all_customers);
-        } else {
-          throw new Error("Unexpected API response structure");
-        }
-      } catch (error) {
-        console.error("Error fetching customers:", error);
-        setCustomers([]);
-      } finally {
-        setIsLoadingCustomers(false);
-      }
-    };
-
-    if (open) {
-      fetchCustomers();
+    setIsLoadingCustomers(true);
+    try {
+      setCustomers(customersData.results.all_customers || []);
+    } catch (error) {
+      console.error("Error loading customers:", error);
+      setCustomers([]);
+    } finally {
+      setIsLoadingCustomers(false);
     }
   }, [open]);
 
@@ -134,18 +104,11 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "application/pdf",
-      ];
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif", "application/pdf"];
       const maxSize = 5 * 1024 * 1024;
 
       if (!allowedTypes.includes(file.type)) {
-        toast.error(
-          "Invalid file type. Please upload a JPEG, PNG, GIF, or PDF."
-        );
+        toast.error("Invalid file type. Please upload a JPEG, PNG, GIF, or PDF.");
         return;
       }
 
@@ -159,9 +122,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -198,86 +159,71 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
       return;
     }
 
-    const formDataToSubmit = new FormData();
-    const projectData = {
-      name: formData.name,
-      status: formData.status,
-      start_date: formData.start_date,
-      deadline: formData.deadline || null,
-      date_delivered: null,
-      customer: parseInt(formData.customer_detail),
-      selling_price: formData.selling_price,
-      logistics: formData.logistics || "0",
-      service_charge: formData.service_charge || "0",
-      note: formData.note || null,
-    };
-
-    Object.entries(projectData).forEach(([key, value]) => {
-      if (value !== null) formDataToSubmit.append(key, value.toString());
-    });
-
-    if (invoiceImage) formDataToSubmit.append("invoice_image", invoiceImage);
-
-    if (allItems.length > 0 && allItems.some(row => row.item && row.price)) {
-      formDataToSubmit.append('all_items', JSON.stringify(allItems.filter(row => row.item && row.price).map(row => ({ ...row, quantity: row.quantity || '1' }))));
-    }
-
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.post(
-        "https://backend.kidsdesigncompany.com/api/project/",
-        formDataToSubmit,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `JWT ${token}`,
-          },
-        }
-      );
+      const newProject = {
+        id: projectsData.all_projects.length + 1,
+        name: formData.name,
+        status: formData.status,
+        start_date: formData.start_date,
+        deadline: formData.deadline || null,
+        date_delivered: null,
+        customer_detail: customers.find(c => String(c.id) === formData.customer_detail),
+        selling_price: formData.selling_price,
+        logistics: formData.logistics || "0",
+        service_charge: formData.service_charge || "0",
+        note: formData.note || null,
+        is_delivered: false,
+        archived: false,
+        all_items: allItems.filter(row => row.item && row.price).map(row => ({ ...row, quantity: row.quantity || '1' })),
+        invoice_image: invoiceImage ? URL.createObjectURL(invoiceImage) : null,
+        products: { progress: 0, total_product_selling_price: 0, total_production_cost: 0, total_artisan_cost: 0, total_overhead_cost: 0, total_raw_material_cost: 0, total_grand_total: 0, total_profit: 0, products: [] },
+        sold_items: { total_cost_price_sold_items: 0, total_selling_price_sold_items: 0, sold_items: [] },
+        expenses: { total_expenses: 0, expenses: [] },
+        other_productions: { total_cost: 0, total_budget: 0, other_productions: [] },
+        calculations: {
+          total_raw_material_cost: 0,
+          total_artisan_cost: 0,
+          total_overhead_cost: 0,
+          total_products_cost: 0,
+          total_product_selling_price: 0,
+          product_profit: 0,
+          total_cost_price_sold_items: 0,
+          total_selling_price_sold_items: 0,
+          shop_items_profit: 0,
+          money_left_for_expensis: 0,
+          money_left_for_expensis_with_logistics_and_service_charge: 0,
+          total_other_productions_budget: 0,
+          total_other_productions_cost: 0,
+          total_expensis: 0,
+          total_money_spent: 0,
+          total_paid: 0,
+          final_profit: 0,
+        },
+        tasks: [],
+      };
 
-      // More comprehensive query invalidation
-      console.log("Project added, invalidating queries...");
-      await queryClient.invalidateQueries({
-        queryKey: ["projects"],
-        exact: false, // This ensures all queries starting with "projects" are invalidated
-      });
-      console.log("Queries invalidated");
+      const updatedProjects = {
+        ...projectsData,
+        all_projects: [...projectsData.all_projects, newProject],
+        all_time_projects_count: projectsData.all_time_projects_count + 1,
+        all_projects_count: projectsData.all_projects_count + 1,
+        ongoing_projects_count: projectsData.ongoing_projects_count + 1,
+      };
 
+      await saveProjectsToJson(updatedProjects);
       toast.success("Project added successfully!");
       onOpenChange(false);
       onSuccess?.();
-
-      // Reset form data
       resetForm();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error adding project:", error);
-
-      if (error.response?.data) {
-        if (typeof error.response.data === "object") {
-          setErrorDetails(error.response.data);
-          const errorMessages = Object.entries(error.response.data)
-            .map(
-              ([key, value]) =>
-                `${key}: ${Array.isArray(value) ? value.join(", ") : value}`
-            )
-            .join("; ");
-          setFormError(`Validation error: ${errorMessages}`);
-        } else {
-          setFormError(
-            "Failed to add project. Please check your data and try again."
-          );
-        }
-      } else {
-        setFormError("Failed to add project. Please try again.");
-      }
-
+      setFormError("Failed to add project. Please try again.");
       toast.error("Failed to add project. Please check the form for errors.");
     } finally {
       setIsPending(false);
     }
   };
 
-  // Reset form when modal closes
   useEffect(() => {
     if (!open) {
       resetForm();
@@ -300,9 +246,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                   <AlertDescription>{formError}</AlertDescription>
                 </Alert>
               )}
-
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                {/* Left column */}
                 <div className="space-y-3 sm:space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-xs sm:text-sm lg:text-base">Project Name</Label>
@@ -315,21 +259,30 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                       className={`text-xs sm:text-sm lg:text-base ${errorDetails.name ? "border-red-500" : ""}`}
                     />
                     {errorDetails.name && (
-                      <p className="text-xs text-red-500">
-                        {errorDetails.name.join(", ")}
-                      </p>
+                      <p className="text-xs text-red-500">{errorDetails.name.join(", ")}</p>
                     )}
                   </div>
-                  <div className="mb-4">
-                    <SearchablePaginatedDropdown
-                      endpoint="https://backend.kidsdesigncompany.com/api/customer/"
-                      label="Customer"
-                      name="customer_detail"
-                      resultsKey="results.all_customers"
-                      onChange={(_name, value) => setFormData((prev) => ({ ...prev, customer_detail: value }))}
-                      selectedValue={formData.customer_detail}
-                      selectedName={customers.find(c => String(c.id) === formData.customer_detail)?.name || ''}
-                    />
+                  <div className="space-y-2">
+                    <Label htmlFor="customer_detail" className="text-xs sm:text-sm lg:text-base">Customer</Label>
+                    <Select
+                      value={formData.customer_detail}
+                      onValueChange={handleCustomerChange}
+                    >
+                      <SelectTrigger className="text-xs sm:text-sm lg:text-base">
+                        <SelectValue placeholder="Select a customer" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {isLoadingCustomers ? (
+                          <SelectItem value="loading">Loading...</SelectItem>
+                        ) : (
+                          customers.map((customer) => (
+                            <SelectItem key={customer.id} value={String(customer.id)}>
+                              {customer.name}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="note" className="text-xs sm:text-sm lg:text-base">Note (optional)</Label>
@@ -343,7 +296,6 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                     />
                   </div>
                 </div>
-                {/* Right column */}
                 <div className="space-y-3 sm:space-y-4">
                   <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="space-y-2">
@@ -358,9 +310,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                         className={`text-xs sm:text-sm lg:text-base ${errorDetails.start_date ? "border-red-500" : ""}`}
                       />
                       {errorDetails.start_date && (
-                        <p className="text-xs text-red-500">
-                          {errorDetails.start_date.join(", ")}
-                        </p>
+                        <p className="text-xs text-red-500">{errorDetails.start_date.join(", ")}</p>
                       )}
                     </div>
                     <div className="space-y-2">
@@ -388,9 +338,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                         className={`text-xs sm:text-sm lg:text-base ${errorDetails.selling_price ? "border-red-500" : ""}`}
                       />
                       {errorDetails.selling_price && (
-                        <p className="text-xs text-red-500">
-                          {errorDetails.selling_price.join(", ")}
-                        </p>
+                        <p className="text-xs text-red-500">{errorDetails.selling_price.join(", ")}</p>
                       )}
                     </div>
                   </div>
@@ -428,16 +376,11 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                       className="cursor-pointer text-xs sm:text-sm lg:text-base"
                     />
                     {invoiceImage && (
-                      <p className="text-xs text-green-600 mt-2">
-                        {invoiceImage.name} selected
-                      </p>
+                      <p className="text-xs text-green-600 mt-2">{invoiceImage.name} selected</p>
                     )}
-                    <p className="text-xs text-muted-foreground">
-                      Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB
-                    </p>
+                    <p className="text-xs text-muted-foreground">Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB</p>
                   </div>
                 </div>
-                {/* All Items and Tasks Sections side by side */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:col-span-2">
                   <div className="space-y-2">
                     <Label className="text-xs sm:text-sm lg:text-base">All Items (Optional)</Label>
@@ -464,7 +407,7 @@ const AddProjectModal: React.FC<AddProjectModalProps> = ({
                             value={row.quantity}
                             onChange={e => handleAllItemChange(idx, 'quantity', e.target.value)}
                             className="w-full sm:w-1/4 text-xs sm:text-sm lg:text-base"
-                      />
+                          />
                           <Button type="button" variant="destructive" size="sm" onClick={() => handleRemoveAllItem(idx)} disabled={allItems.length === 1} className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2">Remove</Button>
                         </div>
                       ))}

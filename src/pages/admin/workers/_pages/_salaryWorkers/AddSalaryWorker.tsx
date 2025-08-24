@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { addSalaryWorker } from "@/utils/jsonDataService";
 
 const AddSalaryWorker = () => {
   const navigate = useNavigate();
@@ -59,19 +59,7 @@ const AddSalaryWorker = () => {
     e.preventDefault();
     setIsPending(true);
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      const data = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) data.append(key, value as string);
-      });
-      if (image) data.append("image", image);
-      if (agreementFormImage) data.append("agreement_form_image", agreementFormImage);
-      await axios.post("https://backend.kidsdesigncompany.com/api/salary-workers/", data, {
-        headers: { 
-          "Content-Type": "multipart/form-data",
-          Authorization: `JWT ${accessToken}`,
-        },
-      });
+      await addSalaryWorker(formData, image, agreementFormImage);
       queryClient.invalidateQueries({ queryKey: ["salary-workers"], refetchType: "active" });
       toast.success("Salary worker added successfully!");
       navigate("/admin/workers");

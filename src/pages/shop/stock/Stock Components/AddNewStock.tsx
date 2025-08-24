@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import SearchablePaginatedDropdown from "../../sold/Sold Components/SearchablePaginatedDropdown";
+import stockData from "../../../../data/shop/stock/stockData.json";
 
 const Modal = ({
   isOpen,
@@ -89,24 +90,11 @@ const AddNewStockPage = () => {
       const submitData = {
         quantity: parseFloat(formData.quantity),
         item: formData.item,
+        date: new Date().toISOString().slice(0, 10),
       };
 
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/add-stock/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-          body: JSON.stringify(submitData),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to submit");
-      }
-
+      // Simulate adding to JSON (in a real static app, you'd need to handle this differently)
+      console.log("Adding stock:", submitData);
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error:", error);
@@ -133,7 +121,7 @@ const AddNewStockPage = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <SearchablePaginatedDropdown
-              endpoint="https://backend.kidsdesigncompany.com/api/inventory-item/"
+              data={stockData.inventory_items}
               label="Item"
               name="item"
               onChange={handleDropdownChange}
@@ -164,7 +152,6 @@ const AddNewStockPage = () => {
         </form>
       </div>
 
-      {/* Success Modal */}
       <Modal
         isOpen={showSuccessModal}
         onClose={() => {
@@ -174,7 +161,6 @@ const AddNewStockPage = () => {
         type="success"
       />
 
-      {/* Error Modal */}
       <Modal
         isOpen={showErrorModal}
         onClose={() => setShowErrorModal(false)}

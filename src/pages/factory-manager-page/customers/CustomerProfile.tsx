@@ -2,7 +2,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaEdit, FaCheck, FaTimes, FaTrash } from "react-icons/fa";
-import { CustomerResponse } from "./Interfaces"
+import { CustomerResponse } from "./Interfaces";
+import customerProfilesInitial from "@/data/factory-manager-page/customers/customer-profiles.json"; // Import initial JSON
 
 const CustomerProfile = () => {
   const { id } = useParams();
@@ -27,43 +28,30 @@ const CustomerProfile = () => {
   useEffect(() => {
     const role = localStorage.getItem("user_role");
     setUserRole(role);
-    const fetchCustomer = async () => {
-      try {
-        setLoading(true);
-        const JWT_TOKEN = localStorage.getItem('accessToken');
-        const response = await fetch(`https://backend.kidsdesigncompany.com/api/customer/${id}/?format=json`, {
-          headers: {
-            'Authorization': `JWT ${JWT_TOKEN}`
-          }
-        });
+    try {
+      setLoading(true);
+      // Load from local storage if available, else use initial JSON
+      const storedProfiles = localStorage.getItem("customerProfiles");
+      const customerProfiles = storedProfiles ? JSON.parse(storedProfiles) : customerProfilesInitial;
+      const data: CustomerResponse = customerProfiles[id as keyof typeof customerProfiles];
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch customer data.");
-        }
-
-        const data: CustomerResponse = await response.json();
-        console.log("Fetched customer data:", data);
-
-        if (!data || !data.customer_details) {
-          setError("Customer not found.");
-          return;
-        }
-
-        setCustomer(data);
-        setEditedName(data.customer_details.name);
-        setEditedEmail(data.customer_details.email);
-        setEditedPhone(data.customer_details.phone_number);
-        setEditedAddress(data.customer_details.address);
-        setEditedCreatedAt(data.customer_details.created_at);
-      } catch (err) {
-        console.error("Error fetching customer:", err);
-        setError("Error loading customer profile.");
-      } finally {
-        setLoading(false);
+      if (!data || !data.customer_details) {
+        setError("Customer not found.");
+        return;
       }
-    };
 
-    fetchCustomer();
+      setCustomer(data);
+      setEditedName(data.customer_details.name);
+      setEditedEmail(data.customer_details.email);
+      setEditedPhone(data.customer_details.phone_number);
+      setEditedAddress(data.customer_details.address);
+      setEditedCreatedAt(data.customer_details.created_at);
+    } catch (err) {
+      console.error("Error loading customer:", err);
+      setError("Error loading customer profile.");
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   const handleUpdate = async () => {
@@ -73,34 +61,47 @@ const CustomerProfile = () => {
     setUpdateError(null);
 
     try {
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/customer/${customer.customer_details.id}/`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            'Authorization': `JWT ${localStorage.getItem('accessToken')}`
-          },
-          body: JSON.stringify({
-            name: editedName,
-            email: editedEmail,
-            phone_number: editedPhone,
-            address: editedAddress,
-            created_at: editedCreatedAt,
-          }),
-        }
-      );
+      // Load current profiles from local storage or initial JSON
+      const storedProfiles = localStorage.getItem("customerProfiles");
+      const customerProfiles = storedProfiles ? JSON.parse(storedProfiles) : customerProfilesInitial;
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Update failed:", errorData);
-        throw new Error(errorData?.detail || "Failed to update customer details.");
-        }
+      // Update customer details
+      const updatedData = {
+        ...customer.customer_details,
+        name: editedName,
+        email: editedEmail,
+        phone_number: editedPhone,
+        address: editedAddress,
+        created_at: editedCreatedAt,
+      };
 
-      const updatedData = await response.json();
-      setCustomer((prev) => prev ? { ...prev, customer_details: { ...prev.customer_details, ...updatedData } } : null);
+      // Update profiles object
+      customerProfiles[customer.customer_details.id] = {
+        ...customer,
+        customer_details: updatedData,
+      };
+
+      // Save to local storage
+      localStorage.setItem("customerProfiles", JSON.stringify(customerProfiles));
+
+      // Update customers.json in local storage
+      const storedCustomers = localStorage.getItem("customersData");
+      const customersData = storedCustomers ? JSON.parse(storedCustomers) : (await import("@/data/factory-manager-page/customers/customers.json")).default;
+      const updatedCustomers = {
+        ...customersData,
+        results: {
+          ...customersData.results,
+          all_customers: customersData.results.all_customers.map((cust: any) =>
+            cust.id === customer.customer_details.id
+              ? { ...cust, name: editedName, email: editedEmail, phone_number: editedPhone, address: editedAddress, created_at: editedCreatedAt }
+              : cust
+          ),
+        },
+      };
+      localStorage.setItem("customersData", JSON.stringify(updatedCustomers));
+
+      setCustomer((prev) => prev ? { ...prev, customer_details: updatedData } : null);
       setIsEditing(false);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setUpdateError("Error updating customer details.");
     } finally {
@@ -112,32 +113,39 @@ const CustomerProfile = () => {
     if (!customer) return;
 
     if (!window.confirm('Are you sure you want to delete this customer? This action cannot be undone.')) {
-        return;
+      return;
     }
 
     setDeleteLoading(true);
     setDeleteError(null);
 
     try {
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/customer/${customer.customer_details.id}/`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            'Authorization': `JWT ${localStorage.getItem('accessToken')}`
-          },
-        }
-      );
+      // Load current profiles from local storage or initial JSON
+      const storedProfiles = localStorage.getItem("customerProfiles");
+      const customerProfiles = storedProfiles ? JSON.parse(storedProfiles) : customerProfilesInitial;
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Delete failed:", errorData);
-        throw new Error(errorData?.detail || "Failed to delete customer.");
-      }
+      // Remove customer from profiles
+      delete customerProfiles[customer.customer_details.id];
+
+      // Save updated profiles to local storage
+      localStorage.setItem("customerProfiles", JSON.stringify(customerProfiles));
+
+      // Update customers.json in local storage
+      const storedCustomers = localStorage.getItem("customersData");
+      const customersData = storedCustomers ? JSON.parse(storedCustomers) : (await import("@/data/factory-manager-page/customers/customers.json")).default;
+      const updatedCustomers = {
+        ...customersData,
+        results: {
+          ...customersData.results,
+          all_customers: customersData.results.all_customers.filter((cust: any) => cust.id !== customer.customer_details.id),
+          all_customers_count: customersData.results.all_customers_count - 1,
+          active_customers: customersData.results.active_customers - (customer.active_projects_count > 0 ? 1 : 0),
+          owing_customers: customersData.results.owing_customers - (customer.customer_details.project.some((proj: any) => Number(proj.balance) > 0) ? 1 : 0),
+        },
+      };
+      localStorage.setItem("customersData", JSON.stringify(updatedCustomers));
 
       navigate('/factory-manager/customers');
-
     } catch (err) {
       setDeleteError("Error deleting customer.");
       console.error(err);
@@ -150,13 +158,10 @@ const CustomerProfile = () => {
   if (error) return <div className="text-red-500 text-center mt-10">{error}</div>;
   if (!customer) return <div className="text-red-500 text-center mt-10">Customer not found.</div>;
 
-
-
   const formatNumberWithCommas = (number: number) => {
     return new Intl.NumberFormat('en-US').format(number);
   };
 
-  // Calculate totals for Shop Items
   let totalCostPrice = 0, totalSellingPrice = 0, totalTotalPrice = 0;
   if (customer.customer_details.shop_item && customer.customer_details.shop_item.length > 0) {
     customer.customer_details.shop_item.forEach((proj) => {
@@ -166,7 +171,6 @@ const CustomerProfile = () => {
     });
   }
 
-  // Calculate totals for Projects
   let totalPaid = 0, totalBalance = 0;
   if (customer.customer_details.project && customer.customer_details.project.length > 0) {
     customer.customer_details.project.forEach((proj) => {
@@ -177,7 +181,6 @@ const CustomerProfile = () => {
 
   return (
     <div className="mx-1 sm:mx-6 my-4 sm:my-10">
-      {/* Customer Summary */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-2 sm:mb-4">
         <article className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
           <h3 className="font-semibold text-xs sm:text-lg text-black-600 mb-1 sm:mb-2">Total Projects</h3>
@@ -203,7 +206,6 @@ const CustomerProfile = () => {
         </article>
       </div>
 
-      {/* Customer Profile */}
       <div className="container mx-auto mt-4 p-2 sm:p-4 max-w-3xl bg-white shadow-lg rounded-2xl mb-8">
         <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-2 sm:space-y-0 sm:space-x-4">
           <div className="flex flex-col gap-2 w-full">
@@ -266,7 +268,7 @@ const CustomerProfile = () => {
                 <p>Address: {customer.customer_details.address || "N/A"}</p>
                 <p>Created: {new Date(customer.customer_details.created_at).toLocaleDateString()}</p>
                 <div className="grid grid-cols-3 gap-2 mt-2 w-full">
-                  {userRole === 'ceo' && (
+
                     <>
                       <button
                         className="bg-white border border-[#30ff6be3] text-[#1f9733] hover:bg-[#e6fbe9] px-3 py-1.5 rounded flex justify-center items-center text-xs sm:text-sm w-full sm:w-auto"
@@ -282,7 +284,6 @@ const CustomerProfile = () => {
                         {deleteLoading ? 'Deleting...' : <><FaTrash className="mr-1" /> Delete</>}
                       </button>
                     </>
-                  )}
                   <div className="flex justify-center w-full">
                     <Link to="/factory-manager/customers" className="bg-white border border-blue-400 text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:no-underline px-3 py-1.5 rounded text-xs sm:text-sm w-full sm:w-auto text-center">
                       Back to Customers
@@ -296,7 +297,6 @@ const CustomerProfile = () => {
           </div>
         </div>
       </div>
- 
 
       <h3 className="mb-6 mt-14 font-bold text-[24px] text-[#0178A3]">Projects</h3>
       <div className="overflow-x-auto mb-14">
@@ -311,17 +311,15 @@ const CustomerProfile = () => {
           <tbody>
             {customer.customer_details.project && customer.customer_details.project.length > 0 ? (
               customer.customer_details.project.map((proj) => (
-              <tr key={proj.id}>
-                <td className="py-4 px-2 border border-gray-300 capitalize">{proj.name}</td>
-                <td className="py-4 px-2 border border-gray-300 capitalize">₦{formatNumberWithCommas(Number(proj.paid))}</td>
-                <td className={`py-4 px-2 border border-gray-300 capitalize ${Number(proj.balance) <= 0 ? 'text-red-600' : ''}`}>₦{formatNumberWithCommas(Number(proj.balance))}</td>
-              </tr>
-                ))
-              ) : (
-                <p>No projects available.</p>
-              )
-            }
-            {/* Total Row */}
+                <tr key={proj.id}>
+                  <td className="py-4 px-2 border border-gray-300 capitalize">{proj.name}</td>
+                  <td className="py-4 px-2 border border-gray-300 capitalize">₦{formatNumberWithCommas(Number(proj.paid))}</td>
+                  <td className={`py-4 px-2 border border-gray-300 capitalize ${Number(proj.balance) <= 0 ? 'text-red-600' : ''}`}>₦{formatNumberWithCommas(Number(proj.balance))}</td>
+                </tr>
+              ))
+            ) : (
+              <p>No projects available.</p>
+            )}
             {customer.customer_details.project && customer.customer_details.project.length > 0 && (
               <tr className="bg-gray-100 font-bold">
                 <td className="py-4 px-2 border border-gray-300 text-left">Total</td>
@@ -348,18 +346,17 @@ const CustomerProfile = () => {
           <tbody>
             {customer.customer_details.shop_item && customer.customer_details.shop_item.length > 0 ? (
               customer.customer_details.shop_item.map((proj) => (
-              <tr key={proj.id}>
+                <tr key={proj.id}>
                   <td className="py-4 px-2 border border-gray-300 capitalize">{proj.name || '-'}</td>
                   <td className="py-4 px-2 border border-gray-300 capitalize">{formatNumberWithCommas(Number(proj.quantity))}</td>
                   <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(Number(proj.cost_price))}</td>
                   <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(Number(proj.selling_price))}</td>
                   <td className="py-4 px-2 border border-gray-300">₦{formatNumberWithCommas(Number(proj.total_price))}</td>
-              </tr>
-                ))
-              ) : (
+                </tr>
+              ))
+            ) : (
               <tr><td className="capitalize text-center py-4 px-2 border border-gray-300" colSpan={5}>No item available.</td></tr>
             )}
-            {/* Total Row */}
             {customer.customer_details.shop_item && customer.customer_details.shop_item.length > 0 && (
               <tr className="bg-gray-100 font-bold">
                 <td className="py-4 px-2 border border-gray-300 text-left">Total</td>

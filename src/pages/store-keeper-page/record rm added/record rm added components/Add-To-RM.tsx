@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Modal from "@/pages/shop/Modal";
 import SearchablePaginatedDropdown from "../../raw-materials/Raw Materials Component/SearchablePaginatedDropdown";
+import rawMaterialsData from "@/data/store-keeper-page/raw-materials/raw-materials.json";
 
 interface ModalConfig {
   isOpen: boolean;
@@ -17,7 +18,7 @@ const AddToRM: React.FC = () => {
   const [materialSearch, setMaterialSearch] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
   const [formData, setFormData] = useState({
-    item: "", // Changed from material to item
+    item: "",
     quantity: "",
     cost_price: "",
   });
@@ -37,24 +38,15 @@ const AddToRM: React.FC = () => {
       [name]: value
     }));
 
-    // If the item is selected, fetch its details and prefill cost_price
     if (name === "item" && value) {
-      try {
-        const response = await fetch(`https://backend.kidsdesigncompany.com/api/raw-materials/${value}/`, {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setFormData(prev => ({
-            ...prev,
-            cost_price: data.price ? data.price.toString() : ""
-          }));
-        }
-      } catch (error) {
-        console.error("Error fetching raw material details:", error);
+      const material = rawMaterialsData.results.items.find(
+        (m: any) => m.id.toString() === value
+      );
+      if (material) {
+        setFormData(prev => ({
+          ...prev,
+          cost_price: material.price ? material.price.toString() : ""
+        }));
       }
     }
   };
@@ -71,55 +63,23 @@ const AddToRM: React.FC = () => {
     e.preventDefault();
     setSubmitLoading(true);
 
-    const payload = {
-      item: parseInt(formData.item), // Changed from material to item
-      quantity: parseFloat(formData.quantity),
-      cost_price: parseFloat(formData.cost_price),
-    };
-
-    console.log('Submitting payload:', payload);
-
     try {
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/add-raw-materials/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      // Log raw response text if not OK
-      if (!response.ok) {
-        const text = await response.text();
-        console.error("Raw response:", text);
-        let errorData;
-        try {
-          errorData = JSON.parse(text);
-        } catch {
-          throw new Error("Server returned non-JSON response: " + text.slice(0, 100));
-        }
-        throw new Error(errorData.detail || errorData.item || "Failed to add raw material");
-      }
-
-      setModalConfig({
-        isOpen: true,
-        title: "Success",
-        message: "Raw material added successfully!",
-        type: "success"
-      });
+      setTimeout(() => {
+        setModalConfig({
+          isOpen: true,
+          title: "Success",
+          message: "Item added successfully!",
+          type: "success"
+        });
+        setSubmitLoading(false);
+      }, 1000);
     } catch (error) {
-      console.error("Error adding raw material:", error);
       setModalConfig({
         isOpen: true,
         title: "Error",
-        message: error instanceof Error ? error.message : "Failed to add raw material",
+        message: "Failed to add item",
         type: "error"
       });
-    } finally {
       setSubmitLoading(false);
     }
   };
@@ -142,14 +102,14 @@ const AddToRM: React.FC = () => {
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-black-800">Add Raw Material</h1>
+          <h1 className="text-2xl font-bold text-black-800">Add Item</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <SearchablePaginatedDropdown
-              endpoint="https://backend.kidsdesigncompany.com/api/raw-materials/"
-              label="Raw Material"
+              endpoint="/data/store-keeper-page/raw-materials/raw-materials.json"
+              label="Item"
               name="item"
               resultsKey="results.items"
               value={materialSearch}
@@ -174,16 +134,16 @@ const AddToRM: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700">Cost Price</label>
             <div className="flex items-center gap-2">
-            <input
-              type="number"
-              name="cost_price"
-              value={formData.cost_price}
-              onChange={handleInputChange}
+              <input
+                type="number"
+                name="cost_price"
+                value={formData.cost_price}
+                onChange={handleInputChange}
                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-              required
-              step="0.01"
+                required
+                step="0.01"
                 readOnly={!costPriceEditable}
-            />
+              />
               <button
                 type="button"
                 onClick={() => setCostPriceEditable((prev) => !prev)}
@@ -202,7 +162,7 @@ const AddToRM: React.FC = () => {
                 submitLoading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              {submitLoading ? "Adding..." : "Add Raw Material"}
+              {submitLoading ? "Adding..." : "Add Item"}
             </button>
           </div>
         </form>

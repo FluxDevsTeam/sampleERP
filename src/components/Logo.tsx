@@ -1,4 +1,4 @@
-import { Logo as img } from "../assets";
+import { Logo2 as img } from "../assets";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";
@@ -18,8 +18,8 @@ const Logo = ({ isSidebarOpen, toggleSidebar }: LogoProps) => {
         src={img} 
         alt="logo" 
         className={clsx(
-          "object-contain transition-all duration-300",
-          isSidebarOpen ? "h-[35px] sm:h-[40px] lg:h-[45px]" : "h-[30px] sm:h-[32px] lg:h-[35px]"
+          "object-contain transition-all duration-300 aspect-square",
+          isSidebarOpen ? "h-[48px] sm:h-[52px] lg:h-[54px]" : "h-[44px] sm:h-[54px] lg:h-[56px]"
         )} 
       />
       <FontAwesomeIcon 

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import {
   PieChart,
   Pie,
@@ -8,7 +7,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import React from "react";
+import ceoDashboardDataInitial from "@/data/ceo/dashboard/ceo-dashboard.json";
 
 // Define interfaces for the data structure
 interface ExpenseCategory {
@@ -96,7 +95,6 @@ const getPieRadii = () => {
 // Custom Legend content to wrap text and add left padding
 const CustomLegend = (props: any) => {
   const { payload } = props;
-  // Always remove left padding for closer alignment
   return (
     <ul className="pl-0 ml-[-8px]">
       {payload.map((entry: any, index: number) => (
@@ -133,24 +131,12 @@ const PieCharts = () => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = () => {
       setLoading(true);
       try {
-        const accessToken = localStorage.getItem("accessToken");
-
-        if (!accessToken) {
-          throw new Error("Please login to access this data");
-        }
-        const response = await axios.get<DashboardData>(
-          "https://backend.kidsdesigncompany.com/api/ceo-dashboard/",
-          {
-            headers: {
-              Authorization: `JWT ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = response.data;
+        // Load from local storage if available, else use initial JSON
+        const storedData = localStorage.getItem("ceoDashboardData");
+        const data: DashboardData = storedData ? JSON.parse(storedData) : ceoDashboardDataInitial;
 
         if (
           data?.categorical_data_year?.expense_categories &&
@@ -158,8 +144,7 @@ const PieCharts = () => {
         ) {
           // Process data to calculate percentages and totals
           const yearCategories = data.categorical_data_year.expense_categories;
-          const monthCategories =
-            data.categorical_data_month.expense_categories;
+          const monthCategories = data.categorical_data_month.expense_categories;
 
           const yearSum = yearCategories.reduce(
             (sum, item) => sum + item.value,
@@ -176,14 +161,14 @@ const PieCharts = () => {
               ...item,
               percent: item.value / yearSum,
             }))
-            .sort((a, b) => b.value - a.value); // Sort by value descending
+            .sort((a, b) => b.value - a.value);
 
           let processedMonthData = monthCategories
             .map((item) => ({
               ...item,
               percent: item.value / monthSum,
             }))
-            .sort((a, b) => b.value - a.value); // Sort by value descending
+            .sort((a, b) => b.value - a.value);
 
           // Top 5 + 'Others' logic for year
           if (processedYearData.length > 5) {
@@ -210,7 +195,7 @@ const PieCharts = () => {
           setMonthTotal(monthSum);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error loading data:", error);
         setError("Failed to load expense data. Please try again later.");
       } finally {
         setLoading(false);
@@ -234,7 +219,6 @@ const PieCharts = () => {
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-    // Only show label for segments that are large enough (more than 5%)
     return percent > 0.04 ? (
       <text
         x={x}
@@ -271,16 +255,16 @@ const PieCharts = () => {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-4  lg:gap-8 p-2 sm:p-4 lg:p-6">
       {/* Yearly Expenses Card */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-blue-50 p-2 mb-4 sm:p-4 border-b border-blue-100">
+        <div className="bg-blue-50 p-2 sm:p-4 border-b border-blue-100">
           <h2 className="text-base sm:text-lg md:text-xl font-bold text-neutral-800 text-center">
             Annual Expense Distribution
           </h2>
-          <p className="text-center text-blue-600 font-medium mt-1 text-xs sm:text-sm md:text-base">
+          <p className="text-center text-neutral-600 font-medium mt-1 text-xs sm:text-sm md:text-base">
             Total: ₦ {yearTotal.toLocaleString()}
           </p>
         </div>
 
-        <div className="p-1 sm:p-4 bg-[#f5f7fa]">
+        <div className="p-1 sm:p-4 bg-[#f5f7fa] h-full">
           <ResponsiveContainer width="100%" height={240} className="sm:h-[300px] md:h-[350px] lg:h-[400px]">
             <PieChart>
               <Pie
@@ -306,7 +290,6 @@ const PieCharts = () => {
             </PieChart>
           </ResponsiveContainer>
 
-          {/* Top categories summary */}
           <div className="mt-2 sm:mt-4 border-t border-gray-100 pt-2 sm:pt-4">
             <h3 className="font-medium text-gray-700 mb-1 sm:mb-2 text-xs sm:text-sm md:text-base">
               Top Expense Categories
@@ -368,7 +351,6 @@ const PieCharts = () => {
             </PieChart>
           </ResponsiveContainer>
 
-          {/* Top categories summary */}
           <div className="mt-2 sm:mt-4 border-t border-gray-100 pt-2 sm:pt-4">
             <h3 className="font-medium text-gray-700 mb-1 sm:mb-2 text-xs sm:text-sm md:text-base">
               Top Expense Categories

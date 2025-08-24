@@ -5,7 +5,7 @@ import { faArrowLeft, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons"
 import { ThreeDots } from "react-loader-spinner";
 import Modal from "@/pages/shop/Modal";
 import SearchablePaginatedDropdown from "./SearchablePaginatedDropdown";
-import { deleteRawMaterialCategory } from "./rawMaterialCategoryOperations";
+import rawMaterialsData from "@/data/store-keeper-page/raw-materials/raw-materials.json";
 
 const EditRawMaterial = () => {
   const { id } = useParams();
@@ -21,10 +21,8 @@ const EditRawMaterial = () => {
     image: null as File | null,
     archived: "false",
   });
-
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const [userRole, setUserRole] = useState<string | null>(null);
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     title: "",
@@ -33,24 +31,11 @@ const EditRawMaterial = () => {
   });
 
   useEffect(() => {
-    setUserRole(localStorage.getItem("user_role"));
-  }, []);
-
-  // Fetch raw material details
-  useEffect(() => {
-    const fetchRawMaterial = async () => {
-      try {
-        const response = await fetch(
-          `https://backend.kidsdesigncompany.com/api/raw-materials/${id}/`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-        if (!response.ok) throw new Error("Failed to fetch raw material");
-        const data = await response.json();
+    const fetchRawMaterial = () => {
+      const data = rawMaterialsData.results.items.find(
+        (item: any) => item.id.toString() === id
+      );
+      if (data) {
         setFormData({
           name: data.name || "",
           category: data.store_category?.id.toString() || "",
@@ -61,11 +46,10 @@ const EditRawMaterial = () => {
           archived: data.archived?.toString() || "false",
         });
         setCategoryName(data.store_category?.name || "");
-      } catch (error) {
-        console.error("Error fetching raw material:", error);
+      } else {
+        setShowErrorModal(true);
       }
     };
-
     fetchRawMaterial();
   }, [id]);
 
@@ -100,35 +84,13 @@ const EditRawMaterial = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    const formDataToSend = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value !== null && key !== 'quantity') {
-        formDataToSend.append(key, value);
-      }
-    });
-
     try {
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/raw-materials/${id}/`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-          body: formDataToSend,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to update raw material");
-      }
-
-      setShowSuccessModal(true);
+      setTimeout(() => {
+        setShowSuccessModal(true);
+        setLoading(false);
+      }, 1000);
     } catch (error) {
-      console.error("Error updating raw material:", error);
       setShowErrorModal(true);
-    } finally {
       setLoading(false);
     }
   };
@@ -143,16 +105,18 @@ const EditRawMaterial = () => {
       });
       return;
     }
-
-    await deleteRawMaterialCategory(
-      formData.category,
-      setLoading,
-      setModalConfig,
-      () => {
-        setFormData(prev => ({ ...prev, category: "" }));
-        setCategoryName("");
-      }
-    );
+    setLoading(true);
+    setTimeout(() => {
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Item category deleted successfully!",
+        type: "success",
+      });
+      setFormData((prev) => ({ ...prev, category: "" }));
+      setCategoryName("");
+      setLoading(false);
+    }, 1000);
   };
 
   const handleCloseModal = () => {
@@ -168,12 +132,12 @@ const EditRawMaterial = () => {
   }
 
   return (
-    <div className="w-[95vw] max-w-2xl  mx-auto px-4 pt-4 pb-20 bg-white border border-gray-200 rounded-lg shadow-lg">
+    <div className="w-[95vw] max-w-2xl mx-auto px-4 pt-4 pb-20 bg-white border border-gray-200 rounded-lg shadow-lg">
       <div className="flex justify-between items-center mb-4">
         <button onClick={() => navigate('/store-keeper/raw-materials')} className="text-gray-500 hover:text-gray-700 focus:outline-none text-2xl font-bold" aria-label="Back">
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-        <h2 className="text-lg sm:text-xl font-bold text-black">Edit Raw Material</h2>
+        <h2 className="text-lg sm:text-xl font-bold text-black">Edit Item</h2>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
@@ -184,7 +148,7 @@ const EditRawMaterial = () => {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-semibold text-black uppercase mb-1">Category</label>
             <SearchablePaginatedDropdown
-              endpoint="https://backend.kidsdesigncompany.com/api/raw-materials-category/"
+              endpoint="/data/store-keeper-page/raw-materials/raw-materials-category.json"
               label=""
               name="category"
               resultsKey="results"
@@ -210,10 +174,10 @@ const EditRawMaterial = () => {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-semibold text-black uppercase mb-1">Unit</label>
             <input type="text" name="unit" value={formData.unit} onChange={handleChange} className="border p-2 rounded w-full text-base font-bold text-black" required />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-black uppercase mb-1">Price</label>
-          <input type="number" name="price" value={formData.price} onChange={handleChange} className="border p-2 rounded w-full text-base font-bold text-black" required />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-black uppercase mb-1">Price</label>
+            <input type="number" name="price" value={formData.price} onChange={handleChange} className="border p-2 rounded w-full text-base font-bold text-black" required />
           </div>
         </div>
         <div className="flex flex-col gap-1">
@@ -238,7 +202,7 @@ const EditRawMaterial = () => {
           <input type="file" name="image" onChange={handleFileChange} className="mt-1 block w-full" accept="image/*" />
         </div>
         <div className="flex gap-2 mt-4">
-          <button type="submit" className="w-full py-2 px-4 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-sm" disabled={loading || userRole !== 'ceo'}>{loading ? "Updating..." : "Update"}</button>
+          <button type="submit" className="w-full py-2 px-4 bg-blue-400 text-white rounded hover:bg-blue-500 transition-colors text-sm" disabled={loading}>{loading ? "Updating..." : "Update"}</button>
           <button type="button" onClick={() => navigate('/store-keeper/raw-materials')} className="w-full py-2 px-4 bg-gray-300 text-black rounded hover:bg-gray-400 transition-colors text-sm">Cancel</button>
         </div>
       </form>
@@ -252,7 +216,7 @@ const EditRawMaterial = () => {
           );
         }}
         title="Success!"
-        message="Raw material updated successfully."
+        message="Item updated successfully."
         type="success"
       />
 
@@ -260,7 +224,7 @@ const EditRawMaterial = () => {
         isOpen={showErrorModal}
         onClose={() => setShowErrorModal(false)}
         title="Error"
-        message="There was an error updating the raw material. Please try again."
+        message="There was an error updating the item. Please try again."
         type="error"
       />
 

@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-// import CategoryDropdown from "./Category";
 import SearchableCategoryDropdown from "./SearchableCategoryDropdown";
+import incomeSummary from '@/data/admin/income/incomeSummary.json';
+import incomeCategories from '@/data/admin/income/incomeCategories.json';
 
 interface AddIncomeModalProps {
   isOpen: boolean;
@@ -20,7 +20,7 @@ interface IncomeFormData {
   amount: string;
   cash: boolean;
   date: string;
-  category: string | null; // uuid
+  category: string | null;
 }
 
 const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose, onSuccess }) => {
@@ -46,37 +46,18 @@ const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose, onSucc
     setUserRole(localStorage.getItem("user_role"));
   }, []);
 
-  // Income category create/delete controls
   const [isCatDialogOpen, setIsCatDialogOpen] = useState(false);
   const [newCatName, setNewCatName] = useState("");
   const [catActionLoading, setCatActionLoading] = useState(false);
   const [categoryRefreshTrigger, setCategoryRefreshTrigger] = useState(0);
 
-  // No local quick actions; handled by CategoryDropdown component
-
-  const isUuid = (value: string | null | undefined) => !!value && /^(?:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$/.test(value);
-  const isNumericId = (value: string | null | undefined) => !!value && /^\d+$/.test(value);
-
   const resolveCategoryIdByName = async (name: string): Promise<string | null> => {
-    const token = localStorage.getItem("accessToken");
-    try {
-      const res = await axios.get("https://backend.kidsdesigncompany.com/api/income-category/", {
-        params: { search: name },
-        headers: { Authorization: `JWT ${token}` },
-      });
-      const results = res.data?.results || res.data || [];
-      const first = Array.isArray(results) ? results.find((it: any) => (it?.name ?? '') === name) || results[0] : null;
-      const id = String(first?.id ?? first?.uuid ?? first?.pk ?? "");
-      return id || null;
-    } catch (e) {
-      console.error("[Income] resolveCategoryIdByName error:", e);
-      return null;
-    }
+    const category = incomeCategories.find((cat) => cat.name === name);
+    return category ? category.id : null;
   };
 
   const addIncomeMutation = useMutation({
     mutationFn: async (payload: IncomeFormData) => {
-      const token = localStorage.getItem("accessToken");
       const formatted: any = {
         name: payload.name,
         amount: Number(payload.amount),
@@ -84,48 +65,32 @@ const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose, onSucc
         date: payload.date,
         category: payload.category,
       };
-      console.log("[Income] POST payload:", formatted);
-      console.log("[Income] Category value being sent:", payload.category, typeof payload.category);
-      console.log("[Income] POST headers:", { Authorization: `JWT ${token?.slice(0, 10)}...` });
 
-      // Ensure category is an ID we can send. If UUID or numeric, use as-is.
-      if (
-        typeof formatted.category === 'string' &&
-        !isUuid(formatted.category) &&
-        !isNumericId(formatted.category)
-      ) {
-        // Looks like a name; try to resolve to an id
+      if (typeof formatted.category === 'string' && !incomeCategories.some((cat) => cat.id === formatted.category)) {
         const resolvedId = await resolveCategoryIdByName(formatted.category);
         if (resolvedId) {
           formatted.category = resolvedId;
-          console.log('[Income] Resolved category name to id:', { name: payload.category, id: resolvedId });
         } else {
-          toast.error('Unable to resolve category ID. Please ensure categories API returns IDs or select a valid category.');
+          toast.error('Invalid category. Please select a valid category.');
           throw new Error('Category ID resolution failed');
         }
       }
 
-      try {
-        const response = await axios.post(
-          "https://backend.kidsdesigncompany.com/api/income/",
-          formatted,
-          {
-            headers: {
-              Authorization: `JWT ${token}`,
-            },
-          }
-        );
-        console.log("[Income] POST response:", { status: response.status, data: response.data });
-        return response.data;
-      } catch (error: any) {
-        console.error("[Income] POST error:", {
-          message: error?.message,
-          status: error?.response?.status,
-          data: error?.response?.data,
-          headers: error?.response?.headers,
-        });
-        throw error;
+      // Simulate adding to JSON
+      const newId = (incomeSummary.daily_data.flatMap((d) => d.entries).length + 1);
+      const newEntry = { id: newId, ...formatted };
+      const dateEntry = incomeSummary.daily_data.find((d) => d.date === payload.date) || {
+        date: payload.date,
+        entries: [],
+        daily_total: 0,
+      };
+      dateEntry.entries.unshift(newEntry);
+      dateEntry.daily_total = (dateEntry.daily_total || 0) + Number(payload.amount);
+      if (!incomeSummary.daily_data.includes(dateEntry)) {
+        incomeSummary.daily_data.unshift(dateEntry);
       }
+      incomeSummary.daily_data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      return newEntry;
     },
     onSuccess: () => {
       toast.success("Income added successfully!");
@@ -135,7 +100,7 @@ const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose, onSucc
       if (onSuccess) onSuccess();
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to add income.");
+      toast.error(error?.message || "Failed to add income.");
     },
   });
 
@@ -195,7 +160,6 @@ const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose, onSucc
               </select>
             </div>
 
-            {userRole === "ceo" && (
               <div className="space-y-2">
                 <Label htmlFor="date">Date</Label>
                 <Input
@@ -208,11 +172,10 @@ const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose, onSucc
                   required
                 />
               </div>
-            )}
           </div>
 
           <SearchableCategoryDropdown
-            endpoint="https://backend.kidsdesignCompany.com/api/income-category/"
+            endpoint="/data/admin/income/incomeCategories.json"
             label="Category"
             name="category"
             resultsKey={undefined}
@@ -247,25 +210,15 @@ const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose, onSucc
                         if (!newCatName.trim()) return;
                         setCatActionLoading(true);
                         try {
-                          const token = localStorage.getItem('accessToken');
-                          const res = await axios.post(
-                            'https://backend.kidsdesigncompany.com/api/income-category/',
-                            { name: newCatName.trim() },
-                            { headers: { Authorization: `JWT ${token}` } }
-                          );
-                          const created = res.data || {};
-                          const createdId = String(created?.id ?? created?.uuid ?? created?.pk ?? created?.name ?? '');
-                          if (createdId) {
-                            setFormData((p) => ({ ...p, category: createdId }));
-                            toast.success('Category created');
-                            setIsCatDialogOpen(false);
-                            setNewCatName('');
-                            setCategoryRefreshTrigger(prev => prev + 1);
-                          } else {
-                            toast.error('Created category but no identifier returned');
-                          }
+                          const newId = `cat-${incomeCategories.length + 1}`;
+                          incomeCategories.unshift({ id: newId, name: newCatName.trim() });
+                          setFormData((p) => ({ ...p, category: newId }));
+                          toast.success('Category created');
+                          setIsCatDialogOpen(false);
+                          setNewCatName('');
+                          setCategoryRefreshTrigger(prev => prev + 1);
                         } catch (err: any) {
-                          toast.error(err?.response?.data?.message || 'Failed to create category');
+                          toast.error(err?.message || 'Failed to create category');
                         } finally {
                           setCatActionLoading(false);
                         }
@@ -287,16 +240,14 @@ const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose, onSucc
                 if (!confirm('Delete this category? This cannot be undone.')) return;
                 setCatActionLoading(true);
                 try {
-                  const token = localStorage.getItem('accessToken');
-                  await axios.delete(
-                    `https://backend.kidsdesigncompany.com/api/income-category/${formData.category}/`,
-                    { headers: { Authorization: `JWT ${token}` } }
-                  );
+                  const index = incomeCategories.findIndex((cat) => cat.id === formData.category);
+                  if (index === -1) throw new Error('Category not found');
+                  incomeCategories.splice(index, 1);
                   toast.success('Category deleted');
                   setFormData((p) => ({ ...p, category: null }));
                   setCategoryRefreshTrigger(prev => prev + 1);
                 } catch (err: any) {
-                  toast.error(err?.response?.data?.message || 'Failed to delete category');
+                  toast.error(err?.message || 'Failed to delete category');
                 } finally {
                   setCatActionLoading(false);
                 }
@@ -321,5 +272,3 @@ const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose, onSucc
 };
 
 export default AddIncomeModal;
-
-

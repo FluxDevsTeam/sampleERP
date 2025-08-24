@@ -1,12 +1,17 @@
-import React from "react";
-import axios from "axios";
+import React, { useRef, useEffect } from "react";
 import { FiMinus, FiEdit2 } from "react-icons/fi";
+import projectsData from "@/data/ceo/project/projects.json";
 
 interface AllItemsManagerProps {
   project: any;
   onUpdate: (items: any[]) => void;
   onClose: () => void;
 }
+
+const saveProjectsToJson = async (updatedProjects: any[]) => {
+  localStorage.setItem("projects", JSON.stringify(updatedProjects));
+  return updatedProjects;
+};
 
 const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, onClose }) => {
   const [items, setItems] = React.useState<any[]>([]);
@@ -19,9 +24,9 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
   const initialLoad = React.useRef(true);
   const [pendingSave, setPendingSave] = React.useState(false);
   const [userTyped, setUserTyped] = React.useState(false);
-  const lastItemRef = React.useRef<HTMLDivElement | null>(null); // Ref for the last item
+  const lastItemRef = React.useRef<HTMLDivElement | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let loadedItems = project.all_items;
     if (typeof loadedItems === 'string') {
       try {
@@ -37,8 +42,7 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
     setPendingSave(false);
   }, [project.all_items]);
 
-  // Auto-save effect
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialLoad.current) {
       initialLoad.current = false;
       return;
@@ -57,18 +61,15 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
     return () => {
       if (saveTimeout.current) clearTimeout(saveTimeout.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, userTyped]);
 
   const saveItems = async () => {
     if (!dirty) return;
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.patch(
-        `https://backend.kidsdesigncompany.com/api/project/${project.id}/`,
-        { all_items: items },
-        { headers: { Authorization: `JWT ${token}` } }
+      const updatedProjects = projectsData.all_projects.map((p) =>
+        p.id === project.id ? { ...p, all_items: items } : p
       );
+      await saveProjectsToJson({ ...projectsData, all_projects: updatedProjects });
       setSaveStatus('saved');
       onUpdate(items);
       setDirty(false);
@@ -80,7 +81,6 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
     }
   };
 
-  // Save on close if dirty
   const handleClose = async () => {
     if (dirty) {
       await saveItems();
@@ -88,14 +88,11 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
     onClose();
   };
 
-  // Add Item
   const handleAddItem = () => {
-    // Only add a new item if there is no empty item at the end
     if (items.length > 0 && (!items[items.length - 1].item || items[items.length - 1].item.trim() === "")) return;
     setItems((prev) => [...prev, { item: "", price: "0", budget: "0", quantity: 1 }]);
     setUserTyped(false);
     setEditingAll(true);
-    // Scroll to the last item after the state update
     setTimeout(() => {
       if (lastItemRef.current) {
         lastItemRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -103,29 +100,21 @@ const AllItemsManager: React.FC<AllItemsManagerProps> = ({ project, onUpdate, on
     }, 0);
   };
 
-  // Edit Item
   const handleItemChange = (idx: number, field: "item" | "price" | "budget" | "quantity", value: any) => {
     setUserTyped(true);
     setItems((prev) => prev.map((itm, i) => i === idx ? { ...itm, [field]: value } : itm));
   };
 
-  // Delete Item (CEO only)
-const handleRemoveItem = (idx: number) => {
-  setItems((prev) => {
-    const newItems = prev.filter((_, i) => i !== idx);
-    return newItems;
-  });
-  setUserTyped(true);
-  setDirty(true);
-  saveItems();
-};
-
-
+  const handleRemoveItem = (idx: number) => {
+    setItems((prev) => prev.filter((_, i) => i !== idx));
+    setUserTyped(true);
+    setDirty(true);
+    saveItems();
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl p-2 sm:p-8 max-w-4xl min-h-[400px] w-full relative shadow-2xl flex flex-col max-h-[98vh] overflow-y-auto">
-        {/* Sticky Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between px-8 py-6 border-b bg-white rounded-t-2xl">
           <h2 className="text-xl md:text-2xl font-bold tracking-tight text-black-200">All Items for <span className="text-blue-400">{project.name}</span></h2>
           <div className="flex gap-2 items-center">
@@ -148,7 +137,6 @@ const handleRemoveItem = (idx: number) => {
             </button>
           </div>
         </div>
-        {/* Items List */}
         <div className="flex-1 overflow-y-auto px-0 md:px-8 py-6 space-y-6 bg-gray-50">
           {(!Array.isArray(items) || items.length === 0) && (
             <div className="text-gray-400 text-center text-lg py-24">No items yet. Click <span className='font-semibold text-blue-400'>+ Add Item</span> to get started.</div>
@@ -219,7 +207,7 @@ const handleRemoveItem = (idx: number) => {
                   )}
                 </div>
               </div>
-              {userRole === "ceo" && editingAll && (
+              {editingAll && (
                 <div className="flex gap-2 absolute top-4 right-4">
                   <button
                     className="p-1 border-2 border-red-400 text-red-400 hover:bg-red-400 hover:text-white rounded-full flex items-center justify-center opacity-80 group-hover:opacity-100 transition-all"
@@ -234,7 +222,6 @@ const handleRemoveItem = (idx: number) => {
             </div>
           ))}
         </div>
-        {/* Sticky Footer */}
         <div className="sticky bottom-0 z-10 flex items-center justify-between px-8 py-2 mb-10 border-t bg-white rounded-b-2xl shadow-inner">
           <button
             className="px-6 py-3 bg-blue-400 text-white rounded-lg shadow hover:bg-blue-600 transition-colors text-lg font-semibold disabled:opacity-60 disabled:cursor-not-allowed"

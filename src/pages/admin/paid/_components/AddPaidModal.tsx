@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -14,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import SearchablePaginatedDropdown from "./SearchablePaginatedDropdown";
+import paidData from "@/data/admin/paid/paidData.json";
+import workersData from "@/data/admin/paid/workers.json";
 
 interface AddPaidModalProps {
   isOpen: boolean;
@@ -37,18 +38,38 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
 
   const addPaidEntryMutation = useMutation({
     mutationFn: async (newEntry: { amount: string; salary?: number; contract?: number; date?: string }) => {
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await axios.post(
-        "https://backend.kidsdesigncompany.com/api/paid/",
-        newEntry,
-        {
-          headers: {
-            Authorization: `JWT ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      return response.data;
+      const newId = Math.max(...paidData.daily_data.flatMap(day => day.entries.map(e => e.id)), 0) + 1;
+      const entryDate = newEntry.date || new Date().toISOString().split('T')[0];
+      
+      const entry = {
+        id: newId,
+        amount: newEntry.amount,
+        date: entryDate,
+        salary_detail: newEntry.salary ? workersData.salary_workers.find(w => w.id === newEntry.salary) || null : null,
+        contractor_detail: newEntry.contract ? workersData.contractors.find(c => c.id === newEntry.contract) || null : null
+      };
+
+      const existingDay = paidData.daily_data.find(d => d.date === entryDate);
+      if (existingDay) {
+        existingDay.entries.push(entry);
+        existingDay.daily_total = (existingDay.daily_total || 0) + parseFloat(newEntry.amount);
+      } else {
+        paidData.daily_data.push({
+          date: entryDate,
+          daily_total: parseFloat(newEntry.amount),
+          entries: [entry]
+        });
+      }
+
+      paidData.monthly_total += parseFloat(newEntry.amount);
+      if (newEntry.salary) {
+        paidData.salary_paid_this_month += parseFloat(newEntry.amount);
+      } else {
+        paidData.contractors_paid_this_month += parseFloat(newEntry.amount);
+      }
+      paidData.yearly_total += parseFloat(newEntry.amount);
+
+      return entry;
     },
     onSuccess: () => {
       toast.success("Paid entry added successfully!");
@@ -89,7 +110,6 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
 
   const handleWorkerChange = (name: string, value: string) => {
     console.log("AddPaidModal: handleWorkerChange - name:", name, "value:", value);
-    
     setWorkerId(value);
     setSelectedWorkerName(name);
   };
@@ -108,11 +128,7 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
     }));
   };
 
-  const workerEndpoint = workerType === "salary" 
-    ? "https://backend.kidsdesigncompany.com/api/salary-workers/" 
-    : "https://backend.kidsdesigncompany.com/api/contractors/";
-
-  const workerResultsKey = workerType === "salary" ? "results.workers" : "results.contractor";
+  const workers = workerType === "salary" ? workersData.salary_workers : workersData.contractors;
 
   useEffect(() => {
     setUserRole(localStorage.getItem('user_role'));
@@ -145,10 +161,10 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
               value={workerType}
               onChange={(e) => {
                 setWorkerType(e.target.value as "salary" | "contractor");
-                setWorkerId(null); // Reset workerId when type changes
+                setWorkerId(null);
                 setSelectedWorkerName(null);
               }}
-              className="p-2  border rounded w-full"
+              className="p-2 border rounded w-full"
             >
               <option value="salary">Salary Worker</option>
               <option value="contractor">Contractor</option>
@@ -157,17 +173,17 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
           <div className="col-span-4">
             <SearchablePaginatedDropdown
               key={workerId || "add-worker-dropdown"}
-              endpoint={workerEndpoint}
+              endpoint={workerType === "salary" ? "salary-workers" : "contractors"}
               label={`${workerType === "salary" ? "Salary Worker" : "Contractor"} Name`}
               onChange={handleWorkerChange}
               name="worker"
-              resultsKey={workerResultsKey}
+              resultsKey={workerType === "salary" ? "salary_workers" : "contractors"}
               dataMapper={workerType === "salary" ? salaryWorkersMapper : contractorsMapper}
               selectedValue={workerId}
               selectedName={selectedWorkerName}
+              staticData={workers}
             />
           </div>
-          {userRole === 'ceo' && (
             <div className="flex flex-col gap-2">
               <Label htmlFor="date" className="text-right">Date</Label>
               <Input
@@ -179,7 +195,6 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
                 required
               />
             </div>
-          )}
           <DialogFooter>
             <div className="w-full md:mt-8 grid grid-cols-2 gap-2 md:flex md:gap-2 md:w-auto">
               <Button type="submit" disabled={addPaidEntryMutation.isPending || !workerId} className="w-full">
@@ -194,4 +209,4 @@ const AddPaidModal: React.FC<AddPaidModalProps> = ({
   );
 };
 
-export default AddPaidModal; 
+export default AddPaidModal;

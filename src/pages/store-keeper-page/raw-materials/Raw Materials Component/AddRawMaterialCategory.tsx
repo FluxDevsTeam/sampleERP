@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import Modal from "../../../shop/Modal";
+import Modal from "@/pages/shop/Modal";
 
 const AddRawMaterialCategory: React.FC = () => {
   const navigate = useNavigate();
@@ -22,41 +22,23 @@ const AddRawMaterialCategory: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/raw-materials-category/",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-          body: formDataToSend,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to add category");
-      }
-
-      setModalConfig({
-        isOpen: true,
-        title: "Success",
-        message: "Raw material category added successfully!",
-        type: "success",
-      });
+      setTimeout(() => {
+        setModalConfig({
+          isOpen: true,
+          title: "Success",
+          message: "Item category added successfully!",
+          type: "success",
+        });
+        setLoading(false);
+      }, 1000);
     } catch (error) {
-      console.error("Error adding category:", error);
       setModalConfig({
         isOpen: true,
         title: "Error",
         message: "Failed to add category",
         type: "error",
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -65,7 +47,6 @@ const AddRawMaterialCategory: React.FC = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === "success") {
       setFormData({ name: "" });
-      // Redirect based on returnTo param
       const params = new URLSearchParams(location.search);
       const returnTo = params.get("returnTo");
       const id = params.get("id");
@@ -89,7 +70,7 @@ const AddRawMaterialCategory: React.FC = () => {
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-20">Add New Raw Material Category</h1>
+          <h1 className="text-2xl font-bold text-gray-20">Add New Item Category</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -131,4 +112,4 @@ const AddRawMaterialCategory: React.FC = () => {
   );
 };
 
-export default AddRawMaterialCategory; 
+export default AddRawMaterialCategory;

@@ -1,13 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchExpenseSummary, ExpenseSummary } from "./_api/ApiService";
-import ExpensesTable from "./_components/ExpensesTable";
-import ExpensesData from "./_components/ExpensesData";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import AddExpenseModal from "./_components/AddExpenseModal";
+import ExpensesTable from "./_components/ExpensesTable";
+import ExpensesData from "./_components/ExpensesData";
+import expensesData from "@/data/admin/expenses/expenses.json";
 
 const Expenses = () => {
   document.title = "Expenses - KDC Admin";
@@ -18,26 +15,15 @@ const Expenses = () => {
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const { data, isLoading, error } = useQuery<ExpenseSummary, Error>({
-    queryKey: ["expenseSummary"],
-    queryFn: fetchExpenseSummary,
-  });
-
   useEffect(() => {
-    if (data) {
-      setTotalExpenses(data.monthly_total);
-      setTotalProjectExpenses(data.monthly_project_expenses_total);
-      setTotalShopExpenses(data.monthly_shop_expenses_total);
-      // Calculate total other expenses
-      setTotalOtherExpenses(data.current_month_product_total);
-    }
-  }, [data]);
-
-  if (isLoading) return <p>Loading expenses data...</p>;
-  if (error) return <p>Error loading expenses: {error.message}</p>;
+    setTotalExpenses(expensesData.monthly_total);
+    setTotalProjectExpenses(expensesData.monthly_project_expenses_total);
+    setTotalShopExpenses(expensesData.monthly_shop_expenses_total);
+    setTotalOtherExpenses(expensesData.current_month_product_total);
+  }, []);
 
   return (
-    <div className="wrapper w-full mx-auto my-0 md:mb-2 mb-20 md:pt-2">
+    <div className="wrapper w-full mx-auto my-0 md:mb-2 mb-20 md annen md:pt-2">
       <div
         className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-2 md:mt-4 ${isTableModalOpen ? "blur-md" : ""}`}
       >
@@ -65,16 +51,10 @@ const Expenses = () => {
         </div>
         <AddExpenseModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
 
-        <div
-          className={`${isTableModalOpen ? "blur-md" : ""}`}
-        >
-          <ExpensesTable
-            isTableModalOpen={isTableModalOpen}
-          />
+        <div className={`${isTableModalOpen ? "blur-md" : ""}`}>
+          <ExpensesTable isTableModalOpen={isTableModalOpen} />
         </div>
       </div>
-
-      
     </div>
   );
 };

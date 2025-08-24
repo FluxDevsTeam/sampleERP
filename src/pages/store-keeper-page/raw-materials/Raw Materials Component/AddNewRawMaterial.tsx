@@ -2,9 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
-import Modal from "../../../shop/Modal";
+import Modal from "@/pages/shop/Modal";
 import SearchablePaginatedDropdown from "./SearchablePaginatedDropdown";
-import { deleteRawMaterialCategory } from "./rawMaterialCategoryOperations";
 
 const AddNewRawMaterial = () => {
   const navigate = useNavigate();
@@ -61,35 +60,13 @@ const AddNewRawMaterial = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitLoading(true);
-
-    const formDataToSend = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value !== null) {
-        formDataToSend.append(key, value);
-      }
-    });
-
     try {
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/raw-materials/",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-          body: formDataToSend,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to add raw material");
-      }
-
-      setShowSuccessModal(true);
+      setTimeout(() => {
+        setShowSuccessModal(true);
+        setSubmitLoading(false);
+      }, 1000);
     } catch (error) {
-      console.error("Error adding raw material:", error);
       setShowErrorModal(true);
-    } finally {
       setSubmitLoading(false);
     }
   };
@@ -104,16 +81,18 @@ const AddNewRawMaterial = () => {
       });
       return;
     }
-
-    await deleteRawMaterialCategory(
-      formData.category,
-      setLoading,
-      setModalConfig,
-      () => {
-        setFormData(prev => ({ ...prev, category: "" }));
-        setCategorySearch("");
-      }
-    );
+    setLoading(true);
+    setTimeout(() => {
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Item category deleted successfully!",
+        type: "success",
+      });
+      setFormData((prev) => ({ ...prev, category: "" }));
+      setCategorySearch("");
+      setLoading(false);
+    }, 1000);
   };
 
   const handleCloseModal = () => {
@@ -126,7 +105,7 @@ const AddNewRawMaterial = () => {
         <button onClick={() => navigate('/store-keeper/raw-materials')} className="text-gray-500 hover:text-gray-700 focus:outline-none text-2xl font-bold" aria-label="Back">
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-        <h2 className="text-lg sm:text-xl font-bold text-black">Add Raw Material</h2>
+        <h2 className="text-lg sm:text-xl font-bold text-black">Add Item</h2>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
@@ -137,7 +116,7 @@ const AddNewRawMaterial = () => {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-semibold text-black uppercase mb-1">Category</label>
             <SearchablePaginatedDropdown
-              endpoint="https://backend.kidsdesigncompany.com/api/raw-materials-category/"
+              endpoint="/data/store-keeper-page/raw-materials/raw-materials-category.json"
               label=""
               name="category"
               resultsKey="results"
@@ -207,7 +186,7 @@ const AddNewRawMaterial = () => {
           navigate("/store-keeper/raw-materials");
         }}
         title="Success!"
-        message="Raw material added successfully."
+        message="Item added successfully."
         type="success"
       />
 
@@ -215,7 +194,7 @@ const AddNewRawMaterial = () => {
         isOpen={showErrorModal}
         onClose={() => setShowErrorModal(false)}
         title="Error"
-        message="There was an error adding the raw material. Please try again."
+        message="There was an error adding the item. Please try again."
         type="error"
       />
 

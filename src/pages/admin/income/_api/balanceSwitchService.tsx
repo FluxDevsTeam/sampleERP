@@ -1,9 +1,9 @@
-import axios from 'axios';
+import balanceSwitchesData from '@/data/admin/income/balanceSwitches.json';
 
 export interface BalanceSwitch {
   id: number;
-  from_method: 'CASH' | 'BANK' | 'POS';
-  to_method: 'CASH' | 'BANK' | 'POS';
+  from_method: 'CASH' | 'BANK' | 'POS' | 'DEBT';
+  to_method: 'CASH' | 'BANK' | 'POS' | 'DEBT';
   amount: string;
   switch_date: string;
 }
@@ -15,53 +15,45 @@ export interface BalanceSwitchResponse {
   results: BalanceSwitch[];
 }
 
-const BALANCE_SWITCH_API_URL = "https://backend.kidsdesigncompany.com/api/balance-switch/";
-
 export const fetchBalanceSwitches = async (page: number = 1): Promise<BalanceSwitchResponse> => {
-  const accessToken = localStorage.getItem("accessToken");
-  const { data } = await axios.get(`${BALANCE_SWITCH_API_URL}?page=${page}`, {
-    headers: {
-      Authorization: `JWT ${accessToken}`,
-    },
-  });
-  return data;
+  const pageSize = 10;
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+  const results = balanceSwitchesData.results.slice(start, end);
+  return {
+    count: balanceSwitchesData.results.length,
+    next: end < balanceSwitchesData.results.length ? `page=${page + 1}` : null,
+    previous: page > 1 ? `page=${page - 1}` : null,
+    results,
+  };
 };
 
 export const createBalanceSwitch = async (balanceSwitch: Omit<BalanceSwitch, 'id'>): Promise<BalanceSwitch> => {
-  const accessToken = localStorage.getItem("accessToken");
-  const { data } = await axios.post(BALANCE_SWITCH_API_URL, balanceSwitch, {
-    headers: {
-      Authorization: `JWT ${accessToken}`,
-    },
-  });
-  return data;
+  // Simulate adding to JSON (in a real app, you'd write to the JSON file)
+  const newId = balanceSwitchesData.results.length + 1;
+  const newSwitch: BalanceSwitch = { id: newId, ...balanceSwitch };
+  balanceSwitchesData.results.unshift(newSwitch); // Add to the top
+  return newSwitch;
 };
 
 export const updateBalanceSwitch = async (id: number, balanceSwitch: Partial<Omit<BalanceSwitch, 'id'>>): Promise<BalanceSwitch> => {
-  const accessToken = localStorage.getItem("accessToken");
-  const { data } = await axios.patch(`${BALANCE_SWITCH_API_URL}${id}/`, balanceSwitch, {
-    headers: {
-      Authorization: `JWT ${accessToken}`,
-    },
-  });
-  return data;
+  // Simulate updating JSON
+  const index = balanceSwitchesData.results.findIndex((item) => item.id === id);
+  if (index === -1) throw new Error('Balance switch not found');
+  const updatedSwitch = { ...balanceSwitchesData.results[index], ...balanceSwitch };
+  balanceSwitchesData.results[index] = updatedSwitch;
+  return updatedSwitch;
 };
 
 export const fetchBalanceSwitchById = async (id: number): Promise<BalanceSwitch> => {
-  const accessToken = localStorage.getItem("accessToken");
-  const { data } = await axios.get(`${BALANCE_SWITCH_API_URL}${id}/`, {
-    headers: {
-      Authorization: `JWT ${accessToken}`,
-    },
-  });
-  return data;
+  const balanceSwitch = balanceSwitchesData.results.find((item) => item.id === id);
+  if (!balanceSwitch) throw new Error('Balance switch not found');
+  return balanceSwitch;
 };
 
 export const deleteBalanceSwitch = async (id: number): Promise<void> => {
-  const accessToken = localStorage.getItem("accessToken");
-  await axios.delete(`${BALANCE_SWITCH_API_URL}${id}/`, {
-    headers: {
-      Authorization: `JWT ${accessToken}`,
-    },
-  });
+  // Simulate deleting from JSON
+  const index = balanceSwitchesData.results.findIndex((item) => item.id === id);
+  if (index === -1) throw new Error('Balance switch not found');
+  balanceSwitchesData.results.splice(index, 1);
 };

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
-import axios from "axios";
 import PaginationComponent from "./Pagination";
 import {
   Dialog,
@@ -25,12 +24,14 @@ import {
 import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
 import {
-  fetchWorkers,
+  fetchSalaryWorkers,
+  fetchContractors,
   deleteWorker,
   SalaryWorker,
   Contractor,
-  PaginatedWorkersResponse,
-} from "../_api/apiService";
+  PaginatedSalaryWorkersResponse,
+  PaginatedContractorsResponse
+} from "../../../../utils/jsonDataService";
 
 interface WorkersTableProps {
   headers: string[];
@@ -56,9 +57,11 @@ const WorkersTable = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
 
-  const { data, isLoading, error } = useQuery<PaginatedWorkersResponse>({ 
-    queryKey: ["workers", currentPage, searchQuery, statusFilter],
-    queryFn: () => fetchWorkers(currentPage, searchQuery, statusFilter),
+  // Choose which data to fetch based on worker type (salary or contractor)
+  // For demonstration, let's fetch salary workers by default
+  const { data, isLoading, error } = useQuery<PaginatedSalaryWorkersResponse>({
+    queryKey: ["salary-workers", currentPage, searchQuery, statusFilter],
+    queryFn: () => fetchSalaryWorkers(currentPage, searchQuery, statusFilter),
   });
 
   useEffect(() => {
@@ -109,14 +112,8 @@ const WorkersTable = ({
     if (currentPage < totalPages) {
       const nextPage = currentPage + 1;
       queryClient.prefetchQuery({
-        queryKey: [
-          "workers",
-          nextPage,
-          searchQuery,
-          statusFilter,
-        ],
-        queryFn: () =>
-          fetchWorkers(nextPage, searchQuery, statusFilter),
+        queryKey: ["salary-workers", nextPage, searchQuery, statusFilter],
+        queryFn: () => fetchSalaryWorkers(nextPage, searchQuery, statusFilter),
       });
     }
   }, [currentPage, queryClient, totalPages, searchQuery, statusFilter]);
@@ -268,11 +265,9 @@ const WorkersTable = ({
               <Button variant="outline" onClick={() => setIsViewModalOpen(false)} className="w-full sm:w-auto text-sm">
                 Close
               </Button>
-              {isCEO && (
                 <Button variant="destructive" onClick={handleDelete} disabled={deleteWorkerMutation.isPending} className="w-full sm:w-auto text-sm">
                   Delete
                 </Button>
-              )}
             </div>
           </DialogFooter>
         </DialogContent>

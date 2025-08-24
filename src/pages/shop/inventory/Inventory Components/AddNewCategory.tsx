@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../Modal";
+import inventoryDataJson from "@/data/shop/inventory/inventory.json";
 
 const AddCategoryPage: React.FC = () => {
   const navigate = useNavigate();
@@ -13,34 +14,18 @@ const AddCategoryPage: React.FC = () => {
     message: "",
     type: "success" as "success" | "error",
   });
-
-  const [formData, setFormData] = useState({
-    name: "",
-  });
+  const [formData, setFormData] = useState({ name: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/inventory-item-category/",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-          body: formDataToSend,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to add item");
+      // Simulate adding category (non-persistent)
+      if (!formData.name) {
+        throw new Error("Category name is required");
       }
-
+      // In a real app, update JSON or persist to backend here
       setModalConfig({
         isOpen: true,
         title: "Success",
@@ -63,7 +48,7 @@ const AddCategoryPage: React.FC = () => {
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === "success") {
-      navigate(`/shop/add-new-item`);
+      navigate(`/inventory/add-new-item`);
     }
   };
 
@@ -72,12 +57,12 @@ const AddCategoryPage: React.FC = () => {
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center mb-6">
           <button
-            onClick={() => navigate("/shop/add-new-item")}
-            className="mr-4 text-gray-20 hover:text-gray-900"
+            onClick={() => navigate("/inventory/add-new-item")}
+            className="mr-4 text-gray-600 hover:text-gray-900"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-20">Add New Category</h1>
+          <h1 className="text-2xl font-bold text-gray-600">Add New Category</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

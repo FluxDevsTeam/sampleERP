@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -20,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { getSalaryWorkerRecords, deleteSalaryWorkerRecord } from "@/utils/jsonDataService";
 
 interface SalaryWorkerRecord {
   id: number;
@@ -60,16 +60,7 @@ const SalaryWorkerRecords = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchRecords = async () => {
-    const token = localStorage.getItem("accessToken");
-    const response = await axios.get(
-      `https://backend.kidsdesigncompany.com/api/salary-workers/${id}/record/?page=${currentPage}`,
-      {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      }
-    );
-    return response.data;
+    return getSalaryWorkerRecords(id, currentPage);
   };
 
   const {
@@ -91,15 +82,7 @@ const SalaryWorkerRecords = () => {
 
   const deleteRecordMutation = useMutation({
     mutationFn: async (recordId: number) => {
-      const token = localStorage.getItem("accessToken");
-      await axios.delete(
-        `https://backend.kidsdesigncompany.com/api/salary-workers/${id}/record/${recordId}/`,
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
-        }
-      );
+      await deleteSalaryWorkerRecord(id, recordId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -172,7 +155,6 @@ const SalaryWorkerRecords = () => {
                 <p className="text-sm text-gray-500">Date: {record.date}</p>
               </CardContent>
               <CardFooter className="flex justify-end gap-2">
-                {isCEO && (
                   <>
                     <Button
                       variant="outline"
@@ -188,7 +170,6 @@ const SalaryWorkerRecords = () => {
                       Delete
                     </Button>
                   </>
-                )}
               </CardFooter>
             </Card>
           ))

@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +34,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useAuth } from "../../AuthPages/AuthContext";
 import PaginationComponent from "../allProjects/_components/Pagination";
 
 // Role options constant
@@ -74,10 +71,13 @@ interface ApiResponse {
 
 const USERS_PER_PAGE = 10;
 const ProfileManagement = () => {
-  const API_URL = "https://backend.kidsdesigncompany.com/auth/signup/";
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deleteUserId, setDeleteUserId] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [usersData, setUsersData] = useState<User[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [formData, setFormData] = useState<UserFormData>({
     first_name: "",
     last_name: "",
@@ -97,32 +97,47 @@ const ProfileManagement = () => {
   const [createVerifyPassword, setCreateVerifyPassword] = useState("");
   const [createError, setCreateError] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const { signup } = useAuth();
+  // local-only mode: performs in-memory create/update/delete against `users.json` loaded at startup
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const { data, isLoading, error, refetch } = useQuery<ApiResponse>({
-    queryKey: ["users", currentPage],
-    queryFn: async () => {
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await axios.get<ApiResponse>(`${API_URL}?page=${currentPage}&page_size=${USERS_PER_PAGE}`, {
-        headers: {
-          Authorization: `JWT ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-      return response.data;
-    },
-    retry: 3,
-  });
+  // Load users from local JSON file inside src/data/ceo/settings/users.json
+  const loadUsers = async () => {
+    setLoading(true);
+    setLoadError(null);
+    try {
+      const mod = await import("@/data/ceo/settings/users.json");
+      const data = (mod && (mod as any).default) ? (mod as any).default : mod;
+      const items: User[] = Array.isArray(data.results) ? data.results : [];
+      setUsersData(items);
+      const count = data.count ?? items.length;
+      setTotalCount(count);
+      setTotalPages(Math.max(1, Math.ceil(count / USERS_PER_PAGE)));
+    } catch (err) {
+      console.error("Failed to load local users.json", err);
+      setLoadError("Failed to load local users data");
+      setUsersData([]);
+      setTotalCount(0);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // convenience refetch used by existing code paths
+  const refetch = () => loadUsers();
 
   useEffect(() => {
-    if (data?.results) {
-      const totalCount = data.count || 0;
-      setTotalPages(Math.ceil(totalCount / USERS_PER_PAGE));
-    }
-  }, [data]);
+    // initial load
+    loadUsers();
+    // recalc totalPages when usersData or totalCount changes
+  }, []);
+
+  useEffect(() => {
+    const total = totalCount || usersData.length;
+    setTotalPages(Math.max(1, Math.ceil(total / USERS_PER_PAGE)));
+  }, [usersData, totalCount]);
 
   const handleEditClick = (user: User) => {
     setEditingUser(user);
@@ -140,21 +155,15 @@ const ProfileManagement = () => {
       console.error("No user selected for editing");
       return;
     }
+    // local update: modify usersData in-memory
     setIsSaving(true);
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      await axios.put(`${API_URL}${editingUser.id}/`, formData, {
-        headers: {
-          Authorization: `JWT ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
+      setUsersData((prev) => prev.map((u) => (u.id === editingUser.id ? { ...u, ...formData } : u)));
       setEditingUser(null);
-      refetch();
-      toast.success("Profile updated successfully!");
-    } catch (error) {
-      console.error("Update error:", error);
-      toast.error("Failed to update profile!");
+      toast.success("Profile updated (local)!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update profile (local)!");
     } finally {
       setIsSaving(false);
     }
@@ -165,21 +174,14 @@ const ProfileManagement = () => {
       console.error("No user ID selected for deletion");
       return;
     }
-
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      await axios.delete(`${API_URL}${deleteUserId}/`, {
-        headers: {
-          Authorization: `JWT ${accessToken}`,
-        },
-      });
-      setDeleteUserId(null); // Close the delete confirmation dialog
-      setSelectedUser(null); // Close the user details modal if open
-      refetch();
-      toast.success("Profile deleted successfully!");
-    } catch (error) {
-      console.error("Delete error:", error);
-      toast.error("Failed to delete profile!");
+      setUsersData((prev) => prev.filter((u) => u.id !== deleteUserId));
+      setDeleteUserId(null);
+      setSelectedUser(null);
+      toast.success("Profile deleted (local)!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete profile (local)!");
     }
   };
 
@@ -225,28 +227,25 @@ const ProfileManagement = () => {
     }
 
     try {
-      const userData = {
-        ...createFormData,
-        password: createPassword,
-        verify_password: createVerifyPassword,
+      // simple local create: generate id and push to state
+      const maxId = usersData.reduce((m, u) => Math.max(m, u.id), 0);
+      const newUser: User = {
+        id: maxId + 1,
+        first_name: createFormData.first_name,
+        last_name: createFormData.last_name,
+        email: createFormData.email,
+        phone_number: createFormData.phone_number,
+        roles: createFormData.roles && createFormData.roles[0] ? [createFormData.roles[0]] : ["shopkeeper"],
       };
-
-      await signup(userData);
+      setUsersData((prev) => [newUser, ...prev]);
       setIsCreateModalOpen(false);
-      setCreateFormData({
-        first_name: "",
-        last_name: "",
-        email: "",
-        phone_number: "",
-        roles: [""]
-      });
+      setCreateFormData({ first_name: "", last_name: "", email: "", phone_number: "", roles: [""] });
       setCreatePassword("");
       setCreateVerifyPassword("");
-      refetch();
-      toast.success("Profile created successfully!");
-    } catch (error: any) {
-      console.error("Create error:", error);
-      setCreateError(error.response?.data?.message || "Failed to create profile");
+      toast.success("Profile created (local)!");
+    } catch (err: any) {
+      console.error("Create error:", err);
+      setCreateError("Failed to create profile (local)");
     } finally {
       setIsCreating(false);
     }
@@ -256,23 +255,17 @@ const ProfileManagement = () => {
     return role.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
-  if (isLoading)
+  if (loading)
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
       </div>
     );
 
-  if (error)
+  if (loadError)
     return (
-      <div
-        className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4"
-        role="alert"
-      >
-        <p>
-          Error fetching users:{" "}
-          {error instanceof Error ? error.message : "Unknown error"}
-        </p>
+      <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+        <p>{loadError}</p>
       </div>
     );
 
@@ -295,7 +288,7 @@ const ProfileManagement = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.results?.length === 0 ? (
+            {usersData?.length === 0 ? (
               <tr>
                 <td colSpan={5} className="py-8">
                   <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-4">
@@ -311,7 +304,8 @@ const ProfileManagement = () => {
                 </td>
               </tr>
             ) : (
-              data?.results?.map((user) => (
+              // client-side pagination slice
+              usersData.slice((currentPage - 1) * USERS_PER_PAGE, (currentPage - 1) * USERS_PER_PAGE + USERS_PER_PAGE).map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="text-xs sm:text-sm">
                   <div>

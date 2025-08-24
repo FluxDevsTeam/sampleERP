@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Modal from "@/pages/shop/Modal";
 import SearchablePaginatedDropdown from "../../raw-materials/Raw Materials Component/SearchablePaginatedDropdown";
+import rawMaterialsData from "@/data/store-keeper-page/raw-materials/raw-materials.json";
+import productsData from "@/data/store-keeper-page/removed/products.json";
 
 const AddRemovedItem: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [userRole, setUserRole] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     material: "",
     product: "",
@@ -25,82 +26,47 @@ const AddRemovedItem: React.FC = () => {
   });
   const [materialDetails, setMaterialDetails] = useState<{ quantity: number; price: number } | null>(null);
 
-  const handleDropdownChange = async (name: string, value: string) => {
+  const handleDropdownChange = (name: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
     if (name === "material" && value) {
-      try {
-        const response = await fetch(`https://backend.kidsdesigncompany.com/api/raw-materials/${value}/`, {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
+      const material = rawMaterialsData.results.items.find(
+        (m: any) => m.id.toString() === value
+      );
+      if (material) {
+        setMaterialDetails({
+          quantity: Number(material.quantity) || 0,
+          price: Number(material.price) || 0,
         });
-        if (response.ok) {
-          const data = await response.json();
-          setMaterialDetails({
-            quantity: Number(data.quantity) || 0,
-            price: Number(data.price) || 0,
-          });
-        } else {
-          setMaterialDetails(null);
-        }
-      } catch {
+      } else {
         setMaterialDetails(null);
       }
     }
   };
-
-  useEffect(() => {
-    // Fetch user role from local storage or context
-    const role = localStorage.getItem("user_role");
-    setUserRole(role);
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const requestBody = {
-        material: parseInt(formData.material),
-        product: parseInt(formData.product),
-        quantity: parseFloat(formData.quantity),
-      };
-
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/removed/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add item. Please check your inputs.");
-      }
-
-      setModalConfig({
-        isOpen: true,
-        title: "Success",
-        message: "Item added successfully!",
-        type: "success",
-      });
+      setTimeout(() => {
+        setModalConfig({
+          isOpen: true,
+          title: "Success",
+          message: "Item added successfully!",
+          type: "success",
+        });
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       setModalConfig({
         isOpen: true,
         title: "Error",
-        message: error instanceof Error ? error.message : "An unknown error occurred.",
+        message: "Failed to add item.",
         type: "error",
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -128,8 +94,8 @@ const AddRemovedItem: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <SearchablePaginatedDropdown
-              endpoint="https://backend.kidsdesigncompany.com/api/raw-materials/"
-              label="Raw Material"
+              endpoint="/data/store-keeper-page/raw-materials/raw-materials.json"
+              label="Item"
               name="material"
               resultsKey="results.items"
               value={materialSearch}
@@ -146,7 +112,7 @@ const AddRemovedItem: React.FC = () => {
 
           <div>
             <SearchablePaginatedDropdown
-              endpoint="https://backend.kidsdesigncompany.com/api/product/"
+              endpoint="/data/store-keeper-page/removed/products.json"
               label="Product"
               name="product"
               resultsKey="results"
@@ -180,7 +146,7 @@ const AddRemovedItem: React.FC = () => {
               <div className="text-xs text-black mt-1">Max: {materialDetails.quantity.toLocaleString()}</div>
             )}
           </div>
-          {userRole === 'ceo' && (
+
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Date
@@ -193,8 +159,6 @@ const AddRemovedItem: React.FC = () => {
               required
             />
           </div>
-          )}
-
 
           <div className="flex justify-end space-x-3 mt-6">
             <button
@@ -204,19 +168,15 @@ const AddRemovedItem: React.FC = () => {
             >
               Cancel
             </button>
-            
-              <>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
-                    loading ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {loading ? "Adding..." : "Add Item"}
-                </button>
-              </>
-            
+            <button
+              type="submit"
+              disabled={loading}
+              className={`px-4 py-2 bg-blue-400 text-white rounded hover:bg-blue-500 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {loading ? "Adding..." : "Add Item"}
+            </button>
           </div>
         </form>
       </div>

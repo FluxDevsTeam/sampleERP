@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import workersData from "@/data/admin/paid/workers.json";
 
 interface PaymentData {
   amount: number;
@@ -30,44 +30,46 @@ const AddPayment = () => {
     recipientType: "contractor",
   });
 
-  const [contractors, setContractors] = useState([]);
-  const [salaryWorkers, setSalaryWorkers] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [contractorRes, salaryRes] = await Promise.all([
-          axios.get("https://backend.kidsdesigncompany.com/api/contractors/"),
-          axios.get("https://backend.kidsdesigncompany.com/api/salary-workers/")
-        ]);
-
-        setContractors(contractorRes.data.results.contractor);
-        setSalaryWorkers(salaryRes.data.results.workers);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to fetch contractors and salary workers");
-      }
-    };
-
-    fetchData();
-  }, []);
+  const [contractors, setContractors] = useState(workersData.contractors);
+  const [salaryWorkers, setSalaryWorkers] = useState(workersData.salary_workers);
 
   const createPaymentMutation = useMutation({
     mutationFn: async (paymentData: PaymentData) => {
-      const formattedData =
-        paymentData.recipientType === "contractor"
-          ? { amount: paymentData.amount, contract: paymentData.recipientId }
-          : { amount: paymentData.amount, salary: paymentData.recipientId };
+      // Simulate adding payment to JSON data
+      const newEntry = {
+        id: Math.max(...paidData.daily_data.flatMap(day => day.entries.map(e => e.id)), 0) + 1,
+        amount: paymentData.amount.toString(),
+        date: new Date().toISOString().split('T')[0],
+        salary_detail: paymentData.recipientType === "salary-worker" ? 
+          salaryWorkers.find(w => w.id === paymentData.recipientId) || null : null,
+        contractor_detail: paymentData.recipientType === "contractor" ? 
+          contractors.find(c => c.id === paymentData.recipientId) || null : null
+      };
 
-      try {
-        const response = await axios.post(
-          "https://backend.kidsdesigncompany.com/api/paid/",
-          formattedData
-        );
-        return response.data;
-      } catch (error: any) {
-        throw error.response?.data || "Failed to process payment";
+      // Update in-memory data (not persisted to file)
+      const today = newEntry.date;
+      const existingDay = paidData.daily_data.find(d => d.date === today);
+      if (existingDay) {
+        existingDay.entries.push(newEntry);
+        existingDay.daily_total = (existingDay.daily_total || 0) + parseFloat(newEntry.amount);
+      } else {
+        paidData.daily_data.push({
+          date: today,
+          daily_total: parseFloat(newEntry.amount),
+          entries: [newEntry]
+        });
       }
+
+      // Update totals
+      paidData.monthly_total += parseFloat(newEntry.amount);
+      if (paymentData.recipientType === "salary-worker") {
+        paidData.salary_paid_this_month += parseFloat(newEntry.amount);
+      } else {
+        paidData.contractors_paid_this_month += parseFloat(newEntry.amount);
+      }
+      paidData.yearly_total += parseFloat(newEntry.amount);
+
+      return newEntry;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paid"] });
@@ -76,7 +78,7 @@ const AddPayment = () => {
     },
     onError: (error: any) => {
       console.error("Error adding payment:", error);
-      toast.error(error.error?.[0] || "Failed to add payment. Please try again.");
+      toast.error("Failed to add payment. Please try again.");
     },
   });
 

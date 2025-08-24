@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
 import {
@@ -18,7 +17,6 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
@@ -30,6 +28,7 @@ import {
 import { fetchPaidEntries, PaidSummary, PaidEntry, DailyPaidData } from "../_api/apiService";
 import AddPaidModal from "./AddPaidModal";
 import EditPaidModal from "./EditPaidModal";
+import paidData from "@/data/admin/paid/paidData.json";
 
 interface PaidTableProps {
   isTableModalOpen: boolean;
@@ -38,9 +37,9 @@ interface PaidTableProps {
 const PaidTable: React.FC<PaidTableProps> = ({
   isTableModalOpen,
 }) => {
-  const [year, setYear] = useState<number | ''>( '');
-  const [month, setMonth] = useState<number | ''>( '');
-  const [day, setDay] = useState<number | ''>( '');
+  const [year, setYear] = useState<number | ''>('');
+  const [month, setMonth] = useState<number | ''>('');
+  const [day, setDay] = useState<number | ''>('');
 
   const { data, isLoading, error } = useQuery<PaidSummary>({ 
     queryKey: ["paid", year, month, day],
@@ -132,19 +131,39 @@ const PaidTable: React.FC<PaidTableProps> = ({
     });
   };
 
-  // Delete mutation (if applicable for paid entries)
+  // Delete mutation
   const deletePaidEntryMutation = useMutation({
     mutationFn: async (entryId: number) => {
-      const accessToken = localStorage.getItem("accessToken");
-      // Replace with your actual paid entry deletion endpoint
-      await axios.delete(
-        `https://backend.kidsdesigncompany.com/api/paid/${entryId}/`,
-        {
-          headers: {
-            Authorization: `JWT ${accessToken}`,
-          },
+      // Find the day and entry to delete
+      const day = paidData.daily_data.find(d => d.entries.some(e => e.id === entryId));
+      if (day) {
+        const entryIndex = day.entries.findIndex(e => e.id === entryId);
+        if (entryIndex !== -1) {
+          const entry = day.entries[entryIndex];
+          const amount = parseFloat(entry.amount);
+
+          // Remove the entry
+          day.entries.splice(entryIndex, 1);
+
+          // Update daily total
+          day.daily_total = (day.daily_total || 0) - amount;
+
+          // If no entries left in the day, remove the day
+          if (day.entries.length === 0) {
+            const dayIndex = paidData.daily_data.findIndex(d => d.date === day.date);
+            paidData.daily_data.splice(dayIndex, 1);
+          }
+
+          // Update summary totals
+          paidData.monthly_total -= amount;
+          if (entry.salary_detail) {
+            paidData.salary_paid_this_month -= amount;
+          } else if (entry.contractor_detail) {
+            paidData.contractors_paid_this_month -= amount;
+          }
+          paidData.yearly_total -= amount;
         }
-      );
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paid"] });
@@ -398,16 +417,15 @@ const PaidTable: React.FC<PaidTableProps> = ({
               <Button variant="outline" onClick={() => setIsViewModalOpen(false)} className="w-full text-sm">
                 Close
               </Button>
-              {isceo ? (
                 <Button variant="secondary" onClick={handleEdit} className="w-full text-sm">
                   Edit
                 </Button>
-              ) : <div />}
-              {isceo ? (
+              <div />
+              
                 <Button variant="destructive" onClick={handleDelete} disabled={deletePaidEntryMutation.isPending} className="w-full text-sm">
                   Delete
                 </Button>
-              ) : <div />}
+               <div />
             </div>
           </DialogFooter>
         </DialogContent>
@@ -422,10 +440,10 @@ const PaidTable: React.FC<PaidTableProps> = ({
               This action cannot be undone. It will permanently delete the paid entry.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <DialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete}>Confirm</AlertDialogAction>
-          </AlertDialogFooter>
+          </DialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 

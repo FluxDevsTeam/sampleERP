@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -15,6 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PaidEntry } from "../_api/apiService";
 import SearchablePaginatedDropdown from "../../../shop/sold/Sold Components/SearchablePaginatedDropdown";
+import paidData from "@/data/admin/paid/paidData.json";
+import workersData from "@/data/admin/paid/workers.json";
 
 interface EditPaidModalProps {
   isOpen: boolean;
@@ -54,7 +55,7 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
       } else {
         setWorkerId(null);
         setSelectedWorkerName(null);
-        setInitialWorkerType("salary"); // Default if no worker detail
+        setInitialWorkerType("salary");
       }
       setDate(entry.date || "");
     }
@@ -62,18 +63,29 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
 
   const editPaidEntryMutation = useMutation({
     mutationFn: async (updatedEntry: { id: number; amount: string; salary?: number | null; contract?: number | null; date?: string }) => {
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await axios.put(
-        `https://backend.kidsdesigncompany.com/api/paid/${updatedEntry.id}/`,
-        updatedEntry,
-        {
-          headers: {
-            Authorization: `JWT ${accessToken}`,
-            "Content-Type": "application/json",
-          },
+      const day = paidData.daily_data.find(d => d.entries.some(e => e.id === updatedEntry.id));
+      if (day) {
+        const entryIndex = day.entries.findIndex(e => e.id === updatedEntry.id);
+        const oldAmount = parseFloat(day.entries[entryIndex].amount);
+        day.entries[entryIndex] = {
+          ...day.entries[entryIndex],
+          amount: updatedEntry.amount,
+          date: updatedEntry.date || day.entries[entryIndex].date,
+          salary_detail: updatedEntry.salary ? workersData.salary_workers.find(w => w.id === updatedEntry.salary) || null : null,
+          contractor_detail: updatedEntry.contract ? workersData.contractors.find(c => c.id === updatedEntry.contract) || null : null
+        };
+        day.daily_total = (day.daily_total || 0) - oldAmount + parseFloat(updatedEntry.amount);
+
+        paidData.monthly_total = paidData.monthly_total - oldAmount + parseFloat(updatedEntry.amount);
+        if (updatedEntry.salary) {
+          paidData.salary_paid_this_month = paidData.salary_paid_this_month - oldAmount + parseFloat(updatedEntry.amount);
+        } else {
+          paidData.contractors_paid_this_month = paidData.contractors_paid_this_month - oldAmount + parseFloat(updatedEntry.amount);
         }
-      );
-      return response.data;
+        paidData.yearly_total = paidData.monthly_total;
+      }
+
+      return updatedEntry;
     },
     onSuccess: () => {
       toast.success("Paid entry updated successfully!");
@@ -98,7 +110,6 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
       amount,
     };
 
-    // Conditionally set salary or contract to null based on workerType change
     if (initialWorkerType === "salary" && workerType === "contractor") {
       payload.salary = null;
     } else if (initialWorkerType === "contractor" && workerType === "salary") {
@@ -137,11 +148,7 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
     }));
   };
 
-  const workerEndpoint = workerType === "salary" 
-    ? "https://backend.kidsdesigncompany.com/api/salary-workers/" 
-    : "https://backend.kidsdesigncompany.com/api/contractors/";
-
-  const workerResultsKey = workerType === "salary" ? "results.workers" : "results.contractor";
+  const workers = workerType === "salary" ? workersData.salary_workers : workersData.contractors;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -183,14 +190,15 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
           <div className="col-span-1 md:col-span-2">
             <SearchablePaginatedDropdown
               key={workerId || "edit-worker-dropdown"}
-              endpoint={workerEndpoint}
+              endpoint={workerType === "salary" ? "salary-workers" : "contractors"}
               label={`${workerType === "salary" ? "Salary Worker" : "Contractor"} Name`}
               onChange={handleWorkerChange}
               name="worker"
-              resultsKey={workerResultsKey}
+              resultsKey={workerType === "salary" ? "salary_workers" : "contractors"}
               dataMapper={workerType === "salary" ? salaryWorkersMapper : contractorsMapper}
               selectedValue={workerId}
               selectedName={selectedWorkerName}
+              staticData={workers}
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -218,4 +226,4 @@ const EditPaidModal: React.FC<EditPaidModalProps> = ({
   );
 };
 
-export default EditPaidModal; 
+export default EditPaidModal;

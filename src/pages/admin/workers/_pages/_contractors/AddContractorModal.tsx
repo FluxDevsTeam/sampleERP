@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -13,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { addContractor } from "@/utils/jsonDataService";
 
 interface Props {
   open: boolean;
@@ -60,16 +60,7 @@ const AddContractorModal: React.FC<Props> = ({ open, onOpenChange }) => {
     e.preventDefault();
     setIsPending(true);
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.post(
-        "https://backend.kidsdesigncompany.com/api/contractors/",
-        formData,
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
-        }
-      );
+      await addContractor(formData);
       queryClient.invalidateQueries({ queryKey: ["contractors"] });
       toast.success("Contractor added!");
       setFormData(initialFormData); // Reset form after success

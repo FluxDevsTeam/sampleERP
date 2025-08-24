@@ -8,125 +8,105 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import dashboardDataJson from "@/data/shop/dashboard/dashboard.json";
 
-// Format number with naira sign and commas
-const formatNairaCompact = (value: number) => `\u20a6${new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value)}`;
+const formatNairaCompact = (value: number) =>
+  `\u20a6${new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    compactDisplay: "short",
+  }).format(value)}`;
 
 const AmountSoldMonthlyBarChart = () => {
-  const [month1, setMonth1] = useState("Jan");
-  const [month1Num, setMonth1Num] = useState(0);
-
-  const [month2, setMonth2] = useState("Feb");
-  const [month2Num, setMonth2Num] = useState(0);
-
-  const [month3, setMonth3] = useState("Mar");
-  const [month3Num, setMonth3Num] = useState(0);
-
-  const [month4, setMonth4] = useState("Apr");
-  const [month4Num, setMonth4Num] = useState(0);
-
-  const [month5, setMonth5] = useState("May");
-  const [month5Num, setMonth5Num] = useState(0);
-
-  const [month6, setMonth6] = useState("Jun");
-  const [month6Num, setMonth6Num] = useState(0);
-
-  const [month7, setMonth7] = useState("Jul");
-  const [month7Num, setMonth7Num] = useState(0);
-
-  const [month8, setMonth8] = useState("Aug");
-  const [month8Num, setMonth8Num] = useState(0);
-
-  const [month9, setMonth9] = useState("Sept");
-  const [month9Num, setMonth9Num] = useState(0);
-
-  const [month10, setMonth10] = useState("Oct");
-  const [month10Num, setMonth10Num] = useState(0);
-
-  const [month11, setMonth11] = useState("Nov");
-  const [month11Num, setMonth11Num] = useState(0);
-
-  const [month12, setMonth12] = useState("Dec");
-  const [month12Num, setMonth12Num] = useState(0);
+  const [january, setJanuary] = useState("Jan");
+  const [januaryValue, setJanuaryValue] = useState(0);
+  const [february, setFebruary] = useState("Feb");
+  const [februaryValue, setFebruaryValue] = useState(0);
+  const [march, setMarch] = useState("Mar");
+  const [marchValue, setMarchValue] = useState(0);
+  const [april, setApril] = useState("Apr");
+  const [aprilValue, setAprilValue] = useState(0);
+  const [may, setMay] = useState("May");
+  const [mayValue, setMayValue] = useState(0);
+  const [june, setJune] = useState("Jun");
+  const [juneValue, setJuneValue] = useState(0);
+  const [july, setJuly] = useState("Jul");
+  const [julyValue, setJulyValue] = useState(0);
+  const [august, setAugust] = useState("Aug");
+  const [augustValue, setAugustValue] = useState(0);
+  const [september, setSeptember] = useState("Sep");
+  const [septemberValue, setSeptemberValue] = useState(0);
+  const [october, setOctober] = useState("Oct");
+  const [octoberValue, setOctoberValue] = useState(0);
+  const [november, setNovember] = useState("Nov");
+  const [novemberValue, setNovemberValue] = useState(0);
+  const [december, setDecember] = useState("Dec");
+  const [decemberValue, setDecemberValue] = useState(0);
 
   const data = [
-    { month: month1, value: month1Num },
-    { month: month2, value: month2Num },
-    { month: month3, value: month3Num },
-    { month: month4, value: month4Num },
-    { month: month5, value: month5Num },
-    { month: month6, value: month6Num },
-    { month: month7, value: month7Num },
-    { month: month8, value: month8Num },
-    { month: month9, value: month9Num },
-    { month: month10, value: month10Num },
-    { month: month11, value: month11Num },
-    { month: month12, value: month12Num },
+    { month: january, value: januaryValue },
+    { month: february, value: februaryValue },
+    { month: march, value: marchValue },
+    { month: april, value: aprilValue },
+    { month: may, value: mayValue },
+    { month: june, value: juneValue },
+    { month: july, value: julyValue },
+    { month: august, value: augustValue },
+    { month: september, value: septemberValue },
+    { month: october, value: octoberValue },
+    { month: november, value: novemberValue },
+    { month: december, value: decemberValue },
   ];
 
   useEffect(() => {
-    async function fetchStockInfo() {
-      // INVENTORY DASHBOARD
-      try {
-        const response = await fetch(
-          "https://backend.kidsdesigncompany.com/api/shopkeeper-dashboard/",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Authentication failed");
-        }
-
-        const logData = await response.json();
-        console.log(logData);
-
-        setMonth1(logData.amount_sold_monthly[0].month);
-        setMonth1Num(logData.amount_sold_monthly[0].total);
-
-        setMonth2(logData.amount_sold_monthly[1].month);
-        setMonth2Num(logData.amount_sold_monthly[1].total);
-
-        setMonth3(logData.amount_sold_monthly[2].month);
-        setMonth3Num(logData.amount_sold_monthly[2].total);
-
-        setMonth4(logData.amount_sold_monthly[3].month);
-        setMonth4Num(logData.amount_sold_monthly[3].total);
-
-        setMonth5(logData.amount_sold_monthly[4].month);
-        setMonth5Num(logData.amount_sold_monthly[4].total);
-
-        setMonth6(logData.amount_sold_monthly[5].month);
-        setMonth6Num(logData.amount_sold_monthly[5].total);
-
-        setMonth7(logData.amount_sold_monthly[6].month);
-        setMonth7Num(logData.amount_sold_monthly[6].total);
-
-        setMonth8(logData.amount_sold_monthly[7].month);
-        setMonth8Num(logData.amount_sold_monthly[7].total);
-
-        setMonth9(logData.amount_sold_monthly[8].month);
-        setMonth9Num(logData.amount_sold_monthly[8].total);
-
-        setMonth10(logData.amount_sold_monthly[9].month);
-        setMonth10Num(logData.amount_sold_monthly[9].total);
-
-        setMonth11(logData.amount_sold_monthly[10].month);
-        setMonth11Num(logData.amount_sold_monthly[10].total);
-
-        setMonth12(logData.amount_sold_monthly[11].month);
-        setMonth12Num(logData.amount_sold_monthly[11].total);
-      } catch (error) {
-        console.error("Error fetching dashboard:", error);
-      }
+    const amountSold = dashboardDataJson.amount_sold_monthly;
+    if (amountSold[0]) {
+      setJanuary(amountSold[0].month);
+      setJanuaryValue(amountSold[0].total);
     }
-
-    fetchStockInfo();
+    if (amountSold[1]) {
+      setFebruary(amountSold[1].month);
+      setFebruaryValue(amountSold[1].total);
+    }
+    if (amountSold[2]) {
+      setMarch(amountSold[2].month);
+      setMarchValue(amountSold[2].total);
+    }
+    if (amountSold[3]) {
+      setApril(amountSold[3].month);
+      setAprilValue(amountSold[3].total);
+    }
+    if (amountSold[4]) {
+      setMay(amountSold[4].month);
+      setMayValue(amountSold[4].total);
+    }
+    if (amountSold[5]) {
+      setJune(amountSold[5].month);
+      setJuneValue(amountSold[5].total);
+    }
+    if (amountSold[6]) {
+      setJuly(amountSold[6].month);
+      setJulyValue(amountSold[6].total);
+    }
+    if (amountSold[7]) {
+      setAugust(amountSold[7].month);
+      setAugustValue(amountSold[7].total);
+    }
+    if (amountSold[8]) {
+      setSeptember(amountSold[8].month);
+      setSeptemberValue(amountSold[8].total);
+    }
+    if (amountSold[9]) {
+      setOctober(amountSold[9].month);
+      setOctoberValue(amountSold[9].total);
+    }
+    if (amountSold[10]) {
+      setNovember(amountSold[10].month);
+      setNovemberValue(amountSold[10].total);
+    }
+    if (amountSold[11]) {
+      setDecember(amountSold[11].month);
+      setDecemberValue(amountSold[11].total);
+    }
   }, []);
 
   return (
@@ -135,10 +115,14 @@ const AmountSoldMonthlyBarChart = () => {
         style={{ fontSize: "clamp(16.5px, 3vw, 23px)" }}
         className="font-semibold mb-2"
       >
-        Amount Sold Monthly
+        Monthly Sales Amount
       </h1>
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data} className="bg-white" margin={{ left: 0, right: 14, top: 10, bottom: 9 }}>
+        <BarChart
+          data={data}
+          className="bg-white"
+          margin={{ left: 0, right: 14, top: 10, bottom: 9 }}
+        >
           <defs>
             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
               <stop offset="10%" stopColor="gray" stopOpacity={1} />
@@ -150,7 +134,6 @@ const AmountSoldMonthlyBarChart = () => {
           <YAxis tickFormatter={formatNairaCompact} width={64} />
           <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
           <Bar
-            // type="monotone"
             dataKey="value"
             stroke="#0178a3"
             fillOpacity={1}

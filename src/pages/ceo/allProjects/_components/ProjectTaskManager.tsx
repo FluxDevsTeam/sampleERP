@@ -1,15 +1,27 @@
 import React, { useRef, useEffect } from "react";
-import axios from "axios";
 import { FiMinus } from "react-icons/fi";
+import projectsData from "@/data/ceo/project/projects.json";
+
+interface Task {
+  title: string;
+  checked: boolean;
+  subtasks?: { title: string; checked: boolean }[];
+}
 
 interface ProjectTaskManagerProps {
   project: any;
-  onUpdate: (tasks: any[]) => void;
+  onUpdate: (tasks: Task[]) => void;
   scrollToLastTaskTrigger?: number;
 }
 
+const saveProjectsToJson = async (updatedProjects: any[]) => {
+  // Placeholder for saving to JSON file (e.g., using localStorage for client-side)
+  localStorage.setItem("projects", JSON.stringify(updatedProjects));
+  return updatedProjects;
+};
+
 const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpdate, scrollToLastTaskTrigger }) => {
-  const [tasks, setTasks] = React.useState<any[]>([]);
+  const [tasks, setTasks] = React.useState<Task[]>([]);
   const [isSaving, setIsSaving] = React.useState(false);
   const [saveStatus, setSaveStatus] = React.useState<'idle' | 'saving' | 'saved'>('idle');
   const saveTimeout = React.useRef<NodeJS.Timeout | null>(null);
@@ -18,10 +30,8 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
   const [pendingSave, setPendingSave] = React.useState(false);
   const [userTyped, setUserTyped] = React.useState(false);
 
-  // Ref for last task
   const lastTaskRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to last task when trigger changes
   useEffect(() => {
     if (typeof scrollToLastTaskTrigger === 'number' && tasks.length > 0) {
       setTimeout(() => {
@@ -30,7 +40,7 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
     }
   }, [scrollToLastTaskTrigger, tasks.length]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let loadedTasks = project.tasks;
     if (typeof loadedTasks === 'string') {
       try {
@@ -46,8 +56,7 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
     setPendingSave(false);
   }, [project.tasks]);
 
-  // Auto-save effect
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialLoad.current) {
       initialLoad.current = false;
       return;
@@ -66,12 +75,10 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
     return () => {
       if (saveTimeout.current) clearTimeout(saveTimeout.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tasks, userTyped]);
 
   const saveTasks = async () => {
     if (!dirty) return;
-    // Filter out empty tasks and empty subtasks
     const filteredTasks = tasks
       .filter(task => task.title && task.title.trim() !== "")
       .map(task => ({
@@ -79,12 +86,10 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
         subtasks: (task.subtasks || []).filter((sub: any) => sub.title && sub.title.trim() !== "")
       }));
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.patch(
-        `https://backend.kidsdesigncompany.com/api/project/${project.id}/`,
-        { tasks: filteredTasks },
-        { headers: { Authorization: `JWT ${token}` } }
+      const updatedProjects = projectsData.all_projects.map((p) =>
+        p.id === project.id ? { ...p, tasks: filteredTasks } : p
       );
+      await saveProjectsToJson({ ...projectsData, all_projects: updatedProjects });
       setSaveStatus('saved');
       onUpdate(filteredTasks);
       setTimeout(() => setSaveStatus('idle'), 800);
@@ -97,42 +102,38 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
     }
   };
 
-  // Add Task
   const handleAddTask = () => {
-    // Only add a new task if there is no empty task at the end
     if (tasks.length > 0 && tasks[tasks.length - 1].title.trim() === "") return;
     setTasks((prev) => [...prev, { title: "", checked: false, subtasks: [] }]);
     setUserTyped(false);
   };
-  // Edit Task
+
   const handleTaskChange = (idx: number, field: "title" | "checked", value: any) => {
     setUserTyped(true);
     setTasks((prev) => prev.map((task, i) => {
       if (i !== idx) return task;
       if (field === "checked") {
-        // If toggling the main task, also toggle all subtasks to match
         return {
           ...task,
           checked: value,
           subtasks: (task.subtasks || []).map((sub: any) => ({ ...sub, checked: value })),
         };
       }
-      // Otherwise, just update the field
       return { ...task, [field]: value };
     }));
   };
-  // Delete Task
+
   const handleRemoveTask = (idx: number) => {
     setTasks((prev) => prev.filter((_, i) => i !== idx));
   };
-  // Add Subtask
+
   const handleAddSubtask = (taskIdx: number) => {
     setTasks((prev) => prev.map((task, i) =>
       i === taskIdx ? { ...task, subtasks: [...(task.subtasks || []), { title: "", checked: false }] } : task
     ));
     setUserTyped(false);
   };
-  // Edit Subtask
+
   const handleSubtaskChange = (taskIdx: number, subIdx: number, field: "title" | "checked", value: any) => {
     setUserTyped(true);
     setTasks((prev) => prev.map((task, i) => {
@@ -142,7 +143,6 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
       );
       let checked = task.checked;
       if (field === "checked") {
-        // If all subtasks are checked, check the parent task
         if (updatedSubtasks.length > 0 && updatedSubtasks.every((sub: any) => sub.checked)) {
           checked = true;
         } else {
@@ -152,15 +152,14 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
       return { ...task, subtasks: updatedSubtasks, checked };
     }));
   };
-  // Delete Subtask
+
   const handleRemoveSubtask = (taskIdx: number, subIdx: number) => {
     setTasks((prev) => prev.map((task, i) =>
       i === taskIdx ? { ...task, subtasks: (task.subtasks || []).filter((_: any, j: number) => j !== subIdx) } : task
     ));
   };
 
-  // Calculate progress percentage
-  function calculateProgress(tasks: any[]): number {
+  function calculateProgress(tasks: Task[]): number {
     if (!Array.isArray(tasks) || tasks.length === 0) return 0;
     let total = 0;
     for (const task of tasks) {
@@ -176,8 +175,7 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
   const progress = calculateProgress(tasks);
 
   return (
-    <div className="max-w-2xl  min-h-[500px] md:min-h-[700px] lg:min-h-[550px]  mx-auto">
-      {/* Progress Bar */}
+    <div className="max-w-2xl min-h-[500px] md:min-h-[700px] lg:min-h-[550px] mx-auto">
       <div className="mb-2">
         <div className="flex items-center justify-between mb-1">
           <span className="text-sm font-medium text-blue-700">Progress</span>
@@ -204,7 +202,7 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
           <span className="text-xl leading-none">+</span> Add Task
         </button>
       </div>
-      <div className="space-y-2 max-h-[580px] lg:max-h-[430px] max-sm:max-h-[440px]  overflow-y-auto ">
+      <div className="space-y-2 max-h-[580px] lg:max-h-[430px] max-sm:max-h-[440px] overflow-y-auto">
         {(!Array.isArray(tasks) || tasks.length === 0) && <div className="text-black-200 text-center text-lg py-12">No tasks yet.</div>}
         {Array.isArray(tasks) && tasks.map((task, idx) => (
           <div
@@ -246,7 +244,7 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
               {(task.subtasks || []).length === 0 && <div className="text-black-200 text-xs pl-2 py-2">No subtasks</div>}
               <ul className="space-y-1">
                 {(task.subtasks || []).map((sub: any, subIdx: number) => (
-                  <li key={subIdx} className="flex items-center gap-0 group/sub mb-1 ">
+                  <li key={subIdx} className="flex items-center gap-0 group/sub mb-1">
                     <input
                       type="checkbox"
                       checked={sub.checked}
@@ -277,4 +275,4 @@ const ProjectTaskManager: React.FC<ProjectTaskManagerProps> = ({ project, onUpda
   );
 };
 
-export default ProjectTaskManager; 
+export default ProjectTaskManager;

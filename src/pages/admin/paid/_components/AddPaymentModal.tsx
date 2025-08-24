@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import paidData from "@/data/admin/paid/paidData.json";
+import workersData from "@/data/admin/paid/workers.json";
 
 interface PaymentData {
   amount: number;
@@ -45,122 +46,60 @@ const AddPaymentModal = ({
   const setIsOpen = isControlled ? onOpenChange : setIsInternalOpen;
 
   const [formData, setFormData] = useState<PaymentData>(initialFormData);
-  const [contractors, setContractors] = useState([]);
-  const [salaryWorkers, setSalaryWorkers] = useState([]);
+  const [contractors, setContractors] = useState(workersData.contractors);
+  const [salaryWorkers, setSalaryWorkers] = useState(workersData.salary_workers);
 
-  // Reset form when modal closes
   useEffect(() => {
     if (!isOpen) {
       setFormData(initialFormData);
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("accessToken");
-        const config = {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
-        };
-
-        const [contractorRes, salaryRes] = await Promise.all([
-          axios.get(
-            "https://backend.kidsdesigncompany.com/api/contractors/",
-            config
-          ),
-          axios.get(
-            "https://backend.kidsdesigncompany.com/api/salary-workers/",
-            config
-          ),
-        ]);
-
-        // Debug the response structure
-        console.log("Full Contractor response:", contractorRes.data);
-        console.log("Full Salary worker response:", salaryRes.data);
-        console.log("Contractor results:", contractorRes.data.results);
-        console.log("Salary worker results:", salaryRes.data.results);
-
-        // Handle different possible data structures
-        let contractorData = [];
-        let salaryWorkerData = [];
-
-        // Try to extract contractor data
-        if (contractorRes.data.results?.contractor) {
-          contractorData = contractorRes.data.results.contractor;
-        } else if (contractorRes.data.contractor) {
-          contractorData = contractorRes.data.contractor;
-        } else if (contractorRes.data.results) {
-          contractorData = Array.isArray(contractorRes.data.results) ? contractorRes.data.results : [];
-        } else if (Array.isArray(contractorRes.data)) {
-          contractorData = contractorRes.data;
-        }
-
-        // Try to extract salary worker data
-        if (salaryRes.data.results?.workers) {
-          salaryWorkerData = salaryRes.data.results.workers;
-        } else if (salaryRes.data.workers) {
-          salaryWorkerData = salaryRes.data.workers;
-        } else if (salaryRes.data.results) {
-          salaryWorkerData = Array.isArray(salaryRes.data.results) ? salaryRes.data.results : [];
-        } else if (Array.isArray(salaryRes.data)) {
-          salaryWorkerData = salaryRes.data;
-        }
-
-        console.log("Processed contractor data:", contractorData);
-        console.log("Processed salary worker data:", salaryWorkerData);
-
-        setContractors(contractorData);
-        setSalaryWorkers(salaryWorkerData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to fetch contractors and salary workers");
-      }
-    };
-
-    if (isOpen) {
-      fetchData();
-    }
-  }, [isOpen]);
-
   const createPaymentMutation = useMutation({
     mutationFn: async (paymentData: PaymentData) => {
-      const formattedData =
-        paymentData.recipientType === "contractor"
-          ? { amount: paymentData.amount, contract: paymentData.recipientId }
-          : { amount: paymentData.amount, salary: paymentData.recipientId };
+      const newEntry = {
+        id: Math.max(...paidData.daily_data.flatMap(day => day.entries.map(e => e.id)), 0) + 1,
+        amount: paymentData.amount.toString(),
+        date: new Date().toISOString().split('T')[0],
+        salary_detail: paymentData.recipientType === "salary-worker" ? 
+          salaryWorkers.find(w => w.id === paymentData.recipientId) || null : null,
+        contractor_detail: paymentData.recipientType === "contractor" ? 
+          contractors.find(c => c.id === paymentData.recipientId) || null : null
+      };
 
-      try {
-        const token = localStorage.getItem("accessToken");
-
-        const response = await axios.post(
-          "https://backend.kidsdesigncompany.com/api/paid/",
-          formattedData,
-          {
-            headers: {
-              Authorization: `JWT ${token}`,
-            },
-          }
-        );
-
-        return response.data;
-      } catch (error: any) {
-        throw error.response?.data || "Failed to process payment";
+      const today = newEntry.date;
+      const existingDay = paidData.daily_data.find(d => d.date === today);
+      if (existingDay) {
+        existingDay.entries.push(newEntry);
+        existingDay.daily_total = (existingDay.daily_total || 0) + parseFloat(newEntry.amount);
+      } else {
+        paidData.daily_data.push({
+          date: today,
+          daily_total: parseFloat(newEntry.amount),
+          entries: [newEntry]
+        });
       }
+
+      paidData.monthly_total += parseFloat(newEntry.amount);
+      if (paymentData.recipientType === "salary-worker") {
+        paidData.salary_paid_this_month += parseFloat(newEntry.amount);
+      } else {
+        paidData.contractors_paid_this_month += parseFloat(newEntry.amount);
+      }
+      paidData.yearly_total += parseFloat(newEntry.amount);
+
+      return newEntry;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paid"] });
       toast.success("Payment added successfully!");
-      setFormData(initialFormData); // Reset form after success
+      setFormData(initialFormData);
       setIsOpen(false);
       onSuccess?.();
     },
     onError: (error: any) => {
       console.error("Error adding payment:", error);
-      toast.error(
-        error.error?.[0] || "Failed to add payment. Please try again."
-      );
+      toast.error("Failed to add payment. Please try again.");
     },
   });
 
@@ -237,16 +176,9 @@ const AddPaymentModal = ({
                 <option value="">-- Select --</option>
                 {formData.recipientType === "contractor"
                   ? contractors.map((contractor: any, index: number) => {
-                      // Debug each contractor object
-                      console.log(`Contractor ${index}:`, contractor);
-                      
-                      // Handle different possible name field structures
-                      const firstName = contractor.first_name || contractor.firstName || contractor.name || contractor.full_name || "";
-                      const lastName = contractor.last_name || contractor.lastName || contractor.surname || "";
-                      const fullName = `${firstName} ${lastName}`.trim() || contractor.name || contractor.full_name || `Contractor ${contractor.id || index}`;
-                      
-                      console.log(`Contractor ${index} name:`, { firstName, lastName, fullName });
-                      
+                      const firstName = contractor.first_name || "";
+                      const lastName = contractor.last_name || "";
+                      const fullName = `${firstName} ${lastName}`.trim() || `Contractor ${contractor.id || index}`;
                       return (
                         <option key={contractor.id || index} value={contractor.id}>
                           {fullName}
@@ -254,16 +186,9 @@ const AddPaymentModal = ({
                       );
                     })
                   : salaryWorkers.map((worker: any, index: number) => {
-                      // Debug each worker object
-                      console.log(`Worker ${index}:`, worker);
-                      
-                      // Handle different possible name field structures
-                      const firstName = worker.first_name || worker.firstName || worker.name || worker.full_name || "";
-                      const lastName = worker.last_name || worker.lastName || worker.surname || "";
-                      const fullName = `${firstName} ${lastName}`.trim() || worker.name || worker.full_name || `Worker ${worker.id || index}`;
-                      
-                      console.log(`Worker ${index} name:`, { firstName, lastName, fullName });
-                      
+                      const firstName = worker.first_name || "";
+                      const lastName = worker.last_name || "";
+                      const fullName = `${firstName} ${lastName}`.trim() || `Worker ${worker.id || index}`;
                       return (
                         <option key={worker.id || index} value={worker.id}>
                           {fullName}

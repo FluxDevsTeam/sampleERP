@@ -12,6 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Modal from "@/pages/shop/Modal";
 import { useNavigate } from "react-router-dom";
+import recordRMAddedData from "@/data/store-keeper-page/record-rm-added/record-rm-added.json";
 
 interface Material {
   id: number;
@@ -51,7 +52,6 @@ const RecordRemovedTable: React.FC = () => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [userRole, setUserRole] = useState<string | null>(null);
   const [year, setYear] = useState<number | string>("");
   const [month, setMonth] = useState<number | string>("");
   const [day, setDay] = useState<number | string>("");
@@ -86,8 +86,29 @@ const RecordRemovedTable: React.FC = () => {
   });
 
   useEffect(() => {
-    const role = localStorage.getItem("user_role");
-    setUserRole(role);
+    const fetchData = () => {
+      setLoading(true);
+      let filteredData = { ...recordRMAddedData };
+      if (year || month || day) {
+        const filteredDailyData = recordRMAddedData.daily_data.filter((dayData) => {
+          const date = new Date(dayData.date);
+          const matchesYear = year ? date.getFullYear().toString() === year.toString() : true;
+          const matchesMonth = month ? (date.getMonth() + 1).toString() === month.toString() : true;
+          const matchesDay = day ? date.getDate().toString() === day.toString() : true;
+          return matchesYear && matchesMonth && matchesDay;
+        });
+        filteredData = { ...recordRMAddedData, daily_data: filteredDailyData };
+      }
+      setMaterialData(filteredData);
+      if (filteredData.daily_data && filteredData.daily_data.length > 0) {
+        setOpenDates((prev) => ({
+          ...prev,
+          [filteredData.daily_data[0].date]: true,
+        }));
+      }
+      setLoading(false);
+    };
+
     fetchData();
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -105,48 +126,11 @@ const RecordRemovedTable: React.FC = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
-
-  const fetchData = async (filterYear?: number | string, filterMonth?: number | string, filterDay?: number | string) => {
-    try {
-      setLoading(true);
-      let url = "https://backend.kidsdesigncompany.com/api/add-raw-materials/?";
-      if (filterYear) url += `year=${filterYear}&`;
-      if (filterMonth) url += `month=${filterMonth}&`;
-      if (filterDay) url += `day=${filterDay}`;
-      const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch data");
-      const data = await response.json();
-      setMaterialData(data);
-      
-      // Open the first date by default if there is data
-      if (data.daily_data && data.daily_data.length > 0) {
-        setOpenDates(prev => ({
-          ...prev,
-          [data.daily_data[0].date]: true
-        }));
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [year, month, day]);
 
   const handleFilter = async () => {
     setFilterLoading(true);
-    try {
-      await fetchData(year, month, day);
-    } finally {
-      setFilterLoading(false);
-    }
+    setFilterLoading(false);
   };
 
   const handleClear = async () => {
@@ -154,11 +138,7 @@ const RecordRemovedTable: React.FC = () => {
     setYear("");
     setMonth("");
     setDay("");
-    try {
-      await fetchData();
-    } finally {
-      setFilterLoading(false);
-    }
+    setFilterLoading(false);
   };
 
   const toggleDate = (date: string) => {
@@ -184,9 +164,6 @@ const RecordRemovedTable: React.FC = () => {
     if (Number.isFinite(num) && Math.floor(num) === num) {
       return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
     }
-    if (Number.isFinite(num) && Number(num) % 1 === 0) {
-      return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
-    }
     return num.toLocaleString("en-US", { maximumFractionDigits: 2 });
   };
 
@@ -204,28 +181,18 @@ const RecordRemovedTable: React.FC = () => {
 
     setDeleteLoading(true);
     try {
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/add-raw-materials/${selectedItem}/`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete item");
-      }
-
-      setModalConfig({
-        isOpen: true,
-        title: "Success",
-        message: "Item deleted successfully",
-        type: "success",
-      });
-      // Redirect to the main record page after delete
-      window.location.href = '/store-keeper/record-rm-added';
+      setTimeout(() => {
+        setModalConfig({
+          isOpen: true,
+          title: "Success",
+          message: "Item deleted successfully",
+          type: "success",
+        });
+        navigate('/store-keeper/record-rm-added');
+        setDeleteLoading(false);
+        setConfirmDelete(false);
+        setSelectedItem(null);
+      }, 1000);
     } catch (error) {
       setModalConfig({
         isOpen: true,
@@ -233,7 +200,6 @@ const RecordRemovedTable: React.FC = () => {
         message: "Failed to delete item",
         type: "error",
       });
-    } finally {
       setDeleteLoading(false);
       setConfirmDelete(false);
       setSelectedItem(null);
@@ -246,15 +212,14 @@ const RecordRemovedTable: React.FC = () => {
 
   return (
     <div className="">
-      {/* Heading and Add Record button in the same row */}
       <div className="flex flex-row justify-between items-center mb-2 sm:mb-4 gap-3 sm:gap-0">
         <h1
           style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
           className="font-semibold py-3 sm:py-5 mt-2 sm:mt-0"
         >
-          Added Raw Materials
+          Added Items
         </h1>
-      <button
+        <button
           onClick={() => navigate("/store-keeper/add-record-removed")}
           className="px-3 max-sm:px-2 py-1 md:py-2 max-md:px-0 border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-white transition-colors text-sm sm:text-base w-auto outline-none focus:ring-2 focus:ring-blue-200"
         >
@@ -262,10 +227,8 @@ const RecordRemovedTable: React.FC = () => {
           Add Record
         </button>
       </div>
-      {/* Filter controls below and right-aligned */}
       <div className="flex w-full justify-end mb-4">
         <div className="flex flex-wrap items-center gap-2">
-          {/* Year Dropdown */}
           <div className="relative w-20 sm:w-24 max-sm:w-14" ref={yearRef}>
             <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{year || 'Year'}</span>
@@ -278,10 +241,9 @@ const RecordRemovedTable: React.FC = () => {
                   const y = new Date().getFullYear() - i;
                   return <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{y}</li>
                 })}
-                </ul>
+              </ul>
             )}
           </div>
-          {/* Month Dropdown */}
           <div className="relative w-24 sm:w-32" ref={monthRef}>
             <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{month ? months[Number(month) - 1] : 'Month'}</span>
@@ -290,13 +252,12 @@ const RecordRemovedTable: React.FC = () => {
             {isMonthOpen && (
               <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
                 <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Month</li>
-                  {months.map((m, i) => (
+                {months.map((m, i) => (
                   <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{m}</li>
-                  ))}
-                </ul>
+                ))}
+              </ul>
             )}
           </div>
-          {/* Day Dropdown */}
           <div className="relative w-20 sm:w-24 max-sm:w-14" ref={dayRef}>
             <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{day || 'Day'}</span>
@@ -307,8 +268,8 @@ const RecordRemovedTable: React.FC = () => {
                 <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Day</li>
                 {[...Array(31)].map((_, i) => (
                   <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{i + 1}</li>
-                  ))}
-                </ul>
+                ))}
+              </ul>
             )}
           </div>
           <button 
@@ -352,29 +313,20 @@ const RecordRemovedTable: React.FC = () => {
         ) : materialData?.daily_data && materialData.daily_data.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
             <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-50 mb-4">
-              {/* Box icon */}
               <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
                 <path d="M16 3v4M8 3v4M3 7h18" stroke="currentColor" strokeWidth="2" />
               </svg>
             </div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-1">No raw material records</h2>
-            <p className="text-gray-500 mb-6 text-center max-w-xs">All your added raw material records will show up here. Add a new record to get started.</p>
+            <h2 className="text-lg font-semibold text-gray-800 mb-1">No item records</h2>
+            <p className="text-gray-500 mb-6 text-center max-w-xs">All your added item records will show up here. Add a new record to get started.</p>
           </div>
         ) : (
           <div className="space-y-6">
-            {/* <button
-              onClick={() => navigate("/store-keeper/add-to-raw-material")}
-              className="mb-4 px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
-            >
-              <FontAwesomeIcon className="pr-2" icon={faPlus} />
-              Add Raw Material
-            </button> */}
-            {/* Daily Data Tables */}
             {materialData?.daily_data.map((dayData) => (
               <div
                 key={dayData.date}
-                className="bg-white shadow-md rounded-lg overflow-auto"
+                className="bg-white shadow-md rounded-none overflow-auto"
               >
                 <div
                   className="bg-white text-blue-20 px-4 py-2 border-b flex justify-between items-center cursor-pointer hover:bg-slate-300 hover:text-blue-20 w-full"
@@ -403,7 +355,7 @@ const RecordRemovedTable: React.FC = () => {
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-bold w-1/4 hidden sm:table-cell">Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-bold w-1/4">Material</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold w-1/4">Item</th>
                         <th className="px-4 py-3 text-left text-xs font-bold w-1/4">Quantity</th>
                         <th className="px-4 py-3 text-left text-xs font-bold w-1/4">Details</th>
                       </tr>
@@ -433,13 +385,12 @@ const RecordRemovedTable: React.FC = () => {
         )}
       </div>
 
-      {/* Add confirmation modal */}
       {selectedEntry && !confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm" onClick={() => setSelectedEntry(null)}></div>
           <div className="relative z-10 bg-white rounded-xl p-6 sm:p-8 max-w-md w-full mx-2 border-2 border-black-200 shadow-2xl">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-blue-400">Raw Material Details</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-blue-400">Item Details</h2>
               <button
                 onClick={() => setSelectedEntry(null)}
                 className="text-black-400 hover:text-blue-400 focus:outline-none text-2xl font-bold"
@@ -449,7 +400,7 @@ const RecordRemovedTable: React.FC = () => {
               </button>
             </div>
             <div className="grid gap-y-2 gap-x-4 grid-cols-2">
-              <div className="font-semibold text-black">Material:</div>
+              <div className="font-semibold text-black">Item:</div>
               <div className="text-black">{selectedEntry.material?.name || 'N/A'}</div>
               <div className="font-semibold text-black">Quantity:</div>
               <div className="text-black">{formatNumber(selectedEntry.quantity)}</div>
@@ -461,25 +412,21 @@ const RecordRemovedTable: React.FC = () => {
               <div className="text-black">{selectedEntry.material?.unit || 'N/A'}</div>
             </div>
             <div className="flex flex-row justify-end gap-2 mt-6 w-full">
-              {userRole === 'ceo' && (
-                <>
-                  <button
-                    onClick={() => handleEdit(selectedEntry.id)}
-                    className="w-full sm:w-auto py-2 px-4 border-2 border-blue-400 text-blue-400 rounded-lg font-semibold transition-colors hover:bg-blue-400 hover:text-white focus:ring-2 focus:ring-blue-200 text-sm"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedItem(selectedEntry.id);
-                      setConfirmDelete(true);
-                    }}
-                    className="w-full sm:w-auto py-2 px-4 border-2 border-red-400 text-red-400 rounded-lg font-semibold transition-colors hover:bg-red-400 hover:text-white focus:ring-2 focus:ring-red-200 text-sm"
-                  >
-                    Delete
-                  </button>
-                </>
-              )}
+              <button
+                onClick={() => handleEdit(selectedEntry.id)}
+                className="w-full sm:w-auto py-2 px-4 border-2 border-blue-400 text-blue-400 rounded-lg font-semibold transition-colors hover:bg-blue-400 hover:text-white focus:ring-2 focus:ring-blue-200 text-sm"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedItem(selectedEntry.id);
+                  setConfirmDelete(true);
+                }}
+                className="w-full sm:w-auto py-2 px-4 border-2 border-red-400 text-red-400 rounded-lg font-semibold transition-colors hover:bg-red-400 hover:text-white focus:ring-2 focus:ring-red-200 text-sm"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>

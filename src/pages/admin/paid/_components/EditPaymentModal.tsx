@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import paidData from "@/data/admin/paid/paidData.json";
+import workersData from "@/data/admin/paid/workers.json";
 
 interface PaymentData {
   amount: number;
@@ -48,114 +49,70 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({
     recipientId: 0,
   });
 
-  const [contractors, setContractors] = useState<any[]>([]);
-  const [salaryWorkers, setSalaryWorkers] = useState<any[]>([]);
+  const [contractors, setContractors] = useState(workersData.contractors);
+  const [salaryWorkers, setSalaryWorkers] = useState(workersData.salary_workers);
 
-  // Fetch Payment Data
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["paid", id],
-    queryFn: async () => {
-      const token = localStorage.getItem("accessToken");
-      const response = await axios.get<PaymentData>(
-        `https://backend.kidsdesigncompany.com/api/paid/${id}/`,
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
-        }
-      );
-      return response.data;
-    },
-    enabled: !!id && open,
-  });
+  const payment = paidData.daily_data
+    .flatMap(day => day.entries)
+    .find(entry => entry.id === parseInt(id || '0'));
 
-  // Fetch Contractors and Salary Workers
   useEffect(() => {
-    if (!open) return;
-
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("accessToken");
-        const config = {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
-        };
-        const [contractorRes, salaryRes] = await Promise.all([
-          axios.get(
-            "https://backend.kidsdesigncompany.com/api/contractors/",
-            config
-          ),
-          axios.get(
-            "https://backend.kidsdesigncompany.com/api/salary-workers/",
-            config
-          ),
-        ]);
-
-        setContractors(contractorRes.data.results.contractor);
-        setSalaryWorkers(salaryRes.data.results.workers);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to fetch contractors and salary workers");
-      }
-    };
-
-    fetchData();
-  }, [open]);
-
-  // Populate form when data is fetched
-  useEffect(() => {
-    if (data) {
+    if (payment) {
       setFormData({
-        amount: data.amount,
-        recipientType: data.salary ? "salary-worker" : "contractor",
-        recipientId: data.salary || data.contract || 0,
-        salary: data.salary,
-        contract: data.contract,
+        amount: parseFloat(payment.amount),
+        recipientType: payment.salary_detail ? "salary-worker" : "contractor",
+        recipientId: payment.salary_detail?.id || payment.contractor_detail?.id || 0,
+        salary: payment.salary_detail?.id,
+        contract: payment.contractor_detail?.id,
       });
     }
-  }, [data]);
+  }, [id, open]);
 
-  // Update Payment Mutation
   const updatePaymentMutation = useMutation({
     mutationFn: async (paymentData: PaymentData) => {
-      // Format the data based on recipient type
-      const formattedData =
-        paymentData.recipientType === "contractor"
-          ? { amount: paymentData.amount, contract: paymentData.recipientId }
-          : { amount: paymentData.amount, salary: paymentData.recipientId };
+      const updatedEntry = {
+        ...payment,
+        amount: paymentData.amount.toString(),
+        salary_detail: paymentData.recipientType === "salary-worker" ? 
+          salaryWorkers.find(w => w.id === paymentData.recipientId) || null : null,
+        contractor_detail: paymentData.recipientType === "contractor" ? 
+          contractors.find(c => c.id === paymentData.recipientId) || null : null
+      };
 
-      // Get the token from localStorage
-      const token = localStorage.getItem("accessToken");
+      // Update in-memory data
+      const day = paidData.daily_data.find(d => d.entries.some(e => e.id === parseInt(id || '0')));
+      if (day && payment) {
+        const oldAmount = parseFloat(payment.amount);
+        const entryIndex = day.entries.findIndex(e => e.id === parseInt(id || '0'));
+        day.entries[entryIndex] = updatedEntry;
+        day.daily_total = (day.daily_total || 0) - oldAmount + paymentData.amount;
 
-      // Make the PUT request with Authorization header
-      const response = await axios.put(
-        `https://backend.kidsdesigncompany.com/api/paid/${id}/`,
-        formattedData,
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
+        // Update totals
+        paidData.monthly_total = paidData.monthly_total - oldAmount + paymentData.amount;
+        if (paymentData.recipientType === "salary-worker") {
+          paidData.salary_paid_this_month = paidData.salary_paid_this_month - oldAmount + paymentData.amount;
+        } else {
+          paidData.contractors_paid_this_month = paidData.contractors_paid_this_month - oldAmount + paymentData.amount;
         }
-      );
+        paidData.yearly_total = paidData.monthly_total;
+      }
 
-      return response.data;
+      return updatedEntry;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paid"] });
       toast.success("Payment updated successfully!");
+      setFormData({
+        amount: 0,
+        recipientType: "salary-worker",
+        recipientId: 0,
+      });
       onOpenChange(false);
       onSuccess?.();
     },
     onError: (error: any) => {
-      console.error(
-        "Error updating payment:",
-        error.response?.data || error.message
-      );
-      toast.error(
-        error.response?.data?.error?.[0] ||
-          "Failed to update payment. Try again."
-      );
+      console.error("Error updating payment:", error);
+      toast.error("Failed to update payment. Try again.");
     },
   });
 
@@ -165,8 +122,7 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        name === "amount" || name === "recipientId" ? Number(value) : value,
+      [name]: name === "amount" || name === "recipientId" ? Number(value) : value,
     }));
   };
 
@@ -186,99 +142,81 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({
     updatePaymentMutation.mutate(formData);
   };
 
+  if (!payment) return <p className="text-center">Payment not found.</p>;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl p-20">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Payment</DialogTitle>
         </DialogHeader>
-        {isLoading ? (
-          <p className="text-center">Loading payment details...</p>
-        ) : error ? (
-          <p className="text-center text-red-500">Error loading data.</p>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount</Label>
-                <Input
-                  id="amount"
-                  name="amount"
-                  type="number"
-                  min="1"
-                  value={formData.amount}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="recipientType">Recipient Type</Label>
-                <Select
-                  value={formData.recipientType}
-                  onValueChange={(value) =>
-                    handleSelectChange("recipientType", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Recipient Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="contractor">Contractor</SelectItem>
-                    <SelectItem value="salary-worker">Salary Worker</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="recipientId">Select Recipient</Label>
-                <Select
-                  value={formData.recipientId.toString()}
-                  onValueChange={(value) =>
-                    handleSelectChange("recipientId", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Recipient" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {formData.recipientType === "contractor"
-                      ? contractors.map((contractor) => (
-                          <SelectItem
-                            key={contractor.id}
-                            value={contractor.id.toString()}
-                          >
-                            {contractor.first_name} {contractor.last_name}
-                          </SelectItem>
-                        ))
-                      : salaryWorkers.map((worker) => (
-                          <SelectItem
-                            key={worker.id}
-                            value={worker.id.toString()}
-                          >
-                            {worker.first_name} {worker.last_name}
-                          </SelectItem>
-                        ))}
-                  </SelectContent>
-                </Select>
-              </div>
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="amount">Amount</Label>
+              <Input
+                id="amount"
+                name="amount"
+                type="number"
+                min="1"
+                value={formData.amount}
+                onChange={handleChange}
+                required
+              />
             </div>
-            <div className="flex justify-between mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
+
+            <div className="space-y-2">
+              <Label htmlFor="recipientType">Recipient Type</Label>
+              <Select
+                value={formData.recipientType}
+                onValueChange={(value) => handleSelectChange("recipientType", value)}
               >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={updatePaymentMutation.isPending}>
-                {updatePaymentMutation.isPending
-                  ? "Updating..."
-                  : "Update Payment"}
-              </Button>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Recipient Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="contractor">Contractor</SelectItem>
+                  <SelectItem value="salary-worker">Salary Worker</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </form>
-        )}
+
+            <div className="space-y-2">
+              <Label htmlFor="recipientId">Select Recipient</Label>
+              <Select
+                value={formData.recipientId.toString()}
+                onValueChange={(value) => handleSelectChange("recipientId", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Recipient" />
+                </SelectTrigger>
+                <SelectContent>
+                  {formData.recipientType === "contractor" ? (
+                    contractors.map((contractor: any) => (
+                      <SelectItem key={contractor.id} value={contractor.id.toString()}>
+                        {contractor.first_name} {contractor.last_name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    salaryWorkers.map((worker: any) => (
+                      <SelectItem key={worker.id} value={worker.id.toString()}>
+                        {worker.first_name} {worker.last_name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-6">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={updatePaymentMutation.isPending}>
+              {updatePaymentMutation.isPending ? "Updating..." : "Update Payment"}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

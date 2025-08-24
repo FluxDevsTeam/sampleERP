@@ -168,7 +168,7 @@ const BalanceSwitchTable: React.FC<BalanceSwitchTableProps> = ({ isTableModalOpe
               disabled={!data?.next}
               className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
             </Button>
@@ -177,7 +177,7 @@ const BalanceSwitchTable: React.FC<BalanceSwitchTableProps> = ({ isTableModalOpe
               disabled={!data?.next}
               className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 6.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 <path fillRule="evenodd" d="M11.293 15.707a1 1 0 010-1.414L15.586 10l-4.293-3.293a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
@@ -220,7 +220,6 @@ const BalanceSwitchTable: React.FC<BalanceSwitchTableProps> = ({ isTableModalOpe
               <Button variant="outline" onClick={() => setIsViewModalOpen(false)} className="w-full text-sm">
                 Close
               </Button>
-              {isCeo && (
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -231,8 +230,6 @@ const BalanceSwitchTable: React.FC<BalanceSwitchTableProps> = ({ isTableModalOpe
                 >
                   Edit
                 </Button>
-              )}
-              {isCeo && (
                 <Button
                   variant="destructive"
                   onClick={() => setIsDeleteDialogOpen(true)}
@@ -241,7 +238,6 @@ const BalanceSwitchTable: React.FC<BalanceSwitchTableProps> = ({ isTableModalOpe
                 >
                   Delete
                 </Button>
-              )}
             </div>
           </DialogFooter>
         </DialogContent>

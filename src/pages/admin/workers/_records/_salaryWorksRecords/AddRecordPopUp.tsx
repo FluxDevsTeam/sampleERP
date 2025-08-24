@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { addSalaryWorkerRecord } from "@/utils/jsonDataService";
 
 interface AddRecordPopupProps {
   isOpen: boolean;
@@ -30,17 +30,8 @@ const AddRecordPopup: React.FC<AddRecordPopupProps> = ({
   const [newRecord, setNewRecord] = useState({ report: "" });
 
   const addRecordMutation = useMutation({
-    mutationFn: async (record: { report: string; date: string }) => {
-      const token = localStorage.getItem("accessToken");
-      await axios.post(
-        `https://backend.kidsdesigncompany.com/api/salary-workers/${salaryWorkerId}/record/`,
-        record,
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
-        }
-      );
+    mutationFn: async (record: { report: string; date?: string }) => {
+      await addSalaryWorkerRecord(salaryWorkerId, record);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

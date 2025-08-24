@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import incomeCategories from '@/data/admin/income/incomeCategories.json';
 
 interface Category {
-  id: string; // income category uses uuid
+  id: string;
   name: string;
 }
 
@@ -29,29 +29,18 @@ interface CategoryPage {
 }
 
 const fetchCategories = async (search: string, page: number): Promise<CategoryPage> => {
-  const token = localStorage.getItem("accessToken");
-  const { data } = await axios.get(
-    "https://backend.kidsdesigncompany.com/api/income-category/",
-    {
-      params: {
-        search: search || undefined,
-        page: page || undefined,
-      },
-      headers: {
-        Authorization: `JWT ${token}`,
-      },
-    }
-  );
-  // Handle both array and paginated responses
-  if (Array.isArray(data)) {
-    return { items: data as Category[], next: null, previous: null, count: (data as Category[]).length };
-  }
-  const items: Category[] = Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [];
+  const pageSize = 10;
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+  const filteredItems = search
+    ? incomeCategories.filter((cat) => cat.name.toLowerCase().includes(search.toLowerCase()))
+    : incomeCategories;
+  const paginatedItems = filteredItems.slice(start, end);
   return {
-    items,
-    next: data?.next ?? null,
-    previous: data?.previous ?? null,
-    count: typeof data?.count === 'number' ? data.count : items.length,
+    items: paginatedItems,
+    next: end < filteredItems.length ? `page=${page + 1}` : null,
+    previous: page > 1 ? `page=${page - 1}` : null,
+    count: filteredItems.length,
   };
 };
 
@@ -63,31 +52,20 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useQuery<CategoryPage>({
-    queryKey: ["income-categories", search, page],
-    queryFn: async () => fetchCategories(search, page),
-  });
+  const { data, isLoading } = { data: fetchCategories(search, page), isLoading: false };
 
   const addCategoryMutation = useMutation({
     mutationFn: async (categoryData: NewCategoryData) => {
-      const accessToken = localStorage.getItem("accessToken");
-      const response = await axios.post<Category>(
-        "https://backend.kidsdesigncompany.com/api/income-category/",
-        categoryData,
-        {
-          headers: {
-            Authorization: `JWT ${accessToken}`,
-          },
-        }
-      );
-      return response.data;
+      const newId = `cat-${incomeCategories.length + 1}`;
+      const newCategory = { id: newId, name: categoryData.name };
+      incomeCategories.unshift(newCategory);
+      return newCategory;
     },
     onSuccess: (data) => {
       if (!data.id) {
         toast.error("Failed to retrieve category ID.");
         return;
       }
-      // Invalidate to refresh paginated list, then select the new category
       queryClient.invalidateQueries({ queryKey: ["income-categories"] });
       onCategoryChange(data.id);
       toast.success("Category added successfully!");
@@ -95,25 +73,16 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
       setIsDialogOpen(false);
     },
     onError: (error: any) => {
-      const errorMessage = error.response?.data
-        ? Object.values(error.response.data).flat().join(", ")
-        : "Failed to add category. Please try again.";
-      toast.error(errorMessage);
+      toast.error(error?.message || "Failed to add category.");
     },
   });
 
   const deleteCategoryMutation = useMutation({
     mutationFn: async (categoryId: string) => {
       setIsDeletingLocal(true);
-      const token = localStorage.getItem("accessToken");
-      await axios.delete(
-        `https://backend.kidsdesigncompany.com/api/income-category/${categoryId}/`,
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
-        }
-      );
+      const index = incomeCategories.findIndex((cat) => cat.id === categoryId);
+      if (index === -1) throw new Error('Category not found');
+      incomeCategories.splice(index, 1);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["income-categories"] });
@@ -200,7 +169,6 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
         </div>
       </div>
 
-      {/* Search */}
       <Input
         placeholder="Search category..."
         value={search}
@@ -229,7 +197,6 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
         )}
       </select>
 
-      {/* Pagination controls */}
       <div className="flex items-center justify-between">
         <Button
           type="button"
@@ -256,5 +223,3 @@ const CategoryDropdown: React.FC<CategoryDropdownProps> = ({ selectedCategory, o
 };
 
 export default CategoryDropdown;
-
-

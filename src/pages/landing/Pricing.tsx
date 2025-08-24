@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "./Navbar";
 import { Button } from "rsuite";
+import Footer from "../../components/Footer";
 
 const Pricing: React.FC = () => {
   return (
@@ -150,6 +151,21 @@ const Pricing: React.FC = () => {
           </div>
         </section>
       </main>
+
+      {/* Final CTA */}
+      <section className="bg-indigo-700 text-white py-12 px-4 text-center mt-16 rounded-3xl max-w-6xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Your Manufacturing?</h2>
+        <p className="mb-6 text-lg max-w-2xl mx-auto">Get started with FluxDevs ERP today and take your operations to the next level. Our team is here to help you every step of the way.</p>
+        <a
+          href="/contact"
+          className="inline-block px-8 py-4 bg-white text-indigo-700 font-semibold rounded-lg shadow hover:bg-indigo-100 transition-colors duration-300"
+        >
+          Book a Free Demo
+        </a>
+      </section>
+
+      {/* Footer */}
+      <Footer />
 
   {/* Floating actions are provided globally via GlobalLayout */}
     </div>

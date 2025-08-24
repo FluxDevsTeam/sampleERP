@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { addContractor } from "@/utils/jsonDataService";
 
 const AddContractor = () => {
   const navigate = useNavigate();
@@ -56,19 +56,8 @@ const AddContractor = () => {
     e.preventDefault();
     setIsPending(true);
     try {
-      const data = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) data.append(key, value as string);
-      });
-      if (image) data.append("image", image);
-      if (agreementFormImage) data.append("agreement_form_image", agreementFormImage);
-      const token = localStorage.getItem("accessToken");
-      await axios.post("https://backend.kidsdesigncompany.com/api/contractors/", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `JWT ${token}`,
-        },
-      });
+      // Use local JSON service to add contractor
+      await addContractor(formData, image, agreementFormImage);
       queryClient.invalidateQueries({ queryKey: ["contractors"], refetchType: "active" });
       toast.success("Contractor added successfully!");
       navigate("/admin/workers");

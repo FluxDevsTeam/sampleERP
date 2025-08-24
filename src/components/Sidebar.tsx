@@ -2,9 +2,10 @@ import { SidebarProps } from "../utils/data-json";
 import clsx from "clsx";
 import { NavLink } from "react-router-dom";
 import Logo from "./Logo";
-import Logout from "@/pages/AuthPages/logout/Logout";
-import { useState } from "react";
-import { useEffect } from "react";
+import { performLogout } from "../utils/data-json";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronRight, faChevronLeft } from "@fortawesome/free-solid-svg-icons";
@@ -18,6 +19,7 @@ interface SidebarProp {
 const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Helper to recursively find the parent dropdown id(s) for the current path
   function findParentDropdowns(items, pathname, parents = []) {
@@ -176,8 +178,27 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, data }: SidebarProp) => {
         </ul>
         
         {/* LOGOUT */}
-        <div className={clsx("px-3 mb-20 lg:mb-4 mt-6", isSidebarOpen ? "px-4" : "px-3")}> 
-           <Logout isSidebarOpen={isSidebarOpen} />
+        <div className={clsx("px-3 mb-20 lg:mb-4 mt-6", isSidebarOpen ? "px-4" : "px-3")}>
+          <button
+            onClick={() => performLogout({ navigate, redirectTo: '/' })}
+            className={clsx(
+              "flex gap-3 items-center w-full hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-xl relative font-medium text-sm transition-all duration-300 h-[48px] text-gray-700 group",
+              isSidebarOpen ? "pl-4 pr-3" : "lg:justify-center justify-start pl-4 lg:pl-0 lg:pr-0",
+              "hover:text-blue-600 hover:shadow-sm"
+            )}
+          >
+            <div className="flex items-center justify-center w-6 h-6 text-gray-500 group-hover:text-blue-600 transition-colors duration-200">
+              <FontAwesomeIcon icon={faRightFromBracket} />
+            </div>
+            <span
+              className={clsx(
+                `transition-all duration-300 font-medium`,
+                isSidebarOpen ? "block" : "block lg:hidden"
+              )}
+            >
+              Logout
+            </span>
+          </button>
         </div>
       </div>
     </aside>

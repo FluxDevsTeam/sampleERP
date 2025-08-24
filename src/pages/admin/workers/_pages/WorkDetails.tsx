@@ -13,6 +13,7 @@ import {
   faBoxOpen,
 } from "@fortawesome/free-solid-svg-icons";
 import { ThreeDots } from "react-loader-spinner";
+import { getWorkerDetails } from "@/utils/jsonDataService";
 
 interface Payment {
   id: number;
@@ -41,23 +42,12 @@ const WorkDetails: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchWorkerDetails = async (type: string, workerId: string, paymentPage: number, productPage: number) => {
-    const token = localStorage.getItem('accessToken');
-    const res = await fetch(`https://backend.kidsdesigncompany.com/api/${type}/${workerId}/details/?payments_page=${paymentPage}&products_page=${productPage}`, {
-      headers: {
-        'Authorization': `JWT ${token}`
-      }
-    });
-    if (!res.ok) {
-      throw new Error(`Failed to fetch ${type} details`);
-    }
     try {
-      const data = await res.json();
-      console.log('Fetched worker details:', data);
+      const data = await getWorkerDetails(type, workerId, paymentPage, productPage);
       return data;
     } catch (error) {
-      console.error(`Error parsing ${type} details response:`, error);
-      console.error('Error fetching worker details:', error);
-      throw new Error(`HTTP error! status: ${res.status}`);
+      console.error(`Error fetching worker details:`, error);
+      throw error;
     }
   };
 

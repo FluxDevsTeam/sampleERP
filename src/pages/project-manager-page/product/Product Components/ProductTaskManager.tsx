@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import axios from "axios";
 import { FiMinus } from "react-icons/fi";
-import { useAuth } from "@/pages/AuthPages/AuthContext";
 
 interface ProductTaskManagerProps {
   product: any;

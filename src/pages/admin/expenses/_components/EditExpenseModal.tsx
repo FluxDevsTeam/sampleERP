@@ -1,31 +1,21 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import SkeletonLoader from "../_components/SkeletonLoader";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import SearchablePaginatedDropdown from "@/pages/shop/sold/Sold Components/SearchablePaginatedDropdown";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import CategoryDropdown from "./Category";
 
 interface ExpenseFormData {
   name: string;
   amount: number | "";
-  quantity?: string; // Make quantity optional
+  quantity?: string;
   description: string | undefined;
   selectedType: string;
   selectedItem: string | null;
   category: number | null;
   date?: string;
-  product?: number | null; // Add product field
+  product?: number | null;
   payment_method?: string;
 }
 
@@ -65,7 +55,7 @@ interface Expense {
   product?: {
     id: number;
     name: string;
-  }; // Add product field to Expense interface
+  };
   date?: string;
   payment_method?: string;
 }
@@ -77,79 +67,23 @@ interface EditExpenseModalProps {
   onSuccess?: () => void;
 }
 
-const fetchProjects = async (): Promise<Project[]> => {
-  const token = localStorage.getItem("accessToken");
-  const response = await axios.get(
-    "https://backend.kidsdesigncompany.com/api/project/",
-    {
-      headers: {
-        Authorization: `JWT ${token}`,
-      },
-    }
-  );
-  return response.data.all_projects || [];
-};
+const projects: Project[] = [
+  { id: 1, name: "Downtown Renovation" },
+  { id: 2, name: "Office Expansion" },
+  { id: 3, name: "Residential Build" },
+];
 
-const fetchShopItems = async (): Promise<ShopItem[]> => {
-  try {
-    const token = localStorage.getItem("accessToken");
-    const response = await axios.get(
-      "https://backend.kidsdesigncompany.com/api/sold/",
-      {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      }
-    );
-    console.log("Fetched Sold API response:", response.data);
+const shopItems: ShopItem[] = [
+  { id: 1, name: "Retail Product A" },
+  { id: 2, name: "Retail Product B" },
+];
 
-    const items: ShopItem[] = [];
+const products: Project[] = [
+  { id: 1, name: "Product Line X" },
+  { id: 2, name: "Product Line Y" },
+];
 
-    if (response.data.daily_data && Array.isArray(response.data.daily_data)) {
-      response.data.daily_data.forEach((day: any) => {
-        if (day.entries && Array.isArray(day.entries)) {
-          day.entries.forEach((entry: any) => {
-            if (!items.some((item) => item.id === entry.id)) {
-              items.push({
-                id: entry.id,
-                name: entry.name || "Unnamed item",
-              });
-            }
-          });
-        }
-      });
-    }
-
-    console.log("Processed Shop Items:", items);
-    return items;
-  } catch (error) {
-    console.error("Error fetching shop items:", error);
-    toast.error("Failed to fetch shop items. Please try again.");
-    return [];
-  }
-};
-
-const fetchCategories = async (): Promise<Category[]> => {
-  const token = localStorage.getItem("accessToken");
-  const { data } = await axios.get<Category[]>(
-    "https://backend.kidsdesigncompany.com/api/expense-category/",
-    {
-      headers: {
-        Authorization: `JWT ${token}`,
-      },
-    }
-  );
-  return data;
-};
-
-const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
-  expense,
-  isOpen,
-  onOpenChange,
-  onSuccess,
-}) => {
-  const queryClient = useQueryClient();
-
+const EditExpenseModal: React.FC<EditExpenseModalProps> = ({ expense, isOpen, onOpenChange, onSuccess }) => {
   const [formData, setFormData] = useState<ExpenseFormData>({
     name: "",
     amount: "",
@@ -165,10 +99,9 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
 
   useEffect(() => {
     if (expense) {
-      // Determine the selected type and item
       let selectedType = "";
       let selectedItem = null;
-      
+
       if (expense.project) {
         selectedType = "project";
         selectedItem = expense.project.id.toString();
@@ -181,105 +114,43 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
       } else if (expense.category && !expense.project && !expense.shop && !expense.product) {
         selectedType = "other";
       }
-      
+
       setFormData({
         name: expense.name || "",
         description: expense.description || "",
         amount: expense.amount || "",
-        quantity: String(expense.quantity ?? "") || undefined, // Initialize as undefined if null or empty
+        quantity: String(expense.quantity ?? "") || undefined,
         selectedType,
         selectedItem,
         category: expense.category?.id || null,
-        date: expense.date ? new Date(expense.date).toISOString().split('T')[0] : "", // Ensure YYYY-MM-DD format
-        product: expense.product?.id || null, // Populate product field
+        date: expense.date ? new Date(expense.date).toISOString().split("T")[0] : "",
+        product: expense.product?.id || null,
         payment_method: expense.payment_method || "CASH",
       });
     }
   }, [expense]);
 
-  const mutation = useMutation({
-    mutationFn: async (data: ExpenseFormData) => {
-      // Format the data according to the API expectations
-      const formattedData: any = {
-        name: data.name,
-        description: data.description || "",
-        amount: Number(data.amount) || 0,
-        quantity: data.quantity || null, // Send null if quantity is empty
-        category: data.category,
-        project: data.selectedType === "project" && data.selectedItem ? Number(data.selectedItem) : null,
-        shop: data.selectedType === "shop" && data.selectedItem ? Number(data.selectedItem) : null,
-        product: data.selectedType === "product" && data.selectedItem ? Number(data.selectedItem) : null, // Change to 'product'
-        date: data.date || undefined,
-        payment_method: data.payment_method || undefined,
-      };
-
-      if (data.selectedType === "other") {
-        formattedData.project = null;
-        formattedData.shop = null;
-        formattedData.product = null; // Clear 'product' as well
-      }
-
-      console.log("Sending update data to API:", formattedData);
-      const accessToken = localStorage.getItem("accessToken");
-      await axios.put(
-        `https://backend.kidsdesigncompany.com/api/expense/${expense.id}/`,
-        formattedData,
-        {
-          headers: {
-            Authorization: `JWT ${accessToken}`,
-          },
-        }
-      );
-    },
-    onSuccess: () => {
-      toast.success("Expense updated successfully.");
-      queryClient.invalidateQueries({ queryKey: ["expenses"] });
-      if (onSuccess) {
-        onSuccess();
-      }
-      onOpenChange(false); // Close the modal on success
-    },
-    onError: (error) => {
-      console.error("Error updating expense:", error);
-      toast.error(
-        "Failed to update expense. " +
-          (error as any).response?.data?.detail ||
-          (error as any).message ||
-          "Please try again."
-      );
-    },
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "amount" || name === "quantity" ? (value === "" ? "" : Number(value)) : value,
-    }));
-  };
-
   const handleInputChange = (name: string, value: string) => {
-    if (name === "project" || name === "shop" || name === "product") { // Include product
+    if (name === "project" || name === "shop" || name === "product") {
       setFormData((prev) => ({
         ...prev,
         selectedType: name,
         selectedItem: value,
       }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({
+        ...prev,
+        [name]: name === "amount" || name === "quantity" ? (value === "" ? "" : Number(value)) : value,
+      }));
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutation.mutate(formData);
+    toast.error("Edit expense functionality is disabled in static mode.");
+    onOpenChange(false);
+    if (onSuccess) onSuccess();
   };
-
-  const isSubmitDisabled = !formData.category || mutation.isPending;
-
-  if (mutation.isPending) {
-    return <SkeletonLoader />;
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -288,151 +159,158 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
           <DialogTitle>Edit Expense</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange(e.target.name, e.target.value)}
-                className="w-full"
-                
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount (₦)</Label>
-                <Input
-                  id="amount"
-                  name="amount"
-                  type="number"
-                  value={formData.amount}
-                  onChange={(e) => handleInputChange(e.target.name, e.target.value)}
-                className="w-full"
-                
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-lg font-medium">Item Type (optional)</Label>
-                <select
-                  id="selectedType"
-                  name="selectedType"
-                  value={formData.selectedType}
-                  onChange={(e) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      selectedType: e.target.value,
-                      selectedItem: null, // Clear selected item when type changes
-                    }));
-                  }}
-                  className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select Item Type</option>
-                  <option value="project">Project</option>
-                  <option value="shop">Shop Item</option>
-                  <option value="product">Product</option>
-                  <option value="other">None</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="quantity">Quantity (Optional)</Label>
-                <Input
-                  id="quantity"
-                  name="quantity"
-                  type="text"
-                  value={formData.quantity || ""} // Handle undefined quantity
-                  onChange={(e) => handleInputChange(e.target.name, e.target.value)}
-                className="w-full"
-              />
-              </div>
-            </div>
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                  {(!formData.selectedType || formData.selectedType === "project") && (
-                    <div className="col-span-2">
-                      <SearchablePaginatedDropdown
-                        endpoint="https://backend.kidsdesigncompany.com/api/project/"
-                        label="Project"
-                        name="project"
-                        onChange={handleInputChange}
-                        resultsKey="all_projects"
-                        selectedValue={formData.selectedType === "project" ? formData.selectedItem : null}
-                        selectedName={expense?.project?.name || null}
-                      />
-                    </div>
-                  )}
-
-                  {(!formData.selectedType || formData.selectedType === "shop") && (
-                    <div className="col-span-2">
-                      <SearchablePaginatedDropdown
-                        endpoint="https://backend.kidsdesigncompany.com/api/sold/"
-                        label="Shop Item"
-                        name="shop"
-                        onChange={handleInputChange}
-                        resultsKey="daily_data"
-                        dataMapper={(data: any[]) => {
-                          const items: { id: number; name: string }[] = [];
-                          data.forEach((day: any) => {
-                            if (day.entries && Array.isArray(day.entries)) {
-                              day.entries.forEach((entry: any) => {
-                                if (!items.some(item => item.id === entry.id)) {
-                                  items.push({
-                                    id: entry.id,
-                                    name: entry.name || "Unnamed item"
-                                  });
-                                }
-                              });
-                            }
-                          });
-                          return items;
-                        }}
-                        selectedValue={formData.selectedType === "shop" ? formData.selectedItem : null}
-                        selectedName={expense?.shop?.name || null}
-                      />
-                    </div>
-                  )}
-
-                  {(!formData.selectedType || formData.selectedType === "product") && (
-                    <div className="col-span-2">
-                      <SearchablePaginatedDropdown
-                        endpoint="https://backend.kidsdesigncompany.com/api/product/"
-                        label="Product"
-                        name="product"
-                        onChange={handleInputChange}
-                        resultsKey="results"
-                        selectedValue={formData.selectedType === "product" ? formData.selectedItem : null}
-                        selectedName={expense?.product?.name || null}
-                      />
-                    </div>
-                  )}
-                </div>
-                {formData.selectedType && (formData.selectedType !== "other") && (
-                  <p className="text-sm text-blue-600 mt-1">
-                    Selected {formData.selectedType === "project" ? "Project" : formData.selectedType === "shop" ? "Shop Item" : "Product"}
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, selectedType: "", selectedItem: null }))}
-                      className="ml-2 text-red-500 hover:text-red-700 focus:outline-none"
-                    >
-                      (Clear)
-                    </button>
-                  </p>
-                )}
-
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="description">Description (Optional)</Label>
+              <Label htmlFor="name">Name</Label>
               <Input
-                id="description"
-                name="description"
-                value={formData.description}
+                id="name"
+                name="name"
+                value={formData.name}
                 onChange={(e) => handleInputChange(e.target.name, e.target.value)}
                 className="w-full"
-                />
+              />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+
+            <div className="space-y-2">
+              <Label htmlFor="amount">Amount (₦)</Label>
+              <Input
+                id="amount"
+                name="amount"
+                type="number"
+                value={formData.amount}
+                onChange={(e) => handleInputChange(e.target.name, e.target.value)}
+                className="w-full"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-lg font-medium">Item Type (optional)</Label>
+              <select
+                id="selectedType"
+                name="selectedType"
+                value={formData.selectedType}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    selectedType: e.target.value,
+                    selectedItem: null,
+                  }));
+                }}
+                className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Item Type</option>
+                <option value="project">Project</option>
+                <option value="shop">Shop Item</option>
+                <option value="product">Product</option>
+                <option value="other">None</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="quantity">Quantity (Optional)</Label>
+              <Input
+                id="quantity"
+                name="quantity"
+                type="text"
+                value={formData.quantity || ""}
+                onChange={(e) => handleInputChange(e.target.name, e.target.value)}
+                className="w-full"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4 mt-2">
+            {(!formData.selectedType || formData.selectedType === "project") && (
+              <div className="col-span-2">
+                <Label htmlFor="project">Project</Label>
+                <select
+                  id="project"
+                  name="project"
+                  value={formData.selectedType === "project" ? formData.selectedItem || "" : ""}
+                  onChange={(e) => handleInputChange("project", e.target.value)}
+                  className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Project</option>
+                  {projects.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {(!formData.selectedType || formData.selectedType === "shop") && (
+              <div className="col-span-2">
+                <Label htmlFor="shop">Shop Item</Label>
+                <select
+                  id="shop"
+                  name="shop"
+                  value={formData.selectedType === "shop" ? formData.selectedItem || "" : ""}
+                  onChange={(e) => handleInputChange("shop", e.target.value)}
+                  className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Shop Item</option>
+                  {shopItems.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {(!formData.selectedType || formData.selectedType === "product") && (
+              <div className="col-span-2">
+                <Label htmlFor="product">Product</Label>
+                <select
+                  id="product"
+                  name="product"
+                  value={formData.selectedType === "product" ? formData.selectedItem || "" : ""}
+                  onChange={(e) => handleInputChange("product", e.target.value)}
+                  className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Product</option>
+                  {products.map((product) => (
+                    <option key={product.id} value={product.id}>
+                      {product.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+          {formData.selectedType && formData.selectedType !== "other" && (
+            <p className="text-sm text-blue-600 mt-1">
+              Selected{" "}
+              {formData.selectedType === "project"
+                ? "Project"
+                : formData.selectedType === "shop"
+                ? "Shop Item"
+                : "Product"}
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData((prev) => ({ ...prev, selectedType: "", selectedItem: null }))
+                }
+                className="ml-2 text-red-500 hover:text-red-700 focus:outline-none"
+              >
+                (Clear)
+              </button>
+            </p>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description (Optional)</Label>
+            <Input
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange(e.target.name, e.target.value)}
+              className="w-full"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="date">Date</Label>
               <Input
@@ -461,21 +339,23 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                 <option value="DEBT">DEBT</option>
               </select>
             </div>
-            </div>
+          </div>
 
-            <div>
-              <CategoryDropdown
-                selectedCategory={formData.category}
-                onCategoryChange={(categoryId) => setFormData((prev) => ({ ...prev, category: categoryId }))}
-              />
-            </div>
+          <div>
+            <CategoryDropdown
+              selectedCategory={formData.category}
+              onCategory sixChange={(categoryId) =>
+                setFormData((prev) => ({ ...prev, category: categoryId }))
+              }
+            />
+          </div>
 
-            <DialogFooter>
-            <Button type="submit" disabled={isSubmitDisabled}>
+          <DialogFooter>
+            <Button type="submit" disabled={!formData.category}>
               Save Changes
-              </Button>
-            </DialogFooter>
-          </form>
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

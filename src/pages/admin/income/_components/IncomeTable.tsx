@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -10,6 +9,8 @@ import AddIncomeModal from "./AddIncomeModal";
 import SkeletonLoader from "@/pages/admin/expenses/_components/SkeletonLoader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import incomeSummary from '@/data/admin/income/incomeSummary.json';
+import incomeCategories from '@/data/admin/income/incomeCategories.json';
 
 interface IncomeCategory { id: string; name: string; }
 
@@ -18,7 +19,7 @@ interface IncomeEntryApi {
   uuid?: string;
   pk?: number | string;
   name: string;
-  category: string | { name: string } | null; // supports uuid or object with name
+  category: string | { name: string } | null;
   amount: string;
   cash: boolean;
   date: string;
@@ -40,24 +41,27 @@ interface IncomeResponse {
 }
 
 const fetchIncome = async (year: number | "", month: number | "", day: number | ""): Promise<IncomeResponse> => {
-  const accessToken = localStorage.getItem("accessToken");
-  const params = new URLSearchParams();
-  if (year) params.append("year", String(year));
-  if (month) params.append("month", String(month));
-  if (day) params.append("day", String(day));
-  const { data } = await axios.get<IncomeResponse>(`https://backend.kidsdesigncompany.com/api/income/?${params.toString()}`, {
-    headers: { Authorization: `JWT ${accessToken}` },
-  });
-  return data;
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  let filteredData = [...incomeSummary.daily_data];
+  if (year) filteredData = filteredData.filter((d) => new Date(d.date).getFullYear() === year);
+  if (month) filteredData = filteredData.filter((d) => new Date(d.date).getMonth() + 1 === month);
+  if (day) filteredData = filteredData.filter((d) => new Date(d.date).getDate() === day);
+  filteredData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+  return {
+    ...incomeSummary,
+    daily_data: filteredData,
+  };
 };
 
 const fetchIncomeCategoriesMap = async (): Promise<Record<string, IncomeCategory>> => {
-  const token = localStorage.getItem("accessToken");
-  const { data } = await axios.get<IncomeCategory[]>(`https://backend.kidsdesigncompany.com/api/income-category/`, {
-    headers: { Authorization: `JWT ${token}` },
-  });
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
   const map: Record<string, IncomeCategory> = {};
-  data.forEach((c) => { map[c.id] = c; });
+  incomeCategories.forEach((c) => { map[c.id] = c; });
   return map;
 };
 
@@ -68,17 +72,14 @@ const IncomeTable: React.FC<IncomeTableProps> = ({ isTableModalOpen }) => {
   const [month, setMonth] = useState<number | "">("");
   const [day, setDay] = useState<number | "">("");
 
-  const { data, isLoading, error } = useQuery<IncomeResponse>({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["income", year, month, day],
     queryFn: () => fetchIncome(year, month, day),
   });
 
-  const { data: categoryMap } = useQuery<Record<string, IncomeCategory>>({
-    queryKey: ["income-categories-map"],
-    queryFn: async () => {
-      const map = await fetchIncomeCategoriesMap();
-      return map && typeof map === 'object' ? map : {};
-    },
+  const { data: categoryMap } = useQuery({
+    queryKey: ["incomeCategories"],
+    queryFn: fetchIncomeCategoriesMap,
   });
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
@@ -119,15 +120,25 @@ const IncomeTable: React.FC<IncomeTableProps> = ({ isTableModalOpen }) => {
 
   const deleteExpenseMutation = useMutation({
     mutationFn: async (entryId: number | string) => {
-      const accessToken = localStorage.getItem("accessToken");
-      await axios.delete(
-        `https://backend.kidsdesigncompany.com/api/income/${entryId}/`,
-        {
-          headers: {
-            Authorization: `JWT ${accessToken}`,
-          },
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const dateEntry = incomeSummary.daily_data.find((d) => d.entries.some((e) => e.id === entryId));
+      if (dateEntry) {
+        const index = dateEntry.entries.findIndex((e) => e.id === entryId);
+        if (index !== -1) {
+          const amount = Number(dateEntry.entries[index].amount);
+          dateEntry.entries.splice(index, 1);
+          dateEntry.daily_total = (dateEntry.daily_total || 0) - amount;
+          if (dateEntry.entries.length === 0) {
+            incomeSummary.daily_data.splice(incomeSummary.daily_data.indexOf(dateEntry), 1);
+          }
+        } else {
+          throw new Error('Entry not found');
         }
-      );
+      } else {
+        throw new Error('Date entry not found');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["income"] });
@@ -166,7 +177,6 @@ const IncomeTable: React.FC<IncomeTableProps> = ({ isTableModalOpen }) => {
   };
 
   if (isLoading) return <SkeletonLoader />;
-  if (error) return <p className="text-red-600">Error: {(error as Error).message}</p>;
 
   return (
     <div className={`relative ${!data?.daily_data?.length ? 'min-h-[300px]' : ''}`}>
@@ -214,8 +224,12 @@ const IncomeTable: React.FC<IncomeTableProps> = ({ isTableModalOpen }) => {
               </ul>
             )}
           </div>
-          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["income"] })} disabled={isLoading} className="px-2 py-1 border border-blue-400 text-blue-400 bg-transparent rounded hover:bg-blue-50 transition-colors text-xs w-12 sm:w-auto">Filter</Button>
-          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); queryClient.invalidateQueries({ queryKey: ["income"] }); }} disabled={isLoading} className="px-1 md:px-2 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-xs w-12 sm:w-auto">Clear</Button>
+          <Button onClick={() => refetch()} disabled={isLoading} className="px-2 py-1 border border-blue-400 text-blue-400 bg-transparent rounded hover:bg-blue-50 transition-colors text-xs w-12 sm:w-auto">
+            {isLoading ? "Loading..." : "Filter"}
+          </Button>
+          <Button onClick={() => { setYear(''); setMonth(''); setDay(''); }} disabled={isLoading} className="px-1 md:px-2 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-xs w-12 sm:w-auto">
+            Clear
+          </Button>
         </div>
       </div>
 
@@ -326,19 +340,15 @@ const IncomeTable: React.FC<IncomeTableProps> = ({ isTableModalOpen }) => {
               <Button variant="outline" onClick={() => setIsViewModalOpen(false)} className="w-full text-sm">
                 Close
               </Button>
-              {isceo && (
                 <Button variant="outline" onClick={() => {
                   setIsViewModalOpen(false);
                   setIsEditModalOpen(true);
                 }} className="w-full text-sm">
                   Edit
                 </Button>
-              )}
-              {isceo && (
                 <Button variant="destructive" onClick={() => setIsDeleteDialogOpen(true)} disabled={deleteExpenseMutation.isPending} className="w-full text-sm">
                   Delete
                 </Button>
-              )}
             </div>
           </DialogFooter>
         </DialogContent>
@@ -387,5 +397,3 @@ const IncomeTable: React.FC<IncomeTableProps> = ({ isTableModalOpen }) => {
 };
 
 export default IncomeTable;
-
-

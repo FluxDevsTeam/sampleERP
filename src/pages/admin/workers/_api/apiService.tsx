@@ -1,7 +1,3 @@
-import axios from "axios";
-
-const SALARY_WORKERS_API_URL = "https://backend.kidsdesigncompany.com/api/salary-workers/";
-const CONTRACTORS_API_URL = "https://backend.kidsdesigncompany.com/api/contractors/";
 
 interface WorkerEntry {
   id: number;
@@ -84,38 +80,7 @@ export interface PaginatedContractorsResponse {
 }
 
 export const fetchWorkersSummary = async (): Promise<WorkersSummary> => {
-  const accessToken = localStorage.getItem("accessToken");
-  const headers = {
-    Authorization: `JWT ${accessToken}`,
-  };
-
-  const [salaryWorkersResponse, contractorsResponse] = await Promise.all([
-    axios.get(SALARY_WORKERS_API_URL, { headers }),
-    axios.get(CONTRACTORS_API_URL, { headers }),
-  ]);
-
-  const salaryWorkersData = salaryWorkersResponse.data;
-  const contractorsData = contractorsResponse.data;
-
-  const summaryResults: WorkersSummaryResults = {
-    salary_workers_count: salaryWorkersData.results.salary_workers_count,
-    active_salary_workers_count: salaryWorkersData.results.active_salary_workers_count,
-    total_salary_workers_monthly_pay: salaryWorkersData.results.total_salary_workers_monthly_pay,
-    total_paid: salaryWorkersData.results.total_paid,
-    all_contractors_count: contractorsData.results.all_contractors_count,
-    all_active_contractors_count: contractorsData.results.all_active_contractors_count,
-    total_contractors_monthly_pay: contractorsData.results.total_contractors_monthly_pay,
-    total_contractors_weekly_pay: contractorsData.results.total_contractors_weekly_pay,
-  };
-
-  const combinedSummary: WorkersSummary = {
-    count: (salaryWorkersData.count || 0) + (contractorsData.count || 0),
-    next: null,
-    previous: null,
-    results: summaryResults,
-  };
-
-  return combinedSummary;
+  return getWorkersSummary();
 };
 
 export const fetchSalaryWorkers = async (
@@ -123,23 +88,7 @@ export const fetchSalaryWorkers = async (
   searchQuery = "",
   statusFilter: boolean | undefined
 ): Promise<PaginatedSalaryWorkersResponse> => {
-  const token = localStorage.getItem("accessToken");
-  const params = new URLSearchParams();
-  params.append("page", String(page));
-
-  if (searchQuery) {
-    params.append("search", searchQuery);
-  }
-  if (statusFilter !== undefined) {
-    params.append("is_still_active", String(statusFilter));
-  }
-
-  const headers = {
-    Authorization: `JWT ${token}`,
-  };
-
-  const response = await axios.get(`${SALARY_WORKERS_API_URL}?${params.toString()}`, { headers });
-  return response.data;
+  return getSalaryWorkers(page, searchQuery, statusFilter);
 };
 
 export const fetchContractors = async (
@@ -147,51 +96,19 @@ export const fetchContractors = async (
   searchQuery = "",
   statusFilter: boolean | undefined
 ): Promise<PaginatedContractorsResponse> => {
-  const token = localStorage.getItem("accessToken");
-  const params = new URLSearchParams();
-  params.append("page", String(page));
-
-  if (searchQuery) {
-    params.append("search", searchQuery);
-  }
-  if (statusFilter !== undefined) {
-    params.append("is_still_active", String(statusFilter));
-  }
-
-  const headers = {
-    Authorization: `JWT ${token}`,
-  };
-
-  const response = await axios.get(`${CONTRACTORS_API_URL}?${params.toString()}`, { headers });
-  return response.data;
+  return getContractors(page, searchQuery, statusFilter);
 };
 
 export const fetchSalaryWorkerDetails = async (id: number): Promise<SalaryWorker> => {
-  const token = localStorage.getItem("accessToken");
-  const { data } = await axios.get(`${SALARY_WORKERS_API_URL}${id}/`, {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  });
-  return data;
+  return getSalaryWorkerDetails(id);
 };
 
 export const fetchContractorDetails = async (id: number): Promise<Contractor> => {
-  const token = localStorage.getItem("accessToken");
-  const { data } = await axios.get(`${CONTRACTORS_API_URL}${id}/`, {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  });
-  return data;
+  return getContractorDetails(id);
 };
 
+import { getSalaryWorkers, getContractors, getSalaryWorkerDetails, getContractorDetails, getWorkersSummary, addSalaryWorker, addContractor, updateSalaryWorker, updateContractor, deleteWorker as deleteWorkerJson } from "../../../../utils/jsonDataService";
+
 export const deleteWorker = async (id: number, type: 'salary' | 'contractor') => {
-  const token = localStorage.getItem("accessToken");
-  const url = type === 'salary' ? `${SALARY_WORKERS_API_URL}${id}/` : `${CONTRACTORS_API_URL}${id}/`;
-  await axios.delete(url, {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  });
-}; 
+  return deleteWorkerJson(id, type);
+};

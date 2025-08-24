@@ -1,59 +1,18 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
-import axios from "axios";
+import {
+  fetchSalaryWorkers,
+  SalaryWorker,
+  PaginatedSalaryWorkersResponse
+} from "../../../../utils/jsonDataService";
 import PaginationComponent from "./Pagination";
 import Modals from "./Modal";
 import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
 import AddSalaryWorkerModal from "../_pages/_salaryWorkers/AddSalaryWorkersModal";
 
-const BASE_URL = "https://backend.kidsdesigncompany.com/api/salary-workers/";
-
-interface SalaryWorker {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string;
-  address: string;
-  craft_specialty: string;
-  years_of_experience: number;
-  image: string | null;
-  agreement_form_image: string | null;
-  date_joined: string;
-  date_left: string;
-  guarantor_name: string;
-  guarantor_phone_number: string;
-  guarantor_address: string;
-  created_at: string;
-  updated_at: string;
-  salary: string;
-  is_still_active: boolean;
-}
-
-interface SalaryWorkersResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: {
-    salary_workers_count: number;
-    active_salary_workers_count: number;
-    total_salary_workers_monthly_pay: number;
-    total_paid: number;
-    workers: SalaryWorker[];
-  };
-}
-
-const fetchSalaryWorkers = async (page = 1): Promise<SalaryWorkersResponse> => {
-  const token = localStorage.getItem("accessToken");
-  const response = await axios.get(`${BASE_URL}?page=${page}`, {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  });
-  return response.data;
-};
+// ...existing code...
 
 const SalaryWorkers = () => {
   const queryClient = useQueryClient();
@@ -68,7 +27,7 @@ const SalaryWorkers = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<PaginatedSalaryWorkersResponse>({
     queryKey: ["salary-workers", currentPage],
     queryFn: () => fetchSalaryWorkers(currentPage),
   });

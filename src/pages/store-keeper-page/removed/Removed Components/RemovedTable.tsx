@@ -12,14 +12,14 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import Modal from "@/pages/shop/Modal";
+import removedData from "@/data/store-keeper-page/removed/removed.json";
 
 const RemovedTable: React.FC = () => {
-  document.title = "Removed Items | Kids Design Company";
+  document.title = "Removed Items - Inventory Admin";
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [filterLoading, setFilterLoading] = useState(false);
-
-  const [removedData, setRemovedData] = useState<{ daily_data: any[] }>({
+  const [removedDataState, setRemovedData] = useState<{ daily_data: any[] }>({
     daily_data: [],
   });
   const [modalConfig, setModalConfig] = useState({
@@ -28,11 +28,9 @@ const RemovedTable: React.FC = () => {
     message: "",
     type: "success" as "success" | "error",
   });
-
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [openSections, setOpenSections] = useState<string[]>([]);
-  const [userRole, setUserRole] = useState<string | null>(null);
   const [year, setYear] = useState<string>("");
   const [month, setMonth] = useState<string>("");
   const [day, setDay] = useState<string>("");
@@ -59,39 +57,29 @@ const RemovedTable: React.FC = () => {
     "December",
   ];
 
-  const fetchItems = async (filterYear?: string, filterMonth?: string, filterDay?: string) => {
-    try {
-      setLoading(true);
-      let url = "https://backend.kidsdesigncompany.com/api/removed/?";
-      if (filterYear) url += `year=${filterYear}&`;
-      if (filterMonth) url += `month=${filterMonth}&`;
-      if (filterDay) url += `day=${filterDay}`;
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-        },
-      });
-
-      const logData = await response.json();
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      setRemovedData(logData);
-
-      if (logData.daily_data && logData.daily_data.length > 0) {
-        setOpenSections([logData.daily_data[0].date]);
-      }
-    } catch (error) {
-      console.error("Error fetching items:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchItems = () => {
+      setLoading(true);
+      let filteredData = { ...removedData };
+      if (year || month || day) {
+        const filteredDailyData = removedData.daily_data.filter((dayData) => {
+          const date = new Date(dayData.date);
+          const matchesYear = year ? date.getFullYear().toString() === year : true;
+          const matchesMonth = month ? (date.getMonth() + 1).toString() === month : true;
+          const matchesDay = day ? date.getDate().toString() === day : true;
+          return matchesYear && matchesMonth && matchesDay;
+        });
+        filteredData = { ...removedData, daily_data: filteredDailyData };
+      }
+      setRemovedData(filteredData);
+      if (filteredData.daily_data && filteredData.daily_data.length > 0) {
+        setOpenSections([filteredData.daily_data[0].date]);
+      }
+      setLoading(false);
+    };
+
+    fetchItems();
+
     const handleClickOutside = (event: MouseEvent) => {
       if (yearRef.current && !yearRef.current.contains(event.target as Node)) {
         setIsYearOpen(false);
@@ -107,13 +95,7 @@ const RemovedTable: React.FC = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
-
-  useEffect(() => {
-    const role = localStorage.getItem("user_role");
-    setUserRole(role);
-    fetchItems();
-  }, []);
+  }, [year, month, day]);
 
   const formatCurrency = (amount: number | string | null | undefined) => {
     if (amount === null || amount === undefined || amount === '') {
@@ -145,19 +127,14 @@ const RemovedTable: React.FC = () => {
     if (Number.isFinite(num) && Math.floor(num) === num) {
       return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
     }
-    if (Number.isFinite(num) && Number(num) % 1 === 0) {
-      return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
-    }
     return num.toLocaleString("en-US", { maximumFractionDigits: 2 });
   };
 
   const handleFilter = async () => {
     setFilterLoading(true);
-    try {
-      await fetchItems(year, month, day);
-    } finally {
+    setTimeout(() => {
       setFilterLoading(false);
-    }
+    }, 500);
   };
 
   const handleClear = async () => {
@@ -165,17 +142,15 @@ const RemovedTable: React.FC = () => {
     setYear('');
     setMonth('');
     setDay('');
-    try {
-      await fetchItems();
-    } finally {
+    setTimeout(() => {
       setFilterLoading(false);
-    }
+    }, 500);
   };
 
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === "success") {
-      fetchItems();
+      setRemovedData(removedData); // Simulate refresh
     }
   };
 
@@ -196,17 +171,7 @@ const RemovedTable: React.FC = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/removed/${selectedItemId}/`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (response.ok) {
+      setTimeout(() => {
         setModalConfig({
           isOpen: true,
           title: "Success",
@@ -214,18 +179,16 @@ const RemovedTable: React.FC = () => {
           type: "success",
         });
         setConfirmDelete(false);
-        fetchItems(); // Refresh the list after deletion
-      } else {
-        throw new Error("Failed to delete item");
-      }
+        setRemovedData(removedData); // Simulate refresh
+      }, 1000);
     } catch (error) {
-      console.error(error);
       setModalConfig({
         isOpen: true,
         title: "Error",
         message: "Failed to delete record",
         type: "error",
       });
+      setConfirmDelete(false);
     }
   };
 
@@ -235,7 +198,6 @@ const RemovedTable: React.FC = () => {
 
   return (
     <div className="p-2">
-      {/* Heading and Remove Item button in the same row */}
       <div className="flex flex-row justify-between items-center mb-2 sm:mb-4 gap-3 sm:gap-0">
         <h1
           style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
@@ -251,10 +213,8 @@ const RemovedTable: React.FC = () => {
           Remove Item
         </button>
       </div>
-      {/* Filter controls below and right-aligned */}
       <div className="flex w-full justify-end mb-4">
         <div className="flex flex-wrap items-center gap-2">
-          {/* Year Dropdown */}
           <div className="relative w-20 sm:w-24 max-sm:w-14" ref={yearRef}>
             <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{year || 'Year'}</span>
@@ -270,7 +230,6 @@ const RemovedTable: React.FC = () => {
               </ul>
             )}
           </div>
-          {/* Month Dropdown */}
           <div className="relative w-24 sm:w-32" ref={monthRef}>
             <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{month ? months[Number(month) - 1] : 'Month'}</span>
@@ -285,7 +244,6 @@ const RemovedTable: React.FC = () => {
               </ul>
             )}
           </div>
-          {/* Day Dropdown */}
           <div className="relative w-20 sm:w-24 max-sm:w-14" ref={dayRef}>
             <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
               <span>{day || 'Day'}</span>
@@ -339,7 +297,7 @@ const RemovedTable: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-4 sm:space-y-6">
-          {removedData?.daily_data?.length === 0 ? (
+          {removedDataState?.daily_data?.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
               <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
                 <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -350,8 +308,8 @@ const RemovedTable: React.FC = () => {
               <p className="text-gray-500 mb-6 text-center max-w-xs">All removed items will show up here. Start by removing an item.</p>
             </div>
           ) : (
-            removedData?.daily_data?.map((dayData: any) => (
-              <div key={dayData.date} className="bg-white shadow-md rounded-lg overflow-hidden">
+            removedDataState?.daily_data?.map((dayData: any) => (
+              <div key={dayData.date} className="bg-white shadow-md rounded-none overflow-hidden">
                 <div
                   className="bg-white text-blue-20 px-3 sm:px-4 py-2 border-b flex flex-row justify-between items-center cursor-pointer hover:bg-slate-200 gap-2 max-md:text-xs"
                   onClick={() => toggleDate(dayData.date)}
@@ -377,41 +335,35 @@ const RemovedTable: React.FC = () => {
                       <table className="min-w-full divide-y divide-gray-200 table-fixed">
                         <thead className="bg-gray-50">
                           <tr>
-                            {/* Name - always visible */}
                             <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 w-1/5">Name</th>
                             <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 w-1/5">Qty</th>
                             <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 max-md:table-cell hidden w-1/5">Product</th>
                             <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell w-1/5">Cost/Unit</th>
                             <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden sm:table-cell w-1/5">Total</th>
                             <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 hidden md:table-cell w-1/5">Product</th>
-                            {userRole === 'ceo' && <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 w-1/6">Actions</th>}
+                            <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-bold text-blue-400 w-1/6">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                           {dayData.entries.length === 0 ? (
                             <tr>
-                              <td colSpan={userRole === 'ceo' ? 7 : 6} className="text-center py-6 text-gray-500">
+                              <td colSpan={7} className="text-center py-6 text-gray-500">
                                 No removed items for this day.
                               </td>
                             </tr>
                           ) : (
                             dayData.entries.map((entry: any) => (
                               <tr key={entry.id} className="hover:bg-gray-50">
-                                {/* Name - always visible */}
                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm cursor-pointer hover:text-blue-600 w-1/5">{entry.name}</td>
                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm w-1/5">{formatNumber(entry.quantity)}</td>
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm max-md:table-cell hidden w-1/5">{entry.product_its_used.name || "—"}</td>
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm max-md:table-cell hidden w-1/5">{entry.product_its_used?.name || "—"}</td>
                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell w-1/5">{formatCurrency(entry.price)}</td>
                                 <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden sm:table-cell w-1/5">{formatCurrency(parseFloat(entry.price) * parseFloat(entry.quantity))}</td>
-                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell w-1/5">{entry.product_its_used.name || "—"}</td>
-                                {userRole === 'ceo' && (
-                                  <td className="flex justify-evenly px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-blue-600">
-                                    <>
-                                      <FontAwesomeIcon onClick={() => handleEdit(entry.id)} className="pr-1 sm:pr-2 cursor-pointer hover:text-blue-500" icon={faPen} />
-                                      <FontAwesomeIcon onClick={() => handleDeleteClick(entry.id)} className="cursor-pointer text-red-400" icon={faTrash} />
-                                    </>
-                                  </td>
-                                )}
+                                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell w-1/5">{entry.product_its_used?.name || "—"}</td>
+                                <td className="flex justify-evenly px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-blue-600">
+                                  <FontAwesomeIcon onClick={() => handleEdit(entry.id)} className="pr-1 sm:pr-2 cursor-pointer hover:text-blue-500" icon={faPen} />
+                                  <FontAwesomeIcon onClick={() => handleDeleteClick(entry.id)} className="cursor-pointer text-red-400" icon={faTrash} />
+                                </td>
                               </tr>
                             ))
                           )}
@@ -420,7 +372,6 @@ const RemovedTable: React.FC = () => {
                     </div>
                   </div>
                 )}
-
               </div>
             ))
           )}

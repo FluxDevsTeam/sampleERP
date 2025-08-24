@@ -147,7 +147,7 @@ const ContractorsTable = ({
       <div
         className={`overflow-x-auto pb-2 md:pb-6 ${isViewModalOpen || isTableModalOpen || isDeleteDialogOpen ? "blur-md" : ""}`}
       >
-        <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
+        <table className="min-w-full bg-white shadow-md overflow-hidden text-xs sm:text-sm">
           <thead className="bg-blue-400 text-white">
             <tr>
               {headers.map((header, index) => {

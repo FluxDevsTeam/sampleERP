@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { updateContractor, getContractorDetails } from "@/utils/jsonDataService";
 
 interface EditContractorModalProps {
   id: string;
@@ -45,16 +45,8 @@ const EditContractorModal: React.FC<EditContractorModalProps> = ({
 
     const fetchContractor = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
-        const response = await axios.get(
-          `https://backend.kidsdesigncompany.com/api/contractors/${id}/`,
-          {
-            headers: {
-              Authorization: `JWT ${token}`,
-            },
-          }
-        );
-        setFormData(response.data);
+        const data = await getContractorDetails(id);
+        setFormData(data);
       } catch (error) {
         toast.error("Failed to fetch contractor data.");
       }
@@ -76,16 +68,7 @@ const EditContractorModal: React.FC<EditContractorModalProps> = ({
     setIsPending(true);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.put(
-        `https://backend.kidsdesigncompany.com/api/contractors/${id}/`,
-        formData,
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
-        }
-      );
+      await updateContractor(id, formData);
       queryClient.invalidateQueries({
         queryKey: ["contractors"],
         refetchType: "active",

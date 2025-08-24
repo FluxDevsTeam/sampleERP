@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   BarChart,
   Bar,
@@ -8,151 +8,17 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { TooltipProps } from 'recharts';
+import dashboardDataJson from "@/data/store-keeper-page/dashboard/storekeeper-dashboard.json";
 
 // Format number with naira sign and commas
-const formatNairaCompact = (value: number) => `\u20a6${new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value)}`;
+const formatNairaCompact = (value: number) =>
+  `\u20a6${new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value)}`;
 
 const AmountSoldMonthlyBarChart = () => {
-  const [month1, setMonth1] = useState("Jan");
-  const [month1Num, setMonth1Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
-
-  const [month2, setMonth2] = useState("Feb");
-  const [month2Num, setMonth2Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
-
-  const [month3, setMonth3] = useState("Mar");
-  const [month3Num, setMonth3Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
-
-  const [month4, setMonth4] = useState("Apr");
-  const [month4Num, setMonth4Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
-
-  const [month5, setMonth5] = useState("May");
-  const [month5Num, setMonth5Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
-
-  const [month6, setMonth6] = useState("Jun");
-  const [month6Num, setMonth6Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
-
-  const [month7, setMonth7] = useState("Jul");
-  const [month7Num, setMonth7Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
-
-  const [month8, setMonth8] = useState("Aug");
-  const [month8Num, setMonth8Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
-
-  const [month9, setMonth9] = useState("Sept");
-  const [month9Num, setMonth9Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
-
-  const [month10, setMonth10] = useState("Oct");
-  const [month10Num, setMonth10Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
-
-  const [month11, setMonth11] = useState("Nov");
-  const [month11Num, setMonth11Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
-
-  const [month12, setMonth12] = useState("Dec");
-  const [month12Num, setMonth12Num] = useState(
-    Math.floor(Math.random() * (100000 - 40000 + 1)) + 40000
-  );
-
-  const data = [
-    { month: month1, value: month1Num },
-    { month: month2, value: month2Num },
-    { month: month3, value: month3Num },
-    { month: month4, value: month4Num },
-    { month: month5, value: month5Num },
-    { month: month6, value: month6Num },
-    { month: month7, value: month7Num },
-    { month: month8, value: month8Num },
-    { month: month9, value: month9Num },
-    { month: month10, value: month10Num },
-    { month: month11, value: month11Num },
-    { month: month12, value: month12Num },
-  ];
-
-  useEffect(() => {
-    async function fetchStockInfo() {
-      // INVENTORY DASHBOARD
-      try {
-        const response = await fetch(
-          "https://backend.kidsdesigncompany.com/api/storekeeper-dashboard/",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Authentication failed");
-        }
-
-        const logData = await response.json();
-        console.log(logData);
-
-        setMonth1(logData.added_amount_monthly[0].month);
-        setMonth1Num(logData.added_amount_monthly[0].total);
-
-        setMonth2(logData.added_amount_monthly[1].month);
-        setMonth2Num(logData.added_amount_monthly[1].total);
-
-        setMonth3(logData.added_amount_monthly[2].month);
-        setMonth3Num(logData.added_amount_monthly[2].total);
-
-        setMonth4(logData.added_amount_monthly[3].month);
-        setMonth4Num(logData.added_amount_monthly[3].total);
-
-        setMonth5(logData.added_amount_monthly[4].month);
-        setMonth5Num(logData.added_amount_monthly[4].total);
-
-        setMonth6(logData.added_amount_monthly[5].month);
-        setMonth6Num(logData.added_amount_monthly[5].total);
-
-        setMonth7(logData.added_amount_monthly[6].month);
-        setMonth7Num(logData.added_amount_monthly[6].total);
-
-        setMonth8(logData.added_amount_monthly[7].month);
-        setMonth8Num(logData.added_amount_monthly[7].total);
-
-        setMonth9(logData.added_amount_monthly[8].month);
-        setMonth9Num(logData.added_amount_monthly[8].total);
-
-        setMonth10(logData.added_amount_monthly[9].month);
-        setMonth10Num(logData.added_amount_monthly[9].total);
-
-        setMonth11(logData.added_amount_monthly[10].month);
-        setMonth11Num(logData.added_amount_monthly[10].total);
-
-        setMonth12(logData.added_amount_monthly[11].month);
-        setMonth12Num(logData.added_amount_monthly[11].total);
-      } catch (error) {
-        console.error("Error fetching dashboard:", error);
-      }
-    }
-
-    fetchStockInfo();
-  }, []);
+  const data = dashboardDataJson.addedAmountMonthly.map((item) => ({
+    month: item.month,
+    value: item.total,
+  }));
 
   return (
     <div>
@@ -163,20 +29,20 @@ const AmountSoldMonthlyBarChart = () => {
         <BarChart data={data} margin={{ left: 0, right: 14, top: 10, bottom: 9 }}>
           <defs>
             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="10%" stopColor="blue" stopOpacity={1} />
-              <stop offset="90%" stopColor="pink" stopOpacity={0.2} />
+              <stop offset="10%" stopColor="#5D8AA8" stopOpacity={0.8} /> {/* Softer blue */}
+              <stop offset="90%" stopColor="#B0E0E6" stopOpacity={0.3} /> {/* Powder blue */}
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
           <YAxis tickFormatter={formatNairaCompact} width={64} />
           <Tooltip formatter={(value: number) => formatNairaCompact(value)} />
-          <Bar
-            // type="monotone"
-            dataKey="value"
-            stroke="#0178a3"
-            fillOpacity={1}
-            fill="url(#colorValue)"
+          <Bar 
+            dataKey="value" 
+            stroke="#0178a3" 
+            fillOpacity={1} 
+            fill="url(#colorValue)" 
+            radius={[4, 4, 0, 0]} // Optional: adds slight rounded corners to bars
           />
         </BarChart>
       </ResponsiveContainer>

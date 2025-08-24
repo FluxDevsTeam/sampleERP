@@ -152,7 +152,6 @@ const AddBalanceSwitchModal: React.FC<AddBalanceSwitchModalProps> = ({ isOpen, o
               )}
             />
 
-            {isCeo && (
               <FormField
                 control={form.control}
                 name="switch_date"
@@ -166,7 +165,7 @@ const AddBalanceSwitchModal: React.FC<AddBalanceSwitchModalProps> = ({ isOpen, o
                   </FormItem>
                 )}
               />
-            )}
+
 
             <DialogFooter>
               <div className="flex justify-end gap-2 w-full">

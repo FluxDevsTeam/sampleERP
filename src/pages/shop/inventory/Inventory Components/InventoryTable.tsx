@@ -1,4 +1,4 @@
-import React, { useEffect, useState, JSX, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ThreeDots } from "react-loader-spinner";
 import { Whisper, Tooltip } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
@@ -16,6 +16,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import Modal from "../../Modal";
+import inventoryDataJson from "@/data/shop/inventory/inventory.json";
 
 interface TableProps {
   headers: string[];
@@ -30,10 +31,7 @@ interface TableData {
   [key: string]: string | number | JSX.Element;
 }
 
-const Table: React.FC<TableProps> = ({
-  headers,
-  onModalChange,
-}) => {
+const InventoryTable: React.FC<TableProps> = ({ headers, onModalChange }) => {
   const userRole = localStorage.getItem("user_role");
   const [tableData, setTableData] = useState<TableData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -42,8 +40,6 @@ const Table: React.FC<TableProps> = ({
   const [showImagePreview, setShowImagePreview] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [nextPageUrl, setNextPageUrl] = useState<string | null>(null);
-  const [prevPageUrl, setPrevPageUrl] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
   const [count, setCount] = useState(0);
   const [currentItems, setCurrentItems] = useState<TableData[]>([]);
@@ -57,8 +53,6 @@ const Table: React.FC<TableProps> = ({
   });
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
-
-  // Add search/filter state here
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [archived, setArchived] = useState(false);
@@ -82,6 +76,7 @@ const Table: React.FC<TableProps> = ({
 
   const handleSearch = () => {
     setSearchQuery(searchInput);
+    setCurrentPage(1);
   };
 
   const handleClear = () => {
@@ -90,87 +85,59 @@ const Table: React.FC<TableProps> = ({
     setArchived(false);
     setEmptyStock(false);
     setLowStock(false);
+    setCurrentPage(1);
   };
 
-  const fetchItems = async (url?: string) => {
-    try {
-      setLoading(true);
-      let fetchUrl = url || `https://backend.kidsdesigncompany.com/api/inventory-item/?page=${currentPage}`;
-      const params = new URLSearchParams();
-      if (searchQuery) {
-        params.append("search", searchQuery);
-      }
-      if (archived) {
-        params.append("archived", "true");
-      }
-      if (emptyStock) {
-        params.append("empty_stock", "true");
-      }
-      if (lowStock) {
-        params.append("low_stock", "true");
-      }
-      if (!url) {
-        fetchUrl += `&${params.toString()}`;
-      }
-      const response = await fetch(fetchUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const data = await response.json();
-      setCount(data.count);
-      setNextPageUrl(data.next);
-      setPrevPageUrl(data.previous);
-      setTotalPages(Math.ceil(data.count / itemsPerPage));
-      const updatedTableData: TableData[] = data.results.items.map(
-        (item: any) => {
-          return {
-            Product: item.name,
-            Category: item.inventory_category?.name || "-",
-            "Stock Status": item.stock,
-            Details: (
-              <button
-                onClick={() => handleViewDetails(item)}
-                className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
-              >
-                View
-              </button>
-            ),
-          };
-        }
+  const fetchItems = () => {
+    setLoading(true);
+    let filteredItems = inventoryDataJson.items;
+
+    // Apply filters
+    if (searchQuery) {
+      filteredItems = filteredItems.filter((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setTableData(updatedTableData);
-      setCurrentItems(updatedTableData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
     }
+    if (emptyStock) {
+      filteredItems = filteredItems.filter((item) => item.stock === 0);
+    }
+    if (lowStock) {
+      filteredItems = filteredItems.filter(
+        (item) => item.stock > 0 && item.stock <= 10
+      );
+    }
+    // Archived filter not applicable in static JSON (no archived field)
+
+    const updatedTableData: TableData[] = filteredItems.map((item) => ({
+      Product: item.name,
+      Category: item.inventory_category?.name || "-",
+      "Stock Status": item.stock,
+      Details: (
+        <button
+          onClick={() => handleViewDetails(item)}
+          className="px-3 py-1 text-blue-400 border-2 border-blue-400 rounded"
+        >
+          View
+        </button>
+      ),
+    }));
+
+    setCount(filteredItems.length);
+    setTotalPages(Math.ceil(filteredItems.length / itemsPerPage));
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    setCurrentItems(updatedTableData.slice(startIndex, endIndex));
+    setTableData(updatedTableData);
+    setLoading(false);
   };
 
   useEffect(() => {
     fetchItems();
-  }, [searchQuery, archived, emptyStock, lowStock, currentPage]);
+  }, [searchQuery, emptyStock, lowStock, currentPage]);
 
   const handlePageChange = (pageNumber: number) => {
-    if (pageNumber < 1 || (totalPages && pageNumber > totalPages)) return;
+    if (pageNumber < 1 || pageNumber > totalPages) return;
     setCurrentPage(pageNumber);
-    let url = null;
-    if (pageNumber === 1 && prevPageUrl) {
-      url = prevPageUrl.replace(/page=\d+/, 'page=1');
-    } else if (pageNumber === totalPages && nextPageUrl) {
-      url = nextPageUrl.replace(/page=\d+/, `page=${totalPages}`);
-    }
-    if (url) {
-      fetchItems(url);
-    } else {
-      fetchItems(`https://backend.kidsdesigncompany.com/api/inventory-item/?page=${pageNumber}`);
-    }
   };
 
   useEffect(() => {
@@ -181,8 +148,6 @@ const Table: React.FC<TableProps> = ({
       document.body.style.overflow = "unset";
       onModalChange(false);
     }
-
-    // Cleanup function to reset overflow when component unmounts
     return () => {
       document.body.style.overflow = "unset";
       onModalChange(false);
@@ -190,7 +155,6 @@ const Table: React.FC<TableProps> = ({
   }, [showModal, showImagePreview, onModalChange]);
 
   useEffect(() => {
-    // Check for returning from add contractor or add worker or addQuotation with updated product data
     if (
       (location.state?.from === "addWorker" ||
         location.state?.from === "addContractor" ||
@@ -199,8 +163,8 @@ const Table: React.FC<TableProps> = ({
         location.state?.from === "editProduct") &&
       location.state?.productData
     ) {
-      setSelectedProduct(location.state.productData); // Set the updated product
-      setShowModal(true); // Show the modal with the updated product data
+      setSelectedProduct(location.state.productData);
+      setShowModal(true);
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
@@ -210,24 +174,14 @@ const Table: React.FC<TableProps> = ({
     setShowModal(true);
   };
 
-  // DELETING ITEM
   const deleteItem = async () => {
     if (selectedProduct) {
       try {
-        const response = await fetch(
-          `https://backend.kidsdesigncompany.com/api/inventory-item/${selectedProduct.id}/`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            },
-          }
+        // Simulate deletion by filtering out the item
+        const updatedItems = inventoryDataJson.items.filter(
+          (item) => item.id !== selectedProduct.id
         );
-
-        if (!response.ok) {
-          throw new Error("Failed to delete item");
-        }
-
+        // In a real app, update JSON or persist to backend here
         setModalConfig({
           isOpen: true,
           title: "Success",
@@ -236,7 +190,7 @@ const Table: React.FC<TableProps> = ({
         });
         setShowModal(false);
         setConfirmDelete(false);
-        fetchItems(); // Refresh items
+        fetchItems();
       } catch (error) {
         console.error("Error deleting item:", error);
         setModalConfig({
@@ -249,7 +203,6 @@ const Table: React.FC<TableProps> = ({
     }
   };
 
-  // NAVIGATION TO EDIT PAGE
   const editItem = () => {
     if (selectedProduct) {
       navigate(`/shop/edit-item/${selectedProduct.id}`, {
@@ -260,24 +213,18 @@ const Table: React.FC<TableProps> = ({
 
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
-    // if (modalConfig.type === "success") {
-    //   window.location.reload();
-    // }
   };
 
   const confirmDeleteItem = () => {
     setConfirmDelete(true);
   };
 
-  const handleConfirmDelete = async (
-    e: React.MouseEvent<HTMLButtonElement>
-  ) => {
+  const handleConfirmDelete = async () => {
     setDeleteLoading(true);
     await deleteItem();
     setDeleteLoading(false);
   };
 
-  // Format number as integer if .00, otherwise as float
   const formatNumber = (number: number | string | undefined | null) => {
     if (number === undefined || number === null || number === "") {
       return "0";
@@ -297,7 +244,6 @@ const Table: React.FC<TableProps> = ({
 
   return (
     <div className="relative">
-      {/* Heading and Add Button in a two-column grid */}
       <div className="grid grid-cols-2 items-center mb-4">
         <h1
           style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
@@ -307,7 +253,7 @@ const Table: React.FC<TableProps> = ({
         </h1>
         <div className="flex justify-end">
           <button
-            onClick={() => navigate("/shop/add-new-item")}
+            onClick={() => navigate("/inventory/add-new-item")}
             className="px-4 py-2 bg-blue-400 text-white rounded mr-2 hover:bg-blue-500 transition-colors"
           >
             <FontAwesomeIcon className="pr-2" icon={faPlus} />
@@ -315,10 +261,8 @@ const Table: React.FC<TableProps> = ({
           </button>
         </div>
       </div>
-      {/* Search and Filter Bar */}
-      <div className="flex justify-between items- mb-4">
-        {/* Search Bar */}
-        <div className="flex items-center gap-x-2 w-1/2 ">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-x-2 w-1/2">
           <input
             type="text"
             placeholder="Search for items by name..."
@@ -333,7 +277,6 @@ const Table: React.FC<TableProps> = ({
             onClick={handleSearch}
             className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 flex items-center justify-center"
           >
-            {/* Icon for mobile, text for md+ */}
             <FontAwesomeIcon icon={faMagnifyingGlass} className="inline md:hidden" />
             <span className="hidden md:inline">Search</span>
           </button>
@@ -341,18 +284,16 @@ const Table: React.FC<TableProps> = ({
             onClick={handleClear}
             className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 flex items-center justify-center"
           >
-            {/* Icon for mobile, text for md+ */}
             <FontAwesomeIcon icon={faXmark} className="inline md:hidden" />
             <span className="hidden md:inline">Clear</span>
           </button>
         </div>
-        {/* Filter Dropdown */}
         <div className="relative" ref={filterRef}>
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
             className="border p-2 rounded flex items-center"
           >
-            Filters{" "}
+            Filters
             <svg
               className="w-4 h-4 ml-2"
               fill="none"
@@ -365,7 +306,7 @@ const Table: React.FC<TableProps> = ({
                 strokeLinejoin="round"
                 strokeWidth="2"
                 d="M19 9l-7 7-7-7"
-              ></path>
+              />
             </svg>
           </button>
           {isFilterOpen && (
@@ -417,90 +358,107 @@ const Table: React.FC<TableProps> = ({
               wrapperClass=""
             />
           </div>
+        ) : currentItems.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+              <svg
+                className="w-8 h-8 text-blue-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2V7a2 2 0 00-2-2h-1V3.5a1.5 1.5 0 00-3 0V5H9a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold text-gray-800 mb-1">
+              No inventory items found
+            </h2>
+            <p className="text-gray-500 mb-6 text-center max-w-xs">
+              All your inventory items will show up here. Start by adding a new item.
+            </p>
+          </div>
+            
         ) : (
-          currentItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
-                <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2V7a2 2 0 00-2-2h-1V3.5a1.5 1.5 0 00-3 0V5H9a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h2 className="text-lg font-semibold text-gray-800 mb-1">No inventory items found</h2>
-              <p className="text-gray-500 mb-6 text-center max-w-xs">All your inventory items will show up here. Start by adding a new item.</p>
-            </div>
-          ) : (
-            <div>
-              <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
-                <thead>
-                  <tr className="bg-blue-400 text-white">
-                    <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Product</th>
-                    <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">Category</th>
-                    <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Stock</th>
-                    <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Details</th>
+          <div>
+            <table className="min-w-full bg-white shadow-md overflow-hidden text-xs sm:text-sm">
+              <thead>
+                <tr className="bg-blue-400 text-white">
+                  <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">
+                    Product
+                  </th>
+                  <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden sm:table-cell">
+                    Category
+                  </th>
+                  <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">
+                    Stock
+                  </th>
+                  <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">
+                    Details
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentItems.map((row, index) => (
+                  <tr key={index} className="hover:bg-gray-100">
+                    <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
+                      {row.Product}
+                    </td>
+                    <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700 hidden sm:table-cell">
+                      {row.Category}
+                    </td>
+                    <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
+                      {formatNumber(row["Stock Status"])}
+                    </td>
+                    <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
+                      {row.Details}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((row, index) => (
-                    <tr key={index} className="hover:bg-gray-100">
-                      <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
-                        {row.Product}
-                      </td>
-                      <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700 hidden sm:table-cell">
-                        {row.Category}
-                      </td>
-                      <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
-                        {formatNumber(row["Stock Status"])}
-                      </td>
-                      <td className="py-2 px-2 sm:py-4 sm:px-4 border-b border-gray-200 text-sm text-gray-700">
-                        {row.Details}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
-      {/* Updated Pagination Controls */}
       <div className="flex justify-center items-center mb-28 gap-2">
         <button
           onClick={() => handlePageChange(1)}
-          disabled={!prevPageUrl}
+          disabled={currentPage === 1}
           className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
           <FontAwesomeIcon icon={faAnglesLeft} />
         </button>
         <button
           onClick={() => handlePageChange(currentPage - 1)}
-          disabled={!prevPageUrl}
+          disabled={currentPage === 1}
           className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-
         <span className="mx-4">
           Page {currentPage} of {totalPages}
         </span>
-
         <button
           onClick={() => handlePageChange(currentPage + 1)}
-          disabled={!nextPageUrl}
+          disabled={currentPage === totalPages}
           className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
           <FontAwesomeIcon icon={faArrowRight} />
         </button>
         <button
           onClick={() => handlePageChange(totalPages)}
-          disabled={!nextPageUrl}
+          disabled={currentPage === totalPages}
           className="px-3 py-1 rounded bg-blue-400 text-white disabled:bg-gray-300"
         >
           <FontAwesomeIcon icon={faAnglesRight} />
         </button>
       </div>
 
-      {/*   PRODUCT DETAILS   */}
       {showModal && selectedProduct && (
         <div
           className={`fixed inset-0 flex items-center justify-center z-[100] ${
@@ -511,9 +469,14 @@ const Table: React.FC<TableProps> = ({
             className="absolute inset-0 bg-black opacity-50"
             onClick={() => setShowModal(false)}
           ></div>
-          <div className="w-[95vw] max-w-md mx-auto p-4 sm:p-6 bg-white border border-gray-200 rounded-lg shadow-lg relative z-10" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+          <div
+            className="w-[95vw] max-w-md mx-auto p-4 sm:p-6 bg-white border border-gray-200 rounded-lg shadow-lg relative z-10"
+            style={{ maxHeight: "80vh", overflowY: "auto" }}
+          >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg sm:text-xl font-bold text-black">{selectedProduct.name}</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-black">
+                {selectedProduct.name}
+              </h2>
               <button
                 onClick={() => setShowModal(false)}
                 className="text-gray-500 hover:text-gray-700 focus:outline-none text-2xl font-bold"
@@ -542,36 +505,68 @@ const Table: React.FC<TableProps> = ({
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white border border-gray-100 rounded-lg p-4 mb-4 shadow">
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-black uppercase">Category</span>
-                <span className="text-base font-bold text-black">{selectedProduct.inventory_category?.name || "No category"}</span>
+                <span className="text-xs font-semibold text-black uppercase">
+                  Category
+                </span>
+                <span className="text-base font-bold text-black">
+                  {selectedProduct.inventory_category?.name || "No category"}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-black uppercase">Stock</span>
-                <span className="text-base font-bold text-black">{formatNumber(selectedProduct.stock ?? selectedProduct.quantity ?? '—')}</span>
+                <span className="text-xs font-semibold text-black uppercase">
+                  Stock
+                </span>
+                <span className="text-base font-bold text-black">
+                  {formatNumber(selectedProduct.stock ?? "—")}
+                </span>
               </div>
               <div className="flex flex-col gap-1 col-span-1 sm:col-span-2">
-                <span className="text-xs font-semibold text-black uppercase">Description</span>
-                <span className="text-base font-bold text-black">{selectedProduct.description || "No description"}</span>
+                <span className="text-xs font-semibold text-black uppercase">
+                  Description
+                </span>
+                <span className="text-base font-bold text-black">
+                  {selectedProduct.description || "No description"}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-black uppercase">Dimensions</span>
-                <span className="text-base font-bold text-black">{selectedProduct.dimensions} cm</span>
+                <span className="text-xs font-semibold text-black uppercase">
+                  Dimensions
+                </span>
+                <span className="text-base font-bold text-black">
+                  {selectedProduct.dimensions || "—"} cm
+                </span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-black uppercase">Cost Price</span>
-                <span className="text-base font-bold text-black">₦ {selectedProduct.cost_price}</span>
+                <span className="text-xs font-semibold text-black uppercase">
+                  Cost Price
+                </span>
+                <span className="text-base font-bold text-black">
+                  ₦ {formatNumber(selectedProduct.cost_price)}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-black uppercase">Selling Price</span>
-                <span className="text-base font-bold text-black">₦ {selectedProduct.selling_price}</span>
+                <span className="text-xs font-semibold text-black uppercase">
+                  Selling Price
+                </span>
+                <span className="text-base font-bold text-black">
+                  ₦ {formatNumber(selectedProduct.selling_price)}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-black uppercase">Profit per item</span>
-                <span className="text-base font-bold text-black">₦ {selectedProduct.profit_per_item}</span>
+                <span className="text-xs font-semibold text-black uppercase">
+                  Profit per item
+                </span>
+                <span className="text-base font-bold text-black">
+                  ₦ {formatNumber(selectedProduct.profit_per_item)}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-black uppercase">Total Price</span>
-                <span className="text-base font-bold text-black">₦ {selectedProduct.total_price}</span>
+                <span className="text-xs font-semibold text-black uppercase">
+                  Total Price
+                </span>
+                <span className="text-base font-bold text-black">
+                  ₦ {formatNumber(selectedProduct.total_price)}
+                </span>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 w-full mt-2">
@@ -602,7 +597,6 @@ const Table: React.FC<TableProps> = ({
         </div>
       )}
 
-      {/* confirmation modal */}
       {confirmDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
           <div className="bg-white rounded-lg p-6 w-96">
@@ -636,7 +630,6 @@ const Table: React.FC<TableProps> = ({
         </div>
       )}
 
-      {/*   IMAGE PREVIEW   */}
       {showImagePreview && selectedProduct && (
         <div
           className="fixed inset-0 bg-opacity-90 flex items-center justify-center z-[200]"
@@ -663,4 +656,4 @@ const Table: React.FC<TableProps> = ({
   );
 };
 
-export default Table;
+export default InventoryTable;

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../../AuthPages/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import SearchablePaginatedDropdown from "./SearchablePaginatedDropdown";
+import soldDataJson from "@/data/shop/sold/sold.json";
 
 const Modal = ({
   isOpen,
@@ -38,9 +38,7 @@ const Modal = ({
         <button
           onClick={onClose}
           className={`w-full py-2 px-4 text-white rounded ${
-            type === "success"
-              ? "bg-blue-600 hover:bg-blue-20"
-              : "bg-red-500 hover:bg-red-600"
+            type === "success" ? "bg-blue-600 hover:bg-blue-700" : "bg-red-500 hover:bg-red-600"
           }`}
         >
           {type === "success" ? "Continue" : "Close"}
@@ -68,17 +66,11 @@ const AddNewSoldItemPage = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("Form data updated:", formData);
-  }, [formData]);
-
-  useEffect(() => {
     const role = localStorage.getItem("user_role");
     setUserRole(role);
   }, []);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -94,17 +86,11 @@ const AddNewSoldItemPage = () => {
     }));
     if (name === "item" && value) {
       try {
-        const response = await fetch(`https://backend.kidsdesigncompany.com/api/inventory-item/${value}/`, {
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
+        const item = soldDataJson.items.find((i) => i.id === parseInt(value));
+        if (item) {
           setItemDetails({
-            quantity: Number(data.stock) || 0,
-            price: Number(data.selling_price) || 0,
+            quantity: Number(item.stock) || 0,
+            price: Number(item.selling_price) || 0,
           });
         } else {
           setItemDetails(null);
@@ -130,7 +116,6 @@ const AddNewSoldItemPage = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Prepare submit data based on sale type
     const submitData = Object.fromEntries(
       Object.entries(formData).map(([key, value]) => {
         if (saleType === "project" && ["customer", "logistics"].includes(key)) {
@@ -144,23 +129,8 @@ const AddNewSoldItemPage = () => {
     );
 
     try {
-      console.log("Data being sent to POST request:", submitData);
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/sold/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-          body: JSON.stringify(submitData),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to record sale");
-      }
-
+      // Simulate adding to JSON (in reality, update soldDataJson or use localStorage)
+      console.log("Simulated POST with data:", submitData);
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error recording sale:", error);
@@ -175,11 +145,11 @@ const AddNewSoldItemPage = () => {
       <div className="flex items-center mb-6">
         <button
           onClick={() => navigate("/shop/sold")}
-          className="mr-4 text-gray-20 hover:text-gray-600"
+          className="mr-4 text-gray-600 hover:text-gray-800"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-        <h1 className="text-2xl font-bold text-gray-20">Record Sale</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Record Sale</h1>
       </div>
 
       <div className="mb-6">
@@ -190,9 +160,7 @@ const AddNewSoldItemPage = () => {
               type="radio"
               value="customer"
               checked={saleType === "customer"}
-              onChange={(e) =>
-                setSaleType(e.target.value as "customer" | "project")
-              }
+              onChange={(e) => setSaleType(e.target.value as "customer" | "project")}
               className="mr-2"
             />
             Customer Sale
@@ -202,9 +170,7 @@ const AddNewSoldItemPage = () => {
               type="radio"
               value="project"
               checked={saleType === "project"}
-              onChange={(e) =>
-                setSaleType(e.target.value as "customer" | "project")
-              }
+              onChange={(e) => setSaleType(e.target.value as "customer" | "project")}
               className="mr-2"
             />
             Project Sale
@@ -214,11 +180,11 @@ const AddNewSoldItemPage = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <SearchablePaginatedDropdown
-          endpoint="https://backend.kidsdesigncompany.com/api/inventory-item/"
+          endpoint="items"
           label="Item"
           name="item"
           onChange={handleDropdownChange}
-          resultsKey="results.items"
+          resultsKey="items"
         />
         {itemDetails && (
           <div className="mt-2 text-xs text-black">
@@ -234,42 +200,40 @@ const AddNewSoldItemPage = () => {
             value={formData.quantity}
             min={1}
             max={itemDetails ? itemDetails.quantity : undefined}
-            onChange={e => {
+            onChange={(e) => {
               let val = e.target.value;
               if (itemDetails && Number(val) > itemDetails.quantity) {
                 val = itemDetails.quantity.toString();
               }
-              setFormData(prev => ({ ...prev, quantity: val }));
+              setFormData((prev) => ({ ...prev, quantity: val }));
             }}
             className="w-full border rounded p-2"
             required
             disabled={!formData.item}
           />
         </div>
-        {userRole === 'ceo' && (
-        <div>
-          <label className="block mb-1">Date:</label>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-            required
-          />
-        </div>
+        {userRole === "ceo" && (
+          <div>
+            <label className="block mb-1">Date:</label>
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              className="w-full border rounded p-2"
+              required
+            />
+          </div>
         )}
-        {/* CUSTOMER SALE TYPE */}
         {saleType === "customer" && (
           <>
             <SearchablePaginatedDropdown
-              endpoint="https://backend.kidsdesigncompany.com/api/customer/"
+              endpoint="customers"
               label="Customer"
               name="customer"
               onChange={handleDropdownChange}
-              resultsKey="results.all_customers"
+              resultsKey="customers"
             />
-
             <div>
               <label className="block mb-1">Logistics:</label>
               <input
@@ -282,18 +246,15 @@ const AddNewSoldItemPage = () => {
             </div>
           </>
         )}
-
-        {/* PROJECT SALE TYPE */}
         {saleType === "project" && (
           <SearchablePaginatedDropdown
-            endpoint="https://backend.kidsdesigncompany.com/api/project/"
+            endpoint="projects"
             label="Project"
             name="project"
             onChange={handleDropdownChange}
-            resultsKey="all_projects"
+            resultsKey="projects"
           />
         )}
-
         <button
           type="submit"
           disabled={loading}
@@ -313,7 +274,6 @@ const AddNewSoldItemPage = () => {
         }}
         type="success"
       />
-
       <Modal
         isOpen={showErrorModal}
         onClose={() => setShowErrorModal(false)}

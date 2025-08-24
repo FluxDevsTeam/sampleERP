@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,10 +23,9 @@ import {
 } from "@/components/ui/select";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import customersData from "@/data/ceo/project/customers.json";
+import projectsData from "@/data/ceo/project/projects.json";
 
-// Define the types for the project data
-
-// Interface for customers
 interface Customer {
   id: number;
   name: string;
@@ -39,77 +37,22 @@ interface Customer {
   created_at: string | null;
 }
 
-// Interface for API response
-interface CustomerApiResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: {
-    all_customers_count: number;
-    active_customers: number;
-    all_customers: Customer[];
-  };
-}
+const saveProjectsToJson = async (updatedProjects: any) => {
+  localStorage.setItem("projects", JSON.stringify(updatedProjects));
+  return updatedProjects;
+};
 
 const AddProject = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isPending, setIsPending] = useState(false);
   const [formError, setFormError] = useState("");
-  const [errorDetails, setErrorDetails] = useState<Record<string, string[]>>(
-    {}
-  );
-
-  // Invoice image states
+  const [errorDetails, setErrorDetails] = useState<Record<string, string[]>>({});
   const [invoiceImage, setInvoiceImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-
-  // Get customers from API
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
-
-  // Fetch customers on mount
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      setIsLoadingCustomers(true);
-      try {
-        const accessToken = localStorage.getItem("accessToken");
-
-        if (!accessToken) {
-          throw new Error("Please login to access this data");
-        }
-        const response = await axios.get<CustomerApiResponse>(
-          "https://backend.kidsdesigncompany.com/api/customer/",
-          {
-            headers: {
-              Authorization: `JWT ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        // Extract customers from the nested structure
-        if (
-          response.data &&
-          response.data.results &&
-          response.data.results.all_customers
-        ) {
-          setCustomers(response.data.results.all_customers);
-        } else {
-          console.error("Unexpected API response structure:", response.data);
-          throw new Error("Unexpected API response structure");
-        }
-      } catch (error) {
-        console.error("Error fetching customers:", error);
-        // No fallback data anymore - we'll just show an error message
-        setCustomers([]);
-      } finally {
-        setIsLoadingCustomers(false);
-      }
-    };
-
-    fetchCustomers();
-  }, []);
+  const [customers] = useState<Customer[]>(customersData.results.all_customers || []);
+  const [isLoadingCustomers] = useState(false);
+  const [allItems, setAllItems] = useState([{ item: "", price: "", quantity: "1" }]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -124,37 +67,26 @@ const AddProject = () => {
     note: "",
   });
 
-  const [allItems, setAllItems] = useState([{ item: '', price: '', quantity: '1' }]);
-
-  const handleAllItemChange = (idx: number, field: 'item' | 'price' | 'quantity', value: string) => {
-    setAllItems((prev) => prev.map((row, i) => i === idx ? { ...row, [field]: value } : row));
+  const handleAllItemChange = (idx: number, field: "item" | "price" | "quantity", value: string) => {
+    setAllItems((prev) => prev.map((row, i) => (i === idx ? { ...row, [field]: value } : row)));
   };
 
   const handleAddAllItem = () => {
-    setAllItems((prev) => [...prev, { item: '', price: '', quantity: '1' }]);
+    setAllItems((prev) => [...prev, { item: "", price: "", quantity: "1" }]);
   };
 
   const handleRemoveAllItem = (idx: number) => {
     setAllItems((prev) => prev.filter((_, i) => i !== idx));
   };
 
-  // Handle image file change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type and size
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "application/pdf",
-      ];
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif", "application/pdf"];
+      const maxSize = 5 * 1024 * 1024;
 
       if (!allowedTypes.includes(file.type)) {
-        toast.error(
-          "Invalid file type. Please upload a JPEG, PNG, GIF, or PDF."
-        );
+        toast.error("Invalid file type. Please upload a JPEG, PNG, GIF, or PDF.");
         return;
       }
 
@@ -168,28 +100,17 @@ const AddProject = () => {
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCustomerChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      customer_detail: value, // Store as string initially
-    }));
+    setFormData((prev) => ({ ...prev, customer_detail: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -198,93 +119,88 @@ const AddProject = () => {
     setErrorDetails({});
     setIsPending(true);
 
-    // Validate form data
     if (!formData.name || formData.customer_detail === "placeholder") {
       setFormError("Please fill all required fields");
       setIsPending(false);
       return;
     }
 
-    // Create FormData for multipart/form-data upload
-    const formDataToSubmit = new FormData();
-
-    // Append all text fields
-    const projectData = {
-      name: formData.name,
-      status: formData.status,
-      start_date: formData.start_date,
-      deadline: formData.deadline || null,
-      date_delivered: null,
-      customer: parseInt(formData.customer_detail),
-      selling_price: formData.selling_price,
-      logistics: formData.logistics || "0",
-      service_charge: formData.service_charge || "0",
-      note: formData.note || null,
-    };
-
-    // Append text fields
-    Object.entries(projectData).forEach(([key, value]) => {
-      if (value !== null) {
-        formDataToSubmit.append(key, value.toString());
-      }
-    });
-
-    // Append all_items as JSON string if not empty
-    if (allItems.length > 0 && allItems.some(row => row.item && row.price)) {
-      formDataToSubmit.append('all_items', JSON.stringify(allItems.filter(row => row.item && row.price).map(row => ({ ...row, quantity: row.quantity || '1' }))));
-    }
-
-    // Append invoice image if present
-    if (invoiceImage) {
-      formDataToSubmit.append("invoice_image", invoiceImage);
-    }
-
     try {
-      const accessToken = localStorage.getItem("accessToken");
+      const newProject = {
+        id: projectsData.all_projects.length + 1,
+        name: formData.name,
+        status: formData.status,
+        start_date: formData.start_date,
+        deadline: formData.deadline || null,
+        date_delivered: null,
+        is_delivered: false,
+        archived: false,
+        customer_detail: customers.find((c) => c.id.toString() === formData.customer_detail) || {
+          id: 0,
+          name: "",
+        },
+        selling_price: formData.selling_price,
+        logistics: formData.logistics || "0",
+        service_charge: formData.service_charge || "0",
+        note: formData.note || null,
+        all_items: allItems
+          .filter((row) => row.item && row.price)
+          .map((row) => ({
+            ...row,
+            quantity: row.quantity || "1",
+          })),
+        invoice_image: invoiceImage ? URL.createObjectURL(invoiceImage) : null,
+        products: {
+          progress: 0,
+          total_product_selling_price: 0,
+          total_production_cost: 0,
+          total_artisan_cost: 0,
+          total_overhead_cost: 0,
+          total_raw_material_cost: 0,
+          total_grand_total: 0,
+          total_profit: 0,
+          products: [],
+        },
+        sold_items: { total_cost_price_sold_items: 0, total_selling_price_sold_items: 0, sold_items: [] },
+        expenses: { total_expenses: 0, expenses: [] },
+        other_productions: { total_cost: 0, total_budget: 0, other_productions: [] },
+        calculations: {
+          total_raw_material_cost: 0,
+          total_artisan_cost: 0,
+          total_overhead_cost: 0,
+          total_products_cost: 0,
+          total_product_selling_price: parseFloat(formData.selling_price) || 0,
+          product_profit: 0,
+          total_cost_price_sold_items: 0,
+          total_selling_price_sold_items: 0,
+          shop_items_profit: 0,
+          money_left_for_expensis: parseFloat(formData.selling_price) || 0,
+          money_left_for_expensis_with_logistics_and_service_charge:
+            parseFloat(formData.selling_price) - parseFloat(formData.logistics) - parseFloat(formData.service_charge) || 0,
+          total_other_productions_budget: 0,
+          total_other_productions_cost: 0,
+          total_expensis: 0,
+          total_money_spent: 0,
+          total_paid: 0,
+          final_profit: parseFloat(formData.selling_price) || 0,
+        },
+        tasks: [],
+      };
 
-      if (!accessToken) {
-        throw new Error("Please login to access this data");
-      }
-      const response = await axios.post(
-        "https://backend.kidsdesigncompany.com/api/project/",
-        formDataToSubmit,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `JWT ${accessToken}`,
-          },
-        }
-      );
+      const updatedProjects = {
+        ...projectsData,
+        all_projects: [...projectsData.all_projects, newProject],
+        all_time_projects_count: projectsData.all_time_projects_count + 1,
+        all_projects_count: projectsData.all_projects_count + 1,
+        ongoing_projects_count: projectsData.ongoing_projects_count + 1,
+      };
 
+      await saveProjectsToJson(updatedProjects);
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       toast.success("Project added successfully!");
       navigate("/ceo/projects");
     } catch (error: any) {
-      console.error("Error adding project:", error);
-
-      // Handle specific API error responses
-      if (error.response && error.response.data) {
-        if (typeof error.response.data === "object") {
-          setErrorDetails(error.response.data);
-
-          // Create a readable error message
-          const errorMessages = Object.entries(error.response.data)
-            .map(
-              ([key, value]) =>
-                `${key}: ${Array.isArray(value) ? value.join(", ") : value}`
-            )
-            .join("; ");
-
-          setFormError(`Validation error: ${errorMessages}`);
-        } else {
-          setFormError(
-            "Failed to add project. Please check your data and try again."
-          );
-        }
-      } else {
-        setFormError("Failed to add project. Please try again.");
-      }
-
+      setFormError("Failed to add project. Please try again.");
       toast.error("Failed to add project. Please check the form for errors.");
     } finally {
       setIsPending(false);
@@ -308,7 +224,7 @@ const AddProject = () => {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Project Name (optional)</Label>
+              <Label htmlFor="name">Project Name*</Label>
               <Input
                 id="name"
                 name="name"
@@ -317,25 +233,17 @@ const AddProject = () => {
                 required
                 className={errorDetails.name ? "border-red-500" : ""}
               />
-              {errorDetails.name && (
-                <p className="text-sm text-red-500">
-                  {errorDetails.name.join(", ")}
-                </p>
-              )}
+              {errorDetails.name && <p className="text-sm text-red-500">{errorDetails.name.join(", ")}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="customer_detail">Customer (optional)</Label>
+              <Label htmlFor="customer_detail">Customer*</Label>
               <Select
                 value={formData.customer_detail}
                 onValueChange={handleCustomerChange}
                 disabled={isLoadingCustomers}
               >
-                <SelectTrigger
-                  className={
-                    errorDetails.customer_detail ? "border-red-500" : ""
-                  }
-                >
+                <SelectTrigger className={errorDetails.customer_detail ? "border-red-500" : ""}>
                   <SelectValue placeholder="Select a customer" />
                 </SelectTrigger>
                 <SelectContent>
@@ -345,10 +253,7 @@ const AddProject = () => {
                     </SelectItem>
                   ) : customers.length > 0 ? (
                     customers.map((customer) => (
-                      <SelectItem
-                        key={customer.id}
-                        value={customer.id.toString()}
-                      >
+                      <SelectItem key={customer.id} value={customer.id.toString()}>
                         {customer.name}
                       </SelectItem>
                     ))
@@ -360,26 +265,16 @@ const AddProject = () => {
                 </SelectContent>
               </Select>
               {errorDetails.customer_detail && (
-                <p className="text-sm text-red-500">
-                  {Array.isArray(errorDetails.customer_detail)
-                    ? errorDetails.customer_detail.join(", ")
-                    : "Invalid customer selection"}
-                </p>
+                <p className="text-sm text-red-500">{errorDetails.customer_detail.join(", ")}</p>
               )}
               {customers.length === 0 && !isLoadingCustomers && (
-                <p className="text-sm text-amber-500">
-                  Failed to load customers from API. Please try refreshing the
-                  page.
-                </p>
+                <p className="text-sm text-amber-500">Failed to load customers. Please try refreshing the page.</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => handleSelectChange("status", value)}
-              >
+              <Select value={formData.status} onValueChange={(value) => handleSelectChange("status", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a status" />
                 </SelectTrigger>
@@ -405,9 +300,7 @@ const AddProject = () => {
                   className={errorDetails.start_date ? "border-red-500" : ""}
                 />
                 {errorDetails.start_date && (
-                  <p className="text-sm text-red-500">
-                    {errorDetails.start_date.join(", ")}
-                  </p>
+                  <p className="text-sm text-red-500">{errorDetails.start_date.join(", ")}</p>
                 )}
               </div>
 
@@ -436,9 +329,7 @@ const AddProject = () => {
                   className={errorDetails.selling_price ? "border-red-500" : ""}
                 />
                 {errorDetails.selling_price && (
-                  <p className="text-sm text-red-500">
-                    {errorDetails.selling_price.join(", ")}
-                  </p>
+                  <p className="text-sm text-red-500">{errorDetails.selling_price.join(", ")}</p>
                 )}
               </div>
 
@@ -480,16 +371,9 @@ const AddProject = () => {
 
             <div className="space-y-2">
               <Label htmlFor="note">Note</Label>
-              <Textarea
-                id="note"
-                name="note"
-                value={formData.note}
-                onChange={handleChange}
-                rows={3}
-              />
+              <Textarea id="note" name="note" value={formData.note} onChange={handleChange} rows={3} />
             </div>
 
-            {/* Invoice Image Upload */}
             <div className="space-y-2">
               <Label htmlFor="invoice_image">Invoice Image</Label>
               <Input
@@ -499,17 +383,10 @@ const AddProject = () => {
                 onChange={handleImageChange}
                 className="cursor-pointer"
               />
-              {invoiceImage && (
-                <p className="text-sm text-green-600 mt-2">
-                  {invoiceImage.name} selected
-                </p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB
-              </p>
+              {invoiceImage && <p className="text-sm text-green-600 mt-2">{invoiceImage.name} selected</p>}
+              <p className="text-xs text-muted-foreground">Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB</p>
             </div>
 
-            {/* All Items Section */}
             <div className="space-y-2">
               <Label>All Items</Label>
               <div className="space-y-2">
@@ -518,14 +395,14 @@ const AddProject = () => {
                     <Input
                       placeholder="Item"
                       value={row.item}
-                      onChange={e => handleAllItemChange(idx, 'item', e.target.value)}
+                      onChange={(e) => handleAllItemChange(idx, "item", e.target.value)}
                       className="w-1/3"
                     />
                     <Input
                       placeholder="Price"
                       type="number"
                       value={row.price}
-                      onChange={e => handleAllItemChange(idx, 'price', e.target.value)}
+                      onChange={(e) => handleAllItemChange(idx, "price", e.target.value)}
                       className="w-1/3"
                     />
                     <Input
@@ -533,22 +410,28 @@ const AddProject = () => {
                       type="number"
                       min="1"
                       value={row.quantity}
-                      onChange={e => handleAllItemChange(idx, 'quantity', e.target.value)}
+                      onChange={(e) => handleAllItemChange(idx, "quantity", e.target.value)}
                       className="w-1/4"
                     />
-                    <Button type="button" variant="destructive" size="sm" onClick={() => handleRemoveAllItem(idx)} disabled={allItems.length === 1}>Remove</Button>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemoveAllItem(idx)}
+                      disabled={allItems.length === 1}
+                    >
+                      Remove
+                    </Button>
                   </div>
                 ))}
-                <Button type="button" variant="outline" size="sm" onClick={handleAddAllItem}>Add Item</Button>
+                <Button type="button" variant="outline" size="sm" onClick={handleAddAllItem}>
+                  Add Item
+                </Button>
               </div>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate("/ceo/projects")}
-            >
+            <Button type="button" variant="outline" onClick={() => navigate("/ceo/projects")}>
               Cancel
             </Button>
             <Button type="submit" disabled={isPending}>

@@ -4,9 +4,10 @@ import MonthlyAddedValueSpikedChart from "./Dashboard Components/Monthly-Added-V
 import MonthlyProfitChart from "./Dashboard Components/Monthly-Profit-Chart";
 import CategoryTable from "./Dashboard Components/CategoryTable";
 import { useEffect, useState } from "react";
+import dashboardDataJson from "@/data/shop/dashboard/dashboard.json";
 
-const ShopDashboard = () => {
-  document.title = "Dashboard - KDC Admin";
+const InventoryDashboard = () => {
+  document.title = "Dashboard - Inventory Admin";
 
   const categoryTableHeaders = [
     "Category",
@@ -15,38 +16,10 @@ const ShopDashboard = () => {
     "Total Profit",
   ];
 
-    const [dashboardData, setDashboardData] = useState<any>(null);
-  
+  const [dashboardData, setDashboardData] = useState<any>(null);
 
   useEffect(() => {
-    async function fetchStockInfo() {
-      // INVENTORY DASHBOARD
-      try {
-        const response = await fetch(
-          "https://backend.kidsdesigncompany.com/api/shopkeeper-dashboard/",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Authentication failed");
-        }
-
-        const logData = await response.json();
-        console.log(logData);
-
-        setDashboardData(logData);
-      } catch (error) {
-        console.error("Error fetching dashboard:", error);
-      }
-    }
-
-    fetchStockInfo();
+    setDashboardData(dashboardDataJson);
   }, []);
 
   return (
@@ -54,48 +27,47 @@ const ShopDashboard = () => {
       <div className="mb-8 sm:mb-16">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-2 md:mb-6">
           <DashboardData
-            info="Total shop value"
-            digits={dashboardData?.total_shop_value}
+            info="Total Inventory Value"
+            digits={dashboardData?.total_shop_value ?? 0}
             currency="₦ "
           />
-              <DashboardData
-                info="Total Cost Value"
-                digits={dashboardData?.total_cost_value}
-                currency="₦ "
-              />
-            <DashboardData
-              info="Total Profit Potential"
-              digits={dashboardData?.total_profit_potential}
-              currency="₦ "
-            />
-            <DashboardData
-              info="Yearly added value"
-              digits={dashboardData?.yearly_added_value}
-              currency="₦ "
-            />
+          <DashboardData
+            info="Total Cost Value"
+            digits={dashboardData?.total_cost_value ?? 0}
+            currency="₦ "
+          />
+          <DashboardData
+            info="Total Profit Potential"
+            digits={dashboardData?.total_profit_potential ?? 0}
+            currency="₦ "
+          />
+          <DashboardData
+            info="Yearly Added Value"
+            digits={dashboardData?.yearly_added_value ?? 0}
+            currency="₦ "
+          />
           <DashboardData
             info="Monthly Added Value"
-            digits={dashboardData?.total_added_this_month}
+            digits={dashboardData?.total_added_this_month ?? 0}
             currency="₦ "
           />
           <DashboardData
             info="Total Monthly Sales"
-            digits={dashboardData?.total_sold_this_month}
+            digits={dashboardData?.total_sold_this_month ?? 0}
             currency="₦ "
           />
           <DashboardData
             info="Monthly Profit"
-            digits={dashboardData?.total_profit_this_month}
+            digits={dashboardData?.total_profit_this_month ?? 0}
             currency="₦ "
           />
           <DashboardData
-            info="Yearly profit"
-            digits={dashboardData?.yearly_profit}
+            info="Yearly Profit"
+            digits={dashboardData?.yearly_profit ?? 0}
             currency="₦ "
           />
         </div>
 
-        {/* Responsive chart grid */}
         <div className="grid gap-4 md:gap-2 lg:grid-cols-2 items-center rounded-sm">
           <div className="w-full min-h-[160px] md:min-h-[300px] bg-white rounded-lg shadow p-2 overflow-x-auto">
             <AmountSoldMonthlyBarChart />
@@ -120,4 +92,4 @@ const ShopDashboard = () => {
   );
 };
 
-export default ShopDashboard;
+export default InventoryDashboard;

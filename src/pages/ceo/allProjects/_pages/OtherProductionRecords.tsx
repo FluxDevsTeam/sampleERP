@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,11 +38,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import productionRecordsData from "@/data/ceo/project/production_records.json";
 
-// Base URL for API requests
-const BASE_URL = 'https://backend.kidsdesigncompany.com/api';
-
-// Define the type for a production record
 interface ProductionRecord {
   id: number;
   name: string;
@@ -53,7 +49,6 @@ interface ProductionRecord {
   updated_at: string;
 }
 
-// Define the type for the API response
 interface ApiResponse {
   count: number;
   next: string | null;
@@ -61,26 +56,29 @@ interface ApiResponse {
   results: ProductionRecord[];
 }
 
-// Fetch production records from the API
-const fetchProductionRecords = async (projectId: string): Promise<ApiResponse> => {
-  const token = localStorage.getItem('accessToken');
-  const response = await axios.get(`${BASE_URL}/project/${projectId}/other-production-record/`, {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  });
-  return response.data;
-};
-
-// Form values interface
 interface FormValues {
   name: string;
   budget: string;
   cost?: string;
 }
 
+const saveProductionRecordsToJson = async (updatedRecords: any[]) => {
+  // Placeholder for saving to JSON file
+  return updatedRecords;
+};
+
+const fetchProductionRecords = async (projectId: string): Promise<ApiResponse> => {
+  const projectRecords = productionRecordsData.find(p => p.projectId.toString() === projectId)?.records || [];
+  return {
+    count: projectRecords.length,
+    next: null,
+    previous: null,
+    results: projectRecords,
+  };
+};
+
 const OtherProductionRecords = () => {
-  const { id: projectId } = useParams<{ id: string }>(); // Use 'id' from route as projectId
+  const { id: projectId } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -104,23 +102,32 @@ const OtherProductionRecords = () => {
     },
   });
 
-  // Fetch records
   const { data, isLoading, error } = useQuery({
     queryKey: ['productionRecords', projectId],
     queryFn: () => fetchProductionRecords(projectId!),
     enabled: !!projectId,
   });
 
-  // Add record mutation
   const addRecordMutation = useMutation({
     mutationFn: async (values: FormValues) => {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.post(`${BASE_URL}/project/${projectId}/other-production-record/`, values, {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      });
-      return response.data;
+      const projectRecords = productionRecordsData.find(p => p.projectId.toString() === projectId)?.records || [];
+      const newRecord = {
+        id: projectRecords.length + 1,
+        name: values.name,
+        budget: values.budget,
+        cost: values.cost || "0",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      const updatedRecords = [...projectRecords, newRecord];
+      const updatedData = productionRecordsData.map(p =>
+        p.projectId.toString() === projectId ? { ...p, records: updatedRecords } : p
+      );
+      if (!updatedData.some(p => p.projectId.toString() === projectId)) {
+        updatedData.push({ projectId: parseInt(projectId!), records: [newRecord] });
+      }
+      await saveProductionRecordsToJson(updatedData);
+      return newRecord;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['productionRecords', projectId] });
@@ -133,17 +140,18 @@ const OtherProductionRecords = () => {
     },
   });
 
-  // Edit record mutation
   const editRecordMutation = useMutation({
     mutationFn: async (values: FormValues & { id: number }) => {
       const { id, ...data } = values;
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.patch(`${BASE_URL}/project/${projectId}/other-production-record/${id}/`, data, {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      });
-      return response.data;
+      const projectRecords = productionRecordsData.find(p => p.projectId.toString() === projectId)?.records || [];
+      const updatedRecords = projectRecords.map(record =>
+        record.id === id ? { ...record, ...data, updated_at: new Date().toISOString() } : record
+      );
+      const updatedData = productionRecordsData.map(p =>
+        p.projectId.toString() === projectId ? { ...p, records: updatedRecords } : p
+      );
+      await saveProductionRecordsToJson(updatedData);
+      return { id, ...data };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['productionRecords', projectId] });
@@ -156,15 +164,14 @@ const OtherProductionRecords = () => {
     },
   });
 
-  // Delete record mutation
   const deleteRecordMutation = useMutation({
     mutationFn: async (id: number) => {
-      const token = localStorage.getItem('accessToken');
-      await axios.delete(`${BASE_URL}/project/${projectId}/other-production-record/${id}/`, {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      });
+      const projectRecords = productionRecordsData.find(p => p.projectId.toString() === projectId)?.records || [];
+      const updatedRecords = projectRecords.filter(record => record.id !== id);
+      const updatedData = productionRecordsData.map(p =>
+        p.projectId.toString() === projectId ? { ...p, records: updatedRecords } : p
+      );
+      await saveProductionRecordsToJson(updatedData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['productionRecords', projectId] });
@@ -176,7 +183,6 @@ const OtherProductionRecords = () => {
     },
   });
 
-  // Handle form submission for adding a new record
   const onSubmit = (values: FormValues) => {
     if (!projectId) {
       toast.error('Project ID is missing. Cannot create record.');
@@ -185,11 +191,9 @@ const OtherProductionRecords = () => {
     const payload: any = { ...values, project: projectId };
     if (!payload.cost) delete payload.cost;
     if (!payload.budget) delete payload.budget;
-    console.log('POST payload to /other-production-record/:', payload);
     addRecordMutation.mutate(payload);
   };
 
-  // Handle form submission for editing a record
   const onEditSubmit = (values: FormValues) => {
     if (selectedRecord) {
       const payload = { ...values };
@@ -198,7 +202,6 @@ const OtherProductionRecords = () => {
     }
   };
 
-  // Handle edit button click
   const handleEdit = (record: ProductionRecord) => {
     setSelectedRecord(record);
     editForm.setValue('name', record.name);
@@ -207,13 +210,11 @@ const OtherProductionRecords = () => {
     setIsEditDialogOpen(true);
   };
 
-  // Handle delete button click
   const handleDelete = (record: ProductionRecord) => {
     setSelectedRecord(record);
     setIsDeleteDialogOpen(true);
   };
 
-  // Confirm delete action
   const confirmDelete = () => {
     if (selectedRecord) {
       deleteRecordMutation.mutate(selectedRecord.id);
@@ -230,15 +231,12 @@ const OtherProductionRecords = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2 sm:gap-0">
         <div>
           <h1 className="text-2xl font-bold">Other Production Records</h1>
-          {/* <p className="text-gray-500">Project ID: {projectId}</p> */}
         </div>
         <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:flex-row sm:w-auto">
           <Button variant="outline" asChild>
             <Link to={`/project-manager/projects`}>Back to Projects</Link>
           </Button>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
-            Add New Record
-          </Button>
+          <Button onClick={() => setIsAddDialogOpen(true)}>Add New Record</Button>
         </div>
       </div>
 
@@ -267,13 +265,9 @@ const OtherProductionRecords = () => {
                   </div>
                 </div>
                 <div className="flex justify-end gap-1 mt-2">
-                  <Button size="sm" variant="outline" onClick={() => handleEdit(record)}>
-                    Edit
-                  </Button>
-                  {typeof window !== 'undefined' && localStorage.getItem('user_role') === 'ceo' && (
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(record)}>
-                      Delete
-                    </Button>
+                  <Button size="sm" variant="outline" onClick={() => handleEdit(record)}>Edit</Button>
+                  {typeof window !== 'undefined' && (
+                    <Button size="sm" variant="destructive" onClick={() => handleDelete(record)}>Delete</Button>
                   )}
                 </div>
               </CardContent>
@@ -282,22 +276,15 @@ const OtherProductionRecords = () => {
         </div>
       )}
 
-      {/* Add Record Dialog */}
-      <Dialog 
-        open={isAddDialogOpen} 
-        onOpenChange={(open) => {
-          // Only allow closing if not in the middle of submitting
-          if (!addRecordMutation.isPending) {
-            setIsAddDialogOpen(open);
-          }
-        }}
-      >
+      <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
+        if (!addRecordMutation.isPending) {
+          setIsAddDialogOpen(open);
+        }
+      }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add New Production Record</DialogTitle>
-            <DialogDescription>
-              Enter the details for the new production record.
-            </DialogDescription>
+            <DialogDescription>Enter the details for the new production record.</DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -350,21 +337,15 @@ const OtherProductionRecords = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Record Dialog */}
-      <Dialog 
-        open={isEditDialogOpen} 
-        onOpenChange={(open) => {
-          if (!editRecordMutation.isPending) {
-            setIsEditDialogOpen(open);
-          }
-        }}
-      >
+      <Dialog open={isEditDialogOpen} onOpenChange={(open) => {
+        if (!editRecordMutation.isPending) {
+          setIsEditDialogOpen(open);
+        }
+      }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Production Record</DialogTitle>
-            <DialogDescription>
-              Update the details for this production record.
-            </DialogDescription>
+            <DialogDescription>Update the details for this production record.</DialogDescription>
           </DialogHeader>
           <Form {...editForm}>
             <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
@@ -417,21 +398,16 @@ const OtherProductionRecords = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog 
-        open={isDeleteDialogOpen} 
-        onOpenChange={(open) => {
-          if (!deleteRecordMutation.isPending) {
-            setIsDeleteDialogOpen(open);
-          }
-        }}
-      >
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={(open) => {
+        if (!deleteRecordMutation.isPending) {
+          setIsDeleteDialogOpen(open);
+        }
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. It will permanently delete the
-              production record "{selectedRecord?.name}".
+              This action cannot be undone. It will permanently delete the production record "{selectedRecord?.name}".
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

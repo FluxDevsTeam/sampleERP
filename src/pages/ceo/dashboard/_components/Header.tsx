@@ -1,26 +1,9 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import ceoDashboardDataInitial from "@/data/ceo/dashboard/ceo-dashboard.json";
 import { MdArrowOutward, MdExpandMore, MdExpandLess } from "react-icons/md";
 import Frame180 from "../../../../assets/images/Frame180.png";
 
-// Create an Axios instance with default headers
-const api = axios.create({
-  baseURL: "https://backend.kidsdesigncompany.com/api/",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// Add a request interceptor to include the token
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
-  if (token) {
-    config.headers.Authorization = `JWT ${token}`;
-  }
-  return config;
-});
-
+// Define interface for CEO dashboard data
 interface CEODashboardData {
   income_breakdown_year: {
     projects: number;
@@ -111,7 +94,6 @@ const DataCard = ({
   label: string;
   value: number | string;
 }) => {
-  // Show Naira sign only for numbers and not for percentage or string values, and not for count metrics
   const isNumber = typeof value === "number";
   const isPercent = typeof value === "string" && value.trim().endsWith("%");
   const showNaira = isNumber && !NO_NAIRA_LABELS.includes(label);
@@ -126,18 +108,28 @@ const DataCard = ({
   );
 };
 
-// Fetch CEO dashboard data
-const fetchCEODashboard = async (): Promise<CEODashboardData> => {
-  const { data } = await api.get<CEODashboardData>("ceo-dashboard/");
-  return data;
-};
-
 // Main CEO Dashboard component
 const Header = () => {
-  const { data, isLoading, error } = useQuery<CEODashboardData>({
-    queryKey: ["ceo-dashboard"],
-    queryFn: fetchCEODashboard,
-  });
+  const [data, setData] = useState<CEODashboardData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    const fetchData = () => {
+      try {
+        // Load from local storage if available, else use initial JSON
+        const storedData = localStorage.getItem("ceoDashboardData");
+        const dashboardData: CEODashboardData = storedData ? JSON.parse(storedData) : ceoDashboardDataInitial;
+        setData(dashboardData);
+        setIsLoading(false);
+      } catch (err) {
+        setError("Failed to load dashboard data");
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Collapsible state for each section
   const [openSection, setOpenSection] = useState<'key' | 'income' | 'expense' | 'asset' | 'customer' | 'additional'>('key');
@@ -145,7 +137,6 @@ const Header = () => {
   // Check if sidebar is open by looking for the sidebar element and its width
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // Update sidebar state when window resizes or sidebar toggles
   React.useEffect(() => {
     const checkSidebarState = () => {
       const sidebar = document.querySelector('aside');
@@ -158,7 +149,6 @@ const Header = () => {
     checkSidebarState();
     window.addEventListener('resize', checkSidebarState);
     
-    // Check periodically for sidebar state changes
     const interval = setInterval(checkSidebarState, 500);
     
     return () => {
@@ -172,15 +162,11 @@ const Header = () => {
   };
 
   if (isLoading) return <p className="p-4 sm:p-6">Loading dashboard data...</p>;
-  if (error)
-    return (
-      <p className="p-4 sm:p-6 text-red-500">Error: {(error as Error).message}</p>
-    );
+  if (error) return <p className="p-4 sm:p-6 text-red-500">Error: {error}</p>;
   if (!data) return <p className="p-4 sm:p-6">No dashboard data available</p>;
 
   return (
     <div className="relative z-10 sm:p-3 lg:p-4 w-full min-w-0">
-      {/* Collapsible Section Headers Row */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:flex gap-2 mb-3 px-0 py-1 w-full min-w-0">
         <button 
           className={`w-full flex-1 flex-shrink min-w-0 flex items-center justify-between px-2 py-6 rounded-lg shadow bg-blue-50/60 hover:bg-blue-100 transition font-semibold text-blue-700 text-[11px] sm:text-xs ${openSection === 'key' ? 'ring-2 ring-blue-400' : ''}`} 
@@ -238,7 +224,6 @@ const Header = () => {
         </button>
       </div>
 
-      {/* Collapsible Section Content */}
       {openSection === 'key' && (
         <section className="mb-6 sm:mb-8 bg-blue-50/60 rounded-2xl shadow p-3 sm:p-4 lg:p-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">

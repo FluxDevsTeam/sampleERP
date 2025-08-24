@@ -1,23 +1,15 @@
+// src/pages/admin/assets/_components/AssetsTable.tsx
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
-import axios from "axios";
+import { toast } from "sonner";
 import PaginationComponent from "./Pagination";
 import Modals from "./Modal";
-import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
-import { AssetsData, Asset } from "../_api/apiService";
+import { Asset } from "../_api/apiService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPencil,
-  faTrash,
-  faArrowLeft,
-  faArrowRight,
-  faXmark,
-  faAnglesLeft,
-  faAnglesRight,
-} from "@fortawesome/free-solid-svg-icons";
+import { faAnglesLeft, faAnglesRight, faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
+import assetsData from "@/data/admin/assets/assets.json";
 
 interface AssetsTableProps {
   headers: string[];
@@ -25,6 +17,7 @@ interface AssetsTableProps {
   showAvailable: boolean;
   showDeprecated: boolean;
   isTableModalOpen: boolean;
+  setIsTableModalOpen: (open: boolean) => void;
 }
 
 interface PaginatedAssetsResponse {
@@ -36,93 +29,58 @@ interface PaginatedAssetsResponse {
   };
 }
 
-const BASE_URL = "https://backend.kidsdesigncompany.com/api/assets/";
-
-const fetchAssets = async (
-  page = 1,
-  searchQuery = "",
-  showAvailable = false,
-  showDeprecated = false
-): Promise<PaginatedAssetsResponse> => {
-  const token = localStorage.getItem("accessToken");
-  const params = new URLSearchParams();
-  params.append("page", String(page));
-
-  if (searchQuery) {
-    params.append("search", searchQuery);
-  }
-  if (showAvailable) {
-    params.append("is_still_available", "true");
-  }
-  if (showDeprecated) {
-    params.append("is_still_available", "false");
-  }
-
-  const response = await axios.get(`${BASE_URL}?${params.toString()}`, {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  });
-  return response.data;
-};
-
 const AssetsTable = ({
   headers,
   searchQuery,
   showAvailable,
   showDeprecated,
   isTableModalOpen,
+  setIsTableModalOpen,
 }: AssetsTableProps) => {
-  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const currentUserRole = localStorage.getItem("user_role");
   const isCEO = currentUserRole === "ceo";
-
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
-
-  const { data, isLoading, error } = useQuery({
-    queryKey: [
-      "assets",
-      currentPage,
-      searchQuery,
-      showAvailable,
-      showDeprecated,
-    ],
-    queryFn: () =>
-      fetchAssets(currentPage, searchQuery, showAvailable, showDeprecated),
-  });
+  const [data, setData] = useState<PaginatedAssetsResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (data?.count) {
-      const itemsPerPage = 10;
-      setTotalPages(Math.ceil(data.count / itemsPerPage));
+    setIsLoading(true);
+    let filteredAssets = assetsData.results.assets;
+    if (searchQuery) {
+      filteredAssets = filteredAssets.filter((asset) =>
+        asset.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
-  }, [data]);
+    if (showAvailable && !showDeprecated) {
+      filteredAssets = filteredAssets.filter((asset) => asset.is_still_available);
+    } else if (showDeprecated && !showAvailable) {
+      filteredAssets = filteredAssets.filter((asset) => !asset.is_still_available);
+    }
 
-  const deleteAssetMutation = useMutation({
-    mutationFn: async (assetId: number) => {
-      const token = localStorage.getItem("accessToken");
-      await axios.delete(`${BASE_URL}${assetId}/`, {
-        headers: {
-          Authorization: `JWT ${token}`,
-        },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["assets"] });
-      setIsDeleteDialogOpen(false);
-      setIsModalOpen(false);
-      toast.success("Asset deleted successfully!");
-    },
-  });
+    const itemsPerPage = 10;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedAssets = filteredAssets.slice(startIndex, startIndex + itemsPerPage);
+
+    setData({
+      count: filteredAssets.length,
+      next: startIndex + itemsPerPage < filteredAssets.length ? "next" : null,
+      previous: startIndex > 0 ? "prev" : null,
+      results: { assets: paginatedAssets },
+    });
+    setTotalPages(Math.ceil(filteredAssets.length / itemsPerPage));
+    setIsLoading(false);
+  }, [currentPage, searchQuery, showAvailable, showDeprecated]);
 
   const handleRowClick = (asset: Asset) => {
     setSelectedAsset(asset);
     setIsModalOpen(true);
+    setIsTableModalOpen(true);
   };
 
   const handleDelete = () => {
@@ -130,35 +88,19 @@ const AssetsTable = ({
   };
 
   const confirmDelete = () => {
-    if (selectedAsset?.id) {
-      deleteAssetMutation.mutate(selectedAsset.id);
-    }
+    toast.error("Delete asset functionality is disabled in static mode.");
+    setIsDeleteDialogOpen(false);
+    setIsModalOpen(false);
+    setSelectedAsset(null);
+    setIsTableModalOpen(false);
   };
 
   const handlePageChange = (newPage: number) => {
     setSearchParams({ page: newPage.toString() });
   };
 
-  useEffect(() => {
-    if (currentPage < totalPages) {
-      const nextPage = currentPage + 1;
-      queryClient.prefetchQuery({
-        queryKey: [
-          "assets",
-          nextPage,
-          searchQuery,
-          showAvailable,
-          showDeprecated,
-        ],
-        queryFn: () =>
-          fetchAssets(nextPage, searchQuery, showAvailable, showDeprecated),
-      });
-    }
-  }, [currentPage, queryClient, totalPages, searchQuery, showAvailable, showDeprecated]);
-
   if (isLoading) return <SkeletonLoader />;
-  if (error)
-    return <p className="text-red-600">Error: {(error as Error).message}</p>;
+  if (error) return <p className="text-red-600">Error: {error}</p>;
 
   const assets = data?.results?.assets || [];
   const hasNextPage = !!data?.next;
@@ -169,13 +111,13 @@ const AssetsTable = ({
       <div
         className={`overflow-x-auto pb-6 ${isModalOpen || isTableModalOpen ? "blur-md" : ""}`}
       >
-        <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
+        <table className="min-w-full bg-white shadow-md overflow-hidden text-xs sm:text-sm">
           <thead className="bg-blue-400 text-white">
             <tr>
               {headers.map((header, index) => (
                 <th
                   key={header}
-                  className={`py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold ${index === 2 ? 'hidden sm:table-cell' : ''}`}
+                  className={`py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold ${index === 2 ? "hidden sm:table-cell" : ""}`}
                 >
                   {header}
                 </th>
@@ -188,36 +130,39 @@ const AssetsTable = ({
                 <td colSpan={headers.length} className="p-0">
                   <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm m-2">
                     <div className="flex items-center justify-center w-16 h-16 rounded-full bg-yellow-50 mb-4">
-                      {/* Building icon */}
-                      <svg className="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <svg
+                        className="w-8 h-8 text-yellow-400"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                      >
                         <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
                         <path d="M9 21V7M15 21V7M3 7h18" stroke="currentColor" strokeWidth="2" />
                       </svg>
                     </div>
                     <h2 className="text-lg font-semibold text-gray-800 mb-1">No assets found</h2>
-                    <p className="text-gray-500 mb-6 text-center max-w-xs">All your assets will show up here. Add a new asset to get started.</p>
+                    <p className="text-gray-500 mb-6 text-center max-w-xs">
+                      All your assets will show up here. Add a new asset to get started.
+                    </p>
+                    <Button onClick={() => setIsTableModalOpen(true)}>Add Asset</Button>
                   </div>
                 </td>
               </tr>
             ) : (
               assets.map((asset) => (
-                <tr
-                  key={asset.id}
-                  className="hover:bg-gray-100"
-                >
+                <tr key={asset.id} className="hover:bg-gray-100">
                   <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 max-w-[12ch] truncate">
                     {asset.name}
                   </td>
                   <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
-                    ₦ {new Intl.NumberFormat('en-NG', { useGrouping: true }).format(asset.value)}
+                    ₦ {new Intl.NumberFormat("en-NG", { useGrouping: true }).format(asset.value)}
                   </td>
                   <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700 hidden sm:table-cell">
                     {asset.expected_lifespan}
                   </td>
                   <td className="py-2 px-2 sm:py-5 sm:px-4 border-b border-gray-200 text-xs sm:text-sm text-gray-700">
-                    <span
-                      className={`inline-flex items-center px-1.5 py-0.5 sm:px-2.5 rounded-full text-xs font-medium`}
-                    >
+                    <span className="inline-flex items-center px-1.5 py-0.5 sm:px-2.5 rounded-full text-xs font-medium">
                       {asset.is_still_available ? "Available" : "Unavailable"}
                     </span>
                   </td>
@@ -251,7 +196,7 @@ const AssetsTable = ({
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-        <span className="mx-4 text-md ">Page {currentPage} of {totalPages}</span>
+        <span className="mx-4 text-md">Page {currentPage} of {totalPages}</span>
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={!hasNextPage}
@@ -267,7 +212,6 @@ const AssetsTable = ({
           <FontAwesomeIcon icon={faAnglesRight} />
         </button>
       </div>
-
       <Modals
         selectedAsset={selectedAsset}
         isModalOpen={isModalOpen}
@@ -277,7 +221,7 @@ const AssetsTable = ({
         handleDelete={handleDelete}
         confirmDelete={confirmDelete}
         isCEO={isCEO}
-        isDeleting={deleteAssetMutation.isPending}
+        onModalStateChange={(isOpen) => {setIsTableModalOpen(isOpen);}}
       />
     </div>
   );

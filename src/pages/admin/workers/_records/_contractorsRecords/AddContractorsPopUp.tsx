@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { addContractorRecord } from "@/utils/jsonDataService";
 
 interface AddRecordPopupProps {
   isOpen: boolean;
@@ -31,16 +31,7 @@ const AddRecordPopup: React.FC<AddRecordPopupProps> = ({
 
   const addRecordMutation = useMutation({
     mutationFn: async (record: { report: string }) => {
-      const token = localStorage.getItem("accessToken");
-      await axios.post(
-        `https://backend.kidsdesigncompany.com/api/contractors/${contractorId}/record/`,
-        record,
-        {
-          headers: {
-            Authorization: `JWT ${token}`,
-          },
-        }
-      );
+      await addContractorRecord(contractorId, record);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

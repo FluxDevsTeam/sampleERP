@@ -1,58 +1,18 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
-import axios from "axios";
+import {
+  fetchContractors,
+  Contractor,
+  PaginatedContractorsResponse
+} from "../../../../utils/jsonDataService";
 import PaginationComponent from "./Pagination";
 import Modals from "./Modal";
 import { toast } from "sonner";
 import SkeletonLoader from "./SkeletonLoader";
 import AddContractorModal from "../_pages/_contractors/AddContractorModal";
 
-const BASE_URL = "https://backend.kidsdesigncompany.com/api/contractors/";
-
-interface Contractor {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string;
-  address: string;
-  craft_specialty: string;
-  years_of_experience: number;
-  image: string | null;
-  agreement_form_image: string | null;
-  date_joined: string;
-  date_left: string;
-  guarantor_name: string;
-  guarantor_phone_number: string;
-  guarantor_address: string;
-  created_at: string;
-  updated_at: string;
-  is_still_active: boolean;
-}
-
-interface ContractorsResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: {
-    all_contractors_count: number;
-    all_active_contractors_count: number;
-    total_contractors_monthly_pay: number;
-    total_contractors_weekly_pay: number;
-    contractor: Contractor[];
-  };
-}
-
-const fetchContractors = async (page = 1): Promise<ContractorsResponse> => {
-  const token = localStorage.getItem("accessToken");
-  const response = await axios.get(`${BASE_URL}?page=${page}`, {
-    headers: {
-      Authorization: `JWT ${token}`,
-    },
-  });
-  return response.data;
-};
+// ...existing code...
 
 const Contractors = () => {
   const queryClient = useQueryClient();
@@ -66,7 +26,7 @@ const Contractors = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<PaginatedContractorsResponse>({
     queryKey: ["contractors", currentPage],
     queryFn: () => fetchContractors(currentPage),
   });

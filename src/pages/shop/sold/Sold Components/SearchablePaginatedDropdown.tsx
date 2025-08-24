@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useEffect, useRef } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import soldDataJson from "@/data/shop/sold/sold.json";
 
 interface DropdownItem {
   id: number;
@@ -12,35 +13,35 @@ interface SearchablePaginatedDropdownProps {
   label: string;
   onChange: (name: string, value: string) => void;
   name: string;
-  resultsKey: string; // e.g., 'results.all_customers' or 'all_projects'
+  resultsKey: string;
   dataMapper?: (data: any) => DropdownItem[];
   selectedValue?: string | null;
   selectedName?: string | null;
   disabled?: boolean;
 }
 
-const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = ({ endpoint, label, onChange, name, resultsKey, dataMapper, selectedValue, selectedName, disabled }) => {
+const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = ({
+  endpoint,
+  label,
+  onChange,
+  name,
+  resultsKey,
+  dataMapper,
+  selectedValue,
+  selectedName,
+  disabled,
+}) => {
   const [items, setItems] = useState<DropdownItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(''); 
-  const [inputValue, setInputValue] = useState(selectedName || ''); 
-  const [nextUrl, setNextUrl] = useState<string | null>(null);
-  const [prevUrl, setPrevUrl] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [inputValue, setInputValue] = useState(selectedName || "");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log("Dropdown: useEffect - selectedName changed:", selectedName);
     if (selectedName) {
       setInputValue(selectedName);
-    }
-  }, [selectedName]);
-
-  useEffect(() => {
-    // Always update inputValue when selectedValue or selectedName changes
-    if (selectedName) {
-      setInputValue(selectedName);
-    } else if (selectedValue === '' || selectedValue == null) {
-      setInputValue('');
+    } else if (selectedValue === "" || selectedValue == null) {
+      setInputValue("");
     }
   }, [selectedValue, selectedName]);
 
@@ -48,72 +49,50 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
-        setSearchTerm('');
-        console.log("Dropdown: handleClickOutside - closing. inputValue:", inputValue, "searchTerm:", '');
+        setSearchTerm("");
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [inputValue]);
-
-  const fetchData = async (url: string) => {
-    try {
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('accessToken')}`,
-        },
-      });
-      const data = await response.json();
-
-      const keys = resultsKey.split('.');
-      let resultItems = data;
-      for (const key of keys) {
-        if (resultItems && typeof resultItems === 'object' && key in resultItems) {
-          resultItems = resultItems[key];
-        } else {
-          resultItems = [];
-          break;
-        }
-      }
-
-      const finalItems = dataMapper ? dataMapper(resultItems) : resultItems;
-      setItems(finalItems || []);
-      setNextUrl(data.next);
-      setPrevUrl(data.previous);
-    } catch (error) {
-      console.error(`Error fetching data from ${url}:`, error);
-    }
-  };
+  }, []);
 
   useEffect(() => {
-    const fullEndpoint = `${endpoint}?search=${searchTerm}`;
-    fetchData(fullEndpoint);
-  }, [endpoint, searchTerm]);
+    try {
+      let resultItems = soldDataJson[resultsKey as keyof typeof soldDataJson] || [];
+      if (dataMapper) {
+        resultItems = dataMapper(resultItems);
+      }
+      const filteredItems = resultItems.filter((item: DropdownItem) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setItems(filteredItems);
+    } catch (error) {
+      console.error(`Error processing data for ${resultsKey}:`, error);
+      setItems([]);
+    }
+  }, [resultsKey, searchTerm, dataMapper]);
 
   const handleSelect = (item: DropdownItem) => {
     onChange(name, String(item.id));
     setIsOpen(false);
     setInputValue(item.name);
-    setSearchTerm('');
-    console.log("Dropdown: handleSelect - after set. inputValue:", item.name, "searchTerm:", '');
+    setSearchTerm("");
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
     setSearchTerm(newValue);
-    console.log("Dropdown: handleInputChange - newValue:", newValue, "searchTerm:", newValue);
-    if (newValue === '') {
-      onChange(name, '');
+    if (newValue === "") {
+      onChange(name, "");
     }
   };
 
   const handleInputFocus = () => {
     setIsOpen(true);
     setSearchTerm(inputValue);
-    console.log("Dropdown: handleInputFocus - inputValue:", inputValue, "searchTerm:", inputValue);
   };
 
   return (
@@ -145,24 +124,6 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
               </li>
             ))}
           </ul>
-          <div className="flex justify-between p-1.5 sm:p-2">
-            <button
-              type="button"
-              onClick={() => prevUrl && fetchData(prevUrl)}
-              disabled={!prevUrl}
-              className="px-2 sm:px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50 text-xs sm:text-sm"
-            >
-              Previous
-            </button>
-            <button
-              type="button"
-              onClick={() => nextUrl && fetchData(nextUrl)}
-              disabled={!nextUrl}
-              className="px-2 sm:px-3 py-1 bg-gray-200 text-gray-700 rounded disabled:opacity-50 text-xs sm:text-sm"
-            >
-              Next
-            </button>
-          </div>
         </div>
       )}
     </div>

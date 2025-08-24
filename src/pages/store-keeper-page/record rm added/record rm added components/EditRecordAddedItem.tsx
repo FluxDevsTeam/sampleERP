@@ -4,11 +4,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ThreeDots } from "react-loader-spinner";
 import Modal from "@/pages/shop/Modal";
+import recordRMAddedData from "@/data/store-keeper-page/record-rm-added/record-rm-added.json";
+import rawMaterialsData from "@/data/store-keeper-page/raw-materials/raw-materials.json";
 
 interface RawMaterial {
   id: number;
   name: string;
   unit: string;
+  quantity: number;
+  price: number;
 }
 
 const EditRecordRemovedItem: React.FC = () => {
@@ -32,101 +36,58 @@ const EditRecordRemovedItem: React.FC = () => {
   const [originalQuantity, setOriginalQuantity] = useState<number>(0);
 
   useEffect(() => {
-    const fetchItem = async () => {
-      try {
-        const response = await fetch(
-          `https://backend.kidsdesigncompany.com/api/add-raw-materials/${id}/`, {
-            method: "GET",
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-              "Content-Type": "application/json",
-            }
-          }
-        );
-        if (!response.ok) throw new Error("Failed to fetch item");
-        const data = await response.json();
+    const fetchItem = () => {
+      const dailyData = recordRMAddedData.daily_data;
+      let entry;
+      for (const day of dailyData) {
+        entry = day.entries.find((e) => e.id.toString() === id);
+        if (entry) break;
+      }
+      if (entry) {
         setFormData({
-          material: data.material?.id.toString() || "",
-          quantity: data.quantity || "",
-          cost_price: data.cost_price || "",
-          date: data.date ? data.date.slice(0, 10) : "",
+          material: entry.material?.id.toString() || "",
+          quantity: entry.quantity || "",
+          cost_price: entry.cost_price || "",
+          date: entry.date ? entry.date.slice(0, 10) : "",
         });
-        setOriginalQuantity(Number(data.quantity) || 0);
-        // Fetch material details for max/available
-        if (data.material?.id) {
-          const rmRes = await fetch(`https://backend.kidsdesigncompany.com/api/raw-materials/${data.material.id}/`, {
-            headers: {
-              Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-              "Content-Type": "application/json",
-            },
+        setOriginalQuantity(Number(entry.quantity) || 0);
+        const material = rawMaterialsData.results.items.find(
+          (m: any) => m.id.toString() === entry.material?.id.toString()
+        );
+        if (material) {
+          setMaterialDetails({
+            quantity: Number(material.quantity) || 0,
+            price: Number(material.price) || 0,
           });
-          if (rmRes.ok) {
-            const rmData = await rmRes.json();
-            setMaterialDetails({
-              quantity: Number(rmData.quantity) || 0,
-              price: Number(rmData.price) || 0,
-            });
-          }
         }
-      } catch (error) {
-        console.error("Error:", error);
+      } else {
+        setModalConfig({
+          isOpen: true,
+          title: "Error",
+          message: "Item not found",
+          type: "error",
+        });
       }
     };
 
     fetchItem();
+    setRawMaterials(rawMaterialsData.results.items);
   }, [id]);
-
-  const fetchRawMaterials = async () => {
-    try {
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/raw-materials/", {
-          method: "GET",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch raw materials");
-      const data = await response.json();
-      setRawMaterials(data.results?.items || []);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchRawMaterials();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/add-raw-materials/${id}/`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            quantity: formData.quantity,
-            date: formData.date,
-          }),
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to update item");
-
-      setModalConfig({
-        isOpen: true,
-        title: "Success",
-        message: "Item updated successfully",
-        type: "success",
-      });
+      setTimeout(() => {
+        setModalConfig({
+          isOpen: true,
+          title: "Success",
+          message: "Item updated successfully",
+          type: "success",
+        });
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       setModalConfig({
         isOpen: true,
@@ -134,7 +95,6 @@ const EditRecordRemovedItem: React.FC = () => {
         message: "Failed to update item",
         type: "error",
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -157,12 +117,12 @@ const EditRecordRemovedItem: React.FC = () => {
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-black-800">Edit Raw Material Record</h1>
+          <h1 className="text-2xl font-bold text-black-800">Edit Item Record</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-xs font-medium text-gray-700">Raw Material</label>
+            <label className="block text-xs font-medium text-gray-700">Item</label>
             <h3 className="mt-1 text-lg font-semibold text-gray-500">
               {rawMaterials.find((material) => material.id.toString() === formData.material)?.name || ""}
             </h3>

@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import SkeletonLoader from "../_components/SkeletonLoader";
-import SearchablePaginatedDropdown from "@/pages/shop/sold/Sold Components/SearchablePaginatedDropdown";
 import CategoryDropdown from "../_components/Category";
+import expensesData from "@/data/admin/expenses/expenses.json";
 
 interface ExpenseFormData {
   name: string;
@@ -56,11 +54,22 @@ interface Expense {
   };
 }
 
+// Static data for dropdowns
+const projects: Project[] = [
+  { id: 1, name: "Downtown Renovation" },
+  { id: 2, name: "Office Expansion" },
+  { id: 3, name: "Residential Build" },
+];
+
+const shopItems: ShopItem[] = [
+  { id: 1, name: "Retail Product A" },
+  { id: 2, name: "Retail Product B" },
+];
+
 const EditExpense: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  
+
   const [formData, setFormData] = useState<ExpenseFormData>({
     name: "",
     amount: "",
@@ -70,83 +79,51 @@ const EditExpense: React.FC = () => {
     selectedItem: null,
     category: null,
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const [expense, setExpense] = useState<Expense | null>(null);
 
-  // Fetch expense data
-  const { data: expense, isLoading } = useQuery<Expense>({
-    queryKey: ["expense", id],
-    queryFn: async () => {
-      const { data } = await axios.get(`https://backend.kidsdesigncompany.com/api/expense/${id}/`);
-      return data;
-    },
-    enabled: !!id,
-  });
-
-  // Update mutation
-  const updateExpenseMutation = useMutation({
-    mutationFn: async (data: ExpenseFormData) => {
-      // Format the data according to the API expectations
-      const formattedData: any = {
-        name: data.name,
-        description: data.description || "",
-        amount: Number(data.amount) || 0,
-        quantity: data.quantity,
-        category: data.category,
-        project: data.selectedType === "project" && data.selectedItem ? Number(data.selectedItem) : null,
-        shop: data.selectedType === "shop" && data.selectedItem ? Number(data.selectedItem) : null,
-      };
-
-      if (data.selectedType === "other") {
-        formattedData.project = null;
-        formattedData.shop = null;
-      }
-
-      console.log("Sending update data to API:", formattedData);
-      const accessToken = localStorage.getItem("accessToken");
-      await axios.put(`https://backend.kidsdesigncompany.com/api/expense/${id}/`, formattedData, {
-        headers: {
-          Authorization: `JWT ${accessToken}`,
-        },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["expenses"] });
-      toast.success("Expense updated successfully!");
-      navigate("/admin/expenses");
-    },
-    onError: (error) => {
-      console.error("Error details:", error);
-      toast.error("Failed to update expense. Please try again.");
-    },
-  });
-
-  // Populate form when expense data is loaded
+  // Simulate fetching expense data from static JSON
   useEffect(() => {
-    if (expense) {
-      // Determine the selected type and item
+    const foundExpense = expensesData.daily_data
+      .flatMap((day) => day.entries)
+      .find((entry) => entry.id === Number(id));
+
+    if (foundExpense) {
       let selectedType = "";
       let selectedItem = null;
-      
-      if (expense.project) {
+
+      if (foundExpense.linked_project) {
         selectedType = "project";
-        selectedItem = expense.project.id.toString();
-      } else if (expense.shop) {
+        selectedItem = foundExpense.linked_project.id.toString();
+      } else if (foundExpense.sold_item) {
         selectedType = "shop";
-        selectedItem = expense.shop.id.toString();
-      } else if (expense.category && !expense.project && !expense.shop) {
+        selectedItem = foundExpense.sold_item.id.toString();
+      } else if (foundExpense.expense_category && !foundExpense.linked_project && !foundExpense.sold_item) {
         selectedType = "other";
       }
-      
+
       setFormData({
-        name: expense.name || "",
-        description: expense.description || "",
-        amount: expense.amount || "",
-        quantity: expense.quantity || "",
+        name: foundExpense.name || "",
+        description: foundExpense.description || "",
+        amount: Number(foundExpense.amount) || "",
+        quantity: Number(foundExpense.quantity) || "",
         selectedType,
         selectedItem,
-        category: expense.category?.id || null,
+        category: foundExpense.expense_category?.id || null,
+      });
+      setExpense({
+        id: foundExpense.id,
+        name: foundExpense.name,
+        description: foundExpense.description,
+        amount: Number(foundExpense.amount),
+        quantity: Number(foundExpense.quantity),
+        category: foundExpense.expense_category,
+        project: foundExpense.linked_project,
+        shop: foundExpense.sold_item,
       });
     }
-  }, [expense]);
+    setIsLoading(false);
+  }, [id]);
 
   // Handle input changes
   const handleInputChange = (name: string, value: string) => {
@@ -157,13 +134,17 @@ const EditExpense: React.FC = () => {
         selectedItem: value,
       }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({
+        ...prev,
+        [name]: name === "amount" || name === "quantity" ? (value === "" ? "" : Number(value)) : value,
+      }));
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateExpenseMutation.mutate(formData);
+    toast.error("Update expense functionality is disabled in static mode.");
+    navigate("/admin/expenses");
   };
 
   return (
@@ -174,7 +155,7 @@ const EditExpense: React.FC = () => {
         </CardHeader>
         {isLoading ? (
           <CardContent>
-            <SkeletonLoader/>
+            <SkeletonLoader />
           </CardContent>
         ) : (
           <form onSubmit={handleSubmit}>
@@ -228,46 +209,42 @@ const EditExpense: React.FC = () => {
                 <Label className="text-lg font-medium">Item Type</Label>
                 <div className="grid grid-cols-2 gap-4 mt-2">
                   <div className="col-span-1">
-                    <SearchablePaginatedDropdown
-                      endpoint="https://backend.kidsdesigncompany.com/api/project/"
-                      label="Project"
+                    <Label htmlFor="project">Project</Label>
+                    <select
+                      id="project"
                       name="project"
-                      onChange={handleInputChange}
-                      resultsKey="all_projects"
-                      selectedValue={formData.selectedType === "project" ? formData.selectedItem : null}
-                      selectedName={formData.selectedType === "project" ? expense?.project?.name || null : null}
-                    />
+                      value={formData.selectedType === "project" ? formData.selectedItem || "" : ""}
+                      onChange={(e) => handleInputChange(e.target.name, e.target.value)}
+                      className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select Project</option>
+                      {projects.map((project) => (
+                        <option key={project.id} value={project.id}>
+                          {project.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="col-span-1">
-                    <SearchablePaginatedDropdown
-                      endpoint="https://backend.kidsdesigncompany.com/api/sold/"
-                      label="Shop Item"
+                    <Label htmlFor="shop">Shop Item</Label>
+                    <select
+                      id="shop"
                       name="shop"
-                      onChange={handleInputChange}
-                      resultsKey="daily_data"
-                      dataMapper={(data: any[]) => {
-                        const items: { id: number; name: string }[] = [];
-                        data.forEach((day: any) => {
-                          if (day.entries && Array.isArray(day.entries)) {
-                            day.entries.forEach((entry: any) => {
-                              if (!items.some(item => item.id === entry.id)) {
-                                items.push({
-                                  id: entry.id,
-                                  name: entry.name || "Unnamed item"
-                                });
-                              }
-                            });
-                          }
-                        });
-                        return items;
-                      }}
-                      selectedValue={formData.selectedType === "shop" ? formData.selectedItem : null}
-                      selectedName={formData.selectedType === "shop" ? expense?.shop?.name || null : null}
-                    />
+                      value={formData.selectedType === "shop" ? formData.selectedItem || "" : ""}
+                      onChange={(e) => handleInputChange(e.target.name, e.target.value)}
+                      className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select Shop Item</option>
+                      {shopItems.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
-                {formData.selectedType && (formData.selectedType !== "other") && (
+                {formData.selectedType && formData.selectedType !== "other" && (
                   <p className="text-sm text-blue-600 mt-1">
                     Selected {formData.selectedType === "project" ? "Project" : "Shop Item"}
                   </p>
@@ -287,11 +264,8 @@ const EditExpense: React.FC = () => {
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
-                disabled={updateExpenseMutation.isPending || !formData.category}
-              >
-                {updateExpenseMutation.isPending ? "Updating..." : "Update Expense"}
+              <Button type="submit" disabled={!formData.category}>
+                Update Expense
               </Button>
             </CardFooter>
           </form>

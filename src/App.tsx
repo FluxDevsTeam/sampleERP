@@ -12,10 +12,6 @@ import {
 import Settings from "./pages/ceo/settingss/settings.tsx";
 import NotFoundPage from "./components/NotFound.tsx";
 
-import ProtectedRoute from "./pages/AuthPages/ProtectedRoute.tsx";
-import Unauthorized from "./pages/AuthPages/Unauthorized.tsx";
-import Logout from "./pages/AuthPages/logout/Logout.tsx";
-
 import {
   Workers,
   AdminDashboard,
@@ -31,7 +27,10 @@ import EditExpense from "./pages/admin/expenses/_pages/EditExpense";
 
 import "react-toastify/dist/ReactToastify.css";
 
-import Signin from "./pages/AuthPages/signin/Signin";
+import Home from "./pages/landing/Home";
+import About from "./pages/landing/About";
+import Contact from "./pages/landing/Contact";
+import Pricing from "./pages/landing/Pricing";
 
 import {
   FactoryManagerSharedLayout,
@@ -39,7 +38,7 @@ import {
   FactoryManagerProducts,
 } from "./pages/factory-manager-page";
 
-import FactoryManagerCustomers from './pages/factory-manager-page/customers/FactoryManagerCustomers.tsx'
+import FactoryManagerCustomers from "./pages/factory-manager-page/customers/FactoryManagerCustomers.tsx";
 import CustomerProfile from "./pages/factory-manager-page/customers/CustomerProfile.tsx";
 
 import { ProjectManagerLayout } from "./pages/project-manager-page";
@@ -91,7 +90,7 @@ import WorkDetails from "./pages/admin/workers/_pages/WorkDetails";
 import AddProject from "./pages/ceo/allProjects/_pages/AddProject";
 import EditProject from "./pages/ceo/allProjects/_pages/EditProject";
 import OtherProductionRecords from "./pages/ceo/allProjects/_pages/OtherProductionRecords";
-import Income from './pages/admin/income/Income';
+import Income from "./pages/admin/income/Income";
 
 import Shop from "./pages/shop/shop.tsx";
 import Product from "./pages/product/product.tsx";
@@ -102,17 +101,21 @@ import AccountantDashboard from "./pages/accountant/AccountantDashboard";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Signin />,
+    element: <Home />,
   },
   {
-    path: "/logout",
-    element: <Logout isSidebarOpen={true} />,
+    path: "/about",
+    element: <About />,
   },
   {
-    path: "/unauthorized",
-    element: <Unauthorized />,
+    path: "/contact",
+    element: <Contact />,
   },
-   {
+  {
+    path: "/pricing",
+    element: <Pricing />,
+  },
+  {
     path: "*",
     element: <NotFoundPage />,
   },
@@ -120,11 +123,7 @@ const router = createBrowserRouter([
   // CEO ROUTES
   {
     path: "/ceo",
-    element: (
-      <ProtectedRoute allowedRoles={["ceo"]}>
-        <CEOSharedLayout />
-      </ProtectedRoute>
-    ),
+    element: <CEOSharedLayout />,
     children: [
       {
         index: true,
@@ -138,234 +137,122 @@ const router = createBrowserRouter([
         path: "income",
         element: <Income />,
       },
-      // Project Manager routes (shared)
+      // Project Manager routes
       {
         path: "project-manager/dashboard",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "project_manager"]}>
-            <ProjectManagerDashboard />
-          </ProtectedRoute>
-        ),
+        element: <ProjectManagerDashboard />,
       },
       {
         path: "projects/:id/records",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "project_manager", "factory_manager", "storekeeper", "admin"]}>
-            <OtherProductionRecords />
-          </ProtectedRoute>
-        ),
+        element: <OtherProductionRecords />,
       },
       {
         path: "project-manager/products",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "project_manager"]}>
-            <ProductsTable />
-          </ProtectedRoute>
-        ),
+        element: <ProductsTable />,
       },
       {
         path: "project-manager/customers",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "project_manager"]}>
-            <FactoryManagerCustomers />
-          </ProtectedRoute>
-        ),
+        element: <FactoryManagerCustomers />,
       },
       {
         path: "project-manager/projects",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "project_manager"]}>
-            <CEOProjects />
-          </ProtectedRoute>
-        ),
+        element: <CEOProjects />,
       },
-      // Factory Manager routes (shared)
+      // Factory Manager routes
       {
         path: "factory-manager/dashboard",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "factory_manager"]}>
-            <FactoryManagerDashboard />
-          </ProtectedRoute>
-        ),
+        element: <FactoryManagerDashboard />,
       },
       {
         path: "factory-manager/workers",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "factory_manager"]}>
-            <Workers />
-          </ProtectedRoute>
-        ),
+        element: <Workers />,
       },
       {
         path: "factory-manager/assets",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "factory_manager"]}>
-            <Assets />
-          </ProtectedRoute>
-        ),
+        element: <Assets />,
       },
       {
         path: "factory-manager/customers",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "factory_manager"]}>
-            <FactoryManagerCustomers />
-          </ProtectedRoute>
-        ),
+        element: <FactoryManagerCustomers />,
       },
       {
         path: "factory-manager/expenses",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "factory_manager"]}>
-            <Expenses />
-          </ProtectedRoute>
-        ),
+        element: <Expenses />,
       },
       {
         path: "factory-manager/income",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "factory_manager"]}>
-            <Income />
-          </ProtectedRoute>
-        ),
+        element: <Income />,
       },
       {
         path: "factory-manager/projects",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "factory_manager"]}>
-            <CEOProjects />
-          </ProtectedRoute>
-        ),
+        element: <CEOProjects />,
       },
       {
         path: "factory-manager/projects/:id/records",
-        element: (
-          <ProtectedRoute allowedRoles={["factory_manager", "ceo", "project_manager", "storekeeper", "admin"]}>
-            <OtherProductionRecords />
-          </ProtectedRoute>
-        ),
+        element: <OtherProductionRecords />,
       },
       {
         path: "factory-manager/products",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "factory_manager"]}>
-            <ProductsTable />
-          </ProtectedRoute>
-        ),
+        element: <ProductsTable />,
       },
-      // Admin routes (shared)
+      // Admin routes
       {
         path: "admin/dashboard",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "admin"]}>
-            <AdminDashboard />
-          </ProtectedRoute>
-        ),
+        element: <AdminDashboard />,
       },
       {
         path: "admin/assets",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "admin"]}>
-            <Assets />
-          </ProtectedRoute>
-        ),
+        element: <Assets />,
       },
       {
         path: "admin/expenses",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "admin"]}>
-            <Expenses />
-          </ProtectedRoute>
-        ),
+        element: <Expenses />,
       },
       {
         path: "admin/income",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "admin"]}>
-            <Income />
-          </ProtectedRoute>
-        ),
+        element: <Income />,
       },
       {
         path: "admin/paid",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "admin"]}>
-            <Paid />
-          </ProtectedRoute>
-        ),
+        element: <Paid />,
       },
       {
         path: "admin/workers",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo", "admin"]}>
-            <Workers />
-          </ProtectedRoute>
-        ),
+        element: <Workers />,
       },
-      // Store routes (CEO only)
+      // Store routes
       {
         path: "store/dashboard",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo"]}>
-            <StoreKeeperDashboard />
-          </ProtectedRoute>
-        ),
+        element: <StoreKeeperDashboard />,
       },
       {
         path: "store/raw-materials",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo"]}>
-            <RawMaterials />
-          </ProtectedRoute>
-        ),
+        element: <RawMaterials />,
       },
       {
         path: "store/removed",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo"]}>
-            <Removed />
-          </ProtectedRoute>
-        ),
+        element: <Removed />,
       },
       {
         path: "store/record-rm-added",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo"]}>
-            <RecordRemoved />
-          </ProtectedRoute>
-        ),
+        element: <RecordRemoved />,
       },
-      // Shop routes (CEO only)
+      // Shop routes
       {
         path: "shop/dashboard",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo"]}>
-            <ShopDashboard />
-          </ProtectedRoute>
-        ),
+        element: <ShopDashboard />,
       },
       {
         path: "shop/inventory",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo"]}>
-            <Inventory />
-          </ProtectedRoute>
-        ),
+        element: <Inventory />,
       },
       {
         path: "shop/sold",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo"]}>
-            <Sold />
-          </ProtectedRoute>
-        ),
+        element: <Sold />,
       },
       {
         path: "shop/stock",
-        element: (
-          <ProtectedRoute allowedRoles={["ceo"]}>
-            <Stock />
-          </ProtectedRoute>
-        ),
+        element: <Stock />,
       },
       // Settings
       {
@@ -378,11 +265,7 @@ const router = createBrowserRouter([
   // FACTORY MANAGER ROUTES
   {
     path: "/factory-manager",
-    element: (
-      <ProtectedRoute allowedRoles={["factory_manager", "ceo", "admin", "project_manager"]}>
-        <FactoryManagerSharedLayout />
-      </ProtectedRoute>
-    ),
+    element: <FactoryManagerSharedLayout />,
     children: [
       {
         index: true,
@@ -398,11 +281,7 @@ const router = createBrowserRouter([
       },
       {
         path: "projects/:id/records",
-        element: (
-          <ProtectedRoute allowedRoles={["factory_manager", "ceo", "project_manager", "storekeeper", "admin"]}>
-            <OtherProductionRecords />
-          </ProtectedRoute>
-        ),
+        element: <OtherProductionRecords />,
       },
       {
         path: "customers",
@@ -472,11 +351,7 @@ const router = createBrowserRouter([
   // PROJECT MANAGER ROUTES
   {
     path: "/project-manager",
-    element: (
-      <ProtectedRoute allowedRoles={["project_manager", "ceo", "factory_manager", "storekeeper"]}>
-        <ProjectManagerLayout />
-      </ProtectedRoute>
-    ),
+    element: <ProjectManagerLayout />,
     children: [
       {
         index: true,
@@ -524,11 +399,7 @@ const router = createBrowserRouter([
       },
       {
         path: "projects/:id/records",
-        element: (
-          <ProtectedRoute allowedRoles={["factory_manager", "ceo", "project_manager", "storekeeper", "admin"]}>
-            <OtherProductionRecords />
-          </ProtectedRoute>
-        ),
+        element: <OtherProductionRecords />,
       },
       // Store routes
       {
@@ -570,11 +441,7 @@ const router = createBrowserRouter([
   // STORE KEEPER ROUTES
   {
     path: "/store-keeper",
-    element: (
-      <ProtectedRoute allowedRoles={["storekeeper", "ceo", "admin", "factory_manager", "project_manager"]}>
-        <StoreKeeperLayout />
-      </ProtectedRoute>
-    ),
+    element: <StoreKeeperLayout />,
     children: [
       {
         index: true,
@@ -638,11 +505,7 @@ const router = createBrowserRouter([
       },
       {
         path: "projects/:id/records",
-        element: (
-          <ProtectedRoute allowedRoles={["storekeeper", "ceo", "admin", "factory_manager", "project_manager"]}>
-            <OtherProductionRecords />
-          </ProtectedRoute>
-        ),
+        element: <OtherProductionRecords />,
       },
     ],
   },
@@ -650,11 +513,7 @@ const router = createBrowserRouter([
   // SHOP ROUTES
   {
     path: "/shop",
-    element: (
-      <ProtectedRoute allowedRoles={["shopkeeper", "ceo", "admin", "factory_manager", "project_manager"]}>
-        <ShopSharedLayout />
-      </ProtectedRoute>
-    ),
+    element: <ShopSharedLayout />,
     children: [
       {
         index: true,
@@ -710,11 +569,7 @@ const router = createBrowserRouter([
   // ADMIN ROUTES
   {
     path: "/admin",
-    element: (
-      <ProtectedRoute allowedRoles={["admin", "ceo", "factory_manager", "project_manager", "accountant"]}>
-        <AdminLayout />
-      </ProtectedRoute>
-    ),
+    element: <AdminLayout />,
     children: [
       {
         index: true,
@@ -802,11 +657,7 @@ const router = createBrowserRouter([
       },
       {
         path: "projects/:id/records",
-        element: (
-          <ProtectedRoute allowedRoles={["admin", "ceo", "factory_manager", "project_manager", "storekeeper"]}>
-            <OtherProductionRecords />
-          </ProtectedRoute>
-        ),
+        element: <OtherProductionRecords />,
       },
       // Store routes
       {
@@ -844,7 +695,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-  
+
   // PUBLIC SHOP ROUTE
   {
     path: "/shop/*",
@@ -854,17 +705,13 @@ const router = createBrowserRouter([
   // PUBLIC PRODUCT ROUTE
   {
     path: "/product/*",
-    element: <Product />
+    element: <Product />,
   },
 
   // ACCOUNTANT ROUTES
   {
     path: "/accountant",
-    element: (
-      <ProtectedRoute allowedRoles={["accountant", "ceo", "admin", "factory_manager", "project_manager"]}>
-        <AccountantDashboard />
-      </ProtectedRoute>
-    ),
+    element: <AccountantDashboard />,
     children: [
       {
         index: true,
@@ -883,11 +730,7 @@ const router = createBrowserRouter([
 ]);
 
 const App = () => {
-  return (
-
-      <RouterProvider router={router} />
-
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;

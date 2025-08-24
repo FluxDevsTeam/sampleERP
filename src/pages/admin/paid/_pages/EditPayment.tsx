@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +13,8 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import paidData from "@/data/admin/paid/paidData.json";
+import workersData from "@/data/admin/paid/workers.json";
 
 interface PaymentData {
   amount: number;
@@ -34,67 +35,56 @@ const EditPayment = () => {
     recipientId: 0,
   });
 
-  const [contractors, setContractors] = useState<any[]>([]);
-  const [salaryWorkers, setSalaryWorkers] = useState<any[]>([]);
+  const [contractors, setContractors] = useState(workersData.contractors);
+  const [salaryWorkers, setSalaryWorkers] = useState(workersData.salary_workers);
 
-  // Fetch Payment Data
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["paid", id],
-    queryFn: async () => {
-      const response = await axios.get<PaymentData>(
-        `https://backend.kidsdesigncompany.com/api/paid/${id}/`
-      );
-      return response.data;
-    },
-    enabled: !!id,
-  });
+  // Simulate fetching payment data
+  const payment = paidData.daily_data
+    .flatMap(day => day.entries)
+    .find(entry => entry.id === parseInt(id || '0'));
 
-  // Fetch Contractors and Salary Workers
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [contractorRes, salaryRes] = await Promise.all([
-          axios.get("https://backend.kidsdesigncompany.com/api/contractors/"),
-          axios.get("https://backend.kidsdesigncompany.com/api/salary-workers/")
-        ]);
-
-        setContractors(contractorRes.data.results.contractor);
-        setSalaryWorkers(salaryRes.data.results.workers);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to fetch contractors and salary workers");
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  // Populate form when data is fetched
-  useEffect(() => {
-    if (data) {
+    if (payment) {
       setFormData({
-        amount: data.amount,
-        recipientType: data.salary ? "salary-worker" : "contractor",
-        recipientId: data.salary || data.contract || 0,
-        salary: data.salary,
-        contract: data.contract
+        amount: parseFloat(payment.amount),
+        recipientType: payment.salary_detail ? "salary-worker" : "contractor",
+        recipientId: payment.salary_detail?.id || payment.contractor_detail?.id || 0,
+        salary: payment.salary_detail?.id,
+        contract: payment.contractor_detail?.id
       });
     }
-  }, [data]);
+  }, [id]);
 
-  // Update Payment Mutation
   const updatePaymentMutation = useMutation({
     mutationFn: async (paymentData: PaymentData) => {
-      // Format the data based on recipient type
-      const formattedData = paymentData.recipientType === "contractor"
-        ? { amount: paymentData.amount, contract: paymentData.recipientId }
-        : { amount: paymentData.amount, salary: paymentData.recipientId };
+      const updatedEntry = {
+        ...payment,
+        amount: paymentData.amount.toString(),
+        salary_detail: paymentData.recipientType === "salary-worker" ? 
+          salaryWorkers.find(w => w.id === paymentData.recipientId) || null : null,
+        contractor_detail: paymentData.recipientType === "contractor" ? 
+          contractors.find(c => c.id === paymentData.recipientId) || null : null
+      };
 
-      const response = await axios.put(
-        `https://backend.kidsdesigncompany.com/api/paid/${id}/`,
-        formattedData
-      );
-      return response.data;
+      // Update in-memory data
+      const day = paidData.daily_data.find(d => d.entries.some(e => e.id === parseInt(id || '0')));
+      if (day && payment) {
+        const oldAmount = parseFloat(payment.amount);
+        const entryIndex = day.entries.findIndex(e => e.id === parseInt(id || '0'));
+        day.entries[entryIndex] = updatedEntry;
+        day.daily_total = (day.daily_total || 0) - oldAmount + paymentData.amount;
+
+        // Update totals
+        paidData.monthly_total = paidData.monthly_total - oldAmount + paymentData.amount;
+        if (paymentData.recipientType === "salary-worker") {
+          paidData.salary_paid_this_month = paidData.salary_paid_this_month - oldAmount + paymentData.amount;
+        } else {
+          paidData.contractors_paid_this_month = paidData.contractors_paid_this_month - oldAmount + paymentData.amount;
+        }
+        paidData.yearly_total = paidData.monthly_total;
+      }
+
+      return updatedEntry;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paid"] });
@@ -102,10 +92,8 @@ const EditPayment = () => {
       navigate("/admin/paid");
     },
     onError: (error: any) => {
-      console.error("Error updating payment:", error.response?.data || error.message);
-      toast.error(
-        error.response?.data?.error?.[0] || "Failed to update payment. Try again."
-      );
+      console.error("Error updating payment:", error);
+      toast.error("Failed to update payment. Try again.");
     },
   });
 
@@ -133,8 +121,7 @@ const EditPayment = () => {
     updatePaymentMutation.mutate(formData);
   };
 
-  if (isLoading) return <p className="text-center">Loading payment details...</p>;
-  if (error) return <p className="text-center text-red-500">Error loading data.</p>;
+  if (!payment) return <p className="text-center">Payment not found.</p>;
 
   return (
     <div className="container mx-auto p-4">

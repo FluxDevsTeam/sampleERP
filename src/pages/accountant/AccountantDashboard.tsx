@@ -17,24 +17,17 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import axios from "axios";
 import SkeletonLoader from "./dashboard/_components/SkeletonLoader";
 import AccountantDashboardCard from "./dashboard/AccountantDashboardCard";
 import React from "react";
 import GlobalLayout from "../../components/GlobalLayout";
 import { getSidebarForRole } from "../../utils/data-json";
+import accountantDashboardData from "@/data/accountant/dashboard/accountant-dashboard.json";
 
 const fetchFinancialData = async () => {
-  const accessToken = localStorage.getItem("accessToken");
-  const { data } = await axios.get(
-    "https://backend.kidsdesigncompany.com/api/accountant-dashboard/",
-    {
-      headers: {
-        Authorization: `JWT ${accessToken}`,
-      },
-    }
-  );
-  return data;
+  // Load from local storage if available, else use JSON
+  const storedData = localStorage.getItem("accountantDashboardData");
+  return storedData ? JSON.parse(storedData) : accountantDashboardData;
 };
 
 // Helper to determine if a key is monetary
@@ -61,7 +54,6 @@ const cardNameMap: Record<string, string> = {
   sales_count: "Sales Count",
   "total_salary_workers_monthly_pay": "Fixed Monthly Salary",
   "total_contractors_monthly_pay": "Monthly Contractors Pay",
-  "total_contractors_weekly_pay": "Weekly Contractors Pay",
   "total_paid": "Monthly Salary Pay",
   // ...add more as needed
 };
@@ -71,15 +63,7 @@ const cardOrder = [
   "Total Expenses",
   "Monthly Salary Pay",
   "Monthly Contractors Pay",
-  "Total Income",
-  "Total Profit",
-  "Total Assets",
-  "Total Shop Value",
-
-  "Yearly Total Paid",
-  "Salary Paid",
-  "Contractors Paid",
-  "Sales Count",
+  "Monthly Total Paid",
 ];
 
 const AccountantDashboard = () => {
@@ -94,7 +78,7 @@ const AccountantDashboard = () => {
   const [showAllCards, setShowAllCards] = React.useState(false);
   const numCols = 5;
   const numRowsDefault = 2;
-  const   defaultVisibleCount = numCols * numRowsDefault;
+  const defaultVisibleCount = numCols * numRowsDefault;
 
   // Responsive: show fewer XAxis ticks on mobile
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
@@ -104,8 +88,6 @@ const AccountantDashboard = () => {
   const financialHealthCards = data?.financial_health
     ? Object.entries(data.financial_health).map(([key, value]) => {
         const title = cardNameMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-        // Remove naira sign for Deprecated Assets and Active Assets
-
         if (title === "Active Assets" || title === "Deprecated Assets") {
           return null; // Exclude these cards
         }
@@ -139,11 +121,28 @@ const AccountantDashboard = () => {
       }))
     : [];
 
+  // Create Monthly Total Paid card as sum of Monthly Salary Pay and Monthly Contractors Pay
+  const monthlySalaryPay = data?.paid?.total_paid || 0;
+  const monthlyContractorsPay = data?.workers?.total_contractors_monthly_pay || 0;
+  const monthlyTotalPaidCard = {
+    key: "custom-monthly-total-paid",
+    title: "Monthly Total Paid",
+    value: Number(monthlySalaryPay) + Number(monthlyContractorsPay),
+    currency: "₦ ",
+  };
+
+  // Filter to show only the specified four cards
   const allCards = [
     ...financialHealthCards,
     ...workersCards,
     ...paidCards,
-  ].sort((a, b) => {
+    monthlyTotalPaidCard,
+  ].filter(card => [
+    "Total Expenses",
+    "Monthly Salary Pay",
+    "Monthly Contractors Pay",
+    "Monthly Total Paid"
+  ].includes(card.title)).sort((a, b) => {
     const aIdx = cardOrder.indexOf(a.title);
     const bIdx = cardOrder.indexOf(b.title);
     if (aIdx === -1 && bIdx === -1) return 0;
@@ -384,7 +383,7 @@ const AccountantDashboard = () => {
                     <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} angle={-26} textAnchor="end" height={60} tickFormatter={(value) => (value.length > 16 ? `${value.substring(0, 16)}..` : value)}/>
                     <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} width={64} />
                     <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{ fill: "rgba(240, 240, 240, 0.5)" }} />
-                    <Bar dataKey="total" fill="url(#topCategoriesGradient)" name="Total" barSize={20} />
+                    <Bar dataKey="total" fill="url(#topCategoriesGradient)" name="Total" barSize={40} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -401,10 +400,10 @@ const AccountantDashboard = () => {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }}  />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                   <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNairaCompact} width={64} />
                   <Tooltip formatter={(value: number) => formatNairaCompact(value)} content={<CustomTooltip />} cursor={{ fill: "rgba(240, 240, 240, 0.5)" }} />
-                  <Bar dataKey="total_expenses" fill="url(#monthlyExpenseGradient)" name="Total Expenses" barSize={20} />
+                  <Bar dataKey="total_expenses" fill="url(#monthlyExpenseGradient)" name="Total Expenses" barSize={40} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

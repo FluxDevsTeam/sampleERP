@@ -16,46 +16,32 @@ export const deleteRawMaterialCategory = async (
       isOpen: true,
       title: "Error",
       message: "Please select a category to delete",
-      type: "error"
+      type: "error",
     });
     return;
   }
 
   try {
     setLoading(true);
-    const response = await fetch(
-      `https://backend.kidsdesigncompany.com/api/raw-materials-category/${categoryId}/`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("accessToken")}`
-        }
+    setTimeout(() => {
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Item category deleted successfully!",
+        type: "success",
+      });
+      if (onSuccess) {
+        onSuccess();
       }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to delete category");
-    }
-
-    setModalConfig({
-      isOpen: true,
-      title: "Success",
-      message: "Raw material category deleted successfully!",
-      type: "success"
-    });
-    
-    if (onSuccess) {
-      onSuccess();
-    }
+      setLoading(false);
+    }, 1000);
   } catch (error) {
-    console.error("Error deleting category:", error);
     setModalConfig({
       isOpen: true,
       title: "Error",
       message: "Failed to delete category",
-      type: "error"
+      type: "error",
     });
-  } finally {
     setLoading(false);
   }
-}; 
+};

@@ -1,6 +1,4 @@
-import axios from "axios";
-
-const PAID_API_URL = "https://backend.kidsdesigncompany.com/api/paid/";
+import paidData from "@/data/admin/paid/paidData.json";
 
 interface SalaryDetail {
   id: number;
@@ -69,36 +67,35 @@ export interface PaidSummary {
 }
 
 export const fetchPaidSummary = async (): Promise<PaidSummary> => {
-  const accessToken = localStorage.getItem("accessToken");
-  const { data } = await axios.get(PAID_API_URL, {
-    headers: {
-      Authorization: `JWT ${accessToken}`,
-    },
-  });
-  return data;
+  return paidData;
 };
 
 export const fetchPaidEntries = async (year: number | '', month: number | '', day: number | ''): Promise<PaidSummary> => {
-  const accessToken = localStorage.getItem("accessToken");
-  const params = new URLSearchParams();
+  let filteredData = { ...paidData };
 
-  if (year) {
-    params.append("year", String(year));
-  }
-  if (month) {
-    params.append("month", String(month));
-  }
-  if (day) {
-    params.append("day", String(day));
+  if (year || month || day) {
+    filteredData.daily_data = paidData.daily_data.filter((daily) => {
+      const date = new Date(daily.date);
+      const matchesYear = year ? date.getFullYear() === year : true;
+      const matchesMonth = month ? date.getMonth() + 1 === month : true;
+      const matchesDay = day ? date.getDate() === day : true;
+      return matchesYear && matchesMonth && matchesDay;
+    });
+
+    // Recalculate totals based on filtered data
+    filteredData.monthly_total = filteredData.daily_data.reduce((sum, daily) => sum + (daily.daily_total || 0), 0);
+    filteredData.salary_paid_this_month = filteredData.daily_data.reduce((sum, daily) => {
+      return sum + daily.entries.reduce((entrySum, entry) => {
+        return entry.salary_detail ? entrySum + parseFloat(entry.amount) : entrySum;
+      }, 0);
+    }, 0);
+    filteredData.contractors_paid_this_month = filteredData.daily_data.reduce((sum, daily) => {
+      return sum + daily.entries.reduce((entrySum, entry) => {
+        return entry.contractor_detail ? entrySum + parseFloat(entry.amount) : entrySum;
+      }, 0);
+    }, 0);
+    filteredData.yearly_total = filteredData.monthly_total; // Simplified for static data
   }
 
-  const { data } = await axios.get<PaidSummary>(
-    `${PAID_API_URL}?${params.toString()}`,
-    {
-      headers: {
-        Authorization: `JWT ${accessToken}`,
-      },
-    }
-  );
-  return data;
-}; 
+  return filteredData;
+};

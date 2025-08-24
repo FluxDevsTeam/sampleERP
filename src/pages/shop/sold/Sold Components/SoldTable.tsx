@@ -12,6 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../Modal";
+import soldDataJson from "@/data/shop/sold/sold.json";
 
 interface SoldEntry {
   id: number;
@@ -38,19 +39,27 @@ interface DailyData {
   daily_total: number;
 }
 
-interface ApiResponse {
-  daily_data: DailyData[];
-  monthly_total: number;
-}
-
 interface SelectedSale {
   id: number;
   name: string;
 }
 
 const SoldTable: React.FC = () => {
-  document.title = "Sold Items - KDC Admin";
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  document.title = "Sold Items - Admin Dashboard";
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -111,49 +120,43 @@ const SoldTable: React.FC = () => {
         setIsDayOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-
-  const fetchItems = async (filterYear?: number | string, filterMonth?: number | string, filterDay?: number | string) => {
+  const fetchItems = () => {
     try {
       setLoading(true);
-      let url = "https://backend.kidsdesigncompany.com/api/sold/?";
-      if (filterYear) url += `year=${filterYear}&`;
-      if (filterMonth) url += `month=${filterMonth}&`;
-      if (filterDay) url += `day=${filterDay}`;
+      let filteredData = soldDataJson.daily_data;
 
-
-      const response = await fetch(
-        url,{
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
+      if (year) {
+        filteredData = filteredData.filter((day) =>
+          new Date(day.date).getFullYear() === Number(year)
+        );
+      }
+      if (month) {
+        filteredData = filteredData.filter(
+          (day) => new Date(day.date).getMonth() + 1 === Number(month)
+        );
+      }
+      if (day) {
+        filteredData = filteredData.filter(
+          (day) => new Date(day.date).getDate() === Number(day)
+        );
       }
 
-      const data: ApiResponse = await response.json();
-      console.log(data);
+      setSoldData(filteredData);
+      setMonthlyTotal(soldDataJson.monthly_total || 0);
 
-      setSoldData(data.daily_data);
-      setMonthlyTotal(data.monthly_total);
-
-      if (data.daily_data && data.daily_data.length > 0) {
-        setOpenDates({ [data.daily_data[0].date]: true });
+      if (filteredData.length > 0) {
+        setOpenDates({ [filteredData[0].date]: true });
       } else {
         setOpenDates({});
       }
     } catch (error) {
-      console.error("Error fetching sold items:", error);
+      console.error("Error processing sold items:", error);
     } finally {
       setLoading(false);
     }
@@ -161,7 +164,7 @@ const SoldTable: React.FC = () => {
 
   const handleFilter = () => {
     setFilterLoading(true);
-    fetchItems(year, month, day);
+    fetchItems();
     setFilterLoading(false);
   };
 
@@ -173,7 +176,6 @@ const SoldTable: React.FC = () => {
     fetchItems();
     setFilterLoading(false);
   };
-
 
   useEffect(() => {
     fetchItems();
@@ -204,27 +206,21 @@ const SoldTable: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(
-        `https://backend.kidsdesigncompany.com/api/sold/${id}/`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        setModalConfig({
-          isOpen: true,
-          title: "Success",
-          message: "Sale record deleted successfully",
-          type: "success",
-        });
-      } else {
-        throw new Error("Failed to delete sale record");
-      }
+      // Simulate deletion by filtering out the item
+      const updatedData = {
+        ...soldDataJson,
+        daily_data: soldDataJson.daily_data.map((day) => ({
+          ...day,
+          entries: day.entries.filter((entry) => entry.id !== id),
+        })),
+      };
+      console.log("Simulated DELETE with ID:", id);
+      setModalConfig({
+        isOpen: true,
+        title: "Success",
+        message: "Sale record deleted successfully",
+        type: "success",
+      });
     } catch (error) {
       console.error("Error deleting sale record:", error);
       setModalConfig({
@@ -238,7 +234,7 @@ const SoldTable: React.FC = () => {
 
   const confirmDeleteSale = (id: number) => {
     setConfirmDelete(true);
-    setSelectedSale({ id, name: selectedSale?.name || "" });
+    setSelectedSale({ id, name: selectedItem?.name || "" });
   };
 
   const handleConfirmDelete = async () => {
@@ -258,7 +254,6 @@ const SoldTable: React.FC = () => {
 
   return (
     <div className="">
-      {/* Heading and Record Sale button in the same row */}
       <div className="flex flex-row justify-between items-center mb-2 sm:mb-4 gap-3 sm:gap-0">
         <h1
           style={{ fontSize: "clamp(16.5px, 3vw, 30px)" }}
@@ -274,51 +269,118 @@ const SoldTable: React.FC = () => {
           Record Sale
         </button>
       </div>
-      {/* Filter controls below and right-aligned */}
       <div className="flex w-full justify-end mb-4">
         <div className="flex flex-wrap items-center gap-2">
-          {/* Year Dropdown */}
           <div className="relative w-20 sm:w-24 max-sm:w-14" ref={yearRef}>
-            <button onClick={() => setIsYearOpen(!isYearOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
-              <span>{year || 'Year'}</span>
-              <FontAwesomeIcon icon={isYearOpen ? faChevronUp : faChevronDown} className="text-xs" />
+            <button
+              onClick={() => setIsYearOpen(!isYearOpen)}
+              className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm"
+            >
+              <span>{year || "Year"}</span>
+              <FontAwesomeIcon
+                icon={isYearOpen ? faChevronUp : faChevronDown}
+                className="text-xs"
+              />
             </button>
             {isYearOpen && (
               <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
-                <li onClick={() => { setYear(''); setIsYearOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Year</li>
+                <li
+                  onClick={() => {
+                    setYear("");
+                    setIsYearOpen(false);
+                  }}
+                  className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
+                >
+                  Year
+                </li>
                 {[...Array(10)].map((_, i) => {
                   const y = new Date().getFullYear() - i;
-                  return <li key={i} onClick={() => { setYear(y); setIsYearOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{y}</li>
+                  return (
+                    <li
+                      key={i}
+                      onClick={() => {
+                        setYear(y);
+                        setIsYearOpen(false);
+                      }}
+                      className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
+                    >
+                      {y}
+                    </li>
+                  );
                 })}
               </ul>
             )}
           </div>
-          {/* Month Dropdown */}
           <div className="relative w-24 sm:w-32" ref={monthRef}>
-            <button onClick={() => setIsMonthOpen(!isMonthOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
-              <span>{month ? months[Number(month) - 1] : 'Month'}</span>
-              <FontAwesomeIcon icon={isMonthOpen ? faChevronUp : faChevronDown} className="text-xs" />
+            <button
+              onClick={() => setIsMonthOpen(!isMonthOpen)}
+              className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm"
+            >
+              <span>{month ? months[Number(month) - 1] : "Month"}</span>
+              <FontAwesomeIcon
+                icon={isMonthOpen ? faChevronUp : faChevronDown}
+                className="text-xs"
+              />
             </button>
             {isMonthOpen && (
               <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
-                <li onClick={() => { setMonth(''); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Month</li>
+                <li
+                  onClick={() => {
+                    setMonth("");
+                    setIsMonthOpen(false);
+                  }}
+                  className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
+                >
+                  Month
+                </li>
                 {months.map((m, i) => (
-                  <li key={i} onClick={() => { setMonth(i + 1); setIsMonthOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{m}</li>
+                  <li
+                    key={i}
+                    onClick={() => {
+                      setMonth(i + 1);
+                      setIsMonthOpen(false);
+                    }}
+                    className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
+                  >
+                    {m}
+                  </li>
                 ))}
               </ul>
             )}
           </div>
-          {/* Day Dropdown */}
           <div className="relative w-20 sm:w-24 max-sm:w-14" ref={dayRef}>
-            <button onClick={() => setIsDayOpen(!isDayOpen)} className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm">
-              <span>{day || 'Day'}</span>
-              <FontAwesomeIcon icon={isDayOpen ? faChevronUp : faChevronDown} className="text-xs" />
+            <button
+              onClick={() => setIsDayOpen(!isDayOpen)}
+              className="p-1.5 sm:p-2 border rounded w-full text-left flex justify-between items-center text-xs sm:text-sm"
+            >
+              <span>{day || "Day"}</span>
+              <FontAwesomeIcon
+                icon={isDayOpen ? faChevronUp : faChevronDown}
+                className="text-xs"
+              />
             </button>
             {isDayOpen && (
               <ul className="absolute z-10 w-full bg-white border rounded mt-1 max-h-40 overflow-y-auto">
-                <li onClick={() => { setDay(''); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">Day</li>
+                <li
+                  onClick={() => {
+                    setDay("");
+                    setIsDayOpen(false);
+                  }}
+                  className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
+                >
+                  Day
+                </li>
                 {[...Array(31)].map((_, i) => (
-                  <li key={i} onClick={() => { setDay(i + 1); setIsDayOpen(false); }} className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm">{i + 1}</li>
+                  <li
+                    key={i}
+                    onClick={() => {
+                      setDay(i + 1);
+                      setIsDayOpen(false);
+                    }}
+                    className="p-1.5 sm:p-2 hover:bg-gray-200 cursor-pointer text-xs sm:text-sm"
+                  >
+                    {i + 1}
+                  </li>
                 ))}
               </ul>
             )}
@@ -364,13 +426,25 @@ const SoldTable: React.FC = () => {
         ) : soldData.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-6 bg-white rounded-lg border border-gray-200 shadow-sm mb-10">
             <div className="flex items-center justify-center w-16 h-16 rounded-full bg-pink-50 mb-4">
-              {/* Shopping bag icon */}
-              <svg className="w-8 h-8 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M5 8h14l-1.68 9.39A2 2 0 0 1 15.35 19H8.65a2 2 0 0 1-1.97-1.61L5 8zm2-3a3 3 0 0 1 6 0" stroke="currentColor" strokeWidth="2" fill="none" />
+              <svg
+                className="w-8 h-8 text-pink-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M5 8h14l-1.68 9.39A2 2 0 0 1 15.35 19H8.65a2 2 0 0 1-1.97-1.61L5 8zm2-3a3 3 0 0 1 6 0"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                />
               </svg>
             </div>
             <h2 className="text-lg font-semibold text-gray-800 mb-1">No sold items</h2>
-            <p className="text-gray-500 mb-6 text-center max-w-xs">All your sold items will show up here. Add a new sale to get started.</p>
+            <p className="text-gray-500 mb-6 text-center max-w-xs">
+              All your sold items will show up here. Add a new sale to get started.
+            </p>
           </div>
         ) : (
           <div className="space-y-4 sm:space-y-6">
@@ -380,14 +454,12 @@ const SoldTable: React.FC = () => {
                 className="bg-white shadow-md rounded-lg overflow-hidden"
               >
                 <div
-                  className="bg-white text-blue-20 px-3 sm:px-4 py-2 border-b flex flex-row justify-between items-center cursor-pointer hover:bg-slate-200 gap-2 max-md:text-xs"
+                  className="bg-white text-blue-600 px-3 sm:px-4 py-2 border-b flex flex-row justify-between items-center cursor-pointer hover:bg-slate-200 gap-2 max-md:text-xs"
                   onClick={() => toggleDate(dayData.date)}
                 >
                   <div className="flex items-center space-x-2">
                     <FontAwesomeIcon
-                      icon={
-                        openDates[dayData.date] ? faChevronUp : faChevronDown
-                      }
+                      icon={openDates[dayData.date] ? faChevronUp : faChevronDown}
                       className="text-blue-400 max-md:text-xs"
                     />
                     <h2 className="text-base sm:text-lg font-semibold text-gray-700">
@@ -396,55 +468,54 @@ const SoldTable: React.FC = () => {
                   </div>
                   <div className="text-left sm:text-right">
                     <p className="text-base sm:text-lg font-bold text-gray-700 max-md:text-xs">
-                    Total: ₦{formatNumber(dayData.daily_total)}
-                  </p>
+                      Total: ₦{formatNumber(dayData.daily_total)}
+                    </p>
                   </div>
                 </div>
 
                 {openDates[dayData.date] && (
-                  //////// Table
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden text-xs sm:text-sm">
+                    <table className="min-w-full bg-white shadow-md text-xs sm:text-sm">
                       <thead>
                         <tr className="bg-blue-400 text-white">
-                          {/* Date - visible on tablet and up */}
-                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden lg:table-cell">Date</th>
-                          {/* Name - always visible */}
-                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Name</th>
-                          {/* Quantity - always visible */}
-                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Quantity</th>
-                          {/* Sold To - visible on tablet and up */}
-                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden md:table-cell">Sold To</th>
-                          {/* Profit - visible on tablet and up */}
-                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden md:table-cell">Profit</th>
-                          {/* Actions - always visible */}
-                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">Actions</th>
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden lg:table-cell">
+                            Date
+                          </th>
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">
+                            Name
+                          </th>
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">
+                            Quantity
+                          </th>
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden md:table-cell">
+                            Sold To
+                          </th>
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold hidden md:table-cell">
+                            Profit
+                          </th>
+                          <th className="py-2 px-2 sm:py-4 sm:px-4 text-left font-semibold">
+                            Actions
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {dayData.entries.map((entry) => (
                           <tr key={entry.id} className="hover:bg-gray-50">
-                            {/* Date - visible on tablet and up */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden lg:table-cell">
                               {formatDate(entry.date)}
                             </td>
-                            {/* Name - always visible */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
                               {entry.name || "—"}
                             </td>
-                            {/* Quantity - always visible */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
                               {formatNumber(entry.quantity)}
                             </td>
-                            {/* Sold To - visible on tablet and up */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">
                               {entry.sold_to?.name || "—"}
                             </td>
-                            {/* Profit - visible on tablet and up */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hidden md:table-cell">
                               ₦{formatNumber(entry.profit)}
                             </td>
-                            {/* Actions - always visible */}
                             <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-blue-400">
                               <button
                                 className="px-2 sm:px-3 py-1 text-blue-400 border-2 border-blue-400 rounded text-xs sm:text-sm"
@@ -465,17 +536,15 @@ const SoldTable: React.FC = () => {
         )}
       </div>
 
-      {/* delete and edit options modal */}
       {showModal && selectedSale && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-sm">
             <div className="flex justify-between items-center">
               <h3 className="text-base sm:text-lg mb-3 sm:mb-4 font-medium">
-                <span className="font-semibold text-blue-20">
+                <span className="font-semibold text-blue-600">
                   {selectedSale.name || "—"}
                 </span>
               </h3>
-
               <FontAwesomeIcon
                 icon={faXmark}
                 size="2x"
@@ -485,9 +554,7 @@ const SoldTable: React.FC = () => {
             </div>
             <div className="space-y-2 sm:space-y-3">
               <button
-                onClick={() =>
-                  navigate(`/shop/edit-sold-item/${selectedSale.id}`)
-                }
+                onClick={() => navigate(`/shop/edit-sold-item/${selectedSale.id}`)}
                 className="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex items-center justify-center text-sm sm:text-base"
               >
                 <FontAwesomeIcon icon={faPencil} className="mr-2" />
@@ -505,12 +572,13 @@ const SoldTable: React.FC = () => {
         </div>
       )}
 
-      {/* confirmation modal */}
       {confirmDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-sm">
             <div className="flex justify-between items-center">
-              <h3 className="text-base sm:text-lg mb-3 sm:mb-4 font-medium">Confirm Deletion</h3>
+              <h3 className="text-base sm:text-lg mb-3 sm:mb-4 font-medium">
+                Confirm Deletion
+              </h3>
               <FontAwesomeIcon
                 icon={faXmark}
                 size="2x"
@@ -542,11 +610,18 @@ const SoldTable: React.FC = () => {
 
       {showDetailsModal && selectedItem && !confirmDelete && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center">
-          {/* Blurred backdrop */}
-          <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm" onClick={() => setShowDetailsModal(false)}></div>
-          <div className="relative w-[95vw] max-w-md mx-auto p-4 sm:p-6 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-y-auto" style={{ maxHeight: '80vh' }}>
+          <div
+            className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm"
+            onClick={() => setShowDetailsModal(false)}
+          ></div>
+          <div
+            className="relative w-[95vw] max-w-md mx-auto p-4 sm:p-6 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-y-auto"
+            style={{ maxHeight: "80vh" }}
+          >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg sm:text-xl font-bold text-black">{selectedItem.name || "—"}</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-black">
+                {selectedItem.name || "—"}
+              </h2>
               <button
                 onClick={() => setShowDetailsModal(false)}
                 className="text-gray-500 hover:text-gray-700 focus:outline-none text-2xl font-bold"
@@ -558,46 +633,66 @@ const SoldTable: React.FC = () => {
             <div className="grid grid-cols-2 gap-4 bg-white border border-gray-100 rounded-lg p-4 mb-4 shadow">
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Category</span>
-                <span className="text-base font-bold text-black">{selectedItem.item_sold?.inventory_category?.name || "—"}</span>
+                <span className="text-base font-bold text-black">
+                  {selectedItem.item_sold?.inventory_category?.name || "—"}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Date</span>
-                <span className="text-base font-bold text-black">{formatDate(selectedItem.date)}</span>
+                <span className="text-base font-bold text-black">
+                  {formatDate(selectedItem.date)}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Dimensions</span>
-                <span className="text-base font-bold text-black">{selectedItem.item_sold?.dimensions || "—"}</span>
+                <span className="text-base font-bold text-black">
+                  {selectedItem.item_sold?.dimensions || "—"}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Quantity</span>
-                <span className="text-base font-bold text-black">{formatNumber(selectedItem.quantity)}</span>
+                <span className="text-base font-bold text-black">
+                  {formatNumber(selectedItem.quantity)}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Project</span>
-                <span className="text-base font-bold text-black">{selectedItem.linked_project?.name || "—"}</span>
+                <span className="text-base font-bold text-black">
+                  {selectedItem.linked_project?.name || "—"}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Customer</span>
-                <span className="text-base font-bold text-black">{selectedItem.sold_to?.name || "—"}</span>
+                <span className="text-base font-bold text-black">
+                  {selectedItem.sold_to?.name || "—"}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Logistics</span>
-                <span className="text-base font-bold text-black">{selectedItem.logistics ? `₦${formatNumber(selectedItem.logistics)}` : "—"}</span>
+                <span className="text-base font-bold text-black">
+                  {selectedItem.logistics ? `₦${formatNumber(selectedItem.logistics)}` : "—"}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Cost Price</span>
-                <span className="text-base font-bold text-black">₦{formatNumber(selectedItem.cost_price)}</span>
+                <span className="text-base font-bold text-black">
+                  ₦{formatNumber(selectedItem.cost_price)}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Selling Price</span>
-                <span className="text-base font-bold text-black">₦{formatNumber(selectedItem.selling_price)}</span>
+                <span className="text-base font-bold text-black">
+                  ₦{formatNumber(selectedItem.selling_price)}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-black uppercase">Profit</span>
-                <span className="text-base font-bold text-black">₦{formatNumber(selectedItem.profit)}</span>
+                <span className="text-base font-bold text-black">
+                  ₦{formatNumber(selectedItem.profit)}
+                </span>
               </div>
             </div>
-            {userRole === 'ceo' && (
+            {userRole === "ceo" && (
               <div className="flex flex-row space-x-2 mb-2">
                 <button
                   onClick={() => navigate(`/shop/edit-sold-item/${selectedItem.id}`)}

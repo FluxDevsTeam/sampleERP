@@ -162,7 +162,6 @@ const EditBalanceSwitchModal: React.FC<EditBalanceSwitchModalProps> = ({ balance
               )}
             />
 
-            {isCeo && (
               <FormField
                 control={form.control}
                 name="switch_date"
@@ -176,7 +175,6 @@ const EditBalanceSwitchModal: React.FC<EditBalanceSwitchModalProps> = ({ balance
                   </FormItem>
                 )}
               />
-            )}
 
             <DialogFooter>
               <div className="flex justify-end gap-2 w-full">

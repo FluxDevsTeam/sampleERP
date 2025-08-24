@@ -5,15 +5,15 @@ const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#ff0000"];
 
 const formatNumber = (num: number) => {
   if (num >= 1000000000) {
-    return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+    return '₦' + (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
   }
   if (num >= 1000000) {
-    return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    return '₦' + (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
   }
   if (num >= 1000) {
-    return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+    return '₦' + (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
   }
-  return num.toString();
+  return '₦' + num.toString();
 };
 
 const PieChartComponent = ({ data }: { data: { name: string; value: number }[] }) => {

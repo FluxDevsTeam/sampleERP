@@ -4,9 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { Whisper, Tooltip } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
-import { ThreeDots } from "react-loader-spinner";
 import Modal from "../../Modal";
-import { deleteCategory } from "./categoryOperations";
+import inventoryDataJson from "@/data/shop/inventory/inventory.json";
 
 const AddItemPage: React.FC = () => {
   const navigate = useNavigate();
@@ -14,8 +13,6 @@ const AddItemPage: React.FC = () => {
   const [categories, setCategories] = useState<{ id: number; name: string }[]>(
     []
   );
-  const [deletingCategory, setDeletingCategory] = useState(false);
-
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -26,7 +23,6 @@ const AddItemPage: React.FC = () => {
     selling_price: "",
     image: null as File | null,
   });
-
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     title: "",
@@ -34,33 +30,8 @@ const AddItemPage: React.FC = () => {
     type: "success" as "success" | "error",
   });
 
-  async function skFn() {
-    try {
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/inventory-item-category/",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch categories");
-      }
-
-      const logData = await response.json();
-      console.log(logData);
-
-      setCategories(logData);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  }
-
   useEffect(() => {
-    skFn();
+    setCategories(inventoryDataJson.categories);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,36 +39,17 @@ const AddItemPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("category", formData.category);
-      formDataToSend.append("stock", formData.stock);
-      formDataToSend.append("description", formData.description);
-      formDataToSend.append("dimensions", formData.dimensions);
-      formDataToSend.append("cost_price", formData.cost_price);
-      formDataToSend.append("selling_price", formData.selling_price);
-
-      if (formData.image) {
-        formDataToSend.append("image", formData.image);
+      if (
+        !formData.name ||
+        !formData.category ||
+        !formData.stock ||
+        !formData.dimensions ||
+        !formData.cost_price ||
+        !formData.selling_price
+      ) {
+        throw new Error("All required fields must be filled");
       }
-
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/inventory-item/",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-          body: formDataToSend,
-        }
-      );
-
-      console.log(response);
-
-      if (!response.ok) {
-        throw new Error("Failed to add item");
-      }
-
+      // Simulate adding item (non-persistent)
       setModalConfig({
         isOpen: true,
         title: "Success",
@@ -120,45 +72,7 @@ const AddItemPage: React.FC = () => {
   const handleCloseModal = () => {
     setModalConfig({ ...modalConfig, isOpen: false });
     if (modalConfig.type === "success") {
-      navigate(`/shop/inventory`);
-    }
-  };
-
-  const handleDeleteCategory = async () => {
-    if (!formData.category) {
-      setModalConfig({
-        isOpen: true,
-        title: "Error",
-        message: "Please select a category to delete",
-        type: "error",
-      });
-      return;
-    }
-
-    setDeletingCategory(true);
-    try {
-      await deleteCategory(
-        formData.category,
-        setDeletingCategory,
-        setModalConfig
-      );
-      setModalConfig({
-        isOpen: true,
-        title: "Success",
-        message: "Category deleted successfully!",
-        type: "success",
-      });
-      skFn();
-    } catch (error) {
-      console.error("Error deleting category:", error);
-      setModalConfig({
-        isOpen: true,
-        title: "Error",
-        message: "Failed to delete category",
-        type: "error",
-      });
-    } finally {
-      setDeletingCategory(false);
+      navigate(`/inventory`);
     }
   };
 
@@ -167,17 +81,16 @@ const AddItemPage: React.FC = () => {
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center mb-6">
           <button
-            onClick={() => navigate("/shop/inventory")}
-            className="mr-4 text-gray-20 hover:text-gray-600"
+            onClick={() => navigate("/inventory")}
+            className="mr-4 text-gray-600 hover:text-gray-900"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-2xl font-bold text-gray-20">Add New Item</h1>
+          <h1 className="text-2xl font-bold text-gray-600">Add New Item</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* item name */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Name
@@ -193,7 +106,6 @@ const AddItemPage: React.FC = () => {
               />
             </div>
 
-            {/* category */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Category
@@ -217,53 +129,21 @@ const AddItemPage: React.FC = () => {
                 followCursor
                 speaker={
                   <Tooltip className="text-red-500">
-                    Can't find the category you are looking for? Click to add
-                    new category
+                    Can't find the category you are looking for? Click to add new
+                    category
                   </Tooltip>
                 }
               >
                 <button
-                  className=" text-gray-20 border-2 border-gray-500 rounded-md mt-2 mr-2 p-2"
-                  onClick={() => navigate("/shop/add-new-category")}
+                  type="button"
+                  className="text-gray-600 border-2 border-gray-500 rounded-md mt-2 mr-2 p-2"
+                  onClick={() => navigate("/inventory/add-new-category")}
                 >
                   Add category
                 </button>
               </Whisper>
-              <Whisper
-                followCursor
-                speaker={
-                  <Tooltip className="text-red-500">
-                    Choose category then click here to delete category
-                  </Tooltip>
-                }
-              >
-                <button
-                  className={`text-gray-20 border-2 border-gray-500 rounded-md mt-2 p-2 relative ${
-                    deletingCategory ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                  onClick={handleDeleteCategory}
-                  disabled={deletingCategory}
-                >
-                  {deletingCategory ? (
-                    <div className="flex items-center space-x-2">
-                      <span>Deleting</span>
-                      <ThreeDots
-                        visible={true}
-                        height="20"
-                        width="20"
-                        color="gray"
-                        radius="9"
-                        ariaLabel="deleting-category"
-                      />
-                    </div>
-                  ) : (
-                    "Delete category"
-                  )}
-                </button>
-              </Whisper>
             </div>
 
-            {/* stock */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Stock
@@ -279,7 +159,6 @@ const AddItemPage: React.FC = () => {
               />
             </div>
 
-            {/* dimensions */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Dimensions
@@ -295,7 +174,6 @@ const AddItemPage: React.FC = () => {
               />
             </div>
 
-            {/* cost price */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Cost Price
@@ -311,7 +189,6 @@ const AddItemPage: React.FC = () => {
               />
             </div>
 
-            {/* selling price */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Selling Price
@@ -328,7 +205,6 @@ const AddItemPage: React.FC = () => {
             </div>
           </div>
 
-          {/* description */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Description (optional)
@@ -343,7 +219,6 @@ const AddItemPage: React.FC = () => {
             />
           </div>
 
-          {/* image */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Image (optional)
@@ -360,7 +235,6 @@ const AddItemPage: React.FC = () => {
             />
           </div>
 
-          {/* add button */}
           <div className="flex justify-end">
             <button
               type="submit"

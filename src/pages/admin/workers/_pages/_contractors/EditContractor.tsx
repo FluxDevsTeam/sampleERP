@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { updateContractor, getContractorDetails } from "@/utils/jsonDataService";
 
 const EditContractor = () => {
   const { id } = useParams<{ id: string }>();
@@ -43,15 +43,7 @@ const EditContractor = () => {
   useEffect(() => {
     const fetchContractor = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
-        const response = await axios.get(`https://backend.kidsdesigncompany.com/api/contractors/${id}/`, {
-          headers: { Authorization: `JWT ${token}` },
-        });
-        const normalized = {
-          ...response.data,
-          date_joined: response.data.date_joined ? response.data.date_joined.slice(0, 10) : "",
-          date_left: response.data.date_left ? response.data.date_left.slice(0, 10) : "",
-        };
+        const normalized = await getContractorDetails(id);
         setFormData(normalized);
         setOriginalData(normalized);
       } catch (error) {
@@ -94,21 +86,7 @@ const EditContractor = () => {
     setIsPending(true);
 
     try {
-      const data = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (originalData && value !== originalData[key]) {
-          data.append(key, value as string);
-        }
-      });
-      if (image) data.append("image", image);
-      if (agreementFormImage) data.append("agreement_form_image", agreementFormImage);
-      const token = localStorage.getItem("accessToken");
-      await axios.patch(`https://backend.kidsdesigncompany.com/api/contractors/${id}/`, data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `JWT ${token}`,
-        },
-      });
+      await updateContractor(id, formData, image, agreementFormImage);
       queryClient.invalidateQueries({ queryKey: ["contractors"], refetchType: "active" });
       toast.success("Contractor updated successfully!");
       navigate("/admin/workers");

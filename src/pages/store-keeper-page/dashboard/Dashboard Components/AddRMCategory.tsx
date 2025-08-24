@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import dashboardDataJson from "@/data/store-keeper-page/dashboard/storekeeper-dashboard.json";
 
 const AddRMCategory: React.FC = () => {
   const [name, setName] = useState("");
@@ -13,26 +14,18 @@ const AddRMCategory: React.FC = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        "https://backend.kidsdesigncompany.com/api/raw-materials-category/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${localStorage.getItem("accessToken")}`,
-          },
-          body: JSON.stringify({ name }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to add category");
-      }
-
-      navigate("/store-keeper/dashboard");
+      // Simulate adding category by updating local state
+      const newCategory = {
+        id: Math.max(...dashboardDataJson.rawMaterialsCategories.map((c) => c.id)) + 1,
+        name,
+      };
+      // For demo purposes, we'll just navigate back without modifying JSON
+      setTimeout(() => {
+        navigate("/store-keeper/dashboard");
+        setIsLoading(false);
+      }, 1000); // Simulate network delay
     } catch (err) {
       setError("Failed to add category. Please try again.");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -40,21 +33,15 @@ const AddRMCategory: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold text-gray-500 mb-6">
-          Add New Category
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-500 mb-6">Add New Category</h1>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-            {error}
-          </div>
+          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">{error}</div>
         )}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="name" className="block text-gray-700 mb-2">
-              Category Name
-            </label>
+            <label htmlFor="name" className="block text-gray-700 mb-2">Category Name</label>
             <input
               type="text"
               id="name"

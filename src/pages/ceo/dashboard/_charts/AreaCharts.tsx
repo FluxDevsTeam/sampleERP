@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import {
   AreaChart,
   Area,
@@ -9,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import ceoDashboardDataInitial from "@/data/ceo/dashboard/ceo-dashboard.json"; // Import static JSON
 
 // Define interfaces for the data structure
 interface DashboardData {
@@ -17,37 +17,17 @@ interface DashboardData {
   monthly_profit_trend?: { month: string; profit: number }[];
 }
 
-interface ChartProps {
-  data: any[];
-  title: string;
-  color: string;
-  id: string;
-}
-
 const AreaChartComponent = () => {
   const [incomeData, setIncomeData] = useState<{ month: string; total_income: number }[]>([]);
   const [expenseData, setExpenseData] = useState<{ month: string; total_expenses: number }[]>([]);
   const [profitData, setProfitData] = useState<{ month: string; profit: number }[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = () => {
       try {
-        const accessToken = localStorage.getItem("accessToken");
-
-        if (!accessToken) {
-          throw new Error("Please login to access this data");
-        }
-
-        const response = await axios.get<DashboardData>(
-          "https://backend.kidsdesigncompany.com/api/ceo-dashboard/",
-          {
-            headers: {
-              Authorization: `JWT ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = response.data;
+        // Load from local storage if available, else use initial JSON
+        const storedData = localStorage.getItem("ceoDashboardData");
+        const data: DashboardData = storedData ? JSON.parse(storedData) : ceoDashboardDataInitial;
 
         if (data?.monthly_income_trend) {
           setIncomeData(data.monthly_income_trend);
@@ -59,7 +39,7 @@ const AreaChartComponent = () => {
           setProfitData(data.monthly_profit_trend);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error loading data:", error);
       }
     };
 

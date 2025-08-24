@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import ceoDashboardDataInitial from "@/data/ceo/dashboard/ceo-dashboard.json";
 
 // Define interfaces for the data structure
 interface IncomeData { month: string; total_income: number; }
@@ -32,34 +33,17 @@ const MonthlyTrendsCharts = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = () => {
       try {
-        const accessToken = localStorage.getItem("accessToken");
-
-        if (!accessToken) {
-          throw new Error("Please login to access this data");
-        }
-
-        const response = await fetch(
-          "https://backend.kidsdesigncompany.com/api/ceo-dashboard/",
-          {
-            headers: {
-              Authorization: `JWT ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const result: ApiResponse = await response.json();
+        // Load from local storage if available, else use initial JSON
+        const storedData = localStorage.getItem("ceoDashboardData");
+        const result: ApiResponse = storedData ? JSON.parse(storedData) : ceoDashboardDataInitial;
         setIncomeData(result.monthly_income_trend || []);
         setExpenseData(result.monthly_expense_trend || []);
         setLoading(false);
       } catch (err) {
-        setError("Failed to fetch data");
+        setError("Failed to load data");
         setLoading(false);
-        // Use sample data if fetch fails
       }
     };
 
@@ -68,7 +52,7 @@ const MonthlyTrendsCharts = () => {
 
   // Format large numbers with commas
   const formatCurrency = (value: number): string => {
-    return `$${value.toLocaleString()}`;
+    return `₦${value.toLocaleString()}`;
   };
 
   // Custom tooltip to display formatted values

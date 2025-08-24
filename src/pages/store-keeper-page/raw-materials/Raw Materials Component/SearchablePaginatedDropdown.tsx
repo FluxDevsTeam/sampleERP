@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import rawMaterialsCategoryData from '@/data/store-keeper-page/raw-materials/raw-materials-category.json';
 
 interface DropdownItem {
   id: number;
@@ -17,26 +18,26 @@ interface SearchablePaginatedDropdownProps {
   onSearchChange: (value: string) => void;
 }
 
-const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = ({ endpoint, label, name, value, resultsKey, onChange, onSearchChange }) => {
+const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = ({ label, name, value, resultsKey, onChange, onSearchChange }) => {
   const [items, setItems] = useState<DropdownItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [nextUrl, setNextUrl] = useState<string | null>(null);
-  const [prevUrl, setPrevUrl] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<DropdownItem | null>(null);
-  const [paginationLoading, setPaginationLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Update selected item when value changes
   useEffect(() => {
-    if (value && items.length > 0) {
-      const item = items.find(item => String(item.id) === value);
+    const filteredItems = rawMaterialsCategoryData.results.filter((item: DropdownItem) =>
+      value ? item.name.toLowerCase().includes(value.toLowerCase()) : true
+    );
+    setItems(filteredItems);
+    if (value && filteredItems.length > 0) {
+      const item = filteredItems.find(item => item.name.toLowerCase() === value.toLowerCase());
       if (item) {
         setSelectedItem(item);
       }
     } else if (!value) {
       setSelectedItem(null);
     }
-  }, [value, items]);
+  }, [value]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -49,75 +50,6 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
-  const fetchData = async (url: string) => {
-    console.log(`Dropdown: Fetching from URL: ${url}`);
-    try {
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem('accessToken')}`,
-        },
-      });
-      const data = await response.json();
-      console.log('Dropdown: API Response Data:', data);
-
-      let itemsToShow = [];
-      let next = null;
-      let prev = null;
-
-      // The API might return a paginated object or a direct array.
-      if (data && typeof data === 'object' && !Array.isArray(data)) {
-        // This handles paginated responses, e.g., { count, next, previous, results: [...] }
-        const keys = resultsKey.split('.');
-        let extractedItems = data;
-        for (const key of keys) {
-          if (extractedItems && typeof extractedItems === 'object' && key in extractedItems) {
-            extractedItems = extractedItems[key];
-          } else {
-            extractedItems = null; 
-            break;
-          }
-        }
-        
-        if (Array.isArray(extractedItems)) {
-          itemsToShow = extractedItems;
-          next = data.next;
-          prev = data.previous;
-        } else {
-           console.error('Dropdown: Could not extract a valid array from the response object.', data);
-        }
-
-      } else if (Array.isArray(data)) {
-        // This handles when the API returns a direct array of items, e.g., [{...}, {...}]
-        itemsToShow = data;
-      } else {
-        console.error('Dropdown: API response is not in a recognized format.', data);
-      }
-
-      console.log('Dropdown: Extracted items:', itemsToShow);
-      setItems(itemsToShow);
-      setNextUrl(next);
-      setPrevUrl(prev);
-
-    } catch (error) {
-      console.error(`Dropdown: Error fetching data from ${url}:`, error);
-      setItems([]); // Clear items on error
-    }
-  };
-
-  const handlePagination = async (url: string) => {
-    setPaginationLoading(true);
-    try {
-      await fetchData(url);
-    } finally {
-      setPaginationLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const fullEndpoint = `${endpoint}?search=${value}`;
-    fetchData(fullEndpoint);
-  }, [endpoint, value]);
 
   const handleSelect = (item: DropdownItem) => {
     setSelectedItem(item);
@@ -162,26 +94,6 @@ const SearchablePaginatedDropdown: React.FC<SearchablePaginatedDropdownProps> = 
               </li>
             ))}
           </ul>
-          <div className="flex justify-between p-2">
-            <button
-              onClick={() => prevUrl && handlePagination(prevUrl)}
-              disabled={!prevUrl || paginationLoading}
-              className={`px-3 py-1 bg-gray-200 text-gray-700 rounded ${
-                !prevUrl || paginationLoading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {paginationLoading ? "Loading..." : "Previous"}
-            </button>
-            <button
-              onClick={() => nextUrl && handlePagination(nextUrl)}
-              disabled={!nextUrl || paginationLoading}
-              className={`px-3 py-1 bg-gray-200 text-gray-700 rounded ${
-                !nextUrl || paginationLoading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {paginationLoading ? "Loading..." : "Next"}
-            </button>
-          </div>
         </div>
       )}
     </div>

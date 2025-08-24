@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,8 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import projectsData from "@/data/ceo/project/projects.json";
+import customersData from "@/data/ceo/project/customers.json";
 
-// Define types for Project data
 interface CustomerDetail {
   id: number;
   name: string;
@@ -47,9 +47,10 @@ interface Project {
   logistics: string;
   service_charge: string;
   note: string | null;
+  tasks: Task[];
+  all_items: { item: string; price: string; quantity: string }[];
 }
 
-// Interface for customers
 interface Customer {
   id: number;
   name: string;
@@ -58,88 +59,125 @@ interface Customer {
   address?: string;
 }
 
-// Interface for API error response
 interface ApiErrorResponse {
   [key: string]: string[];
 }
 
-// Task and Subtask types
 interface Subtask {
   title: string;
   checked: boolean;
 }
+
 interface Task {
   title: string;
   checked: boolean;
   subtasks: Subtask[];
 }
 
-// --- TasksEditor component (OUTSIDE main component) ---
+const saveProjectsToJson = async (updatedProjects: any) => {
+  localStorage.setItem("projects", JSON.stringify(updatedProjects));
+  return updatedProjects;
+};
+
 const TasksEditor: React.FC<{
   tasks: Task[];
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }> = ({ tasks, setTasks }) => {
-  const handleTaskChange = (idx: number, field: 'title' | 'checked', value: any) => {
-    setTasks(prev => prev.map((task, i) => i === idx ? { ...task, [field]: value } : task));
+  const handleTaskChange = (idx: number, field: "title" | "checked", value: any) => {
+    setTasks((prev) => prev.map((task, i) => (i === idx ? { ...task, [field]: value } : task)));
   };
   const handleAddTask = () => {
-    setTasks(prev => [...prev, { title: '', checked: false, subtasks: [] }]);
+    setTasks((prev) => [...prev, { title: "", checked: false, subtasks: [] }]);
   };
   const handleRemoveTask = (idx: number) => {
-    setTasks(prev => prev.filter((_, i) => i !== idx));
+    setTasks((prev) => prev.filter((_, i) => i !== idx));
   };
-  const handleSubtaskChange = (taskIdx: number, subIdx: number, field: 'title' | 'checked', value: any) => {
-    setTasks(prev => prev.map((task, i) =>
-      i === taskIdx
-        ? { ...task, subtasks: task.subtasks.map((sub, j) => j === subIdx ? { ...sub, [field]: value } : sub) }
-        : task
-    ));
+  const handleSubtaskChange = (taskIdx: number, subIdx: number, field: "title" | "checked", value: any) => {
+    setTasks((prev) =>
+      prev.map((task, i) =>
+        i === taskIdx
+          ? { ...task, subtasks: task.subtasks.map((sub, j) => (j === subIdx ? { ...sub, [field]: value } : sub)) }
+          : task
+      )
+    );
   };
   const handleAddSubtask = (taskIdx: number) => {
-    setTasks(prev => prev.map((task, i) =>
-      i === taskIdx ? { ...task, subtasks: [...task.subtasks, { title: '', checked: false }] } : task
-    ));
+    setTasks((prev) =>
+      prev.map((task, i) =>
+        i === taskIdx ? { ...task, subtasks: [...task.subtasks, { title: "", checked: false }] } : task
+      )
+    );
   };
   const handleRemoveSubtask = (taskIdx: number, subIdx: number) => {
-    setTasks(prev => prev.map((task, i) =>
-      i === taskIdx ? { ...task, subtasks: task.subtasks.filter((_, j) => j !== subIdx) } : task
-    ));
+    setTasks((prev) =>
+      prev.map((task, i) =>
+        i === taskIdx ? { ...task, subtasks: task.subtasks.filter((_, j) => j !== subIdx) } : task
+      )
+    );
   };
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <label className="font-semibold">Tasks</label>
-        <button type="button" className="px-2 py-1 bg-blue-500 text-white rounded" onClick={handleAddTask}>Add Task</button>
+        <button type="button" className="px-2 py-1 bg-blue-500 text-white rounded" onClick={handleAddTask}>
+          Add Task
+        </button>
       </div>
       {tasks.length === 0 && <div className="text-gray-500 text-sm">No tasks yet.</div>}
       {tasks.map((task, idx) => (
         <div key={idx} className="border rounded-lg p-3 mb-2 bg-gray-50">
           <div className="flex items-center gap-2 mb-2">
-            <input type="checkbox" checked={task.checked} onChange={e => handleTaskChange(idx, 'checked', e.target.checked)} />
+            <input
+              type="checkbox"
+              checked={task.checked}
+              onChange={(e) => handleTaskChange(idx, "checked", e.target.checked)}
+            />
             <input
               placeholder="Task title"
               value={task.title}
-              onChange={e => handleTaskChange(idx, 'title', e.target.value)}
+              onChange={(e) => handleTaskChange(idx, "title", e.target.value)}
               className="w-1/2 border px-2 py-1 rounded"
             />
-            <button type="button" className="ml-2 px-2 py-1 bg-red-500 text-white rounded" onClick={() => handleRemoveTask(idx)}>Remove</button>
+            <button
+              type="button"
+              className="ml-2 px-2 py-1 bg-red-500 text-white rounded"
+              onClick={() => handleRemoveTask(idx)}
+            >
+              Remove
+            </button>
           </div>
           <div className="ml-6">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs text-gray-600">Subtasks</span>
-              <button type="button" className="px-2 py-1 bg-blue-400 text-white rounded text-xs" onClick={() => handleAddSubtask(idx)}>Add Subtask</button>
+              <button
+                type="button"
+                className="px-2 py-1 bg-blue-400 text-white rounded text-xs"
+                onClick={() => handleAddSubtask(idx)}
+              >
+                Add Subtask
+              </button>
             </div>
             {task.subtasks.length === 0 && <div className="text-gray-400 text-xs">No subtasks</div>}
             {task.subtasks.map((sub, subIdx) => (
               <div key={subIdx} className="flex items-center gap-2 mb-1">
-                <input type="checkbox" checked={sub.checked} onChange={e => handleSubtaskChange(idx, subIdx, 'checked', e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={sub.checked}
+                  onChange={(e) => handleSubtaskChange(idx, subIdx, "checked", e.target.checked)}
+                />
                 <input
                   placeholder="Subtask title"
                   value={sub.title}
-                  onChange={e => handleSubtaskChange(idx, subIdx, 'title', e.target.value)}
+                  onChange={(e) => handleSubtaskChange(idx, subIdx, "title", e.target.value)}
                   className="w-1/2 border px-2 py-1 rounded"
                 />
-                <button type="button" className="ml-2 px-2 py-1 bg-red-400 text-white rounded text-xs" onClick={() => handleRemoveSubtask(idx, subIdx)}>Remove</button>
+                <button
+                  type="button"
+                  className="ml-2 px-2 py-1 bg-red-400 text-white rounded text-xs"
+                  onClick={() => handleRemoveSubtask(idx, subIdx)}
+                >
+                  Remove
+                </button>
               </div>
             ))}
           </div>
@@ -154,7 +192,6 @@ const EditProject = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // Project form state
   const [formData, setFormData] = useState({
     name: "",
     status: "",
@@ -170,107 +207,29 @@ const EditProject = () => {
     note: "",
   });
 
-  // Image states
   const [invoiceImage, setInvoiceImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [currentInvoiceImage, setCurrentInvoiceImage] = useState<string | null>(
-    null
-  );
-
-  // Loading, error, and validation states
+  const [currentInvoiceImage, setCurrentInvoiceImage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
   const [errorDetails, setErrorDetails] = useState<ApiErrorResponse>({});
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
+  const [customers] = useState<Customer[]>(customersData.results.all_customers || []);
+  const [isLoadingCustomers] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [allItems, setAllItems] = useState<{ item: string; price: string; quantity: string }[]>([]);
 
-  // Fetch project data
-  const {
-    data: project,
-    isLoading,
-    error,
-  } = useQuery<Project>({
+  const { data: project, isLoading, error } = useQuery<Project>({
     queryKey: ["project", id],
     queryFn: async () => {
-      const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken) {
-        throw new Error("Please login to access this data");
+      const project = projectsData.all_projects.find((p) => p.id.toString() === id);
+      if (!project) {
+        throw new Error("Project not found");
       }
-      const response = await axios.get(
-        `https://backend.kidsdesigncompany.com/api/project/${id}/`,
-        {
-          headers: {
-            Authorization: `JWT ${accessToken}`,
-          },
-        }
-      );
-      return response.data;
+      return project;
     },
     enabled: !!id,
   });
 
-  // Fetch customers
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      setIsLoadingCustomers(true);
-      try {
-        const accessToken = localStorage.getItem("accessToken");
-        if (!accessToken) {
-          throw new Error("Please login to access this data");
-        }
-        const response = await axios.get(
-          "https://backend.kidsdesigncompany.com/api/customer/",
-          {
-            headers: {
-              Authorization: `JWT ${accessToken}`,
-            },
-          }
-        );
-
-        // Extract customers from the nested structure (similar to AddProject)
-        if (
-          response.data &&
-          response.data.results &&
-          response.data.results.all_customers
-        ) {
-          setCustomers(response.data.results.all_customers);
-        } else {
-          // Fallback to mock data if API structure is unexpected
-          console.error("Unexpected API response structure:", response.data);
-
-          // Use mock data as fallback (same as in the original component)
-          setCustomers([
-            { id: 1, name: "Adebayo Jubreel" },
-            { id: 2, name: "Julius Caesar" },
-            { id: 3, name: "Martha Ayodele" },
-            { id: 4, name: "Smith Wigglesworth" },
-            { id: 5, name: "iyegere" },
-            { id: 6, name: "john cena" },
-            { id: 7, name: "suskidee" },
-          ]);
-        }
-      } catch (error) {
-        console.error("Error fetching customers:", error);
-
-        setCustomers([
-          { id: 1, name: "Adebayo Jubreel" },
-          { id: 2, name: "Julius Caesar" },
-          { id: 3, name: "Martha Ayodele" },
-          { id: 4, name: "Smith Wigglesworth" },
-          { id: 5, name: "iyegere" },
-          { id: 6, name: "john cena" },
-          { id: 7, name: "suskidee" },
-        ]);
-      } finally {
-        setIsLoadingCustomers(false);
-      }
-    };
-
-    fetchCustomers();
-  }, []);
-
-  // Update form when project data is loaded
   useEffect(() => {
     if (project) {
       setFormData({
@@ -287,44 +246,79 @@ const EditProject = () => {
         service_charge: project.service_charge || "",
         note: project.note || "",
       });
+      setCurrentInvoiceImage(project.invoice_image);
+      setTasks(project.tasks || []);
+      setAllItems(
+        Array.isArray(project.all_items)
+          ? project.all_items.map((row: any) => ({
+              item: row.item || "",
+              price: row.price || "",
+              quantity: row.quantity ? String(row.quantity) : "1",
+            }))
+          : []
+      );
+    }
+  }, [project]);
 
-      // Set current invoice image if it exists
-      if (project.invoice_image) {
-        setCurrentInvoiceImage(project.invoice_image);
+  const handleAllItemChange = (idx: number, field: "item" | "price" | "quantity", value: string) => {
+    setAllItems((prev) => prev.map((row, i) => (i === idx ? { ...row, [field]: value } : row)));
+  };
+
+  const handleAddAllItem = () => {
+    setAllItems((prev) => [...prev, { item: "", price: "", quantity: "1" }]);
+  };
+
+  const handleRemoveAllItem = (idx: number) => {
+    setAllItems((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const updateProjectMutation = useMutation({
+    mutationFn: async (updatedProject: FormData) => {
+      const projectData: any = {};
+      updatedProject.forEach((value, key) => {
+        projectData[key] = value;
+      });
+      if (projectData.customer) {
+        projectData.customer_detail = customers.find((c) => c.id.toString() === projectData.customer) || project!.customer_detail;
+        delete projectData.customer;
       }
-    }
-  }, [project]);
+      if (updatedProject.get("tasks")) {
+        projectData.tasks = JSON.parse(updatedProject.get("tasks") as string);
+      }
+      if (invoiceImage) {
+        projectData.invoice_image = URL.createObjectURL(invoiceImage);
+      }
+      projectData.all_items = allItems
+        .filter((row) => row.item && row.price)
+        .map((row) => ({ ...row, quantity: row.quantity || "1" }));
+      const updatedProjects = {
+        ...projectsData,
+        all_projects: projectsData.all_projects.map((p) => (p.id.toString() === id ? { ...p, ...projectData } : p)),
+      };
+      await saveProjectsToJson(updatedProjects);
+      return projectData;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project", id] });
+      navigate("/ceo/projects");
+      toast.success("Project updated successfully!");
+    },
+    onError: (error: any) => {
+      setFormError("Failed to update project. Please try again.");
+      toast.error("Failed to update project. Please check the form for errors.");
+      setIsSubmitting(false);
+    },
+  });
 
-  // Prepopulate tasks from project if available
-  useEffect(() => {
-    if (project && (project as any).tasks && Array.isArray((project as any).tasks)) {
-      setTasks((project as any).tasks.map((task: any) => ({
-        title: task.title || '',
-        checked: !!task.checked,
-        subtasks: Array.isArray(task.subtasks) ? task.subtasks.map((sub: any) => ({ title: sub.title || '', checked: !!sub.checked })) : []
-      })));
-    } else {
-      setTasks([]);
-    }
-  }, [project]);
-
-  // Handle image file change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type and size
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "application/pdf",
-      ];
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif", "application/pdf"];
+      const maxSize = 5 * 1024 * 1024;
 
       if (!allowedTypes.includes(file.type)) {
-        toast.error(
-          "Invalid file type. Please upload a JPEG, PNG, GIF, or PDF."
-        );
+        toast.error("Invalid file type. Please upload a JPEG, PNG, GIF, or PDF.");
         return;
       }
 
@@ -338,111 +332,36 @@ const EditProject = () => {
     }
   };
 
-  // Update project mutation
-  const updateProjectMutation = useMutation({
-    mutationFn: async (updatedProject: FormData) => {
-      return axios.put(
-        `https://backend.kidsdesigncompany.com/api/project/${id}/`,
-        updatedProject,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      queryClient.invalidateQueries({ queryKey: ["project", id] });
-      navigate("/ceo/projects");
-      toast.success("Project updated successfully!");
-    },
-    onError: (error: any) => {
-      console.error("Update error:", error);
-
-      // Handle specific API error responses
-      if (error.response && error.response.data) {
-        if (typeof error.response.data === "object") {
-          setErrorDetails(error.response.data);
-
-          // Create a readable error message
-          const errorMessages = Object.entries(error.response.data)
-            .map(
-              ([key, value]) =>
-                `${key}: ${Array.isArray(value) ? value.join(", ") : value}`
-            )
-            .join("; ");
-
-          setFormError(`Validation error: ${errorMessages}`);
-        } else {
-          setFormError(
-            "Failed to update project. Please check your data and try again."
-          );
-        }
-      } else {
-        setFormError("Failed to update project. Please try again.");
-      }
-
-      toast.error(
-        "Failed to update project. Please check the form for errors."
-      );
-      setIsSubmitting(false);
-    },
-  });
-
-  // Handle form input changes
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
-  // Handle checkbox change
   const handleCheckboxChange = (name: string, checked: boolean) => {
-    setFormData({
-      ...formData,
-      [name]: checked,
-    });
+    setFormData({ ...formData, [name]: checked });
   };
 
-  // Handle select change
   const handleSelectChange = (name: string, value: string) => {
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
-  // Handle customer change
   const handleCustomerChange = (value: string) => {
-    setFormData({
-      ...formData,
-      customer_detail: value,
-    });
+    setFormData({ ...formData, customer_detail: value });
   };
 
-  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setFormError("");
     setErrorDetails({});
 
-    // Validate form
     if (!formData.name || !formData.customer_detail) {
       setFormError("Please fill out all required fields");
       setIsSubmitting(false);
       return;
     }
 
-    // Create FormData for multipart/form-data upload
     const formDataToSubmit = new FormData();
-
-    // Append all text fields
     const projectData = {
       name: formData.name,
       status: formData.status,
@@ -456,22 +375,18 @@ const EditProject = () => {
       logistics: formData.logistics,
       service_charge: formData.service_charge,
       note: formData.note || null,
+      tasks: JSON.stringify(tasks),
     };
 
-    // Append text fields
     Object.entries(projectData).forEach(([key, value]) => {
       if (value !== null) {
         formDataToSubmit.append(key, value.toString());
       }
     });
 
-    // Append invoice image if present
     if (invoiceImage) {
       formDataToSubmit.append("invoice_image", invoiceImage);
     }
-
-    // Append tasks as JSON string
-    formDataToSubmit.append('tasks', JSON.stringify(tasks));
 
     updateProjectMutation.mutate(formDataToSubmit);
   };
@@ -484,11 +399,8 @@ const EditProject = () => {
       <Card>
         <CardHeader>
           <CardTitle>Edit Project</CardTitle>
-          <CardDescription>
-            Update the details for the selected project.
-          </CardDescription>
+          <CardDescription>Update the details for the selected project.</CardDescription>
         </CardHeader>
-
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {formError && (
@@ -500,7 +412,7 @@ const EditProject = () => {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Project Name (optional)</Label>
+              <Label htmlFor="name">Project Name*</Label>
               <Input
                 id="name"
                 name="name"
@@ -509,23 +421,17 @@ const EditProject = () => {
                 placeholder="Enter project name"
                 className={errorDetails.name ? "border-red-500" : ""}
               />
-              {errorDetails.name && (
-                <p className="text-sm text-red-500">
-                  {errorDetails.name.join(", ")}
-                </p>
-              )}
+              {errorDetails.name && <p className="text-sm text-red-500">{errorDetails.name.join(", ")}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="customer_detail">Customer (optional)</Label>
+              <Label htmlFor="customer_detail">Customer*</Label>
               <Select
                 value={formData.customer_detail}
                 onValueChange={handleCustomerChange}
                 disabled={isLoadingCustomers}
               >
-                <SelectTrigger
-                  className={errorDetails.customer ? "border-red-500" : ""}
-                >
+                <SelectTrigger className={errorDetails.customer ? "border-red-500" : ""}>
                   <SelectValue placeholder="Select a customer" />
                 </SelectTrigger>
                 <SelectContent>
@@ -535,10 +441,7 @@ const EditProject = () => {
                     </SelectItem>
                   ) : customers.length > 0 ? (
                     customers.map((customer) => (
-                      <SelectItem
-                        key={customer.id}
-                        value={customer.id.toString()}
-                      >
+                      <SelectItem key={customer.id} value={customer.id.toString()}>
                         {customer.name}
                       </SelectItem>
                     ))
@@ -549,22 +452,13 @@ const EditProject = () => {
                   )}
                 </SelectContent>
               </Select>
-              {errorDetails.customer && (
-                <p className="text-sm text-red-500">
-                  {errorDetails.customer.join(", ")}
-                </p>
-              )}
+              {errorDetails.customer && <p className="text-sm text-red-500">{errorDetails.customer.join(", ")}</p>}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => handleSelectChange("status", value)}
-              >
-                <SelectTrigger
-                  className={errorDetails.status ? "border-red-500" : ""}
-                >
+              <Select value={formData.status} onValueChange={(value) => handleSelectChange("status", value)}>
+                <SelectTrigger className={errorDetails.status ? "border-red-500" : ""}>
                   <SelectValue placeholder="Select a status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -574,16 +468,12 @@ const EditProject = () => {
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
-              {errorDetails.status && (
-                <p className="text-sm text-red-500">
-                  {errorDetails.status.join(", ")}
-                </p>
-              )}
+              {errorDetails.status && <p className="text-sm text-red-500">{errorDetails.status.join(", ")}</p>}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="start_date">Start Date (optional)</Label>
+                <Label htmlFor="start_date">Start Date*</Label>
                 <Input
                   id="start_date"
                   name="start_date"
@@ -593,9 +483,7 @@ const EditProject = () => {
                   className={errorDetails.start_date ? "border-red-500" : ""}
                 />
                 {errorDetails.start_date && (
-                  <p className="text-sm text-red-500">
-                    {errorDetails.start_date.join(", ")}
-                  </p>
+                  <p className="text-sm text-red-500">{errorDetails.start_date.join(", ")}</p>
                 )}
               </div>
 
@@ -609,17 +497,13 @@ const EditProject = () => {
                   onChange={handleChange}
                   className={errorDetails.deadline ? "border-red-500" : ""}
                 />
-                {errorDetails.deadline && (
-                  <p className="text-sm text-red-500">
-                    {errorDetails.deadline.join(", ")}
-                  </p>
-                )}
+                {errorDetails.deadline && <p className="text-sm text-red-500">{errorDetails.deadline.join(", ")}</p>}
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="selling_price">Selling Price (₦) (optional)</Label>
+                <Label htmlFor="selling_price">Selling Price (₦)*</Label>
                 <Input
                   id="selling_price"
                   name="selling_price"
@@ -629,9 +513,7 @@ const EditProject = () => {
                   className={errorDetails.selling_price ? "border-red-500" : ""}
                 />
                 {errorDetails.selling_price && (
-                  <p className="text-sm text-red-500">
-                    {errorDetails.selling_price.join(", ")}
-                  </p>
+                  <p className="text-sm text-red-500">{errorDetails.selling_price.join(", ")}</p>
                 )}
               </div>
 
@@ -644,14 +526,10 @@ const EditProject = () => {
                   value={formData.date_delivered}
                   onChange={handleChange}
                   disabled={!formData.is_delivered}
-                  className={
-                    errorDetails.date_delivered ? "border-red-500" : ""
-                  }
+                  className={errorDetails.date_delivered ? "border-red-500" : ""}
                 />
                 {errorDetails.date_delivered && (
-                  <p className="text-sm text-red-500">
-                    {errorDetails.date_delivered.join(", ")}
-                  </p>
+                  <p className="text-sm text-red-500">{errorDetails.date_delivered.join(", ")}</p>
                 )}
               </div>
             </div>
@@ -667,11 +545,7 @@ const EditProject = () => {
                   onChange={handleChange}
                   className={errorDetails.logistics ? "border-red-500" : ""}
                 />
-                {errorDetails.logistics && (
-                  <p className="text-sm text-red-500">
-                    {errorDetails.logistics.join(", ")}
-                  </p>
-                )}
+                {errorDetails.logistics && <p className="text-sm text-red-500">{errorDetails.logistics.join(", ")}</p>}
               </div>
 
               <div className="space-y-2">
@@ -682,14 +556,10 @@ const EditProject = () => {
                   type="number"
                   value={formData.service_charge}
                   onChange={handleChange}
-                  className={
-                    errorDetails.service_charge ? "border-red-500" : ""
-                  }
+                  className={errorDetails.service_charge ? "border-red-500" : ""}
                 />
                 {errorDetails.service_charge && (
-                  <p className="text-sm text-red-500">
-                    {errorDetails.service_charge.join(", ")}
-                  </p>
+                  <p className="text-sm text-red-500">{errorDetails.service_charge.join(", ")}</p>
                 )}
               </div>
             </div>
@@ -705,14 +575,9 @@ const EditProject = () => {
                 rows={3}
                 className={errorDetails.note ? "border-red-500" : ""}
               />
-              {errorDetails.note && (
-                <p className="text-sm text-red-500">
-                  {errorDetails.note.join(", ")}
-                </p>
-              )}
+              {errorDetails.note && <p className="text-sm text-red-500">{errorDetails.note.join(", ")}</p>}
             </div>
 
-            {/* Invoice Image Upload */}
             <div className="space-y-2">
               <Label htmlFor="invoice_image">Invoice Image</Label>
               <Input
@@ -722,14 +587,51 @@ const EditProject = () => {
                 onChange={handleImageChange}
                 className="cursor-pointer"
               />
-              {invoiceImage && (
-                <p className="text-sm text-green-600 mt-2">
-                  {invoiceImage.name} selected
-                </p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB
-              </p>
+              {invoiceImage && <p className="text-sm text-green-600 mt-2">{invoiceImage.name} selected</p>}
+              <p className="text-xs text-muted-foreground">Allowed formats: JPEG, PNG, GIF, PDF. Max size: 5MB</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label>All Items</Label>
+              <div className="space-y-2">
+                {allItems.map((row, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <Input
+                      placeholder="Item"
+                      value={row.item}
+                      onChange={(e) => handleAllItemChange(idx, "item", e.target.value)}
+                      className="w-1/3"
+                    />
+                    <Input
+                      placeholder="Price"
+                      type="number"
+                      value={row.price}
+                      onChange={(e) => handleAllItemChange(idx, "price", e.target.value)}
+                      className="w-1/3"
+                    />
+                    <Input
+                      placeholder="Quantity"
+                      type="number"
+                      min="1"
+                      value={row.quantity}
+                      onChange={(e) => handleAllItemChange(idx, "quantity", e.target.value)}
+                      className="w-1/4"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemoveAllItem(idx)}
+                      disabled={allItems.length === 1}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                <Button type="button" variant="outline" size="sm" onClick={handleAddAllItem}>
+                  Add Item
+                </Button>
+              </div>
             </div>
 
             <div className="flex flex-col space-y-2">
@@ -737,9 +639,7 @@ const EditProject = () => {
                 <Checkbox
                   id="is_delivered"
                   checked={formData.is_delivered}
-                  onCheckedChange={(checked) =>
-                    handleCheckboxChange("is_delivered", checked as boolean)
-                  }
+                  onCheckedChange={(checked) => handleCheckboxChange("is_delivered", checked as boolean)}
                 />
                 <Label htmlFor="is_delivered">Project is delivered</Label>
               </div>
@@ -748,35 +648,23 @@ const EditProject = () => {
                 <Checkbox
                   id="archived"
                   checked={formData.archived}
-                  onCheckedChange={(checked) =>
-                    handleCheckboxChange("archived", checked as boolean)
-                  }
+                  onCheckedChange={(checked) => handleCheckboxChange("archived", checked as boolean)}
                 />
                 <Label htmlFor="archived">Archive this project</Label>
               </div>
             </div>
 
-            {/* Tasks Section */}
             <div className="space-y-2">
               <TasksEditor tasks={tasks} setTasks={setTasks} />
             </div>
           </CardContent>
 
           <CardFooter className="flex justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate("/ceo/projects")}
-            >
+            <Button type="button" variant="outline" onClick={() => navigate("/ceo/projects")}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting || updateProjectMutation.isPending}
-            >
-              {isSubmitting || updateProjectMutation.isPending
-                ? "Saving..."
-                : "Save Changes"}
+            <Button type="submit" disabled={isSubmitting || updateProjectMutation.isPending}>
+              {isSubmitting || updateProjectMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </CardFooter>
         </form>
