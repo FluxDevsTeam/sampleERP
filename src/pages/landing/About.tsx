@@ -1,12 +1,34 @@
 // About.tsx
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
+import Footer from "../../components/Footer";
 import Button from "../../components/Button";
 import { motion } from "framer-motion";
 
 const About: React.FC = () => {
   const navigate = useNavigate();
+
+  // Map role titles to role keys and target demo routes
+  const roleRedirects: Record<string, { key: string; path: string }> = {
+    "CEO Demo": { key: "ceo", path: "/ceo/dashboard" },
+    "Factory Manager Demo": { key: "factory_manager", path: "/factory-manager/dashboard" },
+    "Project Manager Demo": { key: "project_manager", path: "/project-manager/dashboard" },
+    "Store Keeper Demo": { key: "storekeeper", path: "/store-keeper/dashboard" },
+    "Admin Demo": { key: "admin", path: "/admin/dashboard" },
+    "Accountant Demo": { key: "accountant", path: "/admin/dashboard" },
+  };
+
+  const handleRoleClick = (title: string) => {
+    const meta = roleRedirects[title];
+    if (!meta) return;
+    try {
+      localStorage.setItem("user_role", meta.key);
+      localStorage.setItem("showReturnPopup", "true");
+    } catch (e) {}
+    // navigate to demo route
+    navigate(meta.path);
+  };
 
   const features = [
     {
@@ -103,46 +125,40 @@ const About: React.FC = () => {
 
 const roles = [
   {
-    title: "CEO",
+    title: "CEO Demo",
     description: "Executive overview with KPIs, financial performance, and operational metrics across all departments.",
     icon: "👔",
     features: ["Financial overview", "Production metrics", "Sales performance", "Company analytics"],
   },
   {
-    title: "Factory Manager",
+    title: "Factory Manager Demo",
     description: "Production monitoring, workforce management, and operational efficiency tools for plant management.",
     icon: "🏭",
     features: ["Production tracking", "Workforce scheduling", "Equipment monitoring", "Quality control"],
   },
   {
-    title: "Project Manager",
+    title: "Project Manager Demo",
     description: "Project planning, resource allocation, and timeline management for product development and orders.",
     icon: "📊",
     features: ["Project planning", "Resource allocation", "Timeline management", "Budget tracking"],
   },
   {
-    title: "Store Keeper",
+    title: "Store Keeper Demo",
     description: "Inventory management, stock tracking, and material handling for efficient warehouse operations.",
     icon: "📦",
     features: ["Inventory management", "Stock tracking", "Material handling", "Order fulfillment"],
   },
   {
-    title: "Admin",
+    title: "Admin Demo",
     description: "System administration, user management, and configuration tools to ensure smooth ERP operations.",
     icon: "🛠️",
     features: ["User management", "System configuration", "Access control", "Data backups"],
   },
   {
-    title: "Accountant",
+    title: "Accountant Demo",
     description: "Financial management, payroll processing, and reporting for accurate accounting and compliance.",
     icon: "💸",
     features: ["Payroll processing", "Financial reporting", "Expense tracking", "Tax compliance"],
-  },
-  {
-    title: "Shopkeeper",
-    description: "Sales tracking, customer order management, and stock updates for seamless shop floor operations.",
-    icon: "🛒",
-    features: ["Sales tracking", "Customer order management", "Stock updates", "Point-of-sale integration"],
   },
 ];
 
@@ -151,7 +167,7 @@ const roles = [
       <Navbar />
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
+      {/* <section className="max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -179,6 +195,57 @@ const roles = [
             </Button>
           </div>
         </motion.div>
+      </section> */}
+
+      {/* Role Demos (moved to top so visitors see available demos immediately) */}
+      <section id="roles" className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-8"
+          >
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 mb-6">Complete <span className="text-blue-600">Manufacturing ERP</span> Solution</h1>
+            <p className="text-lg text-gray-700 max-w-4xl mx-auto">
+              Explore interactive demos of the full ERP experience for each user role — no signup required. Click a role to open a live demo of that user's interface and try the product with pre-seeded demo data.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {roles.map((role, index) => (
+              <motion.div
+                key={index}
+                onClick={() => handleRoleClick(role.title)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleRoleClick(role.title); }}
+                tabIndex={0}
+                role="button"
+                className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 cursor-pointer hover:shadow-xl transition-all"
+                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.08 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex items-center mb-6">
+                  <span className="text-4xl mr-4">{role.icon}</span>
+                  <h3 className="text-2xl font-semibold text-blue-700">{role.title}</h3>
+                </div>
+                <p className="text-gray-700 mb-6">{role.description}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {role.features.map((feature, i) => (
+                    <div key={i} className="flex items-center text-sm text-gray-700">
+                      <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      {feature}
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Features Overview */}
@@ -229,52 +296,7 @@ const roles = [
         </div>
       </section>
 
-      {/* Role-Based Dashboards */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-700 mb-4">Role-Specific Dashboards</h2>
-            <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-              Customized interfaces for every role in your organization, providing relevant information and tools for maximum productivity.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {roles.map((role, index) => (
-              <motion.div
-                key={index}
-                className="bg-white p-8 rounded-xl shadow-lg border border-gray-700"
-                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.2 }}
-                viewport={{ once: true }}
-              >
-                <div className="flex items-center mb-6">
-                  <span className="text-4xl mr-4">{role.icon}</span>
-                  <h3 className="text-2xl font-semibold text-blue-700">{role.title}</h3>
-                </div>
-                <p className="text-gray-700 mb-6">{role.description}</p>
-                <div className="grid grid-cols-2 gap-3">
-                  {role.features.map((feature, i) => (
-                    <div key={i} className="flex items-center text-sm text-gray-700">
-                      <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {feature}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+  {/* Role demos moved above */}
 
       {/* Technology Stack */}
       <section className="bg-gray-100 py-16">
@@ -369,49 +391,8 @@ const roles = [
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="text-xl font-semibold mb-4">FluxDevs ERP</h3>
-            <p className="text-gray-400">
-              Advanced manufacturing ERP solution designed to streamline operations, increase efficiency, and drive growth for modern manufacturers.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li><Link to="/" className="text-gray-400 hover:text-white">Home</Link></li>
-              <li><Link to="/about" className="text-gray-400 hover:text-white">Features</Link></li>
-              <li><Link to="/contact" className="text-gray-400 hover:text-white">Contact</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Contact Us</h3>
-            <p className="text-gray-400">Email: <a href="mailto:sales@fluxdevs.com" className="hover:text-white">sales@fluxdevs.com</a></p>
-            <p className="text-gray-400">Phone: +1 555-123-4567</p>
-            <p className="text-gray-400">WhatsApp: +1 555-123-4567</p>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2025 FluxDevs. All rights reserved.</p>
-        </div>
-      </footer>
-
-      {/* Floating WhatsApp */}
-      <motion.a
-        href="https://wa.me/15551234567"
-        target="_blank"
-        rel="noreferrer"
-        className="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg z-50"
-        title="Chat with us on WhatsApp"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.33.26 2.62.74 3.82L2 22l6.44-.87c1.22.47 2.54.74 3.9.74 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm-.01 1.67c4.6 0 8.34 3.74 8.34 8.34s-3.74 8.34-8.34 8.34c-1.2 0-2.36-.25-3.44-.73l-.45-.18-3.83.52.53-3.79-.18-.46c-.48-1.09-.73-2.27-.73-3.49 0-4.6 3.74-8.34 8.34-8.34zm4.36 10.93c-.24.73-1.42 1.4-2.09 1.62-.67.22-1.52.31-2.37-.15-1.01-.55-1.84-1.44-2.45-2.45-.61-1.01-.91-2.15-.68-3.21.2-.89.66-1.67 1.39-2.18.24-.17.52-.26.81-.26.26 0 .51.09.72.25.21.16.37.39.47.65.1.26.17.54.14.83-.03.29-.14.57-.32.81-.18.24-.43.44-.71.59-.29.15-.59.31-.84.52-.25.21-.48.46-.65.74-.17.28-.3.59-.36.93-.06.34.03.69.25.97.22.28.54.55.92.79.38.24.82.43 1.3.54.48.11.99.13 1.48.03.49-.1.92-.34 1.27-.65.35-.31.62-.72.79-1.17.17-.45.22-.94.12-1.39-.1-.45-.34-.84-.69-1.14z" />
-        </svg>
-      </motion.a>
+  {/* Footer (shared) */}
+  <Footer />
     </div>
   );
 };
