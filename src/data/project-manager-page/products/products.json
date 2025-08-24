@@ -1,0 +1,633 @@
+{
+  "count": 12,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 1,
+      "name": "Classic Dining Table",
+      "linked_project": { "id": 1, "name": "Main Workshop Project", "paid": 0.0, "balance": "0.00" },
+      "selling_price": "250000.00",
+      "quantity": 5,
+      "progress": 40,
+      "colour": "Walnut",
+      "design": "6-seater classic pedestal",
+      "dimensions": "180 x 90 x 75 cm",
+      "overhead_cost": "3.00",
+      "overhead_cost_base": "20000",
+      "production_note": "Use kiln-dried hardwood and brass fasteners",
+      "tasks": "[{\"title\":\"Frame Construction\",\"checked\":true,\"subtasks\":[{\"title\":\"Cut table legs\",\"checked\":true},{\"title\":\"Assemble pedestal base\",\"checked\":true},{\"title\":\"Join apron to base\",\"checked\":true},{\"title\":\"Reinforce joints\",\"checked\":false}]},{\"title\":\"Tabletop Preparation\",\"checked\":false,\"subtasks\":[{\"title\":\"Cut planks to size\",\"checked\":false},{\"title\":\"Join planks with biscuits\",\"checked\":false},{\"title\":\"Sand surface smooth\",\"checked\":false},{\"title\":\"Route edges\",\"checked\":false}]},{\"title\":\"Finishing\",\"checked\":false,\"subtasks\":[{\"title\":\"Apply wood conditioner\",\"checked\":false},{\"title\":\"Stain with walnut finish\",\"checked\":false},{\"title\":\"Apply polyurethane coat\",\"checked\":false},{\"title\":\"Buff to satin finish\",\"checked\":false}]}]",
+      "quotation": [
+        { "id": 1, "department": "Carpentry", "quotation": [{"name":"Oak Planks","quantity":10},{"name":"Brass Fasteners","quantity":50},{"name":"Wood Glue","quantity":2},{"name":"Sandpaper","quantity":10}], "contractor": [201,202], "salary_worker": [101,102], "date": "2025-08-01" },
+        { "id": 2, "department": "Finishing", "quotation": [{"name":"Walnut Stain","quantity":3},{"name":"Polyurethane","quantity":2},{"name":"Brushes","quantity":5},{"name":"Tack Cloth","quantity":2}], "contractor": [203], "salary_worker": [103], "date": "2025-08-02" },
+        { "id": 3, "department": "Hardware", "quotation": [{"name":"Table Braces","quantity":4},{"name":"Corner Brackets","quantity":8},{"name":"Leveling Feet","quantity":5}], "contractor": [204], "salary_worker": [104], "date": "2025-08-03" }
+      ],
+      "raw_materials": [
+        { "name": "Oak Planks", "quantity": 10, "price": "50000.00", "date": "2025-08-02" },
+        { "name": "Brass Fasteners", "quantity": 50, "price": "25000.00", "date": "2025-08-02" },
+        { "name": "Wood Glue", "quantity": 2, "price": "8000.00", "date": "2025-08-02" },
+        { "name": "Walnut Stain", "quantity": 3, "price": "18000.00", "date": "2025-08-03" }
+      ],
+      "expensis": [
+        { "name": "Glue & Varnish", "amount": "15000.00", "quantity": 1, "date": "2025-08-03" },
+        { "name": "Sanding Discs", "amount": "12000.00", "quantity": 1, "date": "2025-08-04" },
+        { "name": "Safety Equipment", "amount": "25000.00", "quantity": 1, "date": "2025-08-04" },
+        { "name": "Tool Maintenance", "amount": "18000.00", "quantity": 1, "date": "2025-08-05" }
+      ],
+      "contractors": [
+        { "id": 201, "name": "Alice Johnson", "cost": "40000.00", "date": "2025-08-02" },
+        { "id": 202, "name": "Bob Smith", "cost": "35000.00", "date": "2025-08-03" },
+        { "id": 203, "name": "Carlos Diaz", "cost": "30000.00", "date": "2025-08-04" }
+      ],
+      "salary_workers": [
+        { "id": 101, "name": "Grace Lee", "date": "2025-08-02" },
+        { "id": 102, "name": "Henry Nguyen", "date": "2025-08-03" },
+        { "id": 103, "name": "Isabella Rossi", "date": "2025-08-04" }
+      ],
+      "images": "/public/1 (4).jpg",
+      "sketch": null
+      ,
+      "calculations": {
+        "total_raw_material_cost": 1820000,
+        "total_production_cost": 105000,
+        "total_overhead_cost": 60000,
+        "quantity": 5,
+        "profit": 62500,
+        "profit_per_item": 12500
+      }
+    },
+    {
+      "id": 2,
+      "name": "Urban Coffee Table",
+      "linked_project": { "id": 2, "name": "Mr John's Project", "paid": 0.0, "balance": "0.00" },
+      "selling_price": "120000.00",
+      "quantity": 12,
+      "progress": 70,
+      "colour": "Matte Black",
+      "design": "Round mid-century",
+      "dimensions": "90 x 90 x 45 cm",
+      "overhead_cost": "4.00",
+      "overhead_cost_base": "20000",
+      "production_note": "Polish with satin finish",
+      "tasks": "[{\"title\":\"Base Fabrication\",\"checked\":true,\"subtasks\":[{\"title\":\"Cut steel tubing\",\"checked\":true},{\"title\":\"Weld frame structure\",\"checked\":true},{\"title\":\"Grind welds smooth\",\"checked\":true},{\"title\":\"Apply primer coat\",\"checked\":true}]},{\"title\":\"Tabletop Creation\",\"checked\":true,\"subtasks\":[{\"title\":\"Cut circular top\",\"checked\":true},{\"title\":\"Sand edges round\",\"checked\":true},{\"title\":\"Apply wood filler\",\"checked\":true},{\"title\":\"Sand surface smooth\",\"checked\":false}]},{\"title\":\"Final Assembly\",\"checked\":false,\"subtasks\":[{\"title\":\"Attach top to base\",\"checked\":false},{\"title\":\"Apply matte black paint\",\"checked\":false},{\"title\":\"Install protective pads\",\"checked\":false},{\"title\":\"Quality inspection\",\"checked\":false}]}]",
+      "quotation": [
+        { "id": 21, "department": "Metalwork", "quotation": [{"name":"Steel Tubing","quantity":8},{"name":"Welding Rods","quantity":2},{"name":"Metal Primer","quantity":1},{"name":"Grinding Discs","quantity":5}], "contractor": [205,206], "salary_worker": [105,106], "date": "2025-07-25" },
+        { "id": 22, "department": "Woodworking", "quotation": [{"name":"Plywood Sheets","quantity":3},{"name":"Wood Filler","quantity":2},{"name":"Router Bits","quantity":3},{"name":"Clamps","quantity":6}], "contractor": [207], "salary_worker": [107], "date": "2025-07-26" },
+        { "id": 23, "department": "Finishing", "quotation": [{"name":"Matte Black Paint","quantity":4},{"name":"Clear Coat","quantity":2},{"name":"Masking Tape","quantity":3}], "contractor": [208], "salary_worker": [108], "date": "2025-07-27" }
+      ],
+      "raw_materials": [
+        { "name": "Steel Tubing", "quantity": 8, "price": "45000.00", "date": "2025-07-25" },
+        { "name": "Plywood Sheets", "quantity": 3, "price": "28000.00", "date": "2025-07-26" },
+        { "name": "Matte Black Paint", "quantity": 4, "price": "22000.00", "date": "2025-07-27" },
+        { "name": "Welding Supplies", "quantity": 1, "price": "15000.00", "date": "2025-07-25" }
+      ],
+      "expensis": [
+        { "name": "Metal Processing", "amount": "35000.00", "quantity": 1, "date": "2025-07-26" },
+        { "name": "Finishing Supplies", "amount": "18000.00", "quantity": 1, "date": "2025-07-28" },
+        { "name": "Packaging Materials", "amount": "12000.00", "quantity": 1, "date": "2025-07-29" },
+        { "name": "Equipment Rental", "amount": "40000.00", "quantity": 1, "date": "2025-07-25" }
+      ],
+      "contractors": [
+        { "id": 205, "name": "David Chen", "cost": "38000.00", "date": "2025-07-25" },
+        { "id": 206, "name": "Emma Wilson", "cost": "42000.00", "date": "2025-07-26" },
+        { "id": 207, "name": "Frank Miller", "cost": "36000.00", "date": "2025-07-27" }
+      ],
+      "salary_workers": [
+        { "id": 105, "name": "Jack Thompson", "date": "2025-07-25" },
+        { "id": 106, "name": "Karen Davis", "date": "2025-07-26" },
+        { "id": 107, "name": "Leo Garcia", "date": "2025-07-27" }
+      ],
+      "images": "/public/1 (2).jpg",
+      "sketch": null
+      ,
+      "calculations": {
+        "total_raw_material_cost": 547000,
+        "total_production_cost": 116000,
+        "total_overhead_cost": 80000,
+        "quantity": 12,
+        "profit": 592000,
+        "profit_per_item": 49333
+      }
+    },
+    {
+      "id": 3,
+      "name": "Modern TV Stand",
+      "linked_project": { "id": 1, "name": "Main Workshop Project", "paid": 0.0, "balance": "0.00" },
+      "selling_price": "180000.00",
+      "quantity": 8,
+      "progress": 25,
+      "colour": "Espresso",
+      "design": "Low profile media console",
+      "dimensions": "160 x 40 x 45 cm",
+      "overhead_cost": "2.50",
+      "overhead_cost_base": "20000",
+      "production_note": "Hidden cable channel; adjustable shelves",
+      "tasks": "[{\"title\":\"Frame Prep\",\"checked\":false,\"subtasks\":[{\"title\":\"Measure\",\"checked\":false},{\"title\":\"Cut panels\",\"checked\":false},{\"title\":\"Drill holes\",\"checked\":false},{\"title\":\"Sand\",\"checked\":false}]},{\"title\":\"Finish\",\"checked\":false,\"subtasks\":[{\"title\":\"Prime\",\"checked\":false},{\"title\":\"Stain\",\"checked\":false},{\"title\":\"Seal\",\"checked\":false},{\"title\":\"Polish\",\"checked\":false}]},{\"title\":\"Assembly\",\"checked\":false,\"subtasks\":[{\"title\":\"Attach legs\",\"checked\":false},{\"title\":\"Fit doors\",\"checked\":false},{\"title\":\"Install shelves\",\"checked\":false},{\"title\":\"Quality check\",\"checked\":false}]}]",
+      "quotation": [
+        { "id": 31, "department": "Carpentry", "quotation": [{"name":"MDF Panel","quantity":4},{"name":"Veneer","quantity":2},{"name":"Hinge","quantity":4},{"name":"Screw Pack","quantity":2}], "contractor": [201,202,203], "salary_worker": [101,102], "date": "2025-07-20" },
+        { "id": 32, "department": "Finish", "quotation": [{"name":"Stain","quantity":2},{"name":"Sealer","quantity":1},{"name":"Brush","quantity":3},{"name":"Sandpaper","quantity":6}], "contractor": [201,202,203], "salary_worker": [101,102], "date": "2025-07-22" },
+        { "id": 33, "department": "Hardware", "quotation": [{"name":"Handles","quantity":4},{"name":"Cable grommet","quantity":2},{"name":"Shelf pin","quantity":12},{"name":"Legs","quantity":4}], "contractor": [201,202,203], "salary_worker": [101,102], "date": "2025-07-23" }
+      ],
+      "raw_materials": [
+        { "name": "MDF Boards", "quantity": 4, "price": "30000.00", "date": "2025-07-19" },
+        { "name": "Veneer Sheets", "quantity": 2, "price": "15000.00", "date": "2025-07-19" },
+        { "name": "Adhesive", "quantity": 2, "price": "8000.00", "date": "2025-07-19" },
+        { "name": "Finishing Oil", "quantity": 1, "price": "12000.00", "date": "2025-07-20" }
+      ],
+      "expensis": [
+        { "name": "Packing", "amount": "5000.00", "quantity": 8, "date": "2025-07-24" },
+        { "name": "Transport", "amount": "20000.00", "quantity": 1, "date": "2025-07-24" },
+        { "name": "Hardware Kits", "amount": "10000.00", "quantity": 8, "date": "2025-07-20" },
+        { "name": "Sanding Supplies", "amount": "6000.00", "quantity": 1, "date": "2025-07-21" }
+      ],
+      "contractors": [
+        { "id": 201, "name": "Alice Johnson", "cost": "40000.00", "date": "2025-07-19" },
+        { "id": 202, "name": "Bob Smith", "cost": "35000.00", "date": "2025-07-20" },
+        { "id": 203, "name": "Carlos Diaz", "cost": "30000.00", "date": "2025-07-21" }
+      ],
+      "salary_workers": [
+        { "id": 101, "name": "Grace Lee", "date": "2025-07-19" },
+        { "id": 102, "name": "Henry Nguyen", "date": "2025-07-20" }
+      ],
+      "images": "/public/1 (3).jpg",
+      "sketch": null
+      ,
+      "calculations": {
+        "total_raw_material_cost": 178000,
+        "total_production_cost": 105000,
+        "total_overhead_cost": 50000,
+        "quantity": 8,
+        "profit": 961000,
+        "profit_per_item": 120125
+      }
+    },
+    {
+      "id": 4,
+      "name": "Scandinavian Sideboard",
+      "linked_project": { "id": 1, "name": "Main Workshop Project", "paid": 0.0, "balance": "0.00" },
+      "selling_price": "320000.00",
+      "quantity": 3,
+      "progress": 55,
+      "colour": "Natural Oak",
+      "design": "Scandi sideboard with tapered legs",
+      "dimensions": "140 x 45 x 80 cm",
+      "overhead_cost": "4.50",
+      "overhead_cost_base": "20000",
+      "production_note": "Use dovetail drawers",
+      "tasks": "[{\"title\":\"Joinery\",\"checked\":false,\"subtasks\":[{\"title\":\"Cut dovetails\",\"checked\":false},{\"title\":\"Assemble carcass\",\"checked\":false},{\"title\":\"Fit drawers\",\"checked\":false},{\"title\":\"Check alignment\",\"checked\":false}]},{\"title\":\"Surface\",\"checked\":false,\"subtasks\":[{\"title\":\"Sand\",\"checked\":false},{\"title\":\"Oil\",\"checked\":false},{\"title\":\"Buff\",\"checked\":false},{\"title\":\"Label\",\"checked\":false}]},{\"title\":\"Final\",\"checked\":false,\"subtasks\":[{\"title\":\"Install hardware\",\"checked\":false},{\"title\":\"Polish edges\",\"checked\":false},{\"title\":\"Pack\",\"checked\":false},{\"title\":\"Dispatch\",\"checked\":false}]}]",
+      "quotation": [
+        { "id": 41, "department": "Carpentry", "quotation": [{"name":"Oak Plank","quantity":6},{"name":"Drawer Slide","quantity":6},{"name":"Knob","quantity":6},{"name":"Glue","quantity":2}], "contractor": [201,202,203], "salary_worker": [101,103], "date": "2025-06-10" },
+        { "id": 42, "department": "Finish", "quotation": [{"name":"Oil","quantity":2},{"name":"Wax","quantity":1},{"name":"Cloth","quantity":4},{"name":"Sponge","quantity":2}], "contractor": [201,202,203], "salary_worker": [101,103], "date": "2025-06-12" },
+        { "id": 43, "department": "Hardware", "quotation": [{"name":"Hinges","quantity":4},{"name":"Legs","quantity":4},{"name":"Screws","quantity":20},{"name":"Feet","quantity":4}], "contractor": [201,202,203], "salary_worker": [101,103], "date": "2025-06-13" }
+      ],
+      "raw_materials": [
+        { "name": "Oak Boards", "quantity": 6, "price": "70000.00", "date": "2025-06-09" },
+        { "name": "Plywood", "quantity": 2, "price": "25000.00", "date": "2025-06-09" },
+        { "name": "Drawer Slides", "quantity": 6, "price": "18000.00", "date": "2025-06-10" },
+        { "name": "Varnish", "quantity": 2, "price": "12000.00", "date": "2025-06-11" }
+      ],
+      "expensis": [
+        { "name": "Workshop Hours", "amount": "80000.00", "quantity": 1, "date": "2025-06-14" },
+        { "name": "Finishing", "amount": "25000.00", "quantity": 1, "date": "2025-06-15" },
+        { "name": "Assembly", "amount": "15000.00", "quantity": 3, "date": "2025-06-16" },
+        { "name": "Transport", "amount": "30000.00", "quantity": 1, "date": "2025-06-17" }
+      ],
+      "contractors": [
+        { "id": 201, "name": "Alice Johnson", "cost": "50000.00", "date": "2025-06-10" },
+        { "id": 202, "name": "Bob Smith", "cost": "45000.00", "date": "2025-06-11" },
+        { "id": 203, "name": "Carlos Diaz", "cost": "40000.00", "date": "2025-06-12" }
+      ],
+      "salary_workers": [
+        { "id": 101, "name": "Grace Lee", "date": "2025-06-09" },
+        { "id": 103, "name": "Ivy Khan", "date": "2025-06-10" }
+      ],
+      "images": "/public/1 (4).jpg",
+      "sketch": null
+      ,
+      "calculations": {
+        "total_raw_material_cost": 602000,
+        "total_production_cost": 135000,
+        "total_overhead_cost": 90000,
+        "quantity": 3,
+        "profit": 48000,
+        "profit_per_item": 16000
+      }
+    },
+    {
+      "id": 5,
+      "name": "Rustic Bookshelf",
+      "linked_project": { "id": 1, "name": "Main Workshop Project", "paid": 0.0, "balance": "0.00" },
+      "selling_price": "140000.00",
+      "quantity": 6,
+      "progress": 60,
+      "colour": "Reclaimed Pine",
+      "design": "Open shelving",
+      "dimensions": "80 x 30 x 200 cm",
+      "overhead_cost": "3.00",
+      "overhead_cost_base": "20000",
+      "production_note": "Ensure vertical stability braces",
+      "tasks": "[{\"title\":\"Cutting\",\"checked\":false,\"subtasks\":[{\"title\":\"Measure\",\"checked\":false},{\"title\":\"Rough cut\",\"checked\":false},{\"title\":\"Fine cut\",\"checked\":false},{\"title\":\"Sand\",\"checked\":false}]},{\"title\":\"Assembly\",\"checked\":false,\"subtasks\":[{\"title\":\"Join shelves\",\"checked\":false},{\"title\":\"Fit braces\",\"checked\":false},{\"title\":\"Clamp\",\"checked\":false},{\"title\":\"Check plumb\",\"checked\":false}]},{\"title\":\"Finish\",\"checked\":false,\"subtasks\":[{\"title\":\"Stain\",\"checked\":false},{\"title\":\"Seal\",\"checked\":false},{\"title\":\"Polish\",\"checked\":false},{\"title\":\"QC\",\"checked\":false}]}]",
+      "quotation": [
+        { "id": 51, "department": "Materials", "quotation": [{"name":"Pine Plank","quantity":10},{"name":"Braces","quantity":4},{"name":"Screws","quantity":30},{"name":"Glue","quantity":2}], "contractor": [201,202,203], "salary_worker": [102,103], "date": "2025-05-05" },
+        { "id": 52, "department": "Finish", "quotation": [{"name":"Stain","quantity":2},{"name":"Sealer","quantity":1},{"name":"Brush","quantity":2},{"name":"Cloth","quantity":4}], "contractor": [201,202,203], "salary_worker": [102,103], "date": "2025-05-06" },
+        { "id": 53, "department": "Transport", "quotation": [{"name":"Pallet","quantity":1},{"name":"Packing","quantity":6},{"name":"Labels","quantity":6},{"name":"Straps","quantity":2}], "contractor": [201,202,203], "salary_worker": [102,103], "date": "2025-05-07" }
+      ],
+      "raw_materials": [
+        { "name": "Pine Planks", "quantity": 10, "price": "40000.00", "date": "2025-05-01" },
+        { "name": "Braces", "quantity": 4, "price": "6000.00", "date": "2025-05-02" },
+        { "name": "Screws", "quantity": 30, "price": "3000.00", "date": "2025-05-03" },
+        { "name": "Glue", "quantity": 2, "price": "4000.00", "date": "2025-05-04" }
+      ],
+      "expensis": [
+        { "name": "Labor", "amount": "60000.00", "quantity": 1, "date": "2025-05-08" },
+        { "name": "Finish Supplies", "amount": "12000.00", "quantity": 1, "date": "2025-05-09" },
+        { "name": "Packaging", "amount": "8000.00", "quantity": 6, "date": "2025-05-10" },
+        { "name": "Inspection", "amount": "6000.00", "quantity": 1, "date": "2025-05-11" }
+      ],
+      "contractors": [
+        { "id": 201, "name": "Alice Johnson", "cost": "28000.00", "date": "2025-05-02" },
+        { "id": 202, "name": "Bob Smith", "cost": "25000.00", "date": "2025-05-03" },
+        { "id": 203, "name": "Carlos Diaz", "cost": "22000.00", "date": "2025-05-04" }
+      ],
+      "salary_workers": [
+        { "id": 102, "name": "Henry Nguyen", "date": "2025-05-02" },
+        { "id": 103, "name": "Ivy Khan", "date": "2025-05-03" }
+      ],
+      "images": "/public/1 (5).jpg",
+      "sketch": null
+      ,
+      "calculations": {
+        "total_raw_material_cost": 522000,
+        "total_production_cost": 75000,
+        "total_overhead_cost": 60000,
+        "quantity": 6,
+        "profit": 57000,
+        "profit_per_item": 9500
+      }
+    },
+    {
+      "id": 6,
+      "name": "Compact Shoe Rack",
+      "linked_project": { "id": 2, "name": "Mr John's Project", "paid": 0.0, "balance": "0.00" },
+      "selling_price": "60000.00",
+      "quantity": 20,
+      "progress": 80,
+      "colour": "White",
+      "design": "Slim vertical rack",
+      "dimensions": "60 x 20 x 120 cm",
+      "overhead_cost": "2.00",
+      "overhead_cost_base": "20000",
+      "production_note": "Ships flat-packed",
+      "tasks": "[{\"title\":\"Prep\",\"checked\":false,\"subtasks\":[{\"title\":\"Cut panels\",\"checked\":false},{\"title\":\"Punch holes\",\"checked\":false},{\"title\":\"Sand\",\"checked\":false},{\"title\":\"Prime\",\"checked\":false}]},{\"title\":\"Assemble\",\"checked\":false,\"subtasks\":[{\"title\":\"Slot shelves\",\"checked\":false},{\"title\":\"Secure screws\",\"checked\":false},{\"title\":\"Label\",\"checked\":false},{\"title\":\"QC\",\"checked\":false}]},{\"title\":\"Pack\",\"checked\":false,\"subtasks\":[{\"title\":\"Flat pack\",\"checked\":false},{\"title\":\"Add manual\",\"checked\":false},{\"title\":\"Seal box\",\"checked\":false},{\"title\":\"Weigh\",\"checked\":false}]}]",
+      "quotation": [
+        { "id": 61, "department": "Materials", "quotation": [{"name":"Plywood","quantity":2},{"name":"Screws","quantity":12},{"name":"Glue","quantity":1},{"name":"Tape","quantity":2}], "contractor": [201,202,203], "salary_worker": [101,102], "date": "2025-08-10" },
+        { "id": 62, "department": "Packaging", "quotation": [{"name":"Boxes","quantity":20},{"name":"Manual","quantity":20},{"name":"Tape","quantity":5},{"name":"Label","quantity":20}], "contractor": [201,202,203], "salary_worker": [101,102], "date": "2025-08-11" },
+        { "id": 63, "department": "Transport", "quotation": [{"name":"Courier","quantity":1},{"name":"Pallet","quantity":1},{"name":"Straps","quantity":2},{"name":"Insurance","quantity":1}], "contractor": [201,202,203], "salary_worker": [101,102], "date": "2025-08-12" }
+      ],
+      "raw_materials": [
+        { "name": "Plywood Sheets", "quantity": 2, "price": "12000.00", "date": "2025-08-09" },
+        { "name": "Screws", "quantity": 12, "price": "1000.00", "date": "2025-08-09" },
+        { "name": "Glue", "quantity": 1, "price": "2000.00", "date": "2025-08-09" },
+        { "name": "Box board", "quantity": 20, "price": "500.00", "date": "2025-08-10" }
+      ],
+      "expensis": [
+        { "name": "Assembly", "amount": "10000.00", "quantity": 20, "date": "2025-08-13" },
+        { "name": "Packing", "amount": "6000.00", "quantity": 20, "date": "2025-08-13" },
+        { "name": "Labeling", "amount": "2000.00", "quantity": 20, "date": "2025-08-13" },
+        { "name": "Transport", "amount": "40000.00", "quantity": 1, "date": "2025-08-14" }
+      ],
+      "contractors": [
+        { "id": 201, "name": "Alice Johnson", "cost": "15000.00", "date": "2025-08-09" },
+        { "id": 202, "name": "Bob Smith", "cost": "12000.00", "date": "2025-08-10" },
+        { "id": 203, "name": "Carlos Diaz", "cost": "10000.00", "date": "2025-08-11" }
+      ],
+      "salary_workers": [
+        { "id": 101, "name": "Grace Lee", "date": "2025-08-09" },
+        { "id": 102, "name": "Henry Nguyen", "date": "2025-08-10" }
+      ],
+      "images": "/public/1 (6).jpg",
+      "sketch": null
+      ,
+      "calculations": {
+        "total_raw_material_cost": 48000,
+        "total_production_cost": 37000,
+        "total_overhead_cost": 40000,
+        "quantity": 20,
+        "profit": 675000,
+        "profit_per_item": 33750
+      }
+    },
+    {
+      "id": 7,
+      "name": "Lounge Armchair",
+      "linked_project": { "id": 3, "name": "Rain House Project", "paid": 0.0, "balance": "0.00" },
+      "selling_price": "210000.00",
+      "quantity": 4,
+      "progress": 45,
+      "colour": "Charcoal",
+      "design": "Tufted lounge chair",
+      "dimensions": "85 x 90 x 95 cm",
+      "overhead_cost": "3.50",
+      "overhead_cost_base": "20000",
+      "production_note": "Foam density standard: medium",
+      "tasks": "[{\"title\":\"Frame\",\"checked\":false,\"subtasks\":[{\"title\":\"Cut frame\",\"checked\":false},{\"title\":\"Assemble frame\",\"checked\":false},{\"title\":\"Check joints\",\"checked\":false},{\"title\":\"Reinforce\",\"checked\":false}]},{\"title\":\"Upholstery\",\"checked\":false,\"subtasks\":[{\"title\":\"Cut fabric\",\"checked\":false},{\"title\":\"Sew cover\",\"checked\":false},{\"title\":\"Fit foam\",\"checked\":false},{\"title\":\"Staple\",\"checked\":false}]},{\"title\":\"Finish\",\"checked\":false,\"subtasks\":[{\"title\":\"Attach legs\",\"checked\":false},{\"title\":\"QC\",\"checked\":false},{\"title\":\"Clean\",\"checked\":false},{\"title\":\"Pack\",\"checked\":false}]}]",
+      "quotation": [
+        { "id": 71, "department": "Upholstery", "quotation": [{"name":"Foam","quantity":2},{"name":"Fabric","quantity":3},{"name":"Thread","quantity":2},{"name":"Buttons","quantity":8}], "contractor": [201,202,203], "salary_worker": [103,101], "date": "2025-04-01" },
+        { "id": 72, "department": "Frame", "quotation": [{"name":"Timber","quantity":4},{"name":"Glue","quantity":1},{"name":"Screws","quantity":20},{"name":"Veneer","quantity":2}], "contractor": [201,202,203], "salary_worker": [103,101], "date": "2025-04-03" },
+        { "id": 73, "department": "Finish", "quotation": [{"name":"Stain","quantity":1},{"name":"Sealer","quantity":1},{"name":"Brush","quantity":2},{"name":"Polish","quantity":1}], "contractor": [201,202,203], "salary_worker": [103,101], "date": "2025-04-05" }
+      ],
+      "raw_materials": [
+        { "name": "Timber", "quantity": 4, "price": "60000.00", "date": "2025-03-28" },
+        { "name": "Foam", "quantity": 2, "price": "25000.00", "date": "2025-03-29" },
+        { "name": "Fabric", "quantity": 3, "price": "18000.00", "date": "2025-03-29" },
+        { "name": "Buttons", "quantity": 8, "price": "2000.00", "date": "2025-03-30" }
+      ],
+      "expensis": [
+        { "name": "Upholstery labor", "amount": "40000.00", "quantity": 1, "date": "2025-04-06" },
+        { "name": "Frame assembly", "amount": "30000.00", "quantity": 1, "date": "2025-04-04" },
+        { "name": "Transport", "amount": "20000.00", "quantity": 1, "date": "2025-04-07" },
+        { "name": "QC", "amount": "10000.00", "quantity": 1, "date": "2025-04-08" }
+      ],
+      "contractors": [
+        { "id": 201, "name": "Alice Johnson", "cost": "55000.00", "date": "2025-03-29" },
+        { "id": 202, "name": "Bob Smith", "cost": "50000.00", "date": "2025-03-30" },
+        { "id": 203, "name": "Carlos Diaz", "cost": "45000.00", "date": "2025-03-31" }
+      ],
+      "salary_workers": [
+        { "id": 103, "name": "Ivy Khan", "date": "2025-03-29" },
+        { "id": 101, "name": "Grace Lee", "date": "2025-03-30" }
+      ],
+      "images": "/public/1 (4).jpg",
+      "sketch": null
+      ,
+      "calculations": {
+        "total_raw_material_cost": 360000,
+        "total_production_cost": 150000,
+        "total_overhead_cost": 70000,
+        "quantity": 4,
+        "profit": 160000,
+        "profit_per_item": 40000
+      }
+    },
+    {
+      "id": 8,
+      "name": "Kids Study Desk",
+      "linked_project": { "id": 1, "name": "Main Workshop Project", "paid": 0.0, "balance": "0.00" },
+      "selling_price": "90000.00",
+      "quantity": 10,
+      "progress": 35,
+      "colour": "Pastel Blue",
+      "design": "Compact study desk",
+      "dimensions": "100 x 50 x 75 cm",
+      "overhead_cost": "2.50",
+      "overhead_cost_base": "20000",
+      "production_note": "Rounded edges for safety",
+      "tasks": "[{\"title\":\"Cutting\",\"checked\":false,\"subtasks\":[{\"title\":\"Measure\",\"checked\":false},{\"title\":\"Cut top\",\"checked\":false},{\"title\":\"Cut legs\",\"checked\":false},{\"title\":\"Sanding\",\"checked\":false}]},{\"title\":\"Assembly\",\"checked\":false,\"subtasks\":[{\"title\":\"Attach legs\",\"checked\":false},{\"title\":\"Fit drawer\",\"checked\":false},{\"title\":\"Secure top\",\"checked\":false},{\"title\":\"QC\",\"checked\":false}]},{\"title\":\"Finish\",\"checked\":false,\"subtasks\":[{\"title\":\"Paint\",\"checked\":false},{\"title\":\"Seal\",\"checked\":false},{\"title\":\"Polish\",\"checked\":false},{\"title\":\"Pack\",\"checked\":false}]}]",
+      "quotation": [
+        { "id": 81, "department": "Materials", "quotation": [{"name":"Boards","quantity":3},{"name":"Drawer slide","quantity":1},{"name":"Screw","quantity":12},{"name":"Glue","quantity":1}], "contractor": [201,202,203], "salary_worker": [102,103], "date": "2025-02-11" },
+        { "id": 82, "department": "Finish", "quotation": [{"name":"Paint","quantity":2},{"name":"Sealant","quantity":1},{"name":"Brush","quantity":2},{"name":"Masking tape","quantity":1}], "contractor": [201,202,203], "salary_worker": [102,103], "date": "2025-02-12" },
+        { "id": 83, "department": "Packaging", "quotation": [{"name":"Boxes","quantity":10},{"name":"Manual","quantity":10},{"name":"Bubble wrap","quantity":5},{"name":"Tape","quantity":2}], "contractor": [201,202,203], "salary_worker": [102,103], "date": "2025-02-13" }
+      ],
+      "raw_materials": [
+        { "name": "Boards", "quantity": 3, "price": "20000.00", "date": "2025-02-10" },
+        { "name": "Legs", "quantity": 4, "price": "6000.00", "date": "2025-02-10" },
+        { "name": "Drawer hardware", "quantity": 1, "price": "8000.00", "date": "2025-02-10" },
+        { "name": "Paint", "quantity": 2, "price": "5000.00", "date": "2025-02-11" }
+      ],
+      "expensis": [
+        { "name": "Labor", "amount": "25000.00", "quantity": 1, "date": "2025-02-14" },
+        { "name": "Paint Supplies", "amount": "6000.00", "quantity": 1, "date": "2025-02-15" },
+        { "name": "Packing", "amount": "4000.00", "quantity": 10, "date": "2025-02-16" },
+        { "name": "Transport", "amount": "12000.00", "quantity": 1, "date": "2025-02-17" }
+      ],
+      "contractors": [
+        { "id": 201, "name": "Alice Johnson", "cost": "20000.00", "date": "2025-02-10" },
+        { "id": 202, "name": "Bob Smith", "cost": "18000.00", "date": "2025-02-11" },
+        { "id": 203, "name": "Carlos Diaz", "cost": "16000.00", "date": "2025-02-12" }
+      ],
+      "salary_workers": [
+        { "id": 102, "name": "Henry Nguyen", "date": "2025-02-10" },
+        { "id": 103, "name": "Ivy Khan", "date": "2025-02-11" }
+      ],
+      "images": "/public/1 (2).jpg",
+      "sketch": null
+      ,
+      "calculations": {
+        "total_raw_material_cost": 102000,
+        "total_production_cost": 54000,
+        "total_overhead_cost": 50000,
+        "quantity": 10,
+        "profit": 611000,
+        "profit_per_item": 61100
+      }
+    },
+    {
+      "id": 9,
+      "name": "Kitchen Bar Stool",
+      "linked_project": { "id": 1, "name": "Main Workshop Project", "paid": 0.0, "balance": "0.00" },
+      "selling_price": "45000.00",
+      "quantity": 30,
+      "progress": 90,
+      "colour": "Honey",
+      "design": "Backless round stool",
+      "dimensions": "45 x 45 x 75 cm",
+      "overhead_cost": "2.00",
+      "overhead_cost_base": "20000",
+      "production_note": "Seat needs protective lacquer",
+      "tasks": "[{\"title\":\"Cut\",\"checked\":false,\"subtasks\":[{\"title\":\"Cut seat\",\"checked\":false},{\"title\":\"Turn legs\",\"checked\":false},{\"title\":\"Drill\",\"checked\":false},{\"title\":\"Sand\",\"checked\":false}]},{\"title\":\"Finish\",\"checked\":false,\"subtasks\":[{\"title\":\"Lacquer\",\"checked\":false},{\"title\":\"Dry\",\"checked\":false},{\"title\":\"Polish\",\"checked\":false},{\"title\":\"Pack\",\"checked\":false}]},{\"title\":\"Pack\",\"checked\":false,\"subtasks\":[{\"title\":\"Box\",\"checked\":false},{\"title\":\"Label\",\"checked\":false},{\"title\":\"Wrap\",\"checked\":false},{\"title\":\"Seal\",\"checked\":false}]}]",
+      "quotation": [
+        { "id": 91, "department": "Materials", "quotation": [{"name":"Seat wood","quantity":30},{"name":"Leg timber","quantity":60},{"name":"Screws","quantity":200},{"name":"Glue","quantity":10}], "contractor": [201,202,203], "salary_worker": [101,102], "date": "2025-01-05" },
+        { "id": 92, "department": "Finish", "quotation": [{"name":"Lacquer","quantity":5},{"name":"Brush","quantity":10},{"name":"Cloth","quantity":5},{"name":"Sandpaper","quantity":30}], "contractor": [201,202,203], "salary_worker": [101,102], "date": "2025-01-06" },
+        { "id": 93, "department": "Packaging", "quotation": [{"name":"Boxes","quantity":30},{"name":"Tape","quantity":5},{"name":"Bubble wrap","quantity":10},{"name":"Label","quantity":30}], "contractor": [201,202,203], "salary_worker": [101,102], "date": "2025-01-07" }
+      ],
+      "raw_materials": [
+        { "name": "Seat blanks", "quantity": 30, "price": "90000.00", "date": "2025-01-01" },
+        { "name": "Leg timber", "quantity": 60, "price": "120000.00", "date": "2025-01-01" },
+        { "name": "Screws", "quantity": 200, "price": "10000.00", "date": "2025-01-02" },
+        { "name": "Lacquer", "quantity": 5, "price": "25000.00", "date": "2025-01-03" }
+      ],
+      "expensis": [
+        { "name": "Production run", "amount": "200000.00", "quantity": 1, "date": "2025-01-08" },
+        { "name": "Finish", "amount": "50000.00", "quantity": 1, "date": "2025-01-09" },
+        { "name": "Packing", "amount": "30000.00", "quantity": 30, "date": "2025-01-10" },
+        { "name": "Transport", "amount": "60000.00", "quantity": 1, "date": "2025-01-11" }
+      ],
+      "contractors": [
+        { "id": 201, "name": "Alice Johnson", "cost": "100000.00", "date": "2025-01-02" },
+        { "id": 202, "name": "Bob Smith", "cost": "90000.00", "date": "2025-01-03" },
+        { "id": 203, "name": "Carlos Diaz", "cost": "80000.00", "date": "2025-01-04" }
+      ],
+      "salary_workers": [
+        { "id": 101, "name": "Grace Lee", "date": "2025-01-02" },
+        { "id": 102, "name": "Henry Nguyen", "date": "2025-01-03" }
+      ],
+      "images": "/public/1 (3).jpg",
+      "sketch": null
+      ,
+      "calculations": {
+        "total_raw_material_cost": 12025000,
+        "total_production_cost": 270000,
+        "total_overhead_cost": 40000,
+        "quantity": 30,
+        "profit": 67500,
+        "profit_per_item": 2250
+      }
+    },
+    {
+      "id": 10,
+      "name": "Outdoor Bench",
+      "linked_project": { "id": 1, "name": "Main Workshop Project", "paid": 0.0, "balance": "0.00" },
+      "selling_price": "150000.00",
+      "quantity": 7,
+      "progress": 50,
+      "colour": "Teak",
+      "design": "Weatherproof outdoor bench",
+      "dimensions": "150 x 40 x 45 cm",
+      "overhead_cost": "3.00",
+      "overhead_cost_base": "20000",
+      "production_note": "Use stainless fasteners",
+      "tasks": "[{\"title\":\"Prep\",\"checked\":false,\"subtasks\":[{\"title\":\"Cut slats\",\"checked\":false},{\"title\":\"Drill\",\"checked\":false},{\"title\":\"Treat wood\",\"checked\":false},{\"title\":\"Assemble\",\"checked\":false}]},{\"title\":\"Finish\",\"checked\":false,\"subtasks\":[{\"title\":\"Oil\",\"checked\":false},{\"title\":\"Cure\",\"checked\":false},{\"title\":\"Polish\",\"checked\":false},{\"title\":\"QC\",\"checked\":false}]},{\"title\":\"Pack\",\"checked\":false,\"subtasks\":[{\"title\":\"Wrap\",\"checked\":false},{\"title\":\"Box\",\"checked\":false},{\"title\":\"Label\",\"checked\":false},{\"title\":\"Ship\",\"checked\":false}]}]",
+      "quotation": [
+        { "id": 101, "department": "Materials", "quotation": [{"name":"Teak slat","quantity":10},{"name":"Stainless bolt","quantity":20},{"name":"Glue","quantity":2},{"name":"Sandpaper","quantity":8}], "contractor": [201,202,203], "salary_worker": [101,103], "date": "2025-09-01" },
+        { "id": 102, "department": "Finish", "quotation": [{"name":"Outdoor oil","quantity":2},{"name":"Brush","quantity":2},{"name":"Cloth","quantity":2},{"name":"Tape","quantity":1}], "contractor": [201,202,203], "salary_worker": [101,103], "date": "2025-09-02" },
+        { "id": 103, "department": "Hardware", "quotation": [{"name":"Bolts","quantity":20},{"name":"Washers","quantity":20},{"name":"Nuts","quantity":20},{"name":"Brackets","quantity":4}], "contractor": [201,202,203], "salary_worker": [101,103], "date": "2025-09-03" }
+      ],
+      "raw_materials": [
+        { "name": "Teak slats", "quantity": 10, "price": "120000.00", "date": "2025-08-30" },
+        { "name": "Bolts", "quantity": 20, "price": "5000.00", "date": "2025-08-31" },
+        { "name": "Glue", "quantity": 2, "price": "4000.00", "date": "2025-09-01" },
+        { "name": "Finish oil", "quantity": 2, "price": "12000.00", "date": "2025-09-02" }
+      ],
+      "expensis": [
+        { "name": "Outdoor treatment", "amount": "40000.00", "quantity": 1, "date": "2025-09-04" },
+        { "name": "Hardware", "amount": "15000.00", "quantity": 1, "date": "2025-09-05" },
+        { "name": "Labor", "amount": "30000.00", "quantity": 1, "date": "2025-09-06" },
+        { "name": "Transport", "amount": "25000.00", "quantity": 1, "date": "2025-09-07" }
+      ],
+      "contractors": [
+        { "id": 201, "name": "Alice Johnson", "cost": "60000.00", "date": "2025-08-30" },
+        { "id": 202, "name": "Bob Smith", "cost": "55000.00", "date": "2025-08-31" },
+        { "id": 203, "name": "Carlos Diaz", "cost": "50000.00", "date": "2025-09-01" }
+      ],
+      "salary_workers": [
+        { "id": 101, "name": "Grace Lee", "date": "2025-08-30" },
+        { "id": 103, "name": "Ivy Khan", "date": "2025-08-31" }
+      ],
+      "images": "/public/1 (4).jpg",
+      "sketch": null
+      ,
+      "calculations": {
+        "total_raw_material_cost": 1332000,
+        "total_production_cost": 165000,
+        "total_overhead_cost": 60000,
+        "quantity": 7,
+        "profit": 52500,
+        "profit_per_item": 7500
+      }
+    },
+    {
+      "id": 11,
+      "name": "Minimalist Floating Shelf",
+      "linked_project": { "id": 1, "name": "Main Workshop Project", "paid": 0.0, "balance": "0.00" },
+      "selling_price": "35000.00",
+      "quantity": 50,
+      "progress": 95,
+      "colour": "White",
+      "design": "Wall-mounted floating shelf",
+      "dimensions": "100 x 20 x 10 cm",
+      "overhead_cost": "2.50",
+      "overhead_cost_base": "20000",
+      "production_note": "Concealed brackets required",
+      "tasks": "[{\"title\":\"Cut & Prep\",\"checked\":false,\"subtasks\":[{\"title\":\"Cut boards\",\"checked\":false},{\"title\":\"Sand\",\"checked\":false},{\"title\":\"Route\",\"checked\":false},{\"title\":\"Test bracket fit\",\"checked\":false}]},{\"title\":\"Finish\",\"checked\":false,\"subtasks\":[{\"title\":\"Prime\",\"checked\":false},{\"title\":\"Paint\",\"checked\":false},{\"title\":\"Seal\",\"checked\":false},{\"title\":\"QC\",\"checked\":false}]},{\"title\":\"Pack\",\"checked\":false,\"subtasks\":[{\"title\":\"Box\",\"checked\":false},{\"title\":\"Manual\",\"checked\":false},{\"title\":\"Label\",\"checked\":false},{\"title\":\"Ship\",\"checked\":false}]}]",
+      "quotation": [
+        { "id": 111, "department": "Materials", "quotation": [{"name":"Board","quantity":50},{"name":"Bracket","quantity":50},{"name":"Screws","quantity":200},{"name":"Glue","quantity":10}], "contractor": [201,202,203], "salary_worker": [102,103], "date": "2024-12-01" },
+        { "id": 112, "department": "Finish", "quotation": [{"name":"Paint","quantity":5},{"name":"Sealer","quantity":2},{"name":"Brush","quantity":5},{"name":"Cloth","quantity":10}], "contractor": [201,202,203], "salary_worker": [102,103], "date": "2024-12-02" },
+        { "id": 113, "department": "Packaging", "quotation": [{"name":"Boxes","quantity":50},{"name":"Tape","quantity":10},{"name":"Manual","quantity":50},{"name":"Label","quantity":50}], "contractor": [201,202,203], "salary_worker": [102,103], "date": "2024-12-03" }
+      ],
+      "raw_materials": [
+        { "name": "Boards", "quantity": 50, "price": "250000.00", "date": "2024-11-30" },
+        { "name": "Brackets", "quantity": 50, "price": "75000.00", "date": "2024-11-30" },
+        { "name": "Screws", "quantity": 200, "price": "8000.00", "date": "2024-11-30" },
+        { "name": "Glue", "quantity": 10, "price": "20000.00", "date": "2024-12-01" }
+      ],
+      "expensis": [
+        { "name": "Run cost", "amount": "150000.00", "quantity": 1, "date": "2024-12-05" },
+        { "name": "Paint", "amount": "30000.00", "quantity": 1, "date": "2024-12-06" },
+        { "name": "Packaging", "amount": "60000.00", "quantity": 50, "date": "2024-12-07" },
+        { "name": "Transport", "amount": "90000.00", "quantity": 1, "date": "2024-12-08" }
+      ],
+      "contractors": [
+        { "id": 201, "name": "Alice Johnson", "cost": "12000.00", "date": "2024-11-30" },
+        { "id": 202, "name": "Bob Smith", "cost": "10000.00", "date": "2024-12-01" },
+        { "id": 203, "name": "Carlos Diaz", "cost": "9000.00", "date": "2024-12-02" }
+      ],
+      "salary_workers": [
+        { "id": 102, "name": "Henry Nguyen", "date": "2024-11-30" },
+        { "id": 103, "name": "Ivy Khan", "date": "2024-12-01" }
+      ],
+      "images": "/public/1 (5).jpg",
+      "sketch": null
+      ,
+      "calculations": {
+        "total_raw_material_cost": 18050000,
+        "total_production_cost": 31000,
+        "total_overhead_cost": 50000,
+        "quantity": 50,
+        "profit": 87500,
+        "profit_per_item": 1750
+      }
+    },
+    {
+      "id": 12,
+      "name": "Convertible Sofa Bed",
+      "linked_project": { "id": 1, "name": "Main Workshop Project", "paid": 0.0, "balance": "0.00" },
+      "selling_price": "520000.00",
+      "quantity": 2,
+      "progress": 15,
+      "colour": "Slate",
+      "design": "3-seater convertible",
+      "dimensions": "200 x 95 x 90 cm",
+      "overhead_cost": "4.00",
+      "overhead_cost_base": "20000",
+      "production_note": "Reinforced frame for conversion mechanism",
+      "tasks": "[{\"title\":\"Frame Build\",\"checked\":false,\"subtasks\":[{\"title\":\"Cut frame\",\"checked\":false},{\"title\":\"Weld\",\"checked\":false},{\"title\":\"Reinforce\",\"checked\":false},{\"title\":\"Check mechanism\",\"checked\":false}]},{\"title\":\"Upholstery\",\"checked\":false,\"subtasks\":[{\"title\":\"Cut fabric\",\"checked\":false},{\"title\":\"Fit foam\",\"checked\":false},{\"title\":\"Stitch\",\"checked\":false},{\"title\":\"Fit cover\",\"checked\":false}]},{\"title\":\"Mechanism\",\"checked\":false,\"subtasks\":[{\"title\":\"Install slides\",\"checked\":false},{\"title\":\"Test pull\",\"checked\":false},{\"title\":\"Lubricate\",\"checked\":false},{\"title\":\"Finalize\",\"checked\":false}]}]",
+      "quotation": [
+        { "id": 121, "department": "Frame", "quotation": [{"name":"Timber","quantity":10},{"name":"Metal slides","quantity":2},{"name":"Screws","quantity":50},{"name":"Glue","quantity":4}], "contractor": [201,202,203], "salary_worker": [101,103], "date": "2025-10-01" },
+        { "id": 122, "department": "Upholstery", "quotation": [{"name":"Foam","quantity":6},{"name":"Fabric","quantity":8},{"name":"Thread","quantity":4},{"name":"Zippers","quantity":2}], "contractor": [201,202,203], "salary_worker": [101,103], "date": "2025-10-03" },
+        { "id": 123, "department": "Mechanism", "quotation": [{"name":"Slides","quantity":2},{"name":"Bolts","quantity":10},{"name":"Brackets","quantity":4},{"name":"Springs","quantity":2}], "contractor": [201,202,203], "salary_worker": [101,103], "date": "2025-10-05" }
+      ],
+      "raw_materials": [
+        { "name": "Timber", "quantity": 10, "price": "200000.00", "date": "2025-09-28" },
+        { "name": "Metal slides", "quantity": 2, "price": "40000.00", "date": "2025-09-29" },
+        { "name": "Foam", "quantity": 6, "price": "60000.00", "date": "2025-09-30" },
+        { "name": "Fabric", "quantity": 8, "price": "80000.00", "date": "2025-09-30" }
+      ],
+      "expensis": [
+        { "name": "Mechanism parts", "amount": "120000.00", "quantity": 1, "date": "2025-10-06" },
+        { "name": "Upholstery", "amount": "90000.00", "quantity": 1, "date": "2025-10-07" },
+        { "name": "Labor", "amount": "150000.00", "quantity": 1, "date": "2025-10-08" },
+        { "name": "Transport", "amount": "40000.00", "quantity": 1, "date": "2025-10-09" }
+      ],
+      "contractors": [
+        { "id": 201, "name": "Alice Johnson", "cost": "150000.00", "date": "2025-09-29" },
+        { "id": 202, "name": "Bob Smith", "cost": "140000.00", "date": "2025-09-30" },
+        { "id": 203, "name": "Carlos Diaz", "cost": "130000.00", "date": "2025-10-01" }
+      ],
+      "salary_workers": [
+        { "id": 101, "name": "Grace Lee", "date": "2025-09-29" },
+        { "id": 103, "name": "Ivy Khan", "date": "2025-09-30" }
+      ],
+      "images": "/public/1 (6).jpg",
+      "sketch": null
+      ,
+      "calculations": {
+        "total_raw_material_cost": 3080000,
+        "total_production_cost": 420000,
+        "total_overhead_cost": 80000,
+        "quantity": 2,
+        "profit": 52000,
+        "profit_per_item": 26000
+      }
+    }
+  ]
+}

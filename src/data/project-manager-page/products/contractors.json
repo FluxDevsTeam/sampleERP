@@ -1,0 +1,7 @@
+{
+  "contractors": [
+    { "id": 201, "first_name": "Alice", "last_name": "Johnson" },
+    { "id": 202, "first_name": "Bob", "last_name": "Smith" },
+    { "id": 203, "first_name": "Carlos", "last_name": "Diaz" }
+  ]
+}

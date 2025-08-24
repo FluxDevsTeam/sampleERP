@@ -1,0 +1,276 @@
+[
+  {
+    "worker_id": "salary-workers/1",
+    "payments": { "results": [
+      { "id": 1, "amount": 5000, "date": "2023-08-01" },
+      { "id": 2, "amount": 5100, "date": "2023-08-05" },
+      { "id": 3, "amount": 4950, "date": "2023-08-12" },
+      { "id": 4, "amount": 5200, "date": "2023-08-20" }
+    ]},
+    "products": { "results": [
+      { "id": 1, "date": "2023-08-01", "product": { "id": 1, "name": "Dining Set", "project": 101, "selling_price": 1200, "progress": 100 }},
+      { "id": 2, "date": "2023-08-03", "product": { "id": 2, "name": "Coffee Table", "project": 101, "selling_price": 800, "progress": 80 }},
+      { "id": 3, "date": "2023-08-07", "product": { "id": 3, "name": "Throw Cushion", "project": 102, "selling_price": 450, "progress": 60 }
+      },
+      { "id": 4, "date": "2023-08-11", "product": { "id": 4, "name": "Table Lamp", "project": 102, "selling_price": 600, "progress": 100 }}
+    ]}
+  },
+  {
+    "worker_id": "salary-workers/2",
+    "payments": { "results": [
+      { "id": 5, "amount": 4000, "date": "2023-08-02" },
+      { "id": 6, "amount": 4200, "date": "2023-08-09" },
+      { "id": 7, "amount": 4100, "date": "2023-08-18" }
+    ]},
+    "products": { "results": [
+      { "id": 5, "date": "2023-08-02", "product": { "id": 5, "name": "Bookshelf", "project": 103, "selling_price": 1500, "progress": 100 }},
+      { "id": 6, "date": "2023-08-06", "product": { "id": 6, "name": "Dining Chair", "project": 103, "selling_price": 300, "progress": 90 }},
+      { "id": 7, "date": "2023-08-14", "product": { "id": 7, "name": "Side Table", "project": 104, "selling_price": 200, "progress": 70 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "salary-workers/3",
+    "payments": { "results": [
+      { "id": 8, "amount": 4500, "date": "2023-08-03" },
+      { "id": 9, "amount": 4600, "date": "2023-08-10" },
+      { "id": 10, "amount": 4700, "date": "2023-08-21" }
+    ]},
+    "products": { "results": [
+      { "id": 8, "date": "2023-08-03", "product": { "id": 8, "name": "Sofa", "project": 105, "selling_price": 250, "progress": 100 }},
+      { "id": 9, "date": "2023-08-08", "product": { "id": 9, "name": "Cutlery Set", "project": 105, "selling_price": 50, "progress": 100 }},
+      { "id": 10, "date": "2023-08-15", "product": { "id": 10, "name": "Skirt", "project": 106, "selling_price": 300, "progress": 60 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "salary-workers/4",
+    "payments": { "results": [
+      { "id": 11, "amount": 4800, "date": "2023-08-04" },
+      { "id": 12, "amount": 4900, "date": "2023-08-13" },
+      { "id": 13, "amount": 5000, "date": "2023-08-19" },
+      { "id": 14, "amount": 5100, "date": "2023-08-25" }
+    ]},
+    "products": { "results": [
+      { "id": 11, "date": "2023-08-04", "product": { "id": 11, "name": "Dining Chair", "project": 107, "selling_price": 8000, "progress": 100 }},
+      { "id": 12, "date": "2023-08-09", "product": { "id": 12, "name": "Throw Blanket", "project": 107, "selling_price": 120, "progress": 100 }},
+      { "id": 13, "date": "2023-08-16", "product": { "id": 13, "name": "Mattress", "project": 108, "selling_price": 200, "progress": 80 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "salary-workers/5",
+    "payments": { "results": [
+      { "id": 15, "amount": 4200, "date": "2023-08-05" },
+      { "id": 16, "amount": 4300, "date": "2023-08-12" },
+      { "id": 17, "amount": 4250, "date": "2023-08-22" }
+    ]},
+    "products": { "results": [
+      { "id": 14, "date": "2023-08-05", "product": { "id": 14, "name": "Dining Table", "project": 109, "selling_price": 150, "progress": 100 }},
+      { "id": 15, "date": "2023-08-10", "product": { "id": 15, "name": "Area Rug", "project": 109, "selling_price": 400, "progress": 90 }},
+      { "id": 16, "date": "2023-08-18", "product": { "id": 16, "name": "Bath Towel Set", "project": 110, "selling_price": 80, "progress": 70 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "salary-workers/6",
+    "payments": { "results": [
+      { "id": 18, "amount": 5100, "date": "2023-08-06" },
+      { "id": 19, "amount": 5200, "date": "2023-08-14" },
+      { "id": 20, "amount": 5250, "date": "2023-08-24" }
+    ]},
+    "products": { "results": [
+      { "id": 17, "date": "2023-08-06", "product": { "id": 17, "name": "Jacket", "project": 111, "selling_price": 900, "progress": 100 }},
+      { "id": 18, "date": "2023-08-11", "product": { "id": 18, "name": "Socks Pack", "project": 111, "selling_price": 120, "progress": 90 }},
+      { "id": 19, "date": "2023-08-20", "product": { "id": 19, "name": "Power Bank", "project": 112, "selling_price": 60, "progress": 75 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "salary-workers/7",
+    "payments": { "results": [
+      { "id": 21, "amount": 4700, "date": "2023-08-07" },
+      { "id": 22, "amount": 4800, "date": "2023-08-15" },
+      { "id": 23, "amount": 4850, "date": "2023-08-23" }
+    ]},
+    "products": { "results": [
+      { "id": 20, "date": "2023-08-07", "product": { "id": 20, "name": "Sneakers", "project": 113, "selling_price": 70, "progress": 100 }},
+      { "id": 21, "date": "2023-08-13", "product": { "id": 21, "name": "Pen Set", "project": 113, "selling_price": 250, "progress": 95 }},
+      { "id": 22, "date": "2023-08-19", "product": { "id": 22, "name": "Backpack", "project": 114, "selling_price": 45, "progress": 60 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "salary-workers/8",
+    "payments": { "results": [
+      { "id": 24, "amount": 5300, "date": "2023-08-08" },
+      { "id": 25, "amount": 5400, "date": "2023-08-17" },
+      { "id": 26, "amount": 5450, "date": "2023-08-26" }
+    ]},
+    "products": { "results": [
+      { "id": 23, "date": "2023-08-08", "product": { "id": 23, "name": "Notebook", "project": 115, "selling_price": 120, "progress": 100 }},
+      { "id": 24, "date": "2023-08-12", "product": { "id": 24, "name": "Sticky Notes", "project": 115, "selling_price": 30, "progress": 90 }},
+      { "id": 25, "date": "2023-08-21", "product": { "id": 25, "name": "Phone Case", "project": 116, "selling_price": 60, "progress": 70 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "salary-workers/9",
+    "payments": { "results": [
+      { "id": 27, "amount": 5500, "date": "2023-08-09" },
+      { "id": 28, "amount": 5600, "date": "2023-08-19" },
+      { "id": 29, "amount": 5650, "date": "2023-08-27" }
+    ]},
+    "products": { "results": [
+      { "id": 26, "date": "2023-08-09", "product": { "id": 26, "name": "Calculator", "project": 117, "selling_price": 5000, "progress": 100 }},
+      { "id": 27, "date": "2023-08-16", "product": { "id": 27, "name": "Headphones", "project": 117, "selling_price": 250, "progress": 90 }},
+      { "id": 28, "date": "2023-08-24", "product": { "id": 28, "name": "Screen Protector", "project": 118, "selling_price": 80, "progress": 75 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "salary-workers/10",
+    "payments": { "results": [
+      { "id": 30, "amount": 4000, "date": "2023-08-10" },
+      { "id": 31, "amount": 4050, "date": "2023-08-20" },
+      { "id": 32, "amount": 4100, "date": "2023-08-28" }
+    ]},
+    "products": { "results": [
+      { "id": 29, "date": "2023-08-10", "product": { "id": 29, "name": "Wallet", "project": 119, "selling_price": 2000, "progress": 100 }},
+      { "id": 30, "date": "2023-08-18", "product": { "id": 30, "name": "Keychain", "project": 119, "selling_price": 150, "progress": 90 }},
+      { "id": 31, "date": "2023-08-26", "product": { "id": 31, "name": "TV Remote", "project": 120, "selling_price": 350, "progress": 60 }
+      }
+    ]}
+  },
+
+  {
+    "worker_id": "contractors/1",
+    "payments": { "results": [
+      { "id": 33, "amount": 10000, "date": "2023-08-11" },
+      { "id": 34, "amount": 10500, "date": "2023-08-20" },
+      { "id": 35, "amount": 9800, "date": "2023-08-27" }
+    ]},
+    "products": { "results": [
+      { "id": 32, "date": "2023-08-11", "product": { "id": 32, "name": "Dining Table", "project": 201, "selling_price": 3000, "progress": 100, "amount": 3000 }},
+      { "id": 33, "date": "2023-08-15", "product": { "id": 33, "name": "Cookware Set", "project": 201, "selling_price": 1200, "progress": 90, "amount": 1200 }},
+      { "id": 34, "date": "2023-08-22", "product": { "id": 34, "name": "Serving Tray", "project": 202, "selling_price": 800, "progress": 80, "amount": 800 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "contractors/2",
+    "payments": { "results": [
+      { "id": 36, "amount": 9000, "date": "2023-08-12" },
+      { "id": 37, "amount": 9200, "date": "2023-08-19" },
+      { "id": 38, "amount": 9400, "date": "2023-08-26" },
+      { "id": 39, "amount": 9100, "date": "2023-08-30" }
+    ]},
+    "products": { "results": [
+      { "id": 35, "date": "2023-08-12", "product": { "id": 35, "name": "Backpack", "project": 203, "selling_price": 1500, "progress": 100, "amount": 1500 }},
+      { "id": 36, "date": "2023-08-16", "product": { "id": 36, "name": "Umbrella", "project": 203, "selling_price": 400, "progress": 95, "amount": 400 }},
+      { "id": 37, "date": "2023-08-23", "product": { "id": 37, "name": "Duvet Cover", "project": 204, "selling_price": 700, "progress": 85, "amount": 700 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "contractors/3",
+    "payments": { "results": [
+      { "id": 40, "amount": 9500, "date": "2023-08-13" },
+      { "id": 41, "amount": 9600, "date": "2023-08-21" }
+    ]},
+    "products": { "results": [
+      { "id": 38, "date": "2023-08-13", "product": { "id": 38, "name": "Dining Set", "project": 205, "selling_price": 2500, "progress": 100, "amount": 2500 }},
+      { "id": 39, "date": "2023-08-18", "product": { "id": 39, "name": "Cutting Board", "project": 205, "selling_price": 300, "progress": 90, "amount": 300 }},
+      { "id": 40, "date": "2023-08-25", "product": { "id": 40, "name": "Kitchen Stool", "project": 206, "selling_price": 450, "progress": 75, "amount": 450 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "contractors/4",
+    "payments": { "results": [
+      { "id": 42, "amount": 9200, "date": "2023-08-14" },
+      { "id": 43, "amount": 9300, "date": "2023-08-22" },
+      { "id": 44, "amount": 9400, "date": "2023-08-29" }
+    ]},
+    "products": { "results": [
+      { "id": 41, "date": "2023-08-14", "product": { "id": 41, "name": "Throw Pillow", "project": 207, "selling_price": 600, "progress": 100, "amount": 600 }},
+      { "id": 42, "date": "2023-08-19", "product": { "id": 42, "name": "Bath Mat", "project": 207, "selling_price": 80, "progress": 95, "amount": 80 }},
+      { "id": 43, "date": "2023-08-26", "product": { "id": 43, "name": "Utility Clamp", "project": 208, "selling_price": 250, "progress": 85, "amount": 250 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "contractors/5",
+    "payments": { "results": [
+      { "id": 45, "amount": 8800, "date": "2023-08-15" },
+      { "id": 46, "amount": 8900, "date": "2023-08-23" }
+    ]},
+    "products": { "results": [
+      { "id": 44, "date": "2023-08-15", "product": { "id": 44, "name": "Paint Roller", "project": 209, "selling_price": 300, "progress": 100, "amount": 300 }},
+      { "id": 45, "date": "2023-08-20", "product": { "id": 45, "name": "Brush Set", "project": 209, "selling_price": 200, "progress": 90, "amount": 200 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "contractors/6",
+    "payments": { "results": [
+      { "id": 47, "amount": 9700, "date": "2023-08-16" },
+      { "id": 48, "amount": 9800, "date": "2023-08-24" },
+      { "id": 49, "amount": 9900, "date": "2023-08-30" }
+    ]},
+    "products": { "results": [
+      { "id": 46, "date": "2023-08-16", "product": { "id": 46, "name": "Toolbox", "project": 210, "selling_price": 2200, "progress": 100, "amount": 2200 }},
+      { "id": 47, "date": "2023-08-21", "product": { "id": 47, "name": "Ratchet Set", "project": 210, "selling_price": 400, "progress": 90, "amount": 400 }},
+      { "id": 48, "date": "2023-08-28", "product": { "id": 48, "name": "Extension Cord", "project": 211, "selling_price": 150, "progress": 75, "amount": 150 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "contractors/7",
+    "payments": { "results": [
+      { "id": 50, "amount": 9300, "date": "2023-08-17" },
+      { "id": 51, "amount": 9400, "date": "2023-08-25" }
+    ]},
+    "products": { "results": [
+      { "id": 49, "date": "2023-08-17", "product": { "id": 49, "name": "Multimeter", "project": 212, "selling_price": 700, "progress": 100, "amount": 700 }},
+      { "id": 50, "date": "2023-08-22", "product": { "id": 50, "name": "Probe Set", "project": 212, "selling_price": 180, "progress": 90, "amount": 180 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "contractors/8",
+    "payments": { "results": [
+      { "id": 52, "amount": 9900, "date": "2023-08-18" },
+      { "id": 53, "amount": 10000, "date": "2023-08-26" }
+    ]},
+    "products": { "results": [
+      { "id": 51, "date": "2023-08-18", "product": { "id": 51, "name": "Clipboard", "project": 213, "selling_price": 120, "progress": 100, "amount": 120 }},
+      { "id": 52, "date": "2023-08-23", "product": { "id": 52, "name": "Folder", "project": 213, "selling_price": 60, "progress": 90, "amount": 60 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "contractors/9",
+    "payments": { "results": [
+      { "id": 54, "amount": 10000, "date": "2023-08-19" },
+      { "id": 55, "amount": 10100, "date": "2023-08-27" }
+    ]},
+    "products": { "results": [
+      { "id": 53, "date": "2023-08-19", "product": { "id": 53, "name": "Ledger", "project": 214, "selling_price": 900, "progress": 100, "amount": 900 }},
+      { "id": 54, "date": "2023-08-24", "product": { "id": 54, "name": "Register", "project": 214, "selling_price": 400, "progress": 90, "amount": 400 }
+      }
+    ]}
+  },
+  {
+    "worker_id": "contractors/10",
+    "payments": { "results": [
+      { "id": 56, "amount": 8500, "date": "2023-08-20" },
+      { "id": 57, "amount": 8600, "date": "2023-08-28" }
+    ]},
+    "products": { "results": [
+      { "id": 55, "date": "2023-08-20", "product": { "id": 55, "name": "Truck Keys", "project": 215, "selling_price": 2500, "progress": 100, "amount": 2500 }},
+      { "id": 56, "date": "2023-08-25", "product": { "id": 56, "name": "Key Ring", "project": 215, "selling_price": 150, "progress": 90, "amount": 150 }
+      }
+    ]}
+  }
+]
