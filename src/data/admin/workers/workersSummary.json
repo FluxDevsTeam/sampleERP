@@ -1,0 +1,15 @@
+{
+  "count": 20,
+  "next": null,
+  "previous": null,
+  "results": {
+    "salary_workers_count": 10,
+    "active_salary_workers_count": 9,
+    "total_salary_workers_monthly_pay": 47500,
+    "total_paid": 47500,
+    "all_contractors_count": 10,
+    "all_active_contractors_count": 8,
+    "total_contractors_monthly_pay": 95000,
+    "total_contractors_weekly_pay": 23750
+  }
+}

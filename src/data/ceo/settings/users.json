@@ -1,0 +1,15 @@
+{
+  "count": 8,
+  "next": null,
+  "previous": null,
+  "results": [
+    { "id": 1, "first_name": "Alice", "last_name": "Johnson", "email": "alice.johnson@example.com", "phone_number": "08012345670", "roles": ["admin"] },
+    { "id": 2, "first_name": "Bob", "last_name": "Smith", "email": "bob.smith@example.com", "phone_number": "08022345671", "roles": ["project_manager"] },
+    { "id": 3, "first_name": "Carlos", "last_name": "Diaz", "email": "carlos.diaz@example.com", "phone_number": "08032345672", "roles": ["factory_manager"] },
+    { "id": 4, "first_name": "Grace", "last_name": "Lee", "email": "grace.lee@example.com", "phone_number": "08042345673", "roles": ["storekeeper"] },
+    { "id": 5, "first_name": "Henry", "last_name": "Nguyen", "email": "henry.nguyen@example.com", "phone_number": "08052345674", "roles": ["accountant"] },
+    { "id": 6, "first_name": "Ivy", "last_name": "Khan", "email": "ivy.khan@example.com", "phone_number": "08062345675", "roles": ["shopkeeper"] },
+    { "id": 7, "first_name": "Jack", "last_name": "Thompson", "email": "jack.thompson@example.com", "phone_number": "08072345676", "roles": ["project_manager"] },
+    { "id": 8, "first_name": "Karen", "last_name": "Davis", "email": "karen.davis@example.com", "phone_number": "08082345677", "roles": ["ceo"] }
+  ]
+}

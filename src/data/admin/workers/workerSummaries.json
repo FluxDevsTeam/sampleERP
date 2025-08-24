@@ -1,0 +1,22 @@
+[
+  {"id": 1, "first_name": "John", "last_name": "Doe", "type": "salary-worker", "active": true, "monthly_pay": 5000, "total_paid": 5000, "position": "Senior Electrician"},
+  {"id": 2, "first_name": "Mike", "last_name": "Smith", "type": "salary-worker", "active": true, "monthly_pay": 4000, "total_paid": 4000, "position": "Plumber"},
+  {"id": 3, "first_name": "Anna", "last_name": "Brown", "type": "salary-worker", "active": true, "monthly_pay": 4500, "total_paid": 4500, "position": "Carpenter"},
+  {"id": 4, "first_name": "Chris", "last_name": "Lee", "type": "salary-worker", "active": true, "monthly_pay": 4800, "total_paid": 4800, "position": "Welder"},
+  {"id": 5, "first_name": "Sara", "last_name": "White", "type": "salary-worker", "active": true, "monthly_pay": 4200, "total_paid": 4200, "position": "Painter"},
+  {"id": 6, "first_name": "Paul", "last_name": "Green", "type": "salary-worker", "active": true, "monthly_pay": 5100, "total_paid": 5100, "position": "Mechanic"},
+  {"id": 7, "first_name": "Linda", "last_name": "Black", "type": "salary-worker", "active": true, "monthly_pay": 4700, "total_paid": 4700, "position": "Technician"},
+  {"id": 8, "first_name": "Tom", "last_name": "King", "type": "salary-worker", "active": true, "monthly_pay": 5300, "total_paid": 5300, "position": "Supervisor"},
+  {"id": 9, "first_name": "Jane", "last_name": "Young", "type": "salary-worker", "active": true, "monthly_pay": 5500, "total_paid": 5500, "position": "Accountant"},
+  {"id": 10, "first_name": "Peter", "last_name": "Hall", "type": "salary-worker", "active": true, "monthly_pay": 4000, "total_paid": 4000, "position": "Driver"},
+  {"id": 1, "first_name": "Alice", "last_name": "Smith", "type": "contractor", "active": true, "monthly_pay": 10000, "total_paid": 10000, "position": "Plumber"},
+  {"id": 2, "first_name": "Bob", "last_name": "Johnson", "type": "contractor", "active": true, "monthly_pay": 9000, "total_paid": 9000, "position": "Electrician"},
+  {"id": 3, "first_name": "Carol", "last_name": "Williams", "type": "contractor", "active": true, "monthly_pay": 9500, "total_paid": 9500, "position": "Carpenter"},
+  {"id": 4, "first_name": "Dave", "last_name": "Miller", "type": "contractor", "active": true, "monthly_pay": 9200, "total_paid": 9200, "position": "Welder"},
+  {"id": 5, "first_name": "Eve", "last_name": "Davis", "type": "contractor", "active": true, "monthly_pay": 8800, "total_paid": 8800, "position": "Painter"},
+  {"id": 6, "first_name": "Frank", "last_name": "Garcia", "type": "contractor", "active": true, "monthly_pay": 9700, "total_paid": 9700, "position": "Mechanic"},
+  {"id": 7, "first_name": "Grace", "last_name": "Martinez", "type": "contractor", "active": true, "monthly_pay": 9300, "total_paid": 9300, "position": "Technician"},
+  {"id": 8, "first_name": "Henry", "last_name": "Lopez", "type": "contractor", "active": true, "monthly_pay": 9900, "total_paid": 9900, "position": "Supervisor"},
+  {"id": 9, "first_name": "Ivy", "last_name": "Gonzalez", "type": "contractor", "active": true, "monthly_pay": 10000, "total_paid": 10000, "position": "Accountant"},
+  {"id": 10, "first_name": "Jack", "last_name": "Wilson", "type": "contractor", "active": true, "monthly_pay": 8500, "total_paid": 8500, "position": "Driver"}
+]

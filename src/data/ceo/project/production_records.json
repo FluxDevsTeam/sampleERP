@@ -1,0 +1,28 @@
+[
+  {
+    "projectId": 1,
+    "records": [
+      {
+        "id": 1,
+        "name": "Material Purchase",
+        "budget": "5000",
+        "cost": "4500",
+        "created_at": "2025-01-10T00:00:00Z",
+        "updated_at": "2025-01-10T00:00:00Z"
+      }
+    ]
+  },
+  {
+    "projectId": 2,
+    "records": [
+      {
+        "id": 2,
+        "name": "Server Setup",
+        "budget": "3000",
+        "cost": "2800",
+        "created_at": "2025-02-10T00:00:00Z",
+        "updated_at": "2025-02-10T00:00:00Z"
+      }
+    ]
+  }
+]

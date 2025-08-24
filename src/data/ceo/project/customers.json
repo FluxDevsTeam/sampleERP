@@ -1,0 +1,81 @@
+{
+  "count": 7,
+  "next": null,
+  "previous": null,
+  "results": {
+    "all_customers_count": 7,
+    "active_customers": 7,
+    "all_customers": [
+      {
+        "id": 1,
+        "name": "Adebayo Jubreel",
+        "email": "adebayo@example.com",
+        "phone_number": "1234567890",
+        "address": "123 Lagos St",
+        "project": null,
+        "shop_item": null,
+        "created_at": "2025-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "name": "Julius Caesar",
+        "email": "julius@example.com",
+        "phone_number": "2345678901",
+        "address": "456 Rome Ave",
+        "project": null,
+        "shop_item": null,
+        "created_at": "2025-01-02T00:00:00Z"
+      },
+      {
+        "id": 3,
+        "name": "Martha Ayodele",
+        "email": "martha@example.com",
+        "phone_number": "3456789012",
+        "address": "789 Abuja Rd",
+        "project": null,
+        "shop_item": null,
+        "created_at": "2025-01-03T00:00:00Z"
+      },
+      {
+        "id": 4,
+        "name": "Smith Wigglesworth",
+        "email": "smith@example.com",
+        "phone_number": "4567890123",
+        "address": "101 London St",
+        "project": null,
+        "shop_item": null,
+        "created_at": "2025-01-04T00:00:00Z"
+      },
+      {
+        "id": 5,
+        "name": "Iyegere",
+        "email": "iyegere@example.com",
+        "phone_number": "5678901234",
+        "address": "202 Benin St",
+        "project": null,
+        "shop_item": null,
+        "created_at": "2025-01-05T00:00:00Z"
+      },
+      {
+        "id": 6,
+        "name": "John Cena",
+        "email": "john@example.com",
+        "phone_number": "6789012345",
+        "address": "303 New York Ave",
+        "project": null,
+        "shop_item": null,
+        "created_at": "2025-01-06T00:00:00Z"
+      },
+      {
+        "id": 7,
+        "name": "Suskidee",
+        "email": "suskidee@example.com",
+        "phone_number": "7890123456",
+        "address": "404 Paris Rd",
+        "project": null,
+        "shop_item": null,
+        "created_at": "2025-01-07T00:00:00Z"
+      }
+    ]
+  }
+}
