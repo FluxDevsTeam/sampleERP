@@ -57,17 +57,6 @@ const Navbar: React.FC = () => {
             )}
           </Button>
           <Button
-            onClick={() => navigate("/contact")}
-            className={`text-[15px] font-semibold relative px-2 py-1 rounded-md ${
-              location.pathname === "/contact" ? "text-indigo-700" : "text-slate-600 hover:text-indigo-700"
-            } transition-colors`}
-          >
-            Contact
-            {location.pathname === "/contact" && (
-              <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-indigo-600"></span>
-            )}
-          </Button>
-          <Button
             onClick={() => navigate("/pricing")}
             className={`text-[15px] font-semibold relative px-2 py-1 rounded-md ${
               location.pathname === "/pricing" ? "text-indigo-700" : "text-slate-600 hover:text-indigo-700"
@@ -75,6 +64,17 @@ const Navbar: React.FC = () => {
           >
             Pricing
             {location.pathname === "/pricing" && (
+              <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-indigo-600"></span>
+            )}
+          </Button>
+          <Button
+            onClick={() => navigate("/contact")}
+            className={`text-[15px] font-semibold relative px-2 py-1 rounded-md ${
+              location.pathname === "/contact" ? "text-indigo-700" : "text-slate-600 hover:text-indigo-700"
+            } transition-colors`}
+          >
+            Contact
+            {location.pathname === "/contact" && (
               <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-indigo-600"></span>
             )}
           </Button>

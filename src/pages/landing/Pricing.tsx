@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 // Removed unused rsuite Button to keep styling consistent
 import Footer from "./Footer";
@@ -6,6 +7,7 @@ import { motion } from "framer-motion";
 import Button from "@/components/Button";
 
 const Pricing: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-900 transition-colors duration-300">
       <Navbar />
@@ -25,46 +27,46 @@ const Pricing: React.FC = () => {
         <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {
-              name: "Basic",
-              price: "₦1.2m",
-              description: "Essential tools for small manufacturers and workshops.",
-              features: [
-                "Project & Product Management",
-                "Basic Inventory Tracking",
-                "Payroll for up to 10 employees",
-                "Email Support",
-              ],
-              cta: "Contact Sales",
-              highlighted: false,
+            name: "Essential",
+            price: "₦800k",
+            description: "Kickstart your manufacturing journey. Perfect for small workshops to organize projects, track inventory, and manage their core team.",
+            features: [
+            "Streamlined Project & Product Management",
+            "Essential Inventory Tracking",
+            "Payroll for up to 10 employees",
+            "Dependable Email Support"
+            ],
+            cta: "Contact Sales",
+            highlighted: false
             },
             {
-              name: "Pro",
-              price: "₦1.9m",
-              description: "Ideal for growing manufacturers with advanced needs.",
-              features: [
-                "All Basic Features",
-                "Advanced Inventory & Sales Reports",
-                "Payroll for up to 50 employees",
-                "Role-Based Dashboards",
-                "Priority Email & Chat Support",
-              ],
-              cta: "Contact Sales",
-              highlighted: true,
+            name: "Professional",
+            price: "₦2.1m",
+            description: "Grow your manufacturing operations with advanced insights, scalability, and priority support.",
+            features: [
+            "All Essential features",
+            "Advanced Inventory & Sales Analytics",
+            "Payroll for up to 50 employees",
+            "Custom Role-Based Dashboards",
+            "Priority Email & Chat Support"
+            ],
+            cta: "Contact Sales",
+            highlighted: true
             },
             {
-              name: "Enterprise",
-              price: "₦3.0m",
-              description: "Tailored for large-scale operations with custom requirements.",
-              features: [
-                "All Pro Features",
-                "Unlimited Employees & Payroll",
-                "Custom Integrations",
-                "Dedicated Account Manager",
-                "24/7 Phone & Chat Support",
-              ],
-              cta: "Request a Quote",
-              highlighted: false,
-            },
+            name: "Enterprise",
+            price: "₦3.5m",
+            description: "A fully customized solution with dedicated resources and premium support for large-scale operations.",
+            features: [
+            "All Professional features",
+            "Unlimited Employees & Payroll",
+            "Custom Software Integrations",
+            "Dedicated Account Manager",
+            "24/7 Phone & Chat Support"
+            ],
+            cta: "Request a Quote",
+            highlighted: false
+            }
           ].map((plan, index) => (
             <div
               key={index}
@@ -81,7 +83,7 @@ const Pricing: React.FC = () => {
               <p className="text-3xl text-slate-800 font-bold mb-4">
                 {plan.price}
                 {plan.price !== "Custom" && (
-                  <span className="text-base font-normal text-slate-600"> / month</span>
+                  <span className="text-base font-normal text-slate-600"></span>
                 )}
               </p>
               <p className="mb-6 text-slate-700">{plan.description}</p>
@@ -126,30 +128,54 @@ const Pricing: React.FC = () => {
 
         {/* FAQs */}
         <section className="mt-16">
-          <h3 className="text-xl font-semibold text-slate-800 text-center mb-6">Frequently Asked Questions</h3>
+          <div className="text-center mb-8">
+            <h3 className="text-2xl md:text-3xl font-semibold text-slate-800">Frequently Asked Questions</h3>
+            <p className="mt-3 text-slate-600 max-w-2xl mx-auto">Everything you need to know about plans, implementation, hosting, and ongoing support before you get started.</p>
+          </div>
           <div className="space-y-4 max-w-3xl mx-auto">
             {[
               {
                 question: "Can I try FluxDevs ERP before purchasing?",
-                answer: "Yes, we offer a free demo and trial period. Contact our sales team to get started.",
+                answer: "Yes. We offer a guided demo so you can explore real workflows, dashboards, and reports relevant to your business. For qualified teams, we also provide a short pilot environment to validate fit with your processes before committing.",
               },
               {
-                question: "Are there any setup fees?",
-                answer: "No, we don’t charge setup fees. Our pricing is transparent, and implementation support is included.",
+                question: "What’s included in the listed pricing?",
+                answer: "Pricing covers the software license, hosting as specified per plan (shared or dedicated), domain setup, regular security patches, and standard support. Implementation services (data migration, custom workflows, and user training) are included at a basic level and can be expanded based on your requirements.",
               },
               {
-                question: "Can I upgrade or downgrade my plan?",
-                answer: "Absolutely! You can switch plans at any time to suit your business needs.",
+                question: "Are there any setup or hidden fees?",
+                answer: "No hidden fees. We provide a transparent quote that includes everything you need to get up and running. If you request extensive customizations or complex integrations, we’ll scope and price those separately, with a clear breakdown and timeline.",
+              },
+              {
+                question: "Can I upgrade or downgrade my plan later?",
+                answer: "Absolutely. You can switch between plans as your operations evolve. Moving from Essential to Professional or Enterprise is seamless, and we’ll retain your data, workflows, and user roles. If downgrading, we’ll help realign features to the lower tier without disrupting your core processes.",
+              },
+              {
+                question: "What kind of hosting and domain do I get?",
+                answer: "Essential and Professional run on a secure shared server with a dedicated domain configured for your business. Enterprise includes a dedicated server and dedicated domain for maximum performance, isolation, and compliance flexibility.",
+              },
+              {
+                question: "How long does implementation take?",
+                answer: "Typical implementations range from 2–6 weeks depending on scope, data migration needs, and the number of modules. We provide a project plan covering discovery, configuration, pilot testing, user training, and go-live support so there are no surprises.",
+              },
+              {
+                question: "What support is included after go-live?",
+                answer: "All plans include ongoing updates, performance monitoring, and access to our support team. Professional receives priority email and chat support, while Enterprise adds 24/7 phone support and a dedicated account manager for proactive guidance and quarterly optimization reviews.",
               },
             ].map((faq, index) => (
               <details
                 key={index}
-                className="bg-white rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-300 border border-slate-100"
+                className="group bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-slate-100"
               >
-                <summary className="font-medium cursor-pointer text-slate-800">
-                  {faq.question}
+                <summary className="flex items-start justify-between gap-4 cursor-pointer select-none">
+                  <span className="text-slate-800 font-medium text-base md:text-lg">{faq.question}</span>
+                  <svg className="w-5 h-5 text-indigo-600 mt-1 transition-transform duration-300 group-open:rotate-45" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                  </svg>
                 </summary>
-                <p className="mt-2 text-slate-700">{faq.answer}</p>
+                <div className="mt-3 text-slate-700 leading-relaxed">
+                  {faq.answer}
+                </div>
               </details>
             ))}
           </div>

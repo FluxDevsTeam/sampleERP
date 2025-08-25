@@ -16,14 +16,14 @@ const Contact: React.FC = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8 text-center">
+      <section className="max-w-7xl mx-auto md:py-24 pt-24 px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 mb-6">
-            Connect with <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">FluxDevs ERP</span>
+            Connect with <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">FluxDevs</span>
           </h1>
           <p className="text-xl md:text-2xl text-slate-700 mb-10 max-w-3xl mx-auto">
             Ready to revolutionize your manufacturing operations? Reach out to our team to schedule a personalized demo and see how FluxDevs ERP can boost efficiency and growth.
@@ -162,8 +162,8 @@ const Contact: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="bg-indigo-50 p-8 rounded-2xl border border-indigo-200"
           >
-            <h3 className="text-2xl font-bold text-indigo-900 mb-6">Why Choose FluxDevs ERP?</h3>
-            <ul className="space-y-4">
+            <h3 className="md:text-3xl text-2xl font-bold text-indigo-900 mb-6">Why Choose FluxDevs ERP?</h3>
+            <ul className="space-y-4 md:text-xl text-lg">
               <li className="flex items-start">
                 <svg className="w-6 h-6 text-indigo-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
