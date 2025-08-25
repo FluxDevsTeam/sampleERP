@@ -1,15 +1,14 @@
 // About.tsx
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; 
 import Navbar from "./Navbar";
-import Footer from "../../components/Footer";
+import Footer from "./Footer";
 import Button from "../../components/Button";
 import { motion } from "framer-motion";
 
 const About: React.FC = () => {
   const navigate = useNavigate();
 
-  // Map role titles to role keys and target demo routes
   const roleRedirects: Record<string, { key: string; path: string }> = {
     "CEO Demo": { key: "ceo", path: "/ceo/dashboard" },
     "Factory Manager Demo": { key: "factory_manager", path: "/factory-manager/dashboard" },
@@ -26,7 +25,6 @@ const About: React.FC = () => {
       localStorage.setItem("user_role", meta.key);
       localStorage.setItem("showReturnPopup", "true");
     } catch (e) {}
-    // navigate to demo route
     navigate(meta.path);
   };
 
@@ -391,8 +389,7 @@ const roles = [
         </div>
       </section>
 
-  {/* Footer (shared) */}
-  <Footer />
+      <Footer />
     </div>
   );
 };

@@ -1,8 +1,8 @@
 // Home.tsx
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; 
 import Navbar from "./Navbar";
-import Footer from "../../components/Footer";
+import Footer from "./Footer";
 import Button from "../../components/Button";
 import { motion } from "framer-motion";
 
@@ -365,7 +365,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-  <Footer />
+      <Footer />
     </div>
   );
 };

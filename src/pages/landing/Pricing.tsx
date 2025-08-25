@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "./Navbar";
 import { Button } from "rsuite";
-import Footer from "../../components/Footer";
+import Footer from "./Footer";
 
 const Pricing: React.FC = () => {
   return (
