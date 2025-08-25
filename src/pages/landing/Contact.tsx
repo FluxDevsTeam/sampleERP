@@ -12,7 +12,7 @@ const Contact: React.FC = () => {
   const iconSize = 24;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-10">
       <Navbar />
 
       {/* Hero Section */}
@@ -110,46 +110,46 @@ const Contact: React.FC = () => {
               <div>
                 <h3 className="font-semibold text-lg text-slate-900 mb-4">Connect with Us</h3>
                 <div className="flex gap-4">
-                  <Link
-                    to="https://www.instagram.com/fluxdevs"
+                  <a
+                    href="https://www.instagram.com/fluxdevs"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-700 transition"
                   >
                     <FaInstagram size={iconSize} />
-                  </Link>
-                  <Link
-                    to="https://x.com/flux_devs"
+                  </a>
+                  <a
+                    href="https://x.com/flux_devs"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-700 transition"
                   >
                     <FaTwitter size={iconSize} />
-                  </Link>
-                  <Link
-                    to="https://www.linkedin.com/company/flux-devs/"
+                  </a>
+                  <a
+                    href="https://www.linkedin.com/company/flux-devs/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-700 transition"
                   >
                     <FaLinkedin size={iconSize} />
-                  </Link>
-                  <Link
-                    to="https://web.facebook.com/fluxxdevs/"
+                  </a>
+                  <a
+                    href="https://web.facebook.com/fluxxdevs/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-700 transition"
                   >
                     <FaFacebook size={iconSize} />
-                  </Link>
-                  <Link
-                    to="https://www.tiktok.com/@fluxdevs"
+                  </a>
+                  <a
+                    href="https://www.tiktok.com/@fluxdevs"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-700 transition"
                   >
                     <FaTiktok size={iconSize} />
-                  </Link>
+                  </a>
                 </div>
               </div>
             </div>
@@ -296,7 +296,7 @@ const Contact: React.FC = () => {
               </Button>
               <Button
                 className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-indigo-700 transition-all"
-                onClick={() => navigate("/")}
+                onClick={() => { navigate("/"); window.scrollTo({top:0,behavior:'smooth'}); }}
               >
                 Explore Features
               </Button>

@@ -75,13 +75,13 @@ const Home: React.FC = () => {
   // stats removed (unused in landing page)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white overflow-x-hidden">
+    <div className="bg-gradient-to-b from-slate-50 to-white overflow-x-hidden pt-10">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-start md:items-center overflow-hidden pt-14 md:pt-0">
+      <section className="flex items-start md:items-center overflow-hidden py-10 md:pt-24">
         {/* Flowing pastel gradient background */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -129,13 +129,13 @@ const Home: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-4 justify-center">
               <Button
                 className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg hover:from-indigo-500 hover:to-violet-500 transition-all shadow-md sm:shadow-lg hover:shadow-lg sm:hover:shadow-xl"
-                onClick={() => navigate("/about")}
+                onClick={() => { navigate("/about"); window.scrollTo({top:0,behavior:'smooth'}); }}
               >
                 Checkout Demo
               </Button>
               <Button
                 className="w-full sm:w-auto bg-white text-indigo-700 border border-indigo-200 px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg hover:bg-indigo-50 transition-all shadow-md sm:shadow-lg hover:shadow-lg sm:hover:shadow-xl"
-                onClick={() => navigate("/pricing")}
+                onClick={() => { navigate("/pricing"); window.scrollTo({top:0,behavior:'smooth'}); }}
               >
                 View Pricing
               </Button>
@@ -242,7 +242,7 @@ const Home: React.FC = () => {
               </ul>
               <Button
                 className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-8 py-3 rounded-lg hover:from-indigo-500 hover:to-violet-500 transition-all"
-                onClick={() => navigate("/about")}
+                onClick={() => { navigate("/about"); window.scrollTo({top:0,behavior:'smooth'}); }}
               >
                 View Full Feature Tour
               </Button>
@@ -350,13 +350,13 @@ const Home: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 className="bg-white text-indigo-700 px-8 py-3 rounded-lg text-lg hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl"
-                onClick={() => navigate("/pricing")}
+                onClick={() => { navigate("/pricing"); window.scrollTo({top:0,behavior:'smooth'}); }}
               >
                 View Pricing
               </Button>
               <Button
                 className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg text-lg hover:bg-white hover:text-indigo-700 transition-all"
-                onClick={() => navigate("/contact")}
+                onClick={() => { navigate("/contact"); window.scrollTo({top:0,behavior:'smooth'}); }}
               >
                 Contact Us
               </Button>

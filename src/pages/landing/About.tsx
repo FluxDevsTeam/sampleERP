@@ -26,6 +26,7 @@ const About: React.FC = () => {
       localStorage.setItem("showReturnPopup", "true");
     } catch (e) {}
     navigate(meta.path);
+    window.scrollTo({top:0,behavior:'smooth'});
   };
 
   const features = [
@@ -161,7 +162,7 @@ const roles = [
 ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-10">
       <Navbar />
 
       {/* Role Demos (moved to top so visitors see available demos immediately) */}
@@ -354,7 +355,7 @@ const roles = [
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 className="bg-white text-indigo-700 px-8 py-3 rounded-lg text-lg hover:bg-indigo-50 transition-all"
-                onClick={() => navigate("/contact")}
+                onClick={() => { navigate("/contact"); window.scrollTo({top:0,behavior:'smooth'}); }}
               >
                 Contact Us
               </Button>

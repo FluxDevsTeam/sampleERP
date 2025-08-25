@@ -9,7 +9,7 @@ import Button from "@/components/Button";
 const Pricing: React.FC = () => {
   const navigate = useNavigate();
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-900 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-900 transition-colors duration-300 pt-10">
       <Navbar />
 
       <main className="max-w-6xl mx-auto py-20 px-6 sm:px-8 lg:px-12">
@@ -203,7 +203,7 @@ const Pricing: React.FC = () => {
               </Button>
               <Button
                 className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-indigo-700 transition-all"
-                onClick={() => navigate("/about")}
+                onClick={() => { navigate("/about"); window.scrollTo({top:0,behavior:'smooth'}); }}
               >
                 Explore Features
               </Button>
