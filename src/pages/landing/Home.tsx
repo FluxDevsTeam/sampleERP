@@ -75,72 +75,72 @@ const Home: React.FC = () => {
   // stats removed (unused in landing page)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white overflow-x-hidden">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="relative z-10"
-        >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-700 mb-6 leading-tight">
-            Revolutionize Your <span className="text-blue-600">Manufacturing Operations</span> With Intelligent ERP
-          </h1>
-            <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-3xl mx-auto">
-            FluxDevs ERP is the complete manufacturing management solution that integrates production, inventory, finance, and workforce management into one powerful platform designed for growth-focused manufacturers.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl"
-              onClick={() => navigateToRole("ceo")}
-            >
-              Explore CEO Dashboard
-            </Button>
-            <Button
-              className="bg-gradient-to-r from-green-400 to-teal-600 text-white px-8 py-3 rounded-lg text-lg hover:from-green-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl"
-              onClick={() => navigate("/contact")}
-            >
-              Request Personalized Demo
-            </Button>
+      <section className="relative min-h-screen flex items-start md:items-center overflow-hidden pt-14 md:pt-0">
+        {/* Flowing pastel gradient background */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="absolute -top-28 -left-24 w-[85vw] h-[85vw] md:w-[60vw] md:h-[60vw] rounded-full blur-3xl opacity-30"
+            style={{ background: "radial-gradient(circle at 30% 30%, #93c5fd, transparent 10%)" }}
+          />
+          <motion.div
+            animate={{ y: [0, -16, 0], x: [0, 8, 0] }}
+            transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -bottom-36 -right-24 w-[85vw] h-[85vw] md:w-[60vw] md:h-[60vw] rounded-full blur-3xl opacity-30"
+            style={{ background: "radial-gradient(circle at 70% 70%, #bfdbfe, transparent 40%)" }}
+          />
+          <motion.div
+            animate={{ y: [0, 14, 0], x: [0, -6, 0] }}
+            transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[65vw] h-[65vw] md:w-[45vw] md:h-[45vw] rounded-full blur-3xl opacity-25"
+            style={{ background: "radial-gradient(circle at 50% 50%, #e0f2fe, transparent 45%)" }}
+          />
+          {/* Subtle grid overlay */}
+          <div className="absolute inset-0 opacity-10">
+            <svg className="w-full h-full" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+                  <path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.2"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
           </div>
-        </motion.div>
-        
-        {/* Animated background elements */}
-        <div className="absolute inset-0 -z-10 opacity-10 overflow-hidden">
-          <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.2"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
-          
-          {/* Floating factory SVG elements */}
-          <motion.svg 
-            className="absolute top-1/4 left-1/4 w-24 h-24 text-blue-200"
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 4, repeat: Infinity }}
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor"
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-6 0H5m2 0h4M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </motion.svg>
-          
-          <motion.svg 
-            className="absolute top-1/3 right-1/4 w-20 h-20 text-blue-200"
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </motion.svg>
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-slate-800 mb-3 sm:mb-6 leading-snug md:leading-tight tracking-tight">
+              Revolutionize Your <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Manufacturing Operations</span> With Intelligent ERP
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl text-slate-700 mb-5 sm:mb-8 max-w-3xl mx-auto">
+              FluxDevs ERP is the complete manufacturing management solution that integrates production, inventory, finance, and workforce management into one powerful platform designed for growth-focused manufacturers.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-4 justify-center">
+              <Button
+                className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg hover:from-indigo-500 hover:to-violet-500 transition-all shadow-md sm:shadow-lg hover:shadow-lg sm:hover:shadow-xl"
+                onClick={() => navigate("/about")}
+              >
+                Checkout Demo
+              </Button>
+              <Button
+                className="w-full sm:w-auto bg-white text-indigo-700 border border-indigo-200 px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg hover:bg-indigo-50 transition-all shadow-md sm:shadow-lg hover:shadow-lg sm:hover:shadow-xl"
+                onClick={() => navigate("/pricing")}
+              >
+                View Pricing
+              </Button>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -165,7 +165,7 @@ const Home: React.FC = () => {
       </section> */}
 
       {/* Features Section */}
-      <section className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+      <section className="max-w-7xl mx-auto md:py-16 px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -173,8 +173,8 @@ const Home: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-700 mb-4">Powerful Features for Modern Manufacturing</h2>
-          <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4">Powerful Features for Modern Manufacturing</h2>
+          <p className="text-lg text-slate-700 max-w-3xl mx-auto">
             Our comprehensive ERP solution is designed to address every aspect of your manufacturing business with precision and efficiency.
           </p>
         </motion.div>
@@ -183,7 +183,7 @@ const Home: React.FC = () => {
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              className="p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all border border-gray-100"
+              className="p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all border border-slate-100"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
@@ -193,15 +193,15 @@ const Home: React.FC = () => {
               <div className="flex justify-center mb-6">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-4 text-center">{feature.title}</h3>
-              <p className="text-gray-700 text-center">{feature.description}</p>
+              <h3 className="text-xl font-semibold text-slate-800 mb-4 text-center">{feature.title}</h3>
+              <p className="text-slate-700 text-center">{feature.description}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* Demo Section */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-slate-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -210,38 +210,38 @@ const Home: React.FC = () => {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-700 mb-6">See FluxDevs ERP in Action</h2>
-              <p className="text-gray-700 mb-6">
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-6">See FluxDevs ERP in Action</h2>
+              <p className="text-slate-700 mb-6">
                 Our interactive demo showcases how FluxDevs ERP can transform your manufacturing operations. From real-time production monitoring to advanced financial analytics, experience the power of integrated manufacturing management.
               </p>
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-gray-700">Live production tracking and analytics</span>
+                  <span className="text-slate-700">Live production tracking and analytics</span>
                 </li>
                 <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-gray-700">Inventory optimization tools</span>
+                  <span className="text-slate-700">Inventory optimization tools</span>
                 </li>
                 <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-gray-700">Financial forecasting and reporting</span>
+                  <span className="text-slate-700">Financial forecasting and reporting</span>
                 </li>
                 <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-gray-700">Role-based customizable dashboards</span>
+                  <span className="text-slate-700">Role-based customizable dashboards</span>
                 </li>
               </ul>
               <Button
-                className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-all"
+                className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-8 py-3 rounded-lg hover:from-indigo-500 hover:to-violet-500 transition-all"
                 onClick={() => navigate("/about")}
               >
                 View Full Feature Tour
@@ -254,37 +254,37 @@ const Home: React.FC = () => {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-700">
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
                 <div className="flex gap-2 mb-4">
                   <div className="w-3 h-3 rounded-full bg-red-400"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                   <div className="w-3 h-3 rounded-full bg-green-400"></div>
                 </div>
                 <div className="bg-gray-100 rounded-lg p-4 h-64 flex items-center justify-center">
-                  <img src="public\website.png" alt="macbook" />
+                  <img src="/website.png" alt="ERP preview" />
                 </div>
                 <div className="mt-4 text-center">
-                  <p className="text-gray-700">Interactive ERP Dashboard Preview</p>
+                  <p className="text-slate-700">Interactive ERP Dashboard Preview</p>
                 </div>
               </div>
               
               {/* Floating elements around the mockup */}
               <motion.div
-                className="absolute -top-4 -right-4 bg-blue-100 p-3 rounded-full shadow-md"
+                className="absolute -top-4 -right-4 bg-indigo-100 p-3 rounded-full shadow-md"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
               >
-                <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </motion.div>
               
               <motion.div
-                className="absolute -bottom-4 -left-4 bg-green-100 p-3 rounded-full shadow-md"
+                className="absolute -bottom-4 -left-4 bg-emerald-100 p-3 rounded-full shadow-md"
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </motion.div>
@@ -302,8 +302,8 @@ const Home: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-700 mb-4">Designed for Diverse Manufacturing Sectors</h2>
-          <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4">Designed for Diverse Manufacturing Sectors</h2>
+          <p className="text-lg text-slate-700 max-w-3xl mx-auto">
             FluxDevs ERP adapts to your specific industry needs with customizable modules and workflows.
           </p>
         </motion.div>
@@ -335,7 +335,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20">
+      <section className="bg-gradient-to-r from-indigo-600 to-violet-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -349,16 +349,16 @@ const Home: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
-                className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl"
-                onClick={() => navigate("/contact")}
+                className="bg-white text-indigo-700 px-8 py-3 rounded-lg text-lg hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl"
+                onClick={() => navigate("/pricing")}
               >
-                Schedule a Demo
+                View Pricing
               </Button>
               <Button
-                className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg text-lg hover:bg-white hover:text-blue-600 transition-all"
-                onClick={() => navigateToRole("ceo")}
+                className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg text-lg hover:bg-white hover:text-indigo-700 transition-all"
+                onClick={() => navigate("/contact")}
               >
-                Explore Demo Dashboard
+                Contact Us
               </Button>
             </div>
           </motion.div>

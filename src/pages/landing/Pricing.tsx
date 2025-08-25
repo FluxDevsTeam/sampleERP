@@ -1,20 +1,22 @@
 import React from "react";
 import Navbar from "./Navbar";
-import { Button } from "rsuite";
+// Removed unused rsuite Button to keep styling consistent
 import Footer from "./Footer";
+import { motion } from "framer-motion";
+import Button from "@/components/Button";
 
 const Pricing: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-900 transition-colors duration-300">
       <Navbar />
 
       <main className="max-w-6xl mx-auto py-20 px-6 sm:px-8 lg:px-12">
         {/* Header */}
         <header className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl text-gray-500 font-extrabold tracking-tight leading-tight">
-            Simple, Transparent <span className="text-indigo-600 dark:text-indigo-400">Pricing</span>
+          <h2 className="text-4xl md:text-5xl text-slate-800 font-extrabold tracking-tight leading-tight">
+            Simple, Transparent <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Pricing</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500  dark:text-gray-700 max-w-3xl mx-auto">
+          <p className="mt-4 text-lg text-slate-700 max-w-3xl mx-auto">
             Choose the plan that best fits your business needs. Unlock the full potential of FluxDevs ERP with flexible pricing designed for manufacturers.
           </p>
         </header>
@@ -67,27 +69,27 @@ const Pricing: React.FC = () => {
             <div
               key={index}
               className={`relative p-8 rounded-3xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${
-                plan.highlighted ? "border-2 border-indigo-600 dark:border-indigo-500 bg-white dark:bg-gray-700 scale-105" : "bg-white dark:bg-gray-700"
+                plan.highlighted ? "border-2 border-indigo-600 bg-white scale-105" : "bg-white border border-slate-100"
               }`}
             >
               {plan.highlighted && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-indigo-600 dark:bg-indigo-400 text-white text-sm font-semibold rounded-full shadow">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-indigo-600 text-white text-sm font-semibold rounded-full shadow">
                   Most Popular
                 </div>
               )}
-              <h3 className="text-2xl text-blue-300 font-semibold mb-2">{plan.name}</h3>
-              <p className="text-3xl text-gray-500 font-bold mb-4">
+              <h3 className="text-2xl text-indigo-700 font-semibold mb-2">{plan.name}</h3>
+              <p className="text-3xl text-slate-800 font-bold mb-4">
                 {plan.price}
                 {plan.price !== "Custom" && (
-                  <span className="text-base font-normal text-gray-700 dark:text-gray-700"> / month</span>
+                  <span className="text-base font-normal text-slate-600"> / month</span>
                 )}
               </p>
-              <p className="mb-6 text-gray-700 dark:text-gray-300">{plan.description}</p>
+              <p className="mb-6 text-slate-700">{plan.description}</p>
               <ul className="space-y-3 mb-8 text-sm">
                 {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-start text-gray-700 dark:text-gray-200">
+                  <li key={i} className="flex items-start text-slate-700">
                     <svg
-                      className="w-5 h-5 text-indigo-500 mr-2 mt-0.5"
+                      className="w-5 h-5 text-indigo-600 mr-2 mt-0.5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -98,23 +100,25 @@ const Pricing: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              <Button
-                href={plan.cta === "Request a Quote" ? "#quote" : "#contact"} className="block w-full text-center text-blue-300 py-3 rounded-lg font-medium transition-all duration-300 bg-blue-300">
+              <a
+                href={plan.cta === "Request a Quote" ? "#quote" : "#contact"}
+                className="block w-full text-center bg-gradient-to-r from-indigo-600 to-violet-600 text-white py-3 rounded-lg font-medium transition-all duration-300 hover:from-indigo-500 hover:to-violet-500"
+              >
                 {plan.cta}
-              </Button>
+              </a>
             </div>
           ))}
   </section>
 
         {/* CTA Section */}
         <section className="mt-20 text-center">
-          <h3 className="text-2xl text-gray-20 font-semibold mb-4">Not Sure Which Plan is Right for You?</h3>
-          <p className="text-gray-700 dark:text-gray-300 mb-6">
+          <h3 className="text-2xl text-slate-800 font-semibold mb-4">Not Sure Which Plan is Right for You?</h3>
+          <p className="text-slate-700 mb-6">
             Contact our team for a personalized demo or consultation to find the perfect fit.
           </p>
           <a
             href="#demo"
-            className="inline-block px-6 py-3 bg-indigo-500 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-300"
+            className="inline-block px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-medium rounded-lg hover:from-indigo-500 hover:to-violet-500 transition-colors duration-300"
           >
             Contact Us
           </a>
@@ -122,7 +126,7 @@ const Pricing: React.FC = () => {
 
         {/* FAQs */}
         <section className="mt-16">
-          <h3 className="text-xl font-semibold text-gray-700 text-center mb-6">Frequently Asked Questions</h3>
+          <h3 className="text-xl font-semibold text-slate-800 text-center mb-6">Frequently Asked Questions</h3>
           <div className="space-y-4 max-w-3xl mx-auto">
             {[
               {
@@ -140,28 +144,46 @@ const Pricing: React.FC = () => {
             ].map((faq, index) => (
               <details
                 key={index}
-                className="bg-white dark:bg-gray-700 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="bg-white rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-300 border border-slate-100"
               >
-                <summary className="font-medium cursor-pointer text-gray-500 dark:text-white">
+                <summary className="font-medium cursor-pointer text-slate-800">
                   {faq.question}
                 </summary>
-                <p className="mt-2 text-gray-700 dark:text-gray-300">{faq.answer}</p>
+                <p className="mt-2 text-slate-700">{faq.answer}</p>
               </details>
             ))}
           </div>
         </section>
       </main>
 
-      {/* Final CTA */}
-      <section className="bg-indigo-700 text-white py-12 px-4 text-center mt-16 rounded-3xl max-w-6xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Your Manufacturing?</h2>
-        <p className="mb-6 text-lg max-w-2xl mx-auto">Get started with FluxDevs ERP today and take your operations to the next level. Our team is here to help you every step of the way.</p>
-        <a
-          href="/contact"
-          className="inline-block px-8 py-4 bg-white text-indigo-700 font-semibold rounded-lg shadow hover:bg-indigo-100 transition-colors duration-300"
-        >
-          Book a Free Demo
-        </a>
+      <section className="py-24 bg-gradient-to-r from-indigo-600 to-violet-700 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl sm:text-5xl font-bold mb-6">Transform Your Manufacturing Today</h2>
+            <p className="text-xl mb-8 max-w-3xl mx-auto opacity-90">
+              Join manufacturers worldwide who have boosted efficiency, cut costs, and scaled operations with FluxDevs ERP.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                className="bg-white text-indigo-700 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-50 transition-all"
+                onClick={() => window.open("https://wa.me/message/IJCGAQKFVMKUB1", "_blank")}
+              >
+                Chat on WhatsApp
+              </Button>
+              <Button
+                className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-indigo-700 transition-all"
+                onClick={() => navigate("/about")}
+              >
+                Explore Features
+              </Button>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* Footer */}

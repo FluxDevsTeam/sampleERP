@@ -161,43 +161,12 @@ const roles = [
 ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <Navbar />
-
-      {/* Hero Section */}
-      {/* <section className="max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center"
-        >
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 mb-6">
-            Complete <span className="text-blue-600">Manufacturing ERP</span> Solution
-          </h1>
-            <p className="text-xl text-gray-700 mb-8 max-w-3xl mx-auto">
-            FluxDevs ERP is designed specifically for manufacturers who need to streamline operations, increase efficiency, and drive growth through integrated management of all aspects of their business.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              className="bg-blue-600 text-white text-lg px-8 py-3 rounded-lg hover:bg-blue-600 transition-all"
-              onClick={() => navigate("/contact")}
-            >
-              View Demo
-            </Button>
-            <Button
-              className="bg-white text-blue-600 border text-lg border-blue-600 px-8 py-3 rounded-lg hover:bg-blue-50 transition-all"
-              onClick={() => navigate("/")}
-            >
-              Back to Home
-            </Button>
-          </div>
-        </motion.div>
-      </section> */}
 
       {/* Role Demos (moved to top so visitors see available demos immediately) */}
       <section id="roles" className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 mt-4 md:mt-14 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -205,9 +174,9 @@ const roles = [
             viewport={{ once: true }}
             className="text-center mb-8"
           >
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 mb-6">Complete <span className="text-blue-600">Manufacturing ERP</span> Solution</h1>
-            <p className="text-lg text-gray-700 max-w-4xl mx-auto">
-              Explore interactive demos of the full ERP experience for each user role — no signup required. Click a role to open a live demo of that user's interface and try the product with pre-seeded demo data.
+            <h1 className="text-3xl sm:text-5xl font-bold text-slate-800 mb-6">Complete <span className="text-4xl sm:text-5xl bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Manufacturing ERP</span> <span className="text-2xl sm:text-5xl"> Solution </span></h1>
+            <p className="text-lg text-slate-700 max-w-4xl mx-auto">
+              Explore interactive demos of the full ERP experience for each user role. Click a role to open a live demo of that user's interface and try the product with demo data.
             </p>
           </motion.div>
 
@@ -219,21 +188,26 @@ const roles = [
                 onKeyDown={(e) => { if (e.key === 'Enter') handleRoleClick(role.title); }}
                 tabIndex={0}
                 role="button"
-                className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 cursor-pointer hover:shadow-xl transition-all"
+                aria-label={`Open ${role.title} demo`}
+                className="relative group bg-white p-8 rounded-xl shadow-lg border border-slate-100 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-indigo-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                 initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.08 }}
                 viewport={{ once: true }}
               >
+                <span className="absolute top-4 right-4 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-1 rounded-md transition">Click to open</span>
                 <div className="flex items-center mb-6">
                   <span className="text-4xl mr-4">{role.icon}</span>
-                  <h3 className="text-2xl font-semibold text-blue-700">{role.title}</h3>
+                  <h3 className="text-2xl font-semibold text-indigo-700">{role.title}</h3>
+                  <svg className="ml-auto w-5 h-5 text-indigo-500 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transform group-hover:translate-x-1 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </div>
-                <p className="text-gray-700 mb-6">{role.description}</p>
+                <p className="text-slate-700 mb-6">{role.description}</p>
                 <div className="grid grid-cols-2 gap-3">
                   {role.features.map((feature, i) => (
-                    <div key={i} className="flex items-center text-sm text-gray-700">
-                      <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div key={i} className="flex items-center text-sm text-slate-700">
+                      <svg className="w-4 h-4 text-indigo-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       {feature}
@@ -247,7 +221,7 @@ const roles = [
       </section>
 
       {/* Features Overview */}
-      <section className="bg-gray-100 py-16">
+      <section className="bg-slate-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -256,8 +230,8 @@ const roles = [
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-700 mb-4">Comprehensive Manufacturing Management</h2>
-            <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4">Comprehensive Manufacturing Management</h2>
+            <p className="text-lg text-slate-700 max-w-3xl mx-auto">
               Our ERP system integrates all aspects of your manufacturing business into a single, powerful platform.
             </p>
           </motion.div>
@@ -266,7 +240,7 @@ const roles = [
             {features.map((feature, index) => (
               <motion.div
                 key={index}
-                className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all border border-slate-100"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
@@ -276,12 +250,12 @@ const roles = [
                 <div className="flex justify-center mb-6">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-4 text-center">{feature.title}</h3>
-                <p className="text-gray-700 mb-6 text-center">{feature.description}</p>
+                <h3 className="text-xl font-semibold text-slate-800 mb-4 text-center">{feature.title}</h3>
+                <p className="text-slate-700 mb-6 text-center">{feature.description}</p>
                 <ul className="space-y-2">
                   {feature.details.map((detail, i) => (
-                    <li key={i} className="flex items-center text-sm text-gray-700">
-                      <svg className="w-4 h-4 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <li key={i} className="flex items-center text-sm text-slate-700">
+                      <svg className="w-4 h-4 text-emerald-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       {detail}
@@ -297,7 +271,7 @@ const roles = [
   {/* Role demos moved above */}
 
       {/* Technology Stack */}
-      <section className="bg-gray-100 py-16">
+      <section className="bg-slate-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -306,7 +280,7 @@ const roles = [
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-blue-300 mb-4">Built on Modern Technology</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-indigo-600 mb-4">Built on Modern Technology</h2>
             <p className="text-lg text-gray-700 max-w-3xl mx-auto">
               Our ERP leverages the latest technologies to ensure reliability, security, and performance.
             </p>
@@ -317,47 +291,47 @@ const roles = [
                 { name: "React", icon: "⚛️", description: "Modern frontend framework for dynamic UIs" },
                 { name: "Next.js", icon: "⚡", description: "React framework for server-side rendering and static sites" },
                 { name: "TypeScript", icon: "📝", description: "Type-safe JavaScript for robust development" },
-                { name: "Redux", icon: "🔄", description: "Predictable state management for complex applications" },
-                { name: "Tailwind CSS", icon: "🎨", description: "Utility-first CSS for responsive, customizable UIs" },
-                { name: "Apollo Client", icon: "🚀", description: "GraphQL client for efficient data fetching" },
-                { name: "SWR", icon: "🔄", description: "React hooks for optimized data fetching and caching" },
-                { name: "Framer Motion", icon: "🎥", description: "Smooth animations for interactive dashboards" },
-                { name: "Vite", icon: "⚡", description: "Fast build tool for optimized frontend performance" },
+                // { name: "Redux", icon: "🔄", description: "Predictable state management for complex applications" },
+                // { name: "Tailwind CSS", icon: "🎨", description: "Utility-first CSS for responsive, customizable UIs" },
+                // { name: "Apollo Client", icon: "🚀", description: "GraphQL client for efficient data fetching" },
+                // { name: "SWR", icon: "🔄", description: "React hooks for optimized data fetching and caching" },
+                // { name: "Framer Motion", icon: "🎥", description: "Smooth animations for interactive dashboards" },
+                // { name: "Vite", icon: "⚡", description: "Fast build tool for optimized frontend performance" },
                 // Backend Technologies
-                { name: "Node.js", icon: "🟢", description: "Scalable backend runtime for efficient APIs" },
+                // { name: "Node.js", icon: "🟢", description: "Scalable backend runtime for efficient APIs" },
                 { name: "Python", icon: "🐍", description: "Versatile language for backend logic and automation" },
                 { name: "Django", icon: "🌐", description: "High-level Python framework for rapid development" },
-                { name: "Flask", icon: "🧪", description: "Lightweight Python framework for flexible APIs" },
+                // { name: "Flask", icon: "🧪", description: "Lightweight Python framework for flexible APIs" },
                 { name: "Celery", icon: "🥕", description: "Distributed task queue for background processing" },
                 { name: "REST API", icon: "🔗", description: "Standardized API for seamless integrations" },
-                { name: "GraphQL", icon: "📊", description: "Efficient query language for flexible APIs" },
-                { name: "gRPC", icon: "🔄", description: "High-performance RPC for low-latency microservices" },
+                // { name: "GraphQL", icon: "📊", description: "Efficient query language for flexible APIs" },
+                // { name: "gRPC", icon: "🔄", description: "High-performance RPC for low-latency microservices" },
                 { name: "Kubernetes", icon: "🛳️", description: "Container orchestration for scalable deployments" },
-                { name: "Apache Kafka", icon: "📡", description: "Real-time data streaming for transaction logs" },
+                // { name: "Apache Kafka", icon: "📡", description: "Real-time data streaming for transaction logs" },
                 { name: "RabbitMQ", icon: "🐰", description: "Message broker for asynchronous task processing" },
                 // Database & Infrastructure
                 { name: "PostgreSQL", icon: "🐘", description: "Robust relational database for data integrity" },
                 { name: "MySQL", icon: "🐬", description: "Reliable database for high-performance queries" },
-                { name: "MongoDB", icon: "🍃", description: "NoSQL database for flexible data models" },
+                // { name: "MongoDB", icon: "🍃", description: "NoSQL database for flexible data models" },
                 { name: "Redis", icon: "🔴", description: "High-performance caching for fast data access" },
                 { name: "Elasticsearch", icon: "🔍", description: "Search and analytics for inventory and logs" },
                 { name: "AWS", icon: "☁️", description: "Scalable cloud infrastructure for deployment" },
                 { name: "Docker", icon: "🐳", description: "Containerization for consistent environments" },
-                { name: "Prometheus", icon: "📈", description: "Monitoring and alerting for system performance" },
+                // { name: "Prometheus", icon: "📈", description: "Monitoring and alerting for system performance" },
                 // Other
                 { name: "C++", icon: "⚙️", description: "High-performance language for critical components" },
             ].map((tech, index) => (
               <motion.div
                 key={index}
-                className="bg-white p-6 rounded-lg text-center shadow-md hover:shadow-lg transition-shadow"
+                className="bg-white p-6 rounded-lg text-center shadow-md hover:shadow-lg transition-shadow border border-slate-100"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
                 <div className="text-3xl mb-3">{tech.icon}</div>
-                <div className="font-semibold text-gray-700 mb-2">{tech.name}</div>
-                <div className="text-sm text-gray-700">{tech.description}</div>
+                <div className="font-semibold text-slate-800 mb-2">{tech.name}</div>
+                <div className="text-sm text-slate-700">{tech.description}</div>
               </motion.div>
             ))}
           </div>
@@ -365,7 +339,7 @@ const roles = [
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+      <section className="py-20 bg-gradient-to-r from-indigo-600 to-violet-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -379,7 +353,7 @@ const roles = [
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
-                className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition-all"
+                className="bg-white text-indigo-700 px-8 py-3 rounded-lg text-lg hover:bg-indigo-50 transition-all"
                 onClick={() => navigate("/contact")}
               >
                 Contact Us

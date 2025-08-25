@@ -12,7 +12,7 @@ const Contact: React.FC = () => {
   const iconSize = 24;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <Navbar />
 
       {/* Hero Section */}
@@ -22,14 +22,14 @@ const Contact: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-indigo-900 mb-6">
-            Connect with <span className="text-indigo-600">FluxDevs ERP</span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 mb-6">
+            Connect with <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">FluxDevs ERP</span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-700 mb-10 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-slate-700 mb-10 max-w-3xl mx-auto">
             Ready to revolutionize your manufacturing operations? Reach out to our team to schedule a personalized demo and see how FluxDevs ERP can boost efficiency and growth.
           </p>
           <Button
-            className="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-all shadow-lg hover:shadow-xl"
+            className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-indigo-500 hover:to-violet-500 transition-all shadow-lg hover:shadow-xl"
             onClick={() => window.open("https://wa.me/2349164097582", "_blank")}
           >
             Chat on WhatsApp
@@ -45,10 +45,10 @@ const Contact: React.FC = () => {
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="bg-white p-8 rounded-2xl shadow-xl"
+            className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100"
           >
-            <h2 className="text-3xl font-bold text-indigo-900 mb-6">Contact Us</h2>
-            <p className="text-gray-700 mb-6">
+            <h2 className="text-3xl font-bold text-slate-900 mb-6">Contact Us</h2>
+            <p className="text-slate-700 mb-6">
               We’re here to help! Our Customer Service Team is available 8am - 5pm, seven days a week.
             </p>
             <div className="space-y-8">
@@ -59,9 +59,9 @@ const Contact: React.FC = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg text-indigo-900">Phone Support</h3>
-                  <p className="text-gray-700">+234 916 409 7582</p>
-                  <p className="text-sm text-gray-500">Talk to a Customer Service Representative for help with our site, app, or finding our products.</p>
+                  <h3 className="font-semibold text-lg text-slate-900">Phone Support</h3>
+                  <p className="text-slate-700">+234 916 409 7582</p>
+                  <p className="text-sm text-slate-500">Talk to a Customer Service Representative for help with our site, app, or finding our products.</p>
                 </div>
               </div>
 
@@ -72,9 +72,9 @@ const Contact: React.FC = () => {
                 </div>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg text-indigo-900">WhatsApp Business</h3>
-                  <p className="text-gray-700">+234 916 409 7582</p>
-                  <p className="text-sm text-gray-500">8am - 5pm, seven days a week</p>
+                  <h3 className="font-semibold text-lg text-slate-900">WhatsApp Business</h3>
+                  <p className="text-slate-700">+234 916 409 7582</p>
+                  <p className="text-sm text-slate-500">8am - 5pm, seven days a week</p>
                 </div>
               </div>
 
@@ -85,11 +85,11 @@ const Contact: React.FC = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg text-indigo-900">Email Us</h3>
-                  <p className="text-gray-700">
+                  <h3 className="font-semibold text-lg text-slate-900">Email Us</h3>
+                  <p className="text-slate-700">
                     <a href="mailto:fluxdevs.company@gmail.com" className="hover:text-indigo-600">fluxdevs.company@gmail.com</a>
                   </p>
-                  <p className="text-sm text-gray-500">Response within 12 hours</p>
+                  <p className="text-sm text-slate-500">Response within 12 hours</p>
                 </div>
               </div>
 
@@ -101,14 +101,14 @@ const Contact: React.FC = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg text-indigo-900">Office Location</h3>
-                  <p className="text-gray-700">Lagos State, Nigeria</p>
+                  <h3 className="font-semibold text-lg text-slate-900">Office Location</h3>
+                  <p className="text-slate-700">Lagos State, Nigeria</p>
                 </div>
               </div>
 
               {/* Social Media Links */}
               <div>
-                <h3 className="font-semibold text-lg text-indigo-900 mb-4">Connect with Us</h3>
+                <h3 className="font-semibold text-lg text-slate-900 mb-4">Connect with Us</h3>
                 <div className="flex gap-4">
                   <Link
                     to="https://www.instagram.com/fluxdevs"
@@ -275,7 +275,7 @@ const Contact: React.FC = () => {
       </section>
 
       {/* Final CTA */}
-      <section className="py-24 bg-gradient-to-r from-indigo-600 to-blue-700 text-white">
+      <section className="py-24 bg-gradient-to-r from-indigo-600 to-violet-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -289,13 +289,13 @@ const Contact: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
-                className="bg-white text-indigo-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-all"
+                className="bg-white text-indigo-700 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-50 transition-all"
                 onClick={() => window.open("https://wa.me/message/IJCGAQKFVMKUB1", "_blank")}
               >
                 Chat on WhatsApp
               </Button>
               <Button
-                className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-indigo-600 transition-all"
+                className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-indigo-700 transition-all"
                 onClick={() => navigate("/")}
               >
                 Explore Features
