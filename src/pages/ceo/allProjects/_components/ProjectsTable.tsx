@@ -531,7 +531,7 @@ const ProjectsTable = () => {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-row">
- Caves             <div className="flex gap-2">
+            <div className="flex gap-2">
               <input
                 type="text"
                 placeholder="Search projects..."
