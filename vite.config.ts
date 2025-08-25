@@ -12,9 +12,9 @@ export default defineConfig({
         enabled: true, // Enables PWA features during development
       },
       manifest: {
-        name: 'Kids Design Company ERP', // Full name of your app
-        short_name: 'FactoryERP', // Short name for the app
-        description: 'An ERP for Kids Design Company factory',
+        name: 'Fluxdevs ERP', // Full name of your app
+        short_name: 'FluxdevsERP', // Short name for the app
+        description: 'An ERP for FluxdevsERP',
         theme_color: '#000000', // Theme color for the app (changed to black for contrast)
         background_color: '#ffffff', // Background color for the splash screen (kept white)
         display: 'fullscreen', 
@@ -22,17 +22,17 @@ export default defineConfig({
         start_url: '/', // URL to open when the app is launched
         icons: [
           {
-            src: '/favicon_io/logo_design.png',
+            src: '/fluxdevs.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: '/favicon_io/logo_design.png',
+            src: '/fluxdevs.png',
             sizes: '512x512',
             type: 'image/png',
           },
           {
-            src: '/favicon_io/logo_design.png',
+            src: '/fluxdevs.png',
             sizes: '1080x1080',
             type: 'image/png',
           },
