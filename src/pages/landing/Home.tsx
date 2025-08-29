@@ -72,33 +72,31 @@ const Home: React.FC = () => {
     },
   ];
 
-  // stats removed (unused in landing page)
-
   return (
-    <div className="bg-gradient-to-b from-slate-50 to-white overflow-x-hidden pt-10">
+    <div className="bg-gradient-to-b from-slate-50 to-[whitesmoke] overflow-x-hidden pt-10">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="flex items-start md:items-center overflow-hidden py-10 md:pt-24">
+      <section className="flex justify-center items-center overflow-hidden min-h-screen">
         {/* Flowing pastel gradient background */}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="absolute -top-28 -left-24 w-[85vw] h-[85vw] md:w-[60vw] md:h-[60vw] rounded-full blur-3xl opacity-30"
+            className="absolute -top-10 -left-10 w-[120vw] h-[120vw] md:-top-28 md:-left-24 md:w-[60vw] md:h-[60vw] rounded-full blur-3xl opacity-30"
             style={{ background: "radial-gradient(circle at 30% 30%, #93c5fd, transparent 10%)" }}
           />
           <motion.div
             animate={{ y: [0, -16, 0], x: [0, 8, 0] }}
             transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -bottom-36 -right-24 w-[85vw] h-[85vw] md:w-[60vw] md:h-[60vw] rounded-full blur-3xl opacity-30"
+            className="absolute -bottom-10 -right-10 w-[120vw] h-[120vw] md:-bottom-36 md:-right-24 md:w-[60vw] md:h-[60vw] rounded-full blur-3xl opacity-30"
             style={{ background: "radial-gradient(circle at 70% 70%, #bfdbfe, transparent 40%)" }}
           />
           <motion.div
             animate={{ y: [0, 14, 0], x: [0, -6, 0] }}
             transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[65vw] h-[65vw] md:w-[45vw] md:h-[45vw] rounded-full blur-3xl opacity-25"
+            className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[100vw] h-[100vw] md:w-[45vw] md:h-[45vw] rounded-full blur-3xl opacity-25"
             style={{ background: "radial-gradient(circle at 50% 50%, #e0f2fe, transparent 45%)" }}
           />
           {/* Subtle grid overlay */}
@@ -114,13 +112,13 @@ const Home: React.FC = () => {
           </div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center flex flex-col justify-center items-center h-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-slate-800 mb-3 sm:mb-6 leading-snug md:leading-tight tracking-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-800 mb-3 sm:mb-6 leading-snug md:leading-tight tracking-tight">
               Revolutionize Your <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Manufacturing Operations</span> With Intelligent ERP
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-slate-700 mb-5 sm:mb-8 max-w-3xl mx-auto">
@@ -144,28 +142,8 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      {/* <section className="bg-blue-600 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                className="text-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2 }}
-              >
-                <div className="text-3xl md:text-4xl font-bold mb-2">{stat.value}</div>
-                <div className="text-sm md:text-base opacity-90">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section> */}
-
       {/* Features Section */}
-      <section className="max-w-7xl mx-auto md:py-16 px-4 sm:px-6 lg:px-8">
+      <section className="max-w-7xl mx-auto py-8 md:py-16 px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -183,7 +161,7 @@ const Home: React.FC = () => {
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              className="p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all border border-slate-100"
+              className="p-6 md:p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all border border-slate-100"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
@@ -201,7 +179,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Demo Section */}
-      <section className="bg-slate-50 py-16">
+      <section className="bg-slate-50 py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -261,7 +239,7 @@ const Home: React.FC = () => {
                   <div className="w-3 h-3 rounded-full bg-green-400"></div>
                 </div>
                 <div className="bg-gray-100 rounded-lg p-4 h-64 flex items-center justify-center">
-                  <img src="/website.png" alt="ERP preview" />
+                  <img src="/website.png" alt="ERP preview" className="w-full h-auto object-contain" />
                 </div>
                 <div className="mt-4 text-center">
                   <p className="text-slate-700">Interactive ERP Dashboard Preview</p>
@@ -294,7 +272,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Industries Section */}
-      <section className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+      <section className="max-w-7xl mx-auto py-12 md:py-16 px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -308,34 +286,99 @@ const Home: React.FC = () => {
           </p>
         </motion.div>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {[
-            { name: "Automotive", icon: "🚗", color: "bg-red-100 text-red-800" },
-            { name: "Electronics", icon: "📱", color: "bg-blue-100 text-blue-800" },
-            { name: "Textiles", icon: "👕", color: "bg-indigo-100 text-indigo-800" },
-            { name: "Food & Beverage", icon: "🍔", color: "bg-amber-100 text-amber-800" },
-            { name: "Furniture", icon: "🪑", color: "bg-emerald-100 text-emerald-800" },
-            { name: "Chemicals", icon: "🧪", color: "bg-purple-100 text-purple-800" },
-            { name: "Plastics", icon: "🧴", color: "bg-cyan-100 text-cyan-800" },
-            { name: "Metalworking", icon: "⚙️", color: "bg-gray-100 text-gray-700" },
+            { 
+              name: "Automotive", 
+              icon: "🚗", 
+              color: "from-red-900/80 to-red-700/80",
+              image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            },
+            { 
+              name: "Electronics", 
+              icon: "📱", 
+              color: "from-blue-900/80 to-blue-700/80",
+              image: "https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            },
+            { 
+              name: "Textiles", 
+              icon: "👕", 
+              color: "from-indigo-900/80 to-indigo-700/80",
+              image: "https://images.unsplash.com/photo-1520367445093-50dc08a59d9d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            },
+            { 
+              name: "Food", 
+              icon: "🍔", 
+              color: "from-amber-900/80 to-amber-700/80",
+              image: "https://th.bing.com/th/id/OIP.paZokRr6HFdXZQoIAKmDjgHaEK?w=311&h=180&c=7&r=0&o=7&pid=1.7&rm=3"
+            },
+            { 
+              name: "Furniture", 
+              icon: "🪑", 
+              color: "from-emerald-900/80 to-emerald-700/80",
+              image: "https://th.bing.com/th/id/OIP.uYMCcvZSf4GPZVBN2BM2mwHaFj?w=204&h=180&c=7&r=0&o=7&pid=1.7&rm=3"
+            },
+            { 
+              name: "Chemicals", 
+              icon: "🧪", 
+              color: "from-purple-900/80 to-purple-700/80",
+              image: "https://images.unsplash.com/photo-1581094271901-8022df4466f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            },
+            { 
+              name: "Plastics", 
+              icon: "🧴", 
+              color: "from-cyan-900/80 to-cyan-700/80",
+              image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            },
+            { 
+              name: `Metal
+              Working`, 
+              icon: "⚙️", 
+              color: "from-gray-900/80 to-gray-700/80",
+              image: "https://www.bing.com/th/id/OIP.zWrqZ1p0Dxhf73J-qO_5DwHaE7?w=295&h=211&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2"
+            },
           ].map((industry, index) => (
             <motion.div
               key={index}
-              className={`p-4 rounded-lg text-center ${industry.color} shadow-md hover:shadow-lg transition-shadow`}
-              initial={{ opacity: 0, scale: 0.9 }}
+              className="relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 h-48 group"
+              initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+              transition={{ delay: index * 0.1, duration: 0.3 }}
               viewport={{ once: true }}
             >
-              <div className="text-2xl mb-2">{industry.icon}</div>
-              <div className="font-medium">{industry.name}</div>
+              <div 
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                style={{ backgroundImage: `url(${industry.image})` }}
+              />
+              {/* <div className="absolute inset-0 bg-black/60"></div> */}
+              <div className="relative h-full flex flex-col items-center justify-center py-4 text-white overflow-hidden">
+                {/* <div className="text-4xl mb-2 drop-shadow-lg transform group-hover:scale-110 transition-transform">
+                  {industry.icon}
+                </div> */}
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <div 
+                    className="text-center"
+                    style={{
+                      WebkitTextFillColor: 'transparent',
+                      WebkitTextStroke: '1px whitesmoke',
+                      textShadow: '0 0 5px rgba(255,255,255,0.5)',
+                      fontSize: '3rem',
+                      lineHeight: '1',
+                      fontWeight: 'bold',
+                      whiteSpace: 'pre-line'
+                    }}>
+                    {industry.name}
+                  </div>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-indigo-600 to-violet-700 text-white py-20">
+      <section className="bg-gradient-to-r from-indigo-600 to-violet-700 text-white py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

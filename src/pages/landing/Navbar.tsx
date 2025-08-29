@@ -19,17 +19,17 @@ const Navbar: React.FC = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <div className="backdrop-blur-md bg-white/80 border-b border-indigo-100/60">
-      <div className="max-w-7xl mx-auto px-2 sm:px-2 py-3 flex items-center justify-between">
-        <Button onClick={() => navigate("/")}className="flex items-center gap-3 group">
+      <div className="backdrop-blur-lg bg-white/80 border-b border-indigo-100/60">
+      <div className="max-w-7xl mx-auto px-4 sm:px-2 py-6 flex items-center justify-between">
+        <Button onClick={() => navigate("/")}className="flex items-center gap-x-2 group">
           <motion.img
             src="/fluxdevs.png"
             alt="FluxDevs Logo"
-            className="md:w-14 w-10 h-auto object-contain group-hover:scale-105 transition-transform duration-200"
+            className="md:w-14 w-8 h-auto object-contain group-hover:scale-105 transition-transform duration-200"
             whileHover={{ scale: 1.1 }}
           />
-          <span className="md:text-2xl text-xl font-semibold text-indigo-700 group-hover:text-indigo-600 transition-colors tracking-tight">
-            Fluxdevs ERP
+          <span className="md:text-2xl text-lg font-bold text-indigo-700 group-hover:text-indigo-600 transition-colors tracking-tight">
+            <span className="max-md:hidden">Fluxdevs</span> ERP
           </span>
         </Button>
 
@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
           onClick={toggleMenu}
           aria-label="Toggle menu"
         >
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
           </svg>
         </button>

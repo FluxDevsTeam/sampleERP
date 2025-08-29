@@ -18,6 +18,23 @@
   :root {
     --radius: 0.5rem; /* Matches tailwind.config.js */
   }
+
+  /* Marquee Animation */
+  .marquee-track {
+    /* display: flex; */
+    /* width: max-content; */
+    /* animation: marquee 40s linear infinite; */
+    /* will-change: transform; */
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 /* General styles */
@@ -27,7 +44,7 @@ height: 100vh;
 background-color: white; /* Use Tailwind utilities, matches manifest background_color */
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent body scrolling */
+  /* overflow: hidden; Prevent body scrolling */
   box-sizing: border-box;
 }
 
