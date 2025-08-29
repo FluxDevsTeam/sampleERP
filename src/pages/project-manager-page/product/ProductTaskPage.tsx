@@ -47,4 +47,4 @@ const ProductTaskPage: React.FC = () => {
   );
 };
 
-export default ProductTaskPage; 
+export default ProductTaskPage;
