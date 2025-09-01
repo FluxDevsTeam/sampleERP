@@ -1,184 +1,165 @@
-// Navbar.tsx
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Button from "@/components/Button";
+import "./styles.css";
+import { Menu, X } from "lucide-react";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  const navItems = [
+    { path: "/", label: "Home" },
+    { path: "/about", label: "Features" },
+    { path: "/pricing", label: "Pricing" },
+    { path: "/contact", label: "Contact" },
+  ];
+
   return (
-    <motion.header
-      className="fixed top-0 left-0 right-0 z-50 transition-transform duration-300"
-      initial={{ y: 0 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className="backdrop-blur-lg bg-white/80 border-b border-indigo-100/60">
-      <div className="max-w-7xl mx-auto px-4 sm:px-2 py-6 flex items-center justify-between">
-        <Button onClick={() => navigate("/")}className="flex items-center gap-x-2 group">
-          <motion.img
-            src="/fluxdevs.png"
-            alt="FluxDevs Logo"
-            className="md:w-14 w-8 h-auto object-contain group-hover:scale-105 transition-transform duration-200"
-            whileHover={{ scale: 1.1 }}
-          />
-          <span className="md:text-2xl text-lg font-bold text-indigo-700 group-hover:text-indigo-600 transition-colors tracking-tight">
-            <span className="max-md:hidden">Fluxdevs</span> ERP
-          </span>
-        </Button>
+    <header className="fixed top-0 left-0 right-0 z-50">
+      <div className="backdrop-blur-xl bg-background/80 border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          
+          {/* Desktop Navbar */}
+          <div className="hidden md:grid grid-cols-3 items-center">
+            {/* Logo (left) */}
+            <div className="flex justify-start">
+              <Button
+                onClick={() => navigate("/")}
+                variant="ghost"
+                className="flex items-center gap-3 hover:bg-transparent p-0"
+              >
+                <img
+                  src="/fluxdevs.png"
+                  alt="FluxDevs Logo"
+                  className="w-10 h-auto object-contain"
+                />
+                <span className="text-lg font-bold text-white bg-clip-text text-transparent">
+                  Fluxdevs ERP
+                </span>
+              </Button>
+            </div>
 
-        <nav className="hidden md:flex items-center gap-6">
-          <Button
-            onClick={() => navigate("/")}
-            className={`text-[15px] font-semibold relative px-2 py-1 rounded-md ${
-              location.pathname === "/" ? "text-indigo-700" : "text-slate-600 hover:text-indigo-700"
-            } transition-colors`}
-          >
-            Home
-            {location.pathname === "/" && (
-              <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-indigo-600"></span>
-            )}
-          </Button>
-          <Button
-            onClick={() => navigate("/about")}
-            className={`text-[15px] font-semibold relative px-2 py-1 rounded-md ${
-              location.pathname === "/about" ? "text-indigo-700" : "text-slate-600 hover:text-indigo-700"
-            } transition-colors`}
-          >
-            Features
-            {location.pathname === "/about" && (
-              <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-indigo-600"></span>
-            )}
-          </Button>
-          <Button
-            onClick={() => navigate("/pricing")}
-            className={`text-[15px] font-semibold relative px-2 py-1 rounded-md ${
-              location.pathname === "/pricing" ? "text-indigo-700" : "text-slate-600 hover:text-indigo-700"
-            } transition-colors`}
-          >
-            Pricing
-            {location.pathname === "/pricing" && (
-              <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-indigo-600"></span>
-            )}
-          </Button>
-          <Button
-            onClick={() => navigate("/contact")}
-            className={`text-[15px] font-semibold relative px-2 py-1 rounded-md ${
-              location.pathname === "/contact" ? "text-indigo-700" : "text-slate-600 hover:text-indigo-700"
-            } transition-colors`}
-          >
-            Contact
-            {location.pathname === "/contact" && (
-              <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-indigo-600"></span>
-            )}
-          </Button>
-          <Button
-            className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md hover:from-indigo-500 hover:to-violet-500 transition-all"
-            onClick={() => navigate("/about")}
-          >
-            View Demo
-          </Button>
-        </nav>
+            {/* Nav (center) */}
+            <nav className="flex justify-center items-center space-x-8">
+              {navItems.map((item) => (
+                <Button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  variant="ghost"
+                  size="sm"
+                  className={`relative ${
+                    location.pathname === item.path
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {item.label}
+                  {location.pathname === item.path && (
+                    <motion.div
+                      layoutId="navbar-indicator"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-primary rounded-full"
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                </Button>
+              ))}
+            </nav>
 
-        <button
-          className="md:hidden text-indigo-600 hover:text-indigo-500 focus:outline-none"
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-        >
-          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-          </svg>
-        </button>
-      </div>
+            {/* View Demo (right) */}
+            <div className="flex justify-end">
+              <Button
+                variant="hero"
+                className="px-5 py-2 bg-gradient-to-r from-[#06069b] to-[#0d6bf8]"
+                onClick={() => navigate("/about")}
+              >
+                View Demo
+              </Button>
+            </div>
+          </div>
+
+          {/* Mobile Navbar */}
+          <div className="flex md:hidden items-center justify-between">
+            {/* Logo */}
+            <Button
+              onClick={() => navigate("/")}
+              variant="ghost"
+              className="flex items-center gap-1 hover:bg-transparent p-0"
+            >
+              <img
+                src="/fluxdevs.png"
+                alt="FluxDevs Logo"
+                className="w-8 h-auto object-contain"
+              />
+              <span className="text-sm font-bold text-white bg-clip-text text-transparent">
+                Fluxdevs ERP
+              </span>
+            </Button>
+
+            {/* Hamburger */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleMenu}
+            >
+              {isMenuOpen ? (
+                <X className="w-6 h-6 text-foreground" />
+              ) : (
+                <Menu className="w-6 h-6 text-foreground" />
+              )}
+            </Button>
+          </div>
+
+        </div>
       </div>
 
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-white/90 backdrop-blur-md border-t border-indigo-100"
+          <div className="md:hidden bg-background/95 text-white backdrop-blur-xl border-b border-border"
           >
-            <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col gap-4">
-              <Button
-                onClick={() => {
-                  navigate("/");
-                  setIsMenuOpen(false);
-                }}
-                className={`text-base font-semibold relative ${
-                  location.pathname === "/" ? "text-indigo-700" : "text-slate-700 hover:text-indigo-700"
-                } transition-colors`}
+            <div className="max-w-7xl mx-auto px-4 py-6 space-y-4">
+              {navItems.map((item, index) => (
+                <div
+                >
+                  <Button
+                    onClick={() => {
+                      navigate(item.path);
+                      setIsMenuOpen(false);
+                    }}
+                    variant="ghost"
+                    className={`w-full justify-start ${
+                      location.pathname === item.path
+                        ? "text-primary bg-muted"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {item.label}
+                  </Button>
+                </div>
+              ))}
+              <div
               >
-                Home
-                {location.pathname === "/" && (
-                  <span className="absolute left-0 bottom-[-4px] w-full h-0.5 bg-indigo-600"></span>
-                )}
-              </Button>
-              <Button
-                onClick={() => {
-                  navigate("/about");
-                  setIsMenuOpen(false);
-                }}
-                className={`text-base font-semibold relative ${
-                  location.pathname === "/about" ? "text-indigo-700" : "text-slate-700 hover:text-indigo-700"
-                } transition-colors`}
-              >
-                Features
-                {location.pathname === "/about" && (
-                  <span className="absolute left-0 bottom-[-4px] w-full h-0.5 bg-indigo-600"></span>
-                )}
-              </Button>
-              <Button
-                onClick={() => {
-                  navigate("/contact");
-                  setIsMenuOpen(false);
-                }}
-                className={`text-base font-semibold relative ${
-                  location.pathname === "/contact" ? "text-indigo-700" : "text-slate-700 hover:text-indigo-700"
-                } transition-colors`}
-              >
-                Contact
-                {location.pathname === "/contact" && (
-                  <span className="absolute left-0 bottom-[-4px] w-full h-0.5 bg-indigo-600"></span>
-                )}
-              </Button>
-              <Button
-                onClick={() => {
-                  navigate("/pricing");
-                  setIsMenuOpen(false);
-                }}
-                className={`text-base font-semibold relative ${
-                  location.pathname === "/pricing" ? "text-indigo-700" : "text-slate-700 hover:text-indigo-700"
-                } transition-colors`}
-              >
-                Pricing
-                {location.pathname === "/pricing" && (
-                  <span className="absolute left-0 bottom-[-4px] w-full h-0.5 bg-indigo-600"></span>
-                )}
-              </Button>
-              <Button
-                className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md hover:from-indigo-500 hover:to-violet-500 transition-all"
-                onClick={() => {
-                  navigate("/about");
-                  setIsMenuOpen(false);
-                }}
-              >
-                View Demo
-              </Button>
+                <Button
+                  variant="hero"
+                  className="w-full px-4 py-2 bg-gradient-to-r from-[#06069b] to-[#0d6bf8]"
+                  onClick={() => {
+                    navigate("/about");
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  View Demo
+                </Button>
+              </div>
             </div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   );
 };
 

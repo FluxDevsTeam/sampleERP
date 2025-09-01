@@ -1,10 +1,9 @@
-// Home.tsx
 import React from "react";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import Button from "../../components/Button";
-import { motion } from "framer-motion";
+import Button from "./Button";
+import "./styles.css";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -20,8 +19,8 @@ const Home: React.FC = () => {
       title: "Real-Time Production Monitoring",
       description: "Track every stage of manufacturing with live dashboards showing production status, bottlenecks, and efficiency metrics across all departments.",
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        <svg className="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm1-13h-2v6l5.25 3.15.75-1.23-4.5-2.67V7z" />
         </svg>
       ),
     },
@@ -29,8 +28,8 @@ const Home: React.FC = () => {
       title: "Advanced Inventory Management",
       description: "Optimize stock levels with predictive analytics, automated reordering, and real-time tracking of raw materials and finished goods.",
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+        <svg className="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20 6h-4V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zM10 4h4v2h-4V4zm10 14H4V8h16v10z" />
         </svg>
       ),
     },
@@ -38,8 +37,8 @@ const Home: React.FC = () => {
       title: "Comprehensive Financial Analytics",
       description: "Gain deep insights into costs, profitability, and cash flow with advanced reporting tools and customizable financial dashboards.",
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg className="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3 14h-2v-2h2v2zm0-4h-2V7h2v5zm-5 4H8v-2h2v2zm0-4H8V7h2v5z" />
         </svg>
       ),
     },
@@ -47,8 +46,8 @@ const Home: React.FC = () => {
       title: "Workforce Optimization",
       description: "Manage contractors, salary workers, and production teams with integrated scheduling, performance tracking, and payroll management.",
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        <svg className="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
         </svg>
       ),
     },
@@ -56,8 +55,8 @@ const Home: React.FC = () => {
       title: "Quality Control Integration",
       description: "Implement robust quality assurance processes with automated inspections, defect tracking, and compliance management systems.",
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        <svg className="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
         </svg>
       ),
     },
@@ -65,346 +64,416 @@ const Home: React.FC = () => {
       title: "Supply Chain Coordination",
       description: "Streamline procurement, vendor management, and logistics with end-to-end visibility across your entire supply chain network.",
       icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        <svg className="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20 8h-3V4H3v10h4v2H3v4h14v-4h-4v-2h4V8zm-9 8H9v-2h2v2zm4 0h-2v-2h2v2zM7 8H5v-2h2v2zm4 0H9v-2h2v2zm4 0h-2v-2h2v2z" />
         </svg>
       ),
     },
   ];
 
+  const industries = [
+    {
+      name: "Aerospace & Defense",
+      icon: (
+        <svg className="w-12 h-12 text-primary group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M21 16.5v-2.3l-7-2.4 7-2.4V7.3L12 10.1V3h-2v7.1L3 7.3v2.3l7 2.4-7 2.4v2.3l9-3.1v7.2h2v-7.2l9 3.1z" />
+        </svg>
+      ),
+      color: "from-blue-600 to-blue-800",
+      benefit: "Precision manufacturing and regulatory compliance",
+    },
+    {
+      name: "Automotive",
+      icon: (
+        <svg className="w-12 h-12 text-primary group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M18.92 5.01C18.72 4.42 18.16 4 17.5 4h-11C5.84 4 5.29 4.42 5.08 5.01L3 11v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 10l1.5-4.5h11L19 10H5z" />
+        </svg>
+      ),
+      color: "from-red-500 to-red-700",
+      benefit: "Streamlined supply chains and mass production",
+    },
+    {
+      name: "Electronics & High-Tech",
+      icon: (
+        <svg className="w-12 h-12 text-primary group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-1 14H5V8h14v10zm-3-1h-2v-2h2v2zm-4 0h-2v-2h2v2zm-4 0H6v-2h2v2z" />
+        </svg>
+      ),
+      color: "from-blue-500 to-blue-600",
+      benefit: "Rapid innovation and inventory tracking",
+    },
+    {
+      name: "Pharmaceuticals",
+      icon: (
+        <svg className="w-12 h-12 text-primary group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 14h-2v-3h-3v-2h3v-3h2v3h3v2h-3v3z" />
+        </svg>
+      ),
+      color: "from-green-500 to-green-700",
+      benefit: "Regulatory compliance and batch tracking",
+    },
+    {
+      name: "Food & Beverage",
+      icon: (
+        <svg className="w-12 h-12 text-primary group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+        </svg>
+      ),
+      color: "from-orange-500 to-orange-600",
+      benefit: "Safety compliance and inventory management",
+    },
+    {
+      name: "Industrial Machinery",
+      icon: (
+        <svg className="w-12 h-12 text-primary group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20 6h-4V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zm-6 10h-4v-4h4v4z" />
+        </svg>
+      ),
+      color: "from-gray-500 to-gray-700",
+      benefit: "Complex assembly and maintenance tracking",
+    },
+    {
+      name: "Chemicals",
+      icon: (
+        <svg className="w-12 h-12 text-primary group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 14H7v-2h10v2zm0-4H7v-2h10v2z" />
+        </svg>
+      ),
+      color: "from-indigo-500 to-indigo-600",
+      benefit: "Material tracking and safety compliance",
+    },
+    {
+      name: "Medical Devices",
+      icon: (
+        <svg className="w-12 h-12 text-primary group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20 6h-4V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2zM10 4h4v2h-4V4zm10 14H4V8h16v10zM9 16h2v-2h2v-2h-2v-2H9v2H7v2h2v2z" />
+        </svg>
+      ),
+      color: "from-teal-500 to-teal-700",
+      benefit: "Precision manufacturing and quality control",
+    },
+  ];
+
   return (
-    <div className="bg-gradient-to-b from-slate-50 to-[whitesmoke] overflow-x-hidden pt-10">
+    <div className="min-h-screen bg-gradient-hero text-foreground">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="flex justify-center items-center overflow-hidden min-h-screen">
-        {/* Flowing pastel gradient background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="absolute -top-10 -left-10 w-[120vw] h-[120vw] md:-top-28 md:-left-24 md:w-[60vw] md:h-[60vw] rounded-full blur-3xl opacity-30"
-            style={{ background: "radial-gradient(circle at 30% 30%, #93c5fd, transparent 10%)" }}
-          />
-          <motion.div
-            animate={{ y: [0, -16, 0], x: [0, 8, 0] }}
-            transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -bottom-10 -right-10 w-[120vw] h-[120vw] md:-bottom-36 md:-right-24 md:w-[60vw] md:h-[60vw] rounded-full blur-3xl opacity-30"
-            style={{ background: "radial-gradient(circle at 70% 70%, #bfdbfe, transparent 40%)" }}
-          />
-          <motion.div
-            animate={{ y: [0, 14, 0], x: [0, -6, 0] }}
-            transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[100vw] h-[100vw] md:w-[45vw] md:h-[45vw] rounded-full blur-3xl opacity-25"
-            style={{ background: "radial-gradient(circle at 50% 50%, #e0f2fe, transparent 45%)" }}
-          />
-          {/* Subtle grid overlay */}
-          <div className="absolute inset-0 opacity-10">
-            <svg className="w-full h-full" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-                  <path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.2"/>
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#grid)" />
+{/* Hero Section */}
+<section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+<div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10">
+
+  {/* Progress Bar */}
+  <svg
+    className="absolute w-24 h-8 opacity-10"
+    style={{ top: "15%", left: "12%" }}
+    viewBox="0 0 100 20"
+    fill="none"
+    stroke="currentColor"
+  >
+    <rect x="0" y="6" width="100" height="8" rx="4" strokeWidth="2" strokeOpacity="0.5" />
+    <rect x="0" y="6" width="70" height="8" rx="4" fill="currentColor" fillOpacity="0.3" />
+  </svg>
+
+  {/* Mini Dashboard (cards with KPIs) */}
+  <svg
+    className="absolute w-28 h-20 opacity-10"
+    style={{ bottom: "15%", right: "18%" }}
+    viewBox="0 0 120 80"
+    fill="none"
+    stroke="currentColor"
+  >
+    <rect x="5" y="5" width="40" height="25" rx="3" strokeWidth="2" strokeOpacity="0.5" />
+    <rect x="55" y="5" width="60" height="25" rx="3" strokeWidth="2" strokeOpacity="0.5" />
+    <rect x="5" y="45" width="110" height="25" rx="3" strokeWidth="2" strokeOpacity="0.5" />
+  </svg>
+
+  {/* Gantt Chart */}
+  <svg
+    className="absolute w-32 h-20 opacity-10"
+    style={{ top: "65%", left: "18%" }}
+    viewBox="0 0 140 80"
+    fill="none"
+    stroke="currentColor"
+  >
+    <rect x="10" y="10" width="100" height="10" rx="2" strokeWidth="2" strokeOpacity="0.5" />
+    <rect x="25" y="30" width="80" height="10" rx="2" strokeWidth="2" strokeOpacity="0.5" />
+    <rect x="40" y="50" width="70" height="10" rx="2" strokeWidth="2" strokeOpacity="0.5" />
+  </svg>
+
+  {/* Pie / KPI Chart */}
+  <svg
+    className="absolute w-16 h-16 opacity-10"
+    style={{ top: "28%", right: "22%" }}
+    viewBox="0 0 36 36"
+    fill="none"
+    stroke="currentColor"
+  >
+    <circle cx="18" cy="18" r="15.9155" strokeWidth="2" strokeOpacity="0.5" />
+    <path
+      d="M18 2.0845
+         a 15.9155 15.9155 0 0 1 0 31.831
+         a 15.9155 15.9155 0 0 1 0 -31.831"
+      fill="currentColor"
+      fillOpacity="0.3"
+    />
+  </svg>
+
+  {/* Task / Checklist */}
+  <svg
+    className="absolute w-14 h-14 opacity-10"
+    style={{ bottom: "25%", left: "25%" }}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+  >
+    <circle cx="12" cy="12" r="9" strokeWidth="2" strokeOpacity="0.5" />
+    <path
+      d="M9 12l2 2 4-4"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeOpacity="0.5"
+    />
+  </svg>
+
+  {/* Bar Chart */}
+  <svg
+    className="absolute w-20 h-16 opacity-10"
+    style={{ top: "20%", right: "10%" }}
+    viewBox="0 0 50 50"
+    fill="currentColor"
+  >
+    <rect x="5" y="30" width="6" height="15" rx="1" fillOpacity="0.3" />
+    <rect x="17" y="20" width="6" height="25" rx="1" fillOpacity="0.3" />
+    <rect x="29" y="10" width="6" height="35" rx="1" fillOpacity="0.3" />
+    <rect x="41" y="25" width="6" height="20" rx="1" fillOpacity="0.3" />
+  </svg>
+
+</div>
+
+  <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+    <div className="text-center">
+      <div className="space-y-8">
+        <div className="space-y-5">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
+            <span className="block">Revolutionize Your</span>
+            <span className="block bg-gradient-to-r py-1 from-[#06069b] to-[#0d6bf8]  bg-clip-text text-transparent">
+              Manufacturing
+            </span>
+            <span className="block">Operations</span>
+          </h1>
+
+          <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+            Fluxdevs ERP is the complete manufacturing management solution that integrates production, inventory, finance, and workforce management into one powerful platform.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center items-center">
+          <Button
+            variant="footer"
+            size="lg"
+            onClick={() => navigate("/about")}
+            className="px-6 py-4 bg-gradient-footer text-lg"
+          >
+            View Live Demo
+            <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => navigate("/pricing")}
+            className="px-6 py-3 text-lg"
+          >
+            View Pricing
+          </Button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{/* Demo Section */}
+<section className="pb-12 md:pb-10">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      
+      {/* Image First */}
+      <div className="relative">
+        <div className="p-6 rounded-xl shadow-lg border border-slate-200 bg-white/5">
+          {/* Fake window controls */}
+          <div className="flex gap-2 mb-4">
+            <div className="w-3 h-3 rounded-full bg-red-400"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+            <div className="w-3 h-3 rounded-full bg-green-400"></div>
+          </div>
+
+          {/* Image wrapper */}
+          <div className="rounded-lg w-full  flex items-center justify-center">
+            <img
+              src="/erp-dashboard.png"
+              alt="ERP preview"
+              className="object-contain rounded-md"
+            />
+          </div>
+
+          <div className="mt-4 text-center">
+            <p className="text-white text-sm sm:text-base">
+              Interactive ERP Dashboard Preview
+            </p>
           </div>
         </div>
+      </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center flex flex-col justify-center items-center h-full">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-800 mb-3 sm:mb-6 leading-snug md:leading-tight tracking-tight">
-              Revolutionize Your <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">Manufacturing Operations</span> With Intelligent ERP
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl text-slate-700 mb-5 sm:mb-8 max-w-3xl mx-auto">
-              FluxDevs ERP is the complete manufacturing management solution that integrates production, inventory, finance, and workforce management into one powerful platform designed for growth-focused manufacturers.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-4 justify-center">
-              <Button
-                className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg hover:from-indigo-500 hover:to-violet-500 transition-all shadow-md sm:shadow-lg hover:shadow-lg sm:hover:shadow-xl"
-                onClick={() => { navigate("/about"); window.scrollTo({top:0,behavior:'smooth'}); }}
+      {/* Text Section */}
+      <div>
+        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+          See Fluxdevs ERP in Action
+        </h2>
+        <p className="text-white mb-6 text-base sm:text-lg">
+          Our interactive demo showcases how Fluxdevs ERP can transform your
+          manufacturing operations. From real-time production monitoring to
+          advanced financial analytics, experience the power of integrated
+          manufacturing management.
+        </p>
+
+        <ul className="space-y-3 mb-8">
+          {[
+            "Live production tracking and analytics",
+            "Inventory optimization tools",
+            "Financial forecasting and reporting",
+            "Role-based customizable dashboards",
+          ].map((item, idx) => (
+            <li key={idx} className="flex items-center">
+              <svg
+                className="w-5 h-5 text-emerald-500 mr-3 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                Checkout Demo
-              </Button>
-              <Button
-                className="w-full sm:w-auto bg-white text-indigo-700 border border-indigo-200 px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg hover:bg-indigo-50 transition-all shadow-md sm:shadow-lg hover:shadow-lg sm:hover:shadow-xl"
-                onClick={() => { navigate("/pricing"); window.scrollTo({top:0,behavior:'smooth'}); }}
-              >
-                View Pricing
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              <span className="text-white">{item}</span>
+            </li>
+          ))}
+        </ul>
+
+        <Button
+          className="text-white px-8 py-3 rounded-lg bg-gradient-footer transition-all"
+          onClick={() => {
+            navigate("/about");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
+          View Full Feature Tour
+        </Button>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Features Section */}
-      <section className="max-w-7xl mx-auto py-8 md:py-16 px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4">Powerful Features for Modern Manufacturing</h2>
-          <p className="text-lg text-slate-700 max-w-3xl mx-auto">
-            Our comprehensive ERP solution is designed to address every aspect of your manufacturing business with precision and efficiency.
-          </p>
-        </motion.div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              className="p-6 md:p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all border border-slate-100"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -5 }}
-            >
-              <div className="flex justify-center mb-6">
-                {feature.icon}
-              </div>
-              <h3 className="text-xl font-semibold text-slate-800 mb-4 text-center">{feature.title}</h3>
-              <p className="text-slate-700 text-center">{feature.description}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Demo Section */}
-      <section className="bg-slate-50 py-12 md:py-16">
+      <section className="md:py-24 py-10 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-6">See FluxDevs ERP in Action</h2>
-              <p className="text-slate-700 mb-6">
-                Our interactive demo showcases how FluxDevs ERP can transform your manufacturing operations. From real-time production monitoring to advanced financial analytics, experience the power of integrated manufacturing management.
-              </p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-slate-700">Live production tracking and analytics</span>
-                </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-slate-700">Inventory optimization tools</span>
-                </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-slate-700">Financial forecasting and reporting</span>
-                </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-emerald-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-slate-700">Role-based customizable dashboards</span>
-                </li>
-              </ul>
-              <Button
-                className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-8 py-3 rounded-lg hover:from-indigo-500 hover:to-violet-500 transition-all"
-                onClick={() => { navigate("/about"); window.scrollTo({top:0,behavior:'smooth'}); }}
+          <div className="text-center mb-6 md:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Powerful Features for Modern Manufacturing
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Our comprehensive ERP solution addresses every aspect of your manufacturing business with precision and efficiency.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="bg-gradient-card p-8 rounded-2xl shadow-card hover:shadow-md transition-shadow duration-200 border border-border"
               >
-                View Full Feature Tour
-              </Button>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <div className="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                <div className="flex gap-2 mb-4">
-                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                <div className="flex items-center justify-center mb-6">
+                  {feature.icon}
                 </div>
-                <div className="bg-gray-100 rounded-lg p-4 h-64 flex items-center justify-center">
-                  <img src="/website.png" alt="ERP preview" className="w-full h-auto object-contain" />
-                </div>
-                <div className="mt-4 text-center">
-                  <p className="text-slate-700">Interactive ERP Dashboard Preview</p>
-                </div>
+                <h3 className="text-xl font-semibold mb-4">{feature.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
               </div>
-              
-              {/* Floating elements around the mockup */}
-              <motion.div
-                className="absolute -top-4 -right-4 bg-indigo-100 p-3 rounded-full shadow-md"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-              >
-                <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </motion.div>
-              
-              <motion.div
-                className="absolute -bottom-4 -left-4 bg-emerald-100 p-3 rounded-full shadow-md"
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </motion.div>
-            </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Industries Section */}
-      <section className="max-w-7xl mx-auto py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4">Designed for Diverse Manufacturing Sectors</h2>
-          <p className="text-lg text-slate-700 max-w-3xl mx-auto">
-            FluxDevs ERP adapts to your specific industry needs with customizable modules and workflows.
-          </p>
-        </motion.div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { 
-              name: "Automotive", 
-              icon: "🚗", 
-              color: "from-red-900/80 to-red-700/80",
-              image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-            },
-            { 
-              name: "Electronics", 
-              icon: "📱", 
-              color: "from-blue-900/80 to-blue-700/80",
-              image: "https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-            },
-            { 
-              name: "Textiles", 
-              icon: "👕", 
-              color: "from-indigo-900/80 to-indigo-700/80",
-              image: "https://images.unsplash.com/photo-1520367445093-50dc08a59d9d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-            },
-            { 
-              name: "Food", 
-              icon: "🍔", 
-              color: "from-amber-900/80 to-amber-700/80",
-              image: "https://th.bing.com/th/id/OIP.paZokRr6HFdXZQoIAKmDjgHaEK?w=311&h=180&c=7&r=0&o=7&pid=1.7&rm=3"
-            },
-            { 
-              name: "Furniture", 
-              icon: "🪑", 
-              color: "from-emerald-900/80 to-emerald-700/80",
-              image: "https://th.bing.com/th/id/OIP.uYMCcvZSf4GPZVBN2BM2mwHaFj?w=204&h=180&c=7&r=0&o=7&pid=1.7&rm=3"
-            },
-            { 
-              name: "Chemicals", 
-              icon: "🧪", 
-              color: "from-purple-900/80 to-purple-700/80",
-              image: "https://images.unsplash.com/photo-1581094271901-8022df4466f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-            },
-            { 
-              name: "Plastics", 
-              icon: "🧴", 
-              color: "from-cyan-900/80 to-cyan-700/80",
-              image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-            },
-            { 
-              name: `Metal
-              Working`, 
-              icon: "⚙️", 
-              color: "from-gray-900/80 to-gray-700/80",
-              image: "https://www.bing.com/th/id/OIP.zWrqZ1p0Dxhf73J-qO_5DwHaE7?w=295&h=211&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2"
-            },
-          ].map((industry, index) => (
-            <motion.div
-              key={index}
-              className="relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 h-48 group"
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              whileHover={{ y: -5 }}
-              transition={{ delay: index * 0.1, duration: 0.3 }}
-              viewport={{ once: true }}
-            >
-              <div 
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                style={{ backgroundImage: `url(${industry.image})` }}
-              />
-              {/* <div className="absolute inset-0 bg-black/60"></div> */}
-              <div className="relative h-full flex flex-col items-center justify-center py-4 text-white overflow-hidden">
-                {/* <div className="text-4xl mb-2 drop-shadow-lg transform group-hover:scale-110 transition-transform">
-                  {industry.icon}
-                </div> */}
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <div 
-                    className="text-center"
-                    style={{
-                      WebkitTextFillColor: 'transparent',
-                      WebkitTextStroke: '1px whitesmoke',
-                      textShadow: '0 0 5px rgba(255,255,255,0.5)',
-                      fontSize: '3rem',
-                      lineHeight: '1',
-                      fontWeight: 'bold',
-                      whiteSpace: 'pre-line'
-                    }}>
+      {/* <sec/tion className="py-24 bg-background"> */}
+        {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Tailored for Your Manufacturing Sector
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Fluxdevs ERP delivers customized solutions to meet the unique challenges of diverse manufacturing industries.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {industries.map((industry, index) => (
+              <div
+                key={index}
+                className={`relative group bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-border bg-gradient-to-br ${industry.color}/10 hover:${industry.color}/20 transform hover:-translate-y-1`}
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="mb-4 transform group-hover:scale-110 transition-transform duration-200">
+                    {industry.icon}
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground group-hover:text-primary">
                     {industry.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-2">{industry.benefit}</p>
+                </div>
+
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                  <div className="bg-gray-900/80 text-white text-sm rounded-lg p-4 max-w-xs shadow-lg">
+                    {industry.benefit} with Fluxdevs ERP’s advanced tools for {industry.name.toLowerCase()}.
                   </div>
                 </div>
               </div>
-            </motion.div>
-          ))}
+            ))}
+          </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-indigo-600 to-violet-700 text-white py-16 md:py-20">
+      <section className="md:py-24 py-12  text-primary-foreground">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Transform Your Manufacturing Operations?</h2>
-            <p className="text-xl mb-8 max-w-3xl mx-auto opacity-90">
-              Join hundreds of manufacturers who have increased efficiency, reduced costs, and scaled their businesses with FluxDevs ERP.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                className="bg-white text-indigo-700 px-8 py-3 rounded-lg text-lg hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl"
-                onClick={() => { navigate("/pricing"); window.scrollTo({top:0,behavior:'smooth'}); }}
-              >
-                View Pricing
-              </Button>
-              <Button
-                className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg text-lg hover:bg-white hover:text-indigo-700 transition-all"
-                onClick={() => { navigate("/contact"); window.scrollTo({top:0,behavior:'smooth'}); }}
-              >
-                Contact Us
-              </Button>
-            </div>
-          </motion.div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            Ready to Transform Your Manufacturing Operations?
+          </h2>
+          <p className="text-xl mb-8 max-w-3xl mx-auto opacity-90">
+            Join hundreds of manufacturers who have increased efficiency, reduced costs, and scaled their businesses with Fluxdevs ERP.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              variant="hero"
+              size="lg"
+              onClick={() => navigate("/pricing")}
+              className="px-6 py-3 text-lg bg-gradient-footer text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+            >
+              View Pricing
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate("/contact")}
+              className="px-6 py-3 text-lg border-primary-foreground text-primary-foreground hover:gradient-footer hover:text-primary"
+            >
+              Contact Sales
+            </Button>
+          </div>
         </div>
       </section>
 
