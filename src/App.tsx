@@ -27,10 +27,10 @@ import EditExpense from "./pages/admin/expenses/_pages/EditExpense";
 
 import "react-toastify/dist/ReactToastify.css";
 
-import Home from "./pages/landing/Home";
-import About from "./pages/landing/About";
-import Contact from "./pages/landing/Contact";
-import Pricing from "./pages/landing/Pricing";
+import Home from "./pages/landing/home";
+import About from "./pages/landing/about";
+import Contact from "./pages/landing/contact";
+import Pricing from "./pages/landing/pricing";
 
 import {
   FactoryManagerSharedLayout,
@@ -97,27 +97,19 @@ import Product from "./pages/product/product.tsx";
 import EditRecordRemovedItem from "./pages/store-keeper-page/record rm added/record rm added components/EditRecordAddedItem.tsx";
 
 import AccountantDashboard from "./pages/accountant/AccountantDashboard";
+import RootLayout from "./RootLayout";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
-  },
-  {
-    path: "/about",
-    element: <About />,
-  },
-  {
-    path: "/contact",
-    element: <Contact />,
-  },
-  {
-    path: "/pricing",
-    element: <Pricing />,
-  },
-  {
-    path: "*",
-    element: <NotFoundPage />,
+    element: <RootLayout />, // Use RootLayout as the root
+    children: [
+      { index: true, element: <Home /> },
+      { path: "about", element: <About /> },
+      { path: "contact", element: <Contact /> },
+      { path: "pricing", element: <Pricing /> },
+      { path: "*", element: <NotFoundPage /> },
+    ],
   },
 
   // CEO ROUTES

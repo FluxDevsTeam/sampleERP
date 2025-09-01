@@ -18,7 +18,7 @@ const Footer: React.FC = () => {
         <div>
           <div className="flex justify-start mb-2 md:mb-4">
               <Button
-                onClick={() => navigate("/")}
+                onClick={() => { navigate("/"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
                 variant="ghost"
                 className="flex items-center gap-3 hover:bg-transparent p-0"
               >

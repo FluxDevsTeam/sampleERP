@@ -289,7 +289,7 @@ const Contact: React.FC = () => {
               <Button
                 variant="outline"
                 size="lg"
-                onClick={() => navigate("/about")}
+                onClick={() => { navigate("/about"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
                 className="px-8 py-4 text-lg border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
               >
                 Explore Features

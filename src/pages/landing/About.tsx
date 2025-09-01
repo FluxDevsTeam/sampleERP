@@ -27,6 +27,8 @@ const About: React.FC = () => {
       localStorage.setItem("showReturnPopup", "true");
     } catch (e) {}
     navigate(meta.path);
+    window.scrollTo(0,0);
+    document.getElementById('root')?.scrollTo(0,0);
   };
 
   const features = [
@@ -176,11 +178,7 @@ const roles = [
       {/* Hero Section */}
       <section className="pt-28 md:pb-16 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
+          <div>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Complete <span className="bg-gradient-to-r py-1 from-[#06069b] to-[#0d6bf8]  bg-clip-text text-transparent">Manufacturing ERP</span> Solution
             </h1>
@@ -300,7 +298,7 @@ const roles = [
           <Button
             variant="footer"
             size="lg"
-            onClick={() => navigate("/contact")}
+            onClick={() => { navigate("/contact"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
             className="px-8 py-4 text-lg bg-gradient-footer text-white hover:bg-primary-foreground/90"
           >
             Contact Us Today

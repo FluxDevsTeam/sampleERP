@@ -88,9 +88,9 @@ const Pricing: React.FC = () => {
     <div className="min-h-screen bg-gradient-hero text-foreground">
       <Navbar />
 
-      <main className="max-w-6xl mx-auto pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+      <main className="max-w-6xl mx-auto pt-28 pb-16 px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <header className="text-center mb-16">
+        <header className="text-center mb-20">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
             Simple, Transparent{" "}
             <span className="bg-gradient-to-r py-1 from-[#06069b] to-[#0d6bf8]  bg-clip-text text-transparent">
@@ -98,7 +98,7 @@ const Pricing: React.FC = () => {
             </span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Choose the plan that best fits your business needs. Unlock the full potential of Fluxdevs ERP with flexible pricing designed for manufacturers.
+            Choose the plan that best fits your business needs. Unlock the full potential with flexible pricing designed for manufacturers.
           </p>
         </header>
 
@@ -144,7 +144,7 @@ const Pricing: React.FC = () => {
               <Button
                 variant={plan.highlighted ? "primary" : "outline"}
                 className="w-full"
-                onClick={() => navigate("/contact")}
+                onClick={() => { navigate("/contact"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
               >
                 {plan.cta}
               </Button>
@@ -159,9 +159,9 @@ const Pricing: React.FC = () => {
             Contact our team for a personalized demo or consultation to find the perfect fit.
           </p>
           <Button
-            variant="hero"
-            onClick={() => navigate("/contact")}
-            className="px-8 py-3"
+            variant="primary"
+            onClick={() => { navigate("/contact"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
+            className="px-8 py-3 bg-gradient-footer"
           >
             Contact Us
           </Button>
@@ -226,7 +226,7 @@ const Pricing: React.FC = () => {
               <Button
                 variant="outline"
                 size="lg"
-                onClick={() => navigate("/about")}
+                onClick={() => { navigate("/about"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
                 className="px-8 py-4 text-lg border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
               >
                 Explore Features

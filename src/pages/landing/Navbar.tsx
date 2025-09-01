@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
             {/* Logo (left) */}
             <div className="flex justify-start">
               <Button
-                onClick={() => navigate("/")}
+                onClick={() => { navigate("/"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
                 variant="ghost"
                 className="flex items-center gap-3 hover:bg-transparent p-0"
               >
@@ -49,7 +49,7 @@ const Navbar: React.FC = () => {
               {navItems.map((item) => (
                 <Button
                   key={item.path}
-                  onClick={() => navigate(item.path)}
+                  onClick={() => { navigate(item.path); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
                   variant="ghost"
                   size="sm"
                   className={`relative ${
@@ -75,7 +75,7 @@ const Navbar: React.FC = () => {
               <Button
                 variant="hero"
                 className="px-5 py-2 bg-gradient-to-r from-[#06069b] to-[#0d6bf8]"
-                onClick={() => navigate("/about")}
+                onClick={() => { navigate("/about"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
               >
                 View Demo
               </Button>
@@ -86,7 +86,7 @@ const Navbar: React.FC = () => {
           <div className="flex md:hidden items-center justify-between">
             {/* Logo */}
             <Button
-              onClick={() => navigate("/")}
+              onClick={() => { navigate("/"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
               variant="ghost"
               className="flex items-center gap-1 hover:bg-transparent p-0"
             >
@@ -129,6 +129,8 @@ const Navbar: React.FC = () => {
                   <Button
                     onClick={() => {
                       navigate(item.path);
+                      window.scrollTo(0,0);
+                      document.getElementById('root')?.scrollTo(0,0);
                       setIsMenuOpen(false);
                     }}
                     variant="ghost"
@@ -149,6 +151,8 @@ const Navbar: React.FC = () => {
                   className="w-full px-4 py-2 bg-gradient-to-r from-[#06069b] to-[#0d6bf8]"
                   onClick={() => {
                     navigate("/about");
+                    window.scrollTo(0,0);
+                    document.getElementById('root')?.scrollTo(0,0);
                     setIsMenuOpen(false);
                   }}
                 >

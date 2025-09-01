@@ -12,6 +12,8 @@ const Home: React.FC = () => {
     localStorage.setItem("showReturnPopup", "true");
     localStorage.setItem("user_role", role);
     navigate(`/${role}/dashboard`);
+    window.scrollTo(0,0);
+    document.getElementById('root')?.scrollTo(0,0);
   };
 
   const features = [
@@ -272,7 +274,7 @@ const Home: React.FC = () => {
           <Button
             variant="footer"
             size="lg"
-            onClick={() => navigate("/about")}
+            onClick={() => { navigate("/about"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
             className="px-6 py-4 bg-gradient-footer text-lg"
           >
             View Live Demo
@@ -283,7 +285,7 @@ const Home: React.FC = () => {
           <Button
             variant="outline"
             size="lg"
-            onClick={() => navigate("/pricing")}
+            onClick={() => { navigate("/pricing"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
             className="px-6 py-3 text-lg"
           >
             View Pricing
@@ -368,7 +370,8 @@ const Home: React.FC = () => {
           className="text-white px-8 py-3 rounded-lg bg-gradient-footer transition-all"
           onClick={() => {
             navigate("/about");
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            window.scrollTo(0,0);
+            document.getElementById('root')?.scrollTo(0,0);
           }}
         >
           View Full Feature Tour
@@ -460,7 +463,7 @@ const Home: React.FC = () => {
             <Button
               variant="hero"
               size="lg"
-              onClick={() => navigate("/pricing")}
+              onClick={() => { navigate("/pricing"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
               className="px-6 py-3 text-lg bg-gradient-footer text-primary-foreground hover:bg-primary-foreground hover:text-primary"
             >
               View Pricing
@@ -468,7 +471,7 @@ const Home: React.FC = () => {
             <Button
               variant="outline"
               size="lg"
-              onClick={() => navigate("/contact")}
+              onClick={() => { navigate("/contact"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
               className="px-6 py-3 text-lg border-primary-foreground text-primary-foreground hover:gradient-footer hover:text-primary"
             >
               Contact Sales
