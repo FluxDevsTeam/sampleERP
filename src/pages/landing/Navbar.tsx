@@ -88,14 +88,14 @@ const Navbar: React.FC = () => {
             <Button
               onClick={() => { navigate("/"); window.scrollTo(0,0); document.getElementById('root')?.scrollTo(0,0); }}
               variant="ghost"
-              className="flex items-center gap-1 hover:bg-transparent p-0"
+              className="flex items-center gap-1 hover:bg-transparent p-1"
             >
               <img
                 src="/fluxdevs.png"
                 alt="FluxDevs Logo"
-                className="w-8 h-auto object-contain"
+                className="w-10 h-auto object-contain"
               />
-              <span className="text-sm font-bold text-white bg-clip-text text-transparent">
+              <span className="text-base font-bold text-white bg-clip-text text-transparent">
                 Fluxdevs ERP
               </span>
             </Button>

@@ -76,7 +76,7 @@ const FloatingActions: React.FC = () => {
           onClick={() => {
             try { localStorage.removeItem("showReturnPopup"); localStorage.removeItem("user_role"); } catch(e){}
             setShowReturnPopup(false);
-            window.location.href = "/";
+            window.location.href = "/about";
           }}
           className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-lg hover:bg-blue-700 transition-all"
         >

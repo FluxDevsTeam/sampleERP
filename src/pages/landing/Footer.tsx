@@ -37,30 +37,52 @@ const Footer: React.FC = () => {
             Advanced manufacturing ERP solution designed to increase efficiency and drive growth for modern manufacturers.
           </p>
         </div>
+        <div className="md:hidden grid grid-cols-2">
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Solutions</h3>
+            <ul className="space-y-2">
+              <li><Link to="/about" className="text-indigo-100/90 hover:text-white cursor-pointer transition">Production Management</Link></li>
+              <li><Link to="/about" className="text-indigo-100/90 hover:text-white cursor-pointer transition">Inventory Control</Link></li>
+              <li><Link to="/about" className="text-indigo-100/90 hover:text-white cursor-pointer transition">Financial Analytics</Link></li>
+              <li><Link to="/about" className="text-indigo-100/90 hover:text-white cursor-pointer transition">Quality Assurance</Link></li>
+            </ul>
+          </div>
 
-        <div>
-          <h3 className="text-xl font-semibold text-white mb-4">Solutions</h3>
-          <ul className="space-y-2">
-            <li><Link to="/about" className="text-indigo-100/90 hover:text-white cursor-pointer transition">Production Management</Link></li>
-            <li><Link to="/about" className="text-indigo-100/90 hover:text-white cursor-pointer transition">Inventory Control</Link></li>
-            <li><Link to="/about" className="text-indigo-100/90 hover:text-white cursor-pointer transition">Financial Analytics</Link></li>
-            <li><Link to="/about" className="text-indigo-100/90 hover:text-white cursor-pointer transition">Quality Assurance</Link></li>
-          </ul>
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-4">Company</h3>
+            <ul className="space-y-2">
+              <li><Link to="/" className="text-indigo-100/90 hover:text-white transition">Home</Link></li>
+              <li><Link to="/about" className="text-indigo-100/90 hover:text-white transition">About</Link></li>
+              <li><Link to="/pricing" className="text-indigo-100/90 hover:text-white transition">Pricing</Link></li>
+              <li><Link to="/contact" className="text-indigo-100/90 hover:text-white transition">Contact</Link></li>
+              <li><a href="https://wa.me/2349164097582" className="text-indigo-100/90 hover:text-white transition">WhatsApp Support</a></li>
+            </ul>
+          </div>
         </div>
 
-        <div>
-          <h3 className="text-xl font-semibold text-white mb-4">Company</h3>
-          <ul className="space-y-2">
-            <li><Link to="/" className="text-indigo-100/90 hover:text-white transition">Home</Link></li>
-            <li><Link to="/about" className="text-indigo-100/90 hover:text-white transition">About</Link></li>
-            <li><Link to="/pricing" className="text-indigo-100/90 hover:text-white transition">Pricing</Link></li>
-            <li><Link to="/contact" className="text-indigo-100/90 hover:text-white transition">Contact</Link></li>
-            <li><a href="https://wa.me/2349164097582" className="text-indigo-100/90 hover:text-white transition">WhatsApp Support</a></li>
-          </ul>
-        </div>
+        <div className="max-sm:hidden">
+            <h3 className="text-lg font-semibold text-white mb-4">Solutions</h3>
+            <ul className="space-y-2">
+              <li><Link to="/about" className="text-indigo-100/90 hover:text-white cursor-pointer transition">Production Management</Link></li>
+              <li><Link to="/about" className="text-indigo-100/90 hover:text-white cursor-pointer transition">Inventory Control</Link></li>
+              <li><Link to="/about" className="text-indigo-100/90 hover:text-white cursor-pointer transition">Financial Analytics</Link></li>
+              <li><Link to="/about" className="text-indigo-100/90 hover:text-white cursor-pointer transition">Quality Assurance</Link></li>
+            </ul>
+          </div>
+
+          <div className="max-sm:hidden">
+            <h3 className="text-lg font-semibold text-white mb-4">Company</h3>
+            <ul className="space-y-2">
+              <li><Link to="/" className="text-indigo-100/90 hover:text-white transition">Home</Link></li>
+              <li><Link to="/about" className="text-indigo-100/90 hover:text-white transition">About</Link></li>
+              <li><Link to="/pricing" className="text-indigo-100/90 hover:text-white transition">Pricing</Link></li>
+              <li><Link to="/contact" className="text-indigo-100/90 hover:text-white transition">Contact</Link></li>
+              <li><a href="https://wa.me/2349164097582" className="text-indigo-100/90 hover:text-white transition">WhatsApp Support</a></li>
+            </ul>
+          </div>
 
         <div>
-          <h3 className="text-xl font-semibold text-white mb-4">Contact Us</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Contact Us</h3>
           <p className="text-indigo-100/90">
             Email:{" "}
             <a

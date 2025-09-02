@@ -90,8 +90,8 @@ const Pricing: React.FC = () => {
 
       <main className="max-w-6xl mx-auto pt-28 pb-16 px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <header className="text-center mb-20">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+        <header className="text-center mb-24">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
             Simple, Transparent{" "}
             <span className="bg-gradient-to-r py-1 from-[#06069b] to-[#0d6bf8]  bg-clip-text text-transparent">
               Pricing

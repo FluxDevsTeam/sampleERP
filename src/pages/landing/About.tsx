@@ -194,29 +194,38 @@ const roles = [
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {roles.map((role, index) => (
-              <div className="group bg-gradient-card p-8 rounded-2xl shadow-card hover:shadow-glow transition-all duration-300 border border-border cursor-pointer">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-4">
-                    {role.icon}
-                    <h3 className="text-lg font-semibold bg-gradient-to-r py-1 from-[#4c76d6] to-[#0d67ef] bg-clip-text text-transparent">
-                      {role.title}
-                    </h3>
-                  </div>
-                  <div className="text-xs font-medium text-white border border-white px-3 py-1 rounded-full">
-                    Open
-                  </div>
-                </div>
-                <p className="text-muted-foreground mb-6">{role.description}</p>
-                <div className="grid grid-cols-2 gap-3">
-                  {role.features.map((feature, i) => (
-                    <div key={i} className="flex items-center text-sm text-muted-foreground">
-                      <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
-                      {feature}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+  <div
+    key={index}
+    onClick={() => handleRoleClick(role.title)}
+    className="group bg-gradient-card p-8 rounded-2xl shadow-card hover:shadow-glow transition-all duration-300 border border-border cursor-pointer"
+  >
+    <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center gap-4">
+        {role.icon}
+        <h3 className="text-lg font-semibold bg-gradient-to-r py-1 from-[#4c76d6] to-[#0d67ef] bg-clip-text text-transparent">
+          {role.title}
+        </h3>
+      </div>
+<div
+  className="text-xs font-medium text-white border border-white px-3 py-1 rounded-full 
+             transition-all duration-200 group-hover:bg-blue-100 group-hover:text-black-900 "
+>
+  Open
+</div>
+
+    </div>
+    <p className="text-muted-foreground mb-6">{role.description}</p>
+    <div className="grid grid-cols-2 gap-3">
+      {role.features.map((feature, i) => (
+        <div key={i} className="flex items-center text-sm text-muted-foreground">
+          <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+          {feature}
+        </div>
+      ))}
+    </div>
+  </div>
+))}
+
           </div>
         </div>
       </section>

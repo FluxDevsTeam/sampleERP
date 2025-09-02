@@ -56,7 +56,7 @@ const Contact: React.FC = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-24 md:pt-28 pb-10 md:pb-16">
+      <section className="pt-28 pb-10 md:pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div
           >
